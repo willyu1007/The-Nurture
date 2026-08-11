@@ -1366,3 +1366,26 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   factory port. No compatibility type alias or ordinary internal route remains.
 - Replaced delimiter-joined exact-key comparison with length plus own-property
   checks, removing an ambiguous structural-validation idiom.
+
+## 2026-08-11 G4-E E7 production-owner source and quality closure
+
+- Implemented one exact `ik2` target option carrying the selected role
+  assignment under actor/workspace HMAC. Compact and domain payloads are
+  closed shapes; target and role owner output drift fails closed.
+- Implemented the Nurture current-authority owner and an AES-256-GCM protected,
+  HMAC-bound prepared-command ledger. Replay is bounded by the five-minute
+  confirmation TTL; expiry scrubs the frozen ciphertext and retains only
+  body-free hashes/audit identity.
+- Replaced four independently injectable module dependencies with one complete
+  formal-owner binding. Invalid external pins or a missing member restores the
+  immutable unavailable implementation.
+- The effectful answer uses stable `command_request_id` for retrieval,
+  generation and ledger identity. A new transport request ID after response
+  loss no longer changes the business digest.
+- Final answer and conflict presentation re-run the same Nurture authority
+  resolver and My-Chat principal-bound canonical PermissionContext check.
+  Revocation during generation therefore fails closed even for authority-only
+  sources.
+- No compatibility alias, old internal handler, route, flag, secret read,
+  gateway call, deployment or traffic path was added. The Prisma migration is
+  authored and remains `NOT_RUN_APPROVAL_PENDING`.

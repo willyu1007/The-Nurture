@@ -5,6 +5,8 @@ import {
   NurtureInstitutionKnowledgePreparedCommandOwner,
   NurtureInstitutionKnowledgeTargetOptionCodec,
   type NurtureInstitutionKnowledgeFormalAuthorityResolverV1,
+  type NurtureInstitutionKnowledgeFormalOwnerBindingV1,
+  type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1,
   type NurtureInstitutionKnowledgeOwnerIntegration,
   type NurtureInstitutionKnowledgePreparedCommandOwnerV1,
 } from "@the-nurture/scenario";
@@ -23,9 +25,7 @@ export type PrismaNurtureInstitutionKnowledgeFormalOwners = Readonly<{
 }>;
 
 export type PrismaNurtureInstitutionKnowledgeFormalModuleBinding = Readonly<{
-  institutionKnowledgeOwnerIntegration: NurtureInstitutionKnowledgeOwnerIntegration;
-  institutionKnowledgeAuthorityResolver: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
-  institutionKnowledgePreparedCommandOwner: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
+  institutionKnowledgeFormalOwnerBinding: NurtureInstitutionKnowledgeFormalOwnerBindingV1;
 }>;
 
 /**
@@ -88,6 +88,7 @@ export function createPrismaNurtureInstitutionKnowledgeFormalOwners(input: {
 export function bindPrismaNurtureInstitutionKnowledgeFormalOwners(input: {
   formalOwners: PrismaNurtureInstitutionKnowledgeFormalOwners;
   ownerIntegration: NurtureInstitutionKnowledgeOwnerIntegration;
+  authorizedRetrievalOwnerFactory: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1;
 }): PrismaNurtureInstitutionKnowledgeFormalModuleBinding {
   if (
     input.ownerIntegration.surface_deps.optionIssuer
@@ -96,10 +97,11 @@ export function bindPrismaNurtureInstitutionKnowledgeFormalOwners(input: {
     throw new Error("Institution Knowledge option issuer must be the formal owner codec instance");
   }
   return Object.freeze({
-    institutionKnowledgeOwnerIntegration: input.ownerIntegration,
-    institutionKnowledgeAuthorityResolver:
-      input.formalOwners.institutionKnowledgeAuthorityResolver,
-    institutionKnowledgePreparedCommandOwner:
-      input.formalOwners.institutionKnowledgePreparedCommandOwner,
+    institutionKnowledgeFormalOwnerBinding: Object.freeze({
+      ownerIntegration: input.ownerIntegration,
+      authorityResolver: input.formalOwners.institutionKnowledgeAuthorityResolver,
+      preparedCommandOwner: input.formalOwners.institutionKnowledgePreparedCommandOwner,
+      authorizedRetrievalOwnerFactory: input.authorizedRetrievalOwnerFactory,
+    }),
   });
 }

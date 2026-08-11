@@ -116,7 +116,15 @@ describe("Institution Knowledge prepared-command owner", () => {
     expect(test.ledger.only()).toMatchObject({ status: "consumed", aggregate_version: 2 });
 
     test.clock.ms += 10 * 60_000;
-    await expect(test.owner.consumeConfirmed(execute)).resolves.toEqual(first);
+    await expect(test.owner.consumeConfirmed(execute)).resolves.toEqual({
+      status: "denied",
+      reason_code: "prepared_command_expired",
+    });
+    expect(test.ledger.only()).toMatchObject({
+      status: "expired",
+      snapshot_codec_version: 0,
+      frozen_snapshot_ciphertext: "",
+    });
   });
 
   it("rejects wrong confirmation reuse without exposing the frozen payload", async () => {
@@ -157,6 +165,17 @@ describe("Institution Knowledge prepared-command owner", () => {
       status: "unavailable",
       reason_code: "prepared_command_snapshot_drift",
     });
+
+    const extraRoot = harness({ injectSnapshotExtra: true });
+    const preparedExtra = await extraRoot.owner.prepare(prepareInput());
+    if (preparedExtra.status !== "ready_to_confirm") throw new Error("prepare failed");
+    await expect(extraRoot.owner.consumeConfirmed(executeInput(
+      preparedExtra.command_request_id,
+      preparedExtra.confirmation_ref,
+    ))).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "prepared_command_snapshot_drift",
+    });
   });
 
   it("rejects an impossible persisted status/time pairing before replaying it", async () => {
@@ -176,10 +195,27 @@ describe("Institution Knowledge prepared-command owner", () => {
   });
 });
 
-function harness(options: { ttlMs?: number } = {}) {
+function harness(options: { ttlMs?: number; injectSnapshotExtra?: boolean } = {}) {
   const ledger = createInMemoryLedger();
   const clock = { ms: START };
   let sequence = 0;
+  const crypto = new NurtureInstitutionKnowledgePreparedCommandCrypto(
+    INTEGRITY_KEY,
+    ENCRYPTION_KEY,
+  );
+  const protection = options.injectSnapshotExtra
+    ? {
+        tag: crypto.tag.bind(crypto),
+        issueConfirmation: crypto.issueConfirmation.bind(crypto),
+        sealSnapshot: crypto.sealSnapshot.bind(crypto),
+        openSnapshot(input: Parameters<typeof crypto.openSnapshot>[0]) {
+          const value = crypto.openSnapshot(input);
+          return value && typeof value === "object" && !Array.isArray(value)
+            ? { ...value, compatibility: true }
+            : value;
+        },
+      }
+    : crypto;
   const owner = new NurtureInstitutionKnowledgePreparedCommandOwner({
     ledger,
     participantBindings: { readCurrentBindings: async () => [binding] },
@@ -191,10 +227,7 @@ function harness(options: { ttlMs?: number } = {}) {
         reason_code: "authorized",
       }),
     },
-    protection: new NurtureInstitutionKnowledgePreparedCommandCrypto(
-      INTEGRITY_KEY,
-      ENCRYPTION_KEY,
-    ),
+    protection,
     now: () => new Date(clock.ms),
     createCommandRequestId: () => `command-request-${++sequence}`,
     ...(options.ttlMs === undefined ? {} : { ttlMs: options.ttlMs }),
@@ -286,12 +319,18 @@ function createInMemoryLedger(): NurtureInstitutionKnowledgePreparedCommandLedge
         record.participant_ref !== input.participant_ref
         || record.confirmation_ref_hash !== input.confirmation_ref_hash
       ) return { status: "conflict" };
+      if (record.status === "expired" || record.expires_at <= input.consumed_at) {
+        byDedup.set(key, {
+          ...record,
+          status: "expired",
+          snapshot_codec_version: 0,
+          frozen_snapshot_ciphertext: "",
+          aggregate_version: record.aggregate_version + 1,
+        });
+        return { status: "expired" };
+      }
       if (record.status === "consumed") {
         return { status: "replayed", record: structuredClone(record) };
-      }
-      if (record.status === "expired" || record.expires_at <= input.consumed_at) {
-        byDedup.set(key, { ...record, status: "expired", aggregate_version: record.aggregate_version + 1 });
-        return { status: "expired" };
       }
       const consumed = {
         ...record,

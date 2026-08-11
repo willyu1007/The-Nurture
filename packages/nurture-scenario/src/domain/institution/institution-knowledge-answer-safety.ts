@@ -451,6 +451,17 @@ const medicalNotice = (): InstitutionKnowledgeSafetyNoticeV1 => ({
   ],
 });
 
+const authorizeAdmin = async (
+  authority: NurtureInstitutionAdminKnowledgeAuthorityV1,
+  context: NurtureInstitutionKnowledgeOnlineContextV1,
+): Promise<"authorized" | "denied" | "unavailable"> => {
+  try {
+    return await authority.authorize(context);
+  } catch {
+    return "unavailable";
+  }
+};
+
 type FinalCurrentness =
   | { status: "eligible" }
   | { status: "changed" }
@@ -761,6 +772,8 @@ export const answerInstitutionKnowledgeV1 = async (input: {
     });
   }
   if (requestSafety.status === "material_source_conflict") {
+    const finalAuthority = await authorizeAdmin(input.admin_authority, context);
+    if (finalAuthority !== "authorized") return { status: finalAuthority };
     return conflictResult({
       findings: requestSafety.findings,
       rule_set_ref: input.rule_set_ref,
@@ -836,6 +849,9 @@ export const answerInstitutionKnowledgeV1 = async (input: {
       safety_notice: safetyNotice(draftSafety.reason_codes),
     });
   }
+
+  const finalAuthority = await authorizeAdmin(input.admin_authority, context);
+  if (finalAuthority !== "authorized") return { status: finalAuthority };
 
   const finalCurrentness = await validateFinalCurrentness({
     context,

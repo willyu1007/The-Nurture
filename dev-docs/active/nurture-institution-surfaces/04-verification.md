@@ -901,7 +901,7 @@ contract slice are recorded in
 | Cross-repository trusted registry | PASS | Base source `6740871` / lock `536638a`; My-Chat source `4960f47`, runtime lock `a57e1ae`, adoption lock `2a2bb3c`; Nurture C30 adoption `42d0858`. |
 | Formal ingress contract | PASS / DEFAULT-OFF | Nurture freezes one query, prepare and execute tuple; no ordinary Institution Knowledge internal handler remains. |
 | Direct declaration defense | PASS | Scenario, method, endpoint, operation, schema, ingress and origin drift fail closed before owner invocation. |
-| Current authority | PASS AT PORT BOUNDARY | Prepare resolves current authority; execute re-resolves it and rejects exact authority snapshot drift before business binding. Concrete production owner remains pending. |
+| Current authority | HISTORICAL PORT-BOUNDARY PASS | At this checkpoint prepare/execute rechecked the port, while the concrete owner was still pending. The current owner result is recorded below. |
 | Full unit | PASS | 92 files / 996 tests. |
 | Focused formal/conformance | PASS | 6 files / 35 tests; owner admission follow-up 2 files / 12 tests. |
 | Type/manifest | PASS | `@the-nurture/scenario` typecheck and generated manifest check. |
@@ -927,7 +927,7 @@ PRODUCTION_OWNER_BINDING_PENDING`.
 | Diff hygiene | PASS | `git diff --check`. |
 | Runtime effects | NONE | No database apply, provider call, route, feature activation or traffic. |
 
-### Final workspace verification
+### Historical post-landing workspace verification
 
 | Check | Result | Evidence |
 | --- | --- | --- |
@@ -936,9 +936,24 @@ PRODUCTION_OWNER_BINDING_PENDING`.
 | Focused formal/runtime regression | PASS | 7 files / 45 tests. |
 | Manifest/test routing/default-off census | PASS | Generated manifest, lane routing and activation absence checks passed. |
 | Governance/diff hygiene | PASS | Project-governance lint and `git diff --check` passed. |
-| Current source revision | PASS | Formal owner hardening source is `1f71f02e3b3087515f6c5e421152a3efc515c61c`. |
-| Current scenario pin | PASS | Nurture scenario hash is `74b6f1d40f304e09cf37ff333b15bfe7ce127afb677907f263437a877e795768`. |
-| Current adoption lock | PASS | C30 owner-adoption hash is `98677cb3ebb78102161975720917eb69d7344c91737a26fd582c3656ddd9288a`. |
+| Then-current source revision | PASS | Formal owner hardening source was `1f71f02e3b3087515f6c5e421152a3efc515c61c`. |
+| Then-current scenario pin | PASS | Nurture scenario hash was `74b6f1d40f304e09cf37ff333b15bfe7ce127afb677907f263437a877e795768`. |
+| Then-current adoption lock | PASS | C30 owner-adoption hash was `98677cb3ebb78102161975720917eb69d7344c91737a26fd582c3656ddd9288a`. |
+
+## 2026-08-11 G4-E E7 current production-owner source verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Full Nurture unit suite | PASS | 94 files / 1014 tests. |
+| Focused authority/replay/safety/formal suite | PASS | 6 files / 48 tests, including wrong-role owner output, signed extra-field rejection, response-loss identity, final revocation, conflict fencing, snapshot closed-shape and expiry scrub. |
+| Scenario and DB typecheck | PASS | `pnpm --filter @the-nurture/scenario typecheck`; `pnpm --filter @the-nurture/db typecheck`. |
+| My-Chat principal-bound retrieval | PASS | 2 focused files / 13 tests plus scenario-integrations typecheck and changed-file ESLint. Retrieval and final access each rebuild canonical PermissionContext. |
+| Single owner composition | PASS | The module accepts only `institutionKnowledgeFormalOwnerBinding`; no separate authority/prepared/retrieval injection track remains. |
+| Runtime effects | NONE / DEFAULT-OFF | No DB connection or apply, live gateway call, route, flag, deployment, secret read or traffic. |
+| Database qualification | `NOT_RUN_APPROVAL_PENDING` | Schema/migration and integration test are authored. Disposable PostgreSQL execution requires explicit approval and is not claimed by this record. |
+
+Current verdict: `G4_E_E7_OWNER_SOURCE_COMPLETE_DEFAULT_OFF /
+DB_QUALIFICATION_PENDING / E8_PENDING`.
 
 ## Required Evidence
 

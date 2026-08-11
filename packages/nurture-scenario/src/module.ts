@@ -72,14 +72,23 @@ export type NurtureScenarioModuleDeps = {
   workerRuntime: WorkflowRuntimePort;
   /** I2-B is fail-closed unless an explicit synthetic or future I3 owner set is supplied. */
   enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
-  /** G4-E E7 admits owner deps only behind the exact Q2/Q3 pin tuple. */
-  institutionKnowledgeOwnerIntegration?: NurtureInstitutionKnowledgeOwnerIntegration;
-  institutionKnowledgeAuthorityResolver?: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
-  institutionKnowledgePreparedCommandOwner?: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
-  institutionKnowledgeAuthorizedRetrievalOwnerFactory?: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1;
+  /** G4-E E7 admits the complete owner set only behind the exact Q2/Q3 pin tuple. */
+  institutionKnowledgeFormalOwnerBinding?: NurtureInstitutionKnowledgeFormalOwnerBindingV1;
   /** Exact C30 owner; omitted production composition remains fail-closed. */
   c30SubjectPresentationOwner?: NurtureC30TrustedInvocationOwner;
 };
+
+/**
+ * Single production binding for the formal Institution Knowledge ingress.
+ * Keeping the four owner pieces in one value prevents authority, confirmation,
+ * retrieval, and admitted surface dependencies from being mixed across tracks.
+ */
+export type NurtureInstitutionKnowledgeFormalOwnerBindingV1 = Readonly<{
+  ownerIntegration: NurtureInstitutionKnowledgeOwnerIntegration;
+  authorityResolver: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
+  preparedCommandOwner: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
+  authorizedRetrievalOwnerFactory: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1;
+}>;
 
 /**
  * Bind owner ports without changing the canonical manifest or activation
@@ -88,9 +97,14 @@ export type NurtureScenarioModuleDeps = {
 export const createNurtureScenarioModule = (
   deps: NurtureScenarioModuleDeps,
 ): WorkflowScenarioModule => {
+  const formalOwnerBinding = deps.institutionKnowledgeFormalOwnerBinding;
   const surfaceDeps = admitNurtureInstitutionKnowledgeOwnerIntegration(
-    deps.institutionKnowledgeOwnerIntegration,
+    formalOwnerBinding?.ownerIntegration,
   );
+  const admittedFormalOwnerBinding =
+    formalOwnerBinding && surfaceDeps !== defaultNurtureInstitutionKnowledgeSurfaceDeps
+      ? formalOwnerBinding
+      : undefined;
   return {
     manifest: nurtureScenarioManifest,
     handlers: createNurtureHandlers(deps.handlerDeps),
@@ -102,10 +116,10 @@ export const createNurtureScenarioModule = (
       ...createNurtureC30TrustedInvocationHandlers(deps.c30SubjectPresentationOwner),
       ...createNurtureInstitutionKnowledgeFormalInvocationHandlers({
         surfaceDeps,
-        authorityResolver: deps.institutionKnowledgeAuthorityResolver,
-        preparedCommandOwner: deps.institutionKnowledgePreparedCommandOwner,
+        authorityResolver: admittedFormalOwnerBinding?.authorityResolver,
+        preparedCommandOwner: admittedFormalOwnerBinding?.preparedCommandOwner,
         authorizedRetrievalOwnerFactory:
-          deps.institutionKnowledgeAuthorizedRetrievalOwnerFactory,
+          admittedFormalOwnerBinding?.authorizedRetrievalOwnerFactory,
       }),
     },
     internal_api_handlers: {

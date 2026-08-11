@@ -375,8 +375,9 @@ Project: `main`
   disposable PostgreSQL. I2-A publishes the exact three-query/21-action
   Surface Contract at `1.19.0`; I2-B maps it to the existing I1 ports through
   fail-closed, explicitly disabled module/manifest adapters. Formal trusted
-  ingress is now structurally bound, but no concrete production owner, Host
-  route, capability activation or durable database apply exists.
+  ingress and one complete owner source binding are now structurally present,
+  but its additive prepared-command migration is not qualified or applied;
+  no Host route, capability activation or durable database apply exists.
   0F has an exact generic Knowledge/PBR/RAG source pin, accepted three-unit
   scope, all three unit freezes, a repaired cross-contract audit and
   `G4_0F_EXIT_PASS`; its E1–E8 roadmap is fixed. E1 passes statically with the
@@ -389,11 +390,12 @@ Project: `main`
   artifact and disabled Workbench adapters. The adopted My-Chat T-040 sequence
   through `942bd00` closes Q2 ingestion/currentness and implements Q3 replay
   plus its provider-neutral safety boundary; Q4 sibling authority is closed.
-- Next Checkpoint: implement the G4-E E7 production owner composition. The
-  trusted registry, single formal query/prepare/execute track, fixed Workbench
-  mapping and current-authority port checks are committed and pinned. Add the
-  Nurture current-authority resolver, durable prepared-command ledger and
-  My-Chat Host adapter, then run E8 Joint Conformance without traffic. The V2
+- Next Checkpoint: qualify the G4-E E7 additive migration on an approved
+  disposable PostgreSQL target, then run E8 Joint Conformance without traffic.
+  The trusted registry, single formal query/prepare/execute track, exact signed-
+  role current-authority owner, bounded encrypted prepared-command ledger and
+  principal-bound My-Chat retrieval/final-access adapter are implemented as one
+  default-off binding. The V2
   owner/adapter admission and default-off composition already pass; Q3 is
   `ADAPTER_QUALIFIED` against
   the sole `/v2`

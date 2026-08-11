@@ -64,9 +64,11 @@ Project: `main`
   evidence is invalid/non-current. Exact E7 owner admission, the committed
   Base/My-Chat trusted registry, the two-stage confirmation contract and the
   Nurture formal handler binding now pass default-off. The old Institution
-  Knowledge internal-handler track is removed. Concrete Nurture authority/
-  prepared-command owners and the My-Chat Host adapter remain pending; E8
-  follows after those bindings qualify.
+  Knowledge internal-handler track is removed. Exact signed-role authority,
+  bounded encrypted confirmation persistence, and principal-bound My-Chat
+  retrieval/final-access now compose through one default-off binding. The
+  additive migration remains `NOT_RUN_APPROVAL_PENDING`; E8 follows only after
+  disposable-DB qualification.
   `live_qualified=false` remains a separate activation gate requiring a real
   gateway smoke; recorded/synthetic transport is never live evidence.
   T-008 still waits for the complete T-007 Exit.
@@ -79,17 +81,14 @@ Project: `main`
 
 1. **Begin T-010 I4-C1.** I4-C0 mapping and authority design are qualified;
    produce and review an additive Prisma diff without database apply.
-2. **Implement the G4-E E7 production owners.** Add the Nurture current-
-   authority resolver, durable prepared-command ledger and My-Chat adapter for
-   the pinned canonical retrieval owner.
-3. **Finish G4-E E7 Host composition.** Bind the existing signed transport only
-   after those owners qualify; keep application routes and traffic default-off.
-4. **Run G4-E E8 without traffic.** Execute joint positive, negative,
+2. **Qualify the G4-E E7 migration.** Use only an explicitly approved
+   disposable PostgreSQL target; run concurrency, expiry-scrub and drift gates.
+3. **Run G4-E E8 without traffic.** Execute joint positive, negative,
    currentness, outage, drift and replay conformance, then issue the G4-E Exit.
-5. **Require `live_qualified` before activation.** Run a real secret-backed
+4. **Require `live_qualified` before activation.** Run a real secret-backed
    gateway smoke before enabling any flag or traffic; never describe mock
    transport as live.
-6. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
+5. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
    production caller**; I1 evidence is not activation evidence.
 7. Only a separately authorized `C30-I4` scope review is eligible for T-002.
 8. Preserve T-006, T-009 and T-003 as done and archive them only after

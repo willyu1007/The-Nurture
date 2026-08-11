@@ -15,7 +15,6 @@ import {
 } from "../../c30/participant-binding.js";
 import { canonicalJsonV1 } from "../commands/command-kernel.js";
 import type {
-  NurtureInstitutionKnowledgeFormalAuthorityResolverV1,
   NurtureInstitutionKnowledgeLocalAuthorityV1,
   NurtureInstitutionKnowledgePreparedCommandOwnerV1,
 } from "../../institution-knowledge-formal-ingress-contract.js";
@@ -27,8 +26,8 @@ import {
 
 type WithConfirmation<T> = T extends unknown ? T & { confirmationRef: string } : never;
 
-/** Compatible with both the committed AdapterRequest name and the pending SurfaceRequest rename. */
-export type NurtureInstitutionKnowledgeFrozenCommandV1 =
+/** Exact action request frozen by the prepare owner with its issued confirmation. */
+type NurtureInstitutionKnowledgeFrozenCommandV1 =
   WithConfirmation<NurtureInstitutionKnowledgeCommandIntentV1>;
 
 export type NurtureInstitutionKnowledgePreparedCommandStatus =
@@ -77,14 +76,14 @@ export type NurtureInstitutionKnowledgePreparedCommandLedgerV1 = {
   >;
 };
 
-export type NurtureInstitutionKnowledgePreparedCommandProtectionV1 = {
+type NurtureInstitutionKnowledgePreparedCommandProtectionV1 = {
   tag(input: { purpose: string; values: readonly string[] }): string;
   issueConfirmation(input: { command_request_id: string; prepare_fingerprint: string }): string;
   sealSnapshot(value: unknown): { codec_version: number; ciphertext: string };
   openSnapshot(input: { codec_version: number; ciphertext: string }): unknown | null;
 };
 
-export type NurtureInstitutionKnowledgePreparedCommandOwnerDeps = {
+type NurtureInstitutionKnowledgePreparedCommandOwnerDeps = {
   ledger: NurtureInstitutionKnowledgePreparedCommandLedgerV1;
   participantBindings: NurtureParticipantBindingReader;
   participantAuthority: NurtureParticipantAuthorityReader;
@@ -94,7 +93,7 @@ export type NurtureInstitutionKnowledgePreparedCommandOwnerDeps = {
   ttlMs?: number;
 };
 
-export const NURTURE_INSTITUTION_KNOWLEDGE_PREPARED_COMMAND_TTL_MS = 5 * 60_000;
+const NURTURE_INSTITUTION_KNOWLEDGE_PREPARED_COMMAND_TTL_MS = 5 * 60_000;
 
 type FrozenSnapshotV1 = {
   snapshot_version: 1;
@@ -472,7 +471,12 @@ implements NurtureInstitutionKnowledgePreparedCommandProtectionV1 {
 }
 
 function parseSnapshot(value: unknown): FrozenSnapshotV1 | null {
-  if (!record(value) || value.snapshot_version !== 1 || !record(value.frozen_request)) return null;
+  if (
+    !record(value)
+    || !exactKeys(value, ["authority", "frozen_request", "snapshot_version"])
+    || value.snapshot_version !== 1
+    || !record(value.frozen_request)
+  ) return null;
   const { confirmationRef, ...intentValue } = value.frozen_request;
   if (!opaqueConfirmation(confirmationRef)) return null;
   const intent = parseNurtureInstitutionKnowledgeCommandIntent(intentValue);
@@ -482,6 +486,13 @@ function parseSnapshot(value: unknown): FrozenSnapshotV1 | null {
     frozen_request: { ...intent, confirmationRef },
     authority: value.authority,
   };
+}
+
+function exactKeys(value: Record<string, unknown>, expected: readonly string[]): boolean {
+  const actual = Object.keys(value).sort();
+  const sortedExpected = [...expected].sort();
+  return actual.length === sortedExpected.length
+    && actual.every((key, index) => key === sortedExpected[index]);
 }
 
 function validRecord(value: NurtureInstitutionKnowledgePreparedCommandRecordV1): boolean {
@@ -500,11 +511,13 @@ function validRecord(value: NurtureInstitutionKnowledgePreparedCommandRecordV1):
       value.origin_invocation_request_id_hash,
       value.confirmation_ref_hash,
     ].every((entry) => /^[0-9a-f]{64}$/u.test(entry))
-    && Number.isSafeInteger(value.snapshot_codec_version)
-    && value.snapshot_codec_version >= 1
-    && typeof value.frozen_snapshot_ciphertext === "string"
-    && value.frozen_snapshot_ciphertext.length >= 20
-    && value.frozen_snapshot_ciphertext.length <= 1_000_000
+    && (value.status === "expired"
+      ? value.snapshot_codec_version === 0 && value.frozen_snapshot_ciphertext === ""
+      : Number.isSafeInteger(value.snapshot_codec_version)
+        && value.snapshot_codec_version >= 1
+        && typeof value.frozen_snapshot_ciphertext === "string"
+        && value.frozen_snapshot_ciphertext.length >= 20
+        && value.frozen_snapshot_ciphertext.length <= 1_000_000)
     && isActionKey(value.capability_key)
     && ["prepared", "consumed", "expired"].includes(value.status)
     && instant(value.prepared_at)
@@ -577,5 +590,3 @@ function instant(value: unknown): value is string {
   const parsed = new Date(value);
   return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === value;
 }
-
-export type { NurtureInstitutionKnowledgeFormalAuthorityResolverV1 };

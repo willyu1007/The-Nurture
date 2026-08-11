@@ -45,21 +45,33 @@ describe("G4-E E7 exact owner integration admission", () => {
       handlerDeps: defaultNurtureDeps,
       presenterDeps: defaultPresenterDeps,
       workerRuntime: {} as WorkflowRuntimePort,
-      institutionKnowledgeOwnerIntegration: integration(surfaceDeps),
-      institutionKnowledgeAuthorityResolver: {
-        resolveCurrent: async () => ({
-          status: "resolved",
-          authority: {
-            workspace_id: "workspace-01",
-            participant_ref: "participant-01",
-            institution_ref: "institution-01",
-            role_assignment_ref: "role-assignment-01",
-            active_role: "institution_admin",
-            surface_key: "institution_workbench",
-            authority_version: "authority-v1",
-            evaluated_at: "2026-08-11T00:00:00.000Z",
-          },
-        }),
+      institutionKnowledgeFormalOwnerBinding: {
+        ownerIntegration: integration(surfaceDeps),
+        authorityResolver: {
+          resolveCurrent: async () => ({
+            status: "resolved",
+            authority: {
+              workspace_id: "workspace-01",
+              participant_ref: "participant-01",
+              institution_ref: "institution-01",
+              role_assignment_ref: "role-assignment-01",
+              active_role: "institution_admin",
+              surface_key: "institution_workbench",
+              authority_version: "authority-v1",
+              evaluated_at: "2026-08-11T00:00:00.000Z",
+            },
+          }),
+        },
+        preparedCommandOwner: {
+          prepare: async () => ({ status: "unavailable", reason_code: "not_used" }),
+          consumeConfirmed: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        },
+        authorizedRetrievalOwnerFactory: {
+          createForPrincipal: () => ({
+            retrieveCandidates: async () => ({ status: "unavailable" }),
+            assertStillAuthorized: async () => "unavailable",
+          }),
+        },
       },
     });
 

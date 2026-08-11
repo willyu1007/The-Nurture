@@ -1,5 +1,4 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import type { ScenarioHumanPrincipalV1 } from "@my-chat/workflow-contracts";
 import {
   NurtureParticipantResolutionError,
   resolveAuthorizedNurtureParticipant,
@@ -8,10 +7,8 @@ import {
 } from "./c30/participant-binding.js";
 import type {
   NurtureInstitutionKnowledgeFormalAuthorityResolverV1,
-  NurtureInstitutionKnowledgeLocalAuthorityV1,
 } from "./institution-knowledge-formal-ingress-contract.js";
 import type {
-  NurtureInstitutionKnowledgeActionKey,
   NurtureInstitutionKnowledgeOptionIssuer,
   NurtureInstitutionKnowledgeSurfaceCapabilityKey,
 } from "./institution-knowledge-surfaces.js";
@@ -69,7 +66,7 @@ export type NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1 = {
   }): Promise<readonly NurtureInstitutionKnowledgeInstitutionAdminRoleV1[]>;
 };
 
-export type NurtureInstitutionKnowledgeCurrentAuthorityOwnerDeps = {
+type NurtureInstitutionKnowledgeCurrentAuthorityOwnerDeps = {
   participantBindings: NurtureParticipantBindingReader;
   participantAuthority: NurtureParticipantAuthorityReader;
   targetOptions: NurtureInstitutionKnowledgeTargetOptionResolverV1;
@@ -183,6 +180,9 @@ implements NurtureInstitutionKnowledgeFormalAuthorityResolverV1 {
         ? "institution_knowledge_target_option_stale"
         : "institution_knowledge_target_not_found");
     }
+    if (!validCurrentTarget(currentTarget.target)) {
+      return unavailable("institution_knowledge_target_owner_invalid");
+    }
 
     let roles;
     try {
@@ -198,9 +198,15 @@ implements NurtureInstitutionKnowledgeFormalAuthorityResolverV1 {
       return unavailable("institution_knowledge_role_owner_unavailable");
     }
     if (roles.length === 0) return denied("institution_admin_role_not_current");
-    if (roles.length !== 1) return unavailable("institution_admin_role_ambiguous");
     const role = roles[0];
-    if (!role || !validRole(role, workspaceId, currentTarget.target)) {
+    if (
+      !role
+      || !validRole(
+        role,
+        selection.role_assignment_ref,
+        currentTarget.target,
+      )
+    ) {
       return unavailable("institution_admin_role_invalid");
     }
 
@@ -298,7 +304,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
     } catch {
       return null;
     }
-    return parseSelection(value);
+    return parseWireSelection(value);
   }
 
   private issueSelection(input: {
@@ -336,15 +342,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
 
 function parseSelection(value: unknown): NurtureInstitutionKnowledgeTargetSelectionV1 | null {
   if (!record(value)) return null;
-  const source = "target_kind" in value
-    ? value
-    : {
-        target_kind: value.k,
-        target_ref: value.r,
-        role_assignment_ref: value.a,
-        target_version: value.v,
-      };
-  const keys = Object.keys(source).filter((key) => source[key] !== undefined);
+  const keys = Object.keys(value).filter((key) => value[key] !== undefined);
   if (
     !keys.every((key) => [
       "target_kind",
@@ -353,26 +351,46 @@ function parseSelection(value: unknown): NurtureInstitutionKnowledgeTargetSelect
       "target_version",
     ].includes(key))
     || keys.length < 3
-    || !["institution", "item", "revision"].includes(String(source.target_kind))
-    || !opaqueId(source.target_ref)
-    || !opaqueId(source.role_assignment_ref)
-    || (source.target_version !== undefined && !nonNegativeVersion(source.target_version))
+    || !["institution", "item", "revision"].includes(String(value.target_kind))
+    || !opaqueId(value.target_ref)
+    || !opaqueId(value.role_assignment_ref)
+    || (value.target_version !== undefined && !nonNegativeVersion(value.target_version))
   ) return null;
   return {
-    target_kind: source.target_kind as NurtureInstitutionKnowledgeTargetKind,
-    target_ref: source.target_ref,
-    role_assignment_ref: source.role_assignment_ref,
-    ...(source.target_version === undefined ? {} : { target_version: source.target_version }),
+    target_kind: value.target_kind as NurtureInstitutionKnowledgeTargetKind,
+    target_ref: value.target_ref,
+    role_assignment_ref: value.role_assignment_ref,
+    ...(value.target_version === undefined ? {} : { target_version: value.target_version }),
   };
+}
+
+function parseWireSelection(value: unknown): NurtureInstitutionKnowledgeTargetSelectionV1 | null {
+  if (!record(value)) return null;
+  const keys = Object.keys(value).sort();
+  const expected = value.v === undefined ? ["a", "k", "r"] : ["a", "k", "r", "v"];
+  if (keys.length !== expected.length || keys.some((key, index) => key !== expected[index])) {
+    return null;
+  }
+  return parseSelection({
+    target_kind: value.k,
+    target_ref: value.r,
+    role_assignment_ref: value.a,
+    ...(value.v === undefined ? {} : { target_version: value.v }),
+  });
+}
+
+function validCurrentTarget(target: NurtureInstitutionKnowledgeCurrentTargetV1): boolean {
+  return opaqueId(target.institution_ref)
+    && nonNegativeVersion(target.institution_revision)
+    && nonNegativeVersion(target.target_revision);
 }
 
 function validRole(
   role: NurtureInstitutionKnowledgeInstitutionAdminRoleV1,
-  workspaceId: string,
+  expectedRoleAssignmentRef: string,
   target: NurtureInstitutionKnowledgeCurrentTargetV1,
 ): boolean {
-  return opaqueId(workspaceId)
-    && opaqueId(role.role_assignment_ref)
+  return role.role_assignment_ref === expectedRoleAssignmentRef
     && role.institution_ref === target.institution_ref
     && role.institution_revision === target.institution_revision
     && nonNegativeVersion(role.role_assignment_revision)
@@ -419,9 +437,3 @@ function safeEqual(left: string, right: string): boolean {
     && leftBytes.length === 43
     && timingSafeEqual(leftBytes, rightBytes);
 }
-
-export type {
-  NurtureInstitutionKnowledgeActionKey,
-  NurtureInstitutionKnowledgeLocalAuthorityV1,
-  ScenarioHumanPrincipalV1,
-};

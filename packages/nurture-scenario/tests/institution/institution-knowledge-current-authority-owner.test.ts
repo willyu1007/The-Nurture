@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import type { CanonicalRef, ScenarioHumanPrincipalV1 } from "@my-chat/workflow-contracts";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -39,6 +40,12 @@ function harness(options: {
     institution_ref: string;
     institution_revision: number;
   }>;
+  roleReaderResult?: Array<{
+    role_assignment_ref: string;
+    role_assignment_revision: number;
+    institution_ref: string;
+    institution_revision: number;
+  }>;
   targetStatus?: "resolved" | "not_found" | "stale";
   bindings?: NurtureParticipantPrincipalBindingV1[];
 } = {}) {
@@ -46,7 +53,7 @@ function harness(options: {
   const readCurrent = vi.fn(async (input: {
     institution_ref: string;
     role_assignment_ref: string;
-  }) => (options.roles ?? [{
+  }) => options.roleReaderResult ?? (options.roles ?? [{
     role_assignment_ref: "role-institution-2",
     role_assignment_revision: 4,
     institution_ref: input.institution_ref,
@@ -169,6 +176,25 @@ describe("Institution Knowledge current-authority owner", () => {
       participant_ref: "participant-2",
       target_option_ref: String(institutionOption),
     })).toBeNull();
+
+    const [version, encoded] = String(institutionOption).split(".");
+    if (!version || !encoded) throw new Error("target option shape invalid");
+    const wire = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")) as object;
+    const withExtra = Buffer.from(JSON.stringify({ ...wire, compatibility: true }), "utf8")
+      .toString("base64url");
+    const tag = createHmac("sha256", INTEGRITY_KEY)
+      .update("nurture.institution-knowledge-target-option.v2\0", "utf8")
+      .update("workspace-1", "utf8")
+      .update("\0", "utf8")
+      .update("participant-1", "utf8")
+      .update("\0", "utf8")
+      .update(withExtra, "utf8")
+      .digest("base64url");
+    expect(test.codec.resolve({
+      workspace_id: "workspace-1",
+      participant_ref: "participant-1",
+      target_option_ref: `${version}.${withExtra}.${tag}`,
+    })).toBeNull();
     expect(test.codec.resolve({
       workspace_id: "workspace-1",
       participant_ref: "participant-1",
@@ -185,6 +211,21 @@ describe("Institution Knowledge current-authority owner", () => {
     await expect(test.owner.resolveCurrent(queryInput(String(revisionOption)))).resolves.toEqual({
       status: "denied",
       reason_code: "institution_knowledge_target_option_invalid",
+    });
+  });
+
+  it("rejects a role reader response that swaps the signed assignment", async () => {
+    const test = harness({ roleReaderResult: [role("role-other")] });
+    const option = test.codec.issueInstitution({
+      workspace_id: "workspace-1",
+      participant_ref: "participant-1",
+      institution_ref: "institution-2",
+      role_assignment_ref: "role-selected",
+    });
+
+    await expect(test.owner.resolveCurrent(queryInput(String(option)))).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "institution_admin_role_invalid",
     });
   });
 

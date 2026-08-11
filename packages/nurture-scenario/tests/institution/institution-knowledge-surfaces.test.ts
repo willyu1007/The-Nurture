@@ -337,7 +337,7 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
     const handler = new NurtureInstitutionKnowledgeSurfaceHandler(deps({
       retrievalOwner: { retrieveCandidates },
     }));
-    const result = await handler.handle({
+    const answerRequest = {
       capabilityKey: "answer_institution_knowledge",
       capabilityVersion: "1.0.0",
       targetOptionRef: "option-institution",
@@ -346,12 +346,23 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
         question: "What is the pickup process?",
         scenarioKeys: ["pickup"],
       },
-    }, trusted());
+    } as const;
+    const firstTrusted = trusted();
+    const result = await handler.handle(answerRequest, firstTrusted);
+    await handler.handle(answerRequest, {
+      ...firstTrusted,
+      invocation_request_id: "invocation-after-response-loss",
+    });
     expect(retrieveCandidates).toHaveBeenCalledWith({
       context: expect.objectContaining({
+        invocation_ref: "command-01",
         purpose: "institution_admin_online_answer",
         scenario_keys: ["pickup"],
       }),
+      question: "What is the pickup process?",
+    });
+    expect(retrieveCandidates).toHaveBeenNthCalledWith(2, {
+      context: expect.objectContaining({ invocation_ref: "command-01" }),
       question: "What is the pickup process?",
     });
     expect(result).toEqual({

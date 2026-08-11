@@ -366,6 +366,17 @@ describe("G4-E answer safety orchestration", () => {
     }))).resolves.toEqual({ status: "unavailable" });
   });
 
+  it("rechecks access after generation for authority-only answers", async () => {
+    const authorize = vi.fn()
+      .mockResolvedValueOnce("authorized")
+      .mockResolvedValueOnce("unavailable");
+    await expect(answerInstitutionKnowledgeV1(dependencies([authorityCandidate()], {
+      admin_authority: { authorize },
+      generation_owner: generation({ candidate_refs: ["candidate-authority-1"] }),
+    }))).resolves.toEqual({ status: "unavailable" });
+    expect(authorize).toHaveBeenCalledTimes(2);
+  });
+
   it("finally revalidates conflict evidence and records one immutable candidate per finding", async () => {
     const candidates = [nurtureCandidate(), authorityCandidate()];
     const conflictRecorder = recorder();
@@ -408,6 +419,39 @@ describe("G4-E answer safety orchestration", () => {
     expect(conflictRecorder.record).toHaveBeenCalledWith(expect.objectContaining({
       targeted_nurture_revision_refs: ["knowledge-revision-1"],
     }));
+  });
+
+  it("rechecks access before recording conflict evidence", async () => {
+    const candidates = [nurtureCandidate(), authorityCandidate()];
+    const conflictRecorder = recorder();
+    const authorize = vi.fn()
+      .mockResolvedValueOnce("authorized")
+      .mockResolvedValueOnce("denied");
+    const conflictSafety: InstitutionKnowledgeAnswerSafetyOwnerPortV2 = {
+      ...clearSafety(),
+      evaluateRequestAndSources: vi.fn(async () => ({
+        status: "material_source_conflict" as const,
+        rule_set_ref: "answer-safety-rules",
+        rule_version: "1.0.0",
+        decision_fingerprint: DECISION_HASH,
+        findings: [{
+          conflict_class: "contradictory_action" as const,
+          finding_fingerprint: FINDING_HASH,
+          sources: candidates.map(({ source_ref, source_version, content_hash }) => ({
+            source_ref,
+            source_version,
+            content_hash,
+          })),
+        }],
+      })),
+    };
+
+    await expect(answerInstitutionKnowledgeV1(dependencies(candidates, {
+      admin_authority: { authorize },
+      safety_owner: conflictSafety,
+      conflict_recorder: conflictRecorder,
+    }))).resolves.toEqual({ status: "denied" });
+    expect(conflictRecorder.record).not.toHaveBeenCalled();
   });
 
   it("never reports an unrecorded conflict candidate", async () => {

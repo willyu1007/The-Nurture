@@ -6,18 +6,20 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-11
-- Next step: **implement the three production owner bindings, then run E8
-  joint conformance without traffic**. The dedicated verified-invocation
+- Next step: **qualify the additive prepared-command migration on an approved
+  disposable PostgreSQL target, then run E8 joint conformance without
+  traffic**. The dedicated verified-invocation
   registry is committed and pinned across Base, My-Chat and Nurture. Nurture
   now exposes one exact query/prepare/execute formal ingress, removes the old
-  Institution Knowledge internal-handler track, re-resolves current local
-  authority, and remains fail-closed when production owners are absent. No
+  Institution Knowledge internal-handler track, and binds one complete owner
+  set: exact signed-role current authority, encrypted owner-held confirmation,
+  and principal-bound My-Chat retrieval plus final access recheck. The module
+  remains fail-closed when that single binding is absent or any pin drifts. No
   HTTP route, authenticated Host composition, credential, activation or
   traffic is bound ([`81`](./81-g4-e-e7-owner-composition-record.md),
   [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md)). The next bounded
-  slice is a Nurture current-authority owner, a durable owner-held prepared-
-  command/confirmation ledger, and a My-Chat host adapter for the already
-  committed canonical retrieval owner.
+  source, migration or test artifact in this slice is activation evidence.
+  The migration is authored but remains `NOT_RUN_APPROVAL_PENDING`.
   The canonical machine contract is
   `nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
   `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`
@@ -100,9 +102,9 @@
   current `2.1.0` verifier with answer-safety `2.0.0` and owner contract `2.0.0`.
   Q3 no longer blocks E7. Exact owner/adapter admission, the scenario-neutral
   verified-invocation registry, the two-stage command contract and the
-  Nurture formal handler binding now pass default-off. The remaining E7 work is
-  the concrete local authority/prepared-command owners plus My-Chat Host
-  composition. Prior
+  Nurture formal handler binding and complete owner composition now pass
+  default-off. The remaining E7 gate is disposable-DB qualification; E8 then
+  proves the cross-repository chain. Prior
   qualification evidence remains invalid/non-current. Record
   [`80`](./80-g4-e-q3-provider-qualification-contract.md) is the current SSOT
   and preserves the separate `live_qualified` activation boundary.

@@ -2,6 +2,7 @@ export {
   nurtureScenarioModule,
   createNurtureScenarioModule,
   type NurtureScenarioModuleDeps,
+  type NurtureInstitutionKnowledgeFormalOwnerBindingV1,
 } from "./module.js";
 export {
   admitNurtureInstitutionKnowledgeOwnerIntegration,
@@ -103,6 +104,7 @@ export * from "./domain/institution/family-care-commands.js";
 export * from "./domain/institution/family-care-query.js";
 export * from "./domain/institution/user-attention-activation.js";
 export * from "./institution-surfaces.js";
+export * from "./institution-knowledge-surfaces.js";
 export * from "./institution-knowledge-formal-ingress-contract.js";
 export * from "./institution-knowledge-formal-ingress.js";
 export * from "./institution-knowledge-current-authority-owner.js";

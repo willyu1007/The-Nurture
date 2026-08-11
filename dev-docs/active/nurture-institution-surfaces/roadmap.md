@@ -51,15 +51,18 @@
   verifier returned `adapter_qualified=true`, `live_qualified=false`,
   `default_off` and no bitwise-determinism claim for the complete 13-pin tuple.
   Pre-V2 qualification evidence is invalid/non-current.
-- E7 contract/adoption slice:
-  `G4_E_E7_FORMAL_INGRESS_BOUND_DEFAULT_OFF /
-  PRODUCTION_OWNER_BINDING_PENDING`; see [`81`](./81-g4-e-e7-owner-composition-record.md)
+- E7 contract/adoption and owner slice:
+  `G4_E_E7_OWNER_SOURCE_COMPLETE_DEFAULT_OFF /
+  DB_QUALIFICATION_PENDING`; see [`81`](./81-g4-e-e7-owner-composition-record.md)
   and [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md). Base and My-Chat
   adopted the dedicated verified registry; Nurture declares one exact
   query/prepare/execute handler set, removes the old internal track, binds a
-  fixed Workbench surface, and fails closed without production owners.
-- Current node: implement the Nurture current-authority owner, durable prepared-
-  command ledger and My-Chat host adapter, then run E8 Joint Conformance. A real gateway
+  fixed Workbench surface, and fails closed without the one complete owner
+  binding. Nurture now has an exact signed-role current-authority owner and a
+  bounded encrypted prepared-command ledger; My-Chat provides principal-bound
+  retrieval and final access recheck. The additive migration has not been run.
+- Current node: qualify that migration on an approved disposable PostgreSQL
+  target, then run E8 Joint Conformance. A real gateway
   smoke produces
   `live_qualified` and is required only before feature-flag/traffic activation.
 - I3/I4 cannot start from a hand-written fixture answer, raw generic moderation

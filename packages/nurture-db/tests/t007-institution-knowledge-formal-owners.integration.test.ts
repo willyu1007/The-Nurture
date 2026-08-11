@@ -91,6 +91,12 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
       const principal = humanPrincipal({ workspaceId, accountId, actorId });
       const moduleBinding = bindPrismaNurtureInstitutionKnowledgeFormalOwners({
         formalOwners: owners,
+        authorizedRetrievalOwnerFactory: {
+          createForPrincipal: () => ({
+            retrieveCandidates: async () => ({ status: "unavailable" }),
+            assertStillAuthorized: async () => "unavailable",
+          }),
+        },
         ownerIntegration: {
           q2_owner_pin: {},
           q3_adapter_qualification_pin: {},
@@ -99,10 +105,16 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
           },
         } as never,
       });
-      expect(moduleBinding.institutionKnowledgeAuthorityResolver)
+      expect(moduleBinding.institutionKnowledgeFormalOwnerBinding.authorityResolver)
         .toBe(owners.institutionKnowledgeAuthorityResolver);
       expect(() => bindPrismaNurtureInstitutionKnowledgeFormalOwners({
         formalOwners: owners,
+        authorizedRetrievalOwnerFactory: {
+          createForPrincipal: () => ({
+            retrieveCandidates: async () => ({ status: "unavailable" }),
+            assertStillAuthorized: async () => "unavailable",
+          }),
+        },
         ownerIntegration: {
           surface_deps: { optionIssuer: { issue: () => null } },
         } as never,

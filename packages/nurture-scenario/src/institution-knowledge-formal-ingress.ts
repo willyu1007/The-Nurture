@@ -30,7 +30,12 @@ export const NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS = Object.freeze({
 export type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1 = {
   createForPrincipal(
     principal: WorkflowVerifiedScenarioInvocationV1["invocation"]["principal"],
-  ): InstitutionKnowledgeRetrievalOwnerPortV1;
+  ): InstitutionKnowledgeRetrievalOwnerPortV1 & {
+    assertStillAuthorized(input: {
+      workspace_id: string;
+      institution_ref: string;
+    }): Promise<"authorized" | "unavailable">;
+  };
 };
 
 export type NurtureInstitutionKnowledgeFormalIngressDeps = {
@@ -66,7 +71,7 @@ async function query(
   try {
     const resolution = await resolveCurrentAuthority(verified, deps, input.request);
     if (resolution.status !== "resolved") return resolution;
-    return invokeSurface(
+    return await invokeSurface(
       verified,
       deps,
       resolution.authority,
@@ -133,7 +138,7 @@ async function execute(
     if (!sameAuthority(consumed.authority, current.authority)) {
       return { status: "denied", reason_code: "institution_authority_snapshot_drift" };
     }
-    return invokeSurface(
+    return await invokeSurface(
       verified,
       deps,
       current.authority,
@@ -164,15 +169,54 @@ async function invokeSurface(
     client_surface: NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_INGRESS_V1.client_surface,
   };
   let retrievalOwner = deps.surfaceDeps.retrievalOwner;
+  let hostAccess: Awaited<ReturnType<
+    NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1["createForPrincipal"]
+  >> | undefined;
   if (request.capabilityKey === "answer_institution_knowledge") {
     if (!deps.authorizedRetrievalOwnerFactory) return unavailable();
-    retrievalOwner = deps.authorizedRetrievalOwnerFactory.createForPrincipal(
-      verified.invocation.principal,
-    );
+    try {
+      hostAccess = deps.authorizedRetrievalOwnerFactory.createForPrincipal(
+        verified.invocation.principal,
+      );
+    } catch {
+      return unavailable();
+    }
+    if (
+      !hostAccess
+      || typeof hostAccess.retrieveCandidates !== "function"
+      || typeof hostAccess.assertStillAuthorized !== "function"
+    ) return unavailable();
+    retrievalOwner = hostAccess;
   }
   const handler = new NurtureInstitutionKnowledgeSurfaceHandler({
     ...deps.surfaceDeps,
     bindings: authorityBoundBindings(deps.surfaceDeps.bindings, authority),
+    adminAuthority: {
+      authorize: async (context) => {
+        let admitted: "authorized" | "denied" | "unavailable";
+        try {
+          admitted = await deps.surfaceDeps.adminAuthority.authorize(context);
+        } catch {
+          return "unavailable";
+        }
+        if (admitted !== "authorized") return admitted;
+        let current;
+        try {
+          current = await resolveCurrentAuthority(verified, deps, request);
+        } catch {
+          return "unavailable";
+        }
+        if (current.status !== "resolved" || !sameAuthority(authority, current.authority)) {
+          return current.status === "denied" ? "denied" : "unavailable";
+        }
+        return hostAccess
+          ? hostAccess.assertStillAuthorized({
+              workspace_id: context.workspace_id,
+              institution_ref: context.institution_ref,
+            }).catch(() => "unavailable" as const)
+          : "authorized";
+      },
+    },
     retrievalOwner,
   });
   return handler.handle(request, trusted);

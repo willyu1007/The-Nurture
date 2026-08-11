@@ -139,23 +139,27 @@ implements NurtureInstitutionKnowledgePreparedCommandLedgerV1 {
         row.participantId !== input.participant_ref
         || row.confirmationRefHash !== input.confirmation_ref_hash
       ) return { status: "conflict" as const };
-      if (row.status === "consumed") {
-        return { status: "replayed" as const, record: toRecord(row) };
-      }
-
       const consumedAt = new Date(input.consumed_at);
       if (row.status === "expired" || row.expiresAt <= consumedAt) {
-        if (row.status === "prepared") {
+        if (row.status !== "expired") {
           await transaction.nurtureInstitutionKnowledgePreparedCommand.updateMany({
             where: {
               commandRequestId: row.commandRequestId,
-              status: "prepared",
+              status: row.status,
               aggregateVersion: row.aggregateVersion,
             },
-            data: { status: "expired", aggregateVersion: { increment: 1 } },
+            data: {
+              status: "expired",
+              snapshotCodecVersion: 0,
+              frozenSnapshotCiphertext: "",
+              aggregateVersion: { increment: 1 },
+            },
           });
         }
         return { status: "expired" as const };
+      }
+      if (row.status === "consumed") {
+        return { status: "replayed" as const, record: toRecord(row) };
       }
 
       const updated = await transaction.nurtureInstitutionKnowledgePreparedCommand.updateMany({

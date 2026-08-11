@@ -309,6 +309,42 @@ describe("Institution Knowledge formal trusted handlers", () => {
     expect(resolve).not.toHaveBeenCalled();
   });
 
+  it("maps a throwing principal-bound retrieval factory to stable unavailable", async () => {
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+      authorityResolver: {
+        resolveCurrent: async () => ({ status: "resolved", authority }),
+      },
+      preparedCommandOwner: {
+        prepare: async () => ({ status: "unavailable", reason_code: "unused" }),
+        consumeConfirmed: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-01",
+          frozen_request: {
+            capabilityKey: "answer_institution_knowledge",
+            capabilityVersion: "1.0.0",
+            targetOptionRef: "institution-option-01",
+            confirmationRef: "owner-confirmation-ref-01",
+            operationInput: { question: "What is the pickup process?" },
+          },
+          authority,
+        }),
+      },
+      authorizedRetrievalOwnerFactory: {
+        createForPrincipal: () => {
+          throw new Error("identity repository unavailable");
+        },
+      },
+    });
+
+    await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.execute]?.(
+      verified("execute", executeInput()),
+    )).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "institution_knowledge_formal_ingress_unavailable",
+    });
+  });
+
   it("keeps every formal lane unavailable when production owners are absent", async () => {
     const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
       surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,

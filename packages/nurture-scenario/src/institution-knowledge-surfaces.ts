@@ -729,7 +729,10 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
         role_assignment_ref: binding.role_assignment_ref,
         surface: binding.surface_key,
         purpose: "institution_admin_online_answer",
-        invocation_ref: trusted.invocation_request_id,
+        // The confirmed command is the stable business invocation. Transport
+        // retries deliberately receive a new request id and must not change
+        // retrieval, generation, or ledger identity after response loss.
+        invocation_ref: trusted.command_request_id,
         evaluated_at: binding.evaluated_at,
       },
       ...this.deps.answerPolicy,

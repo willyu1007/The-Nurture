@@ -41,5 +41,6 @@
 - `prisma validate`: PASS with a non-routable placeholder URL; no connection.
 - scenario TypeScript: PASS.
 - DB TypeScript: PASS.
-- owner tests: 11/11 PASS.
+- focused owner regression: PASS; current population is recorded in
+  `04-verification.md` rather than duplicated here.
 - normalized DB context refresh: PASS with no warnings.

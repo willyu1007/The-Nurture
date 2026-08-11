@@ -11,7 +11,7 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 // owner commits are content-inert for the C30 Host source profiles.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  hostHead: "caa367e7f344675322ceec2390e57f5421cf9220",
+  hostHead: "ae563988a0ee77c8faad5c3b29399dc0688d51a7",
 };
 
 const run = (command, args, cwd) =>
