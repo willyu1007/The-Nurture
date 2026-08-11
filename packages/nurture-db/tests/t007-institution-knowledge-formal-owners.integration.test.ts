@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto";
 import type { ScenarioHumanPrincipalV1 } from "@my-chat/workflow-contracts";
 import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
-import { createPrismaNurtureInstitutionKnowledgeFormalOwners } from
+import {
+  bindPrismaNurtureInstitutionKnowledgeFormalOwners,
+  createPrismaNurtureInstitutionKnowledgeFormalOwners,
+} from
   "../src/institution-knowledge-formal-owners.composition.js";
 
 const prisma = createPrismaClient();
@@ -18,6 +21,7 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
     const participantId = `participant-${suffix}`;
     const institutionId = `institution-${suffix}`;
     const roleAssignmentId = `role-${suffix}`;
+    const caregiverRoleAssignmentId = `caregiver-role-${suffix}`;
     const accountId = `account-${suffix}`;
     const actorId = `actor-${suffix}`;
     const now = new Date("2026-08-11T10:00:00.000Z");
@@ -64,6 +68,18 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
           aggregateVersion: 5,
         },
       });
+      await prisma.nurtureCareRoleAssignment.create({
+        data: {
+          id: caregiverRoleAssignmentId,
+          workspaceId,
+          participantId,
+          role: "caregiver",
+          scopeType: "institution",
+          scopeId: institutionId,
+          status: "active",
+          aggregateVersion: 2,
+        },
+      });
 
       const owners = createPrismaNurtureInstitutionKnowledgeFormalOwners({
         prisma,
@@ -73,13 +89,52 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
         now: () => new Date(now),
       });
       const principal = humanPrincipal({ workspaceId, accountId, actorId });
+      const moduleBinding = bindPrismaNurtureInstitutionKnowledgeFormalOwners({
+        formalOwners: owners,
+        ownerIntegration: {
+          q2_owner_pin: {},
+          q3_adapter_qualification_pin: {},
+          surface_deps: {
+            optionIssuer: owners.institutionKnowledgeOptionIssuer,
+          },
+        } as never,
+      });
+      expect(moduleBinding.institutionKnowledgeAuthorityResolver)
+        .toBe(owners.institutionKnowledgeAuthorityResolver);
+      expect(() => bindPrismaNurtureInstitutionKnowledgeFormalOwners({
+        formalOwners: owners,
+        ownerIntegration: {
+          surface_deps: { optionIssuer: { issue: () => null } },
+        } as never,
+      })).toThrow(/option issuer/u);
+
       const targetOptionRef = owners.institutionKnowledgeOptionIssuer.issueInstitution({
         workspace_id: workspaceId,
         participant_ref: participantId,
         institution_ref: institutionId,
+        role_assignment_ref: roleAssignmentId,
         version: 3,
       });
       if (!targetOptionRef) throw new Error("target option issuance failed");
+      const caregiverTargetOptionRef =
+        owners.institutionKnowledgeOptionIssuer.issueInstitution({
+          workspace_id: workspaceId,
+          participant_ref: participantId,
+          institution_ref: institutionId,
+          role_assignment_ref: caregiverRoleAssignmentId,
+          version: 3,
+        });
+      if (!caregiverTargetOptionRef) throw new Error("caregiver target option issuance failed");
+      await expect(owners.institutionKnowledgeAuthorityResolver.resolveCurrent({
+        principal,
+        invocation_request_id: `caregiver-authority-${suffix}`,
+        declared_operation_key: "query_institution_knowledge",
+        capability_key: "query_institution_knowledge_preview",
+        target_option_ref: caregiverTargetOptionRef,
+      })).resolves.toEqual({
+        status: "denied",
+        reason_code: "institution_admin_role_not_current",
+      });
 
       const authority = await owners.institutionKnowledgeAuthorityResolver.resolveCurrent({
         principal,

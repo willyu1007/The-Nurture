@@ -43,28 +43,61 @@ implements NurtureInstitutionKnowledgePreparedCommandLedgerV1 {
     input: NurtureInstitutionKnowledgePreparedCommandRecordV1,
   ): ReturnType<NurtureInstitutionKnowledgePreparedCommandLedgerV1["getOrCreate"]> {
     try {
-      const created = await this.prisma.nurtureInstitutionKnowledgePreparedCommand.create({
-        data: {
-          commandRequestId: input.command_request_id,
-          workspaceId: input.workspace_id,
-          participantId: input.participant_ref,
-          institutionId: input.institution_ref,
-          roleAssignmentId: input.role_assignment_ref,
-          clientSurface: input.client_surface,
-          clientCommandIdHash: input.client_command_id_hash,
-          prepareFingerprint: input.prepare_fingerprint,
-          originInvocationRequestIdHash: input.origin_invocation_request_id_hash,
-          confirmationRefHash: input.confirmation_ref_hash,
-          capabilityKey: input.capability_key,
-          snapshotCodecVersion: input.snapshot_codec_version,
-          frozenSnapshotCiphertext: input.frozen_snapshot_ciphertext,
-          status: input.status,
-          preparedAt: new Date(input.prepared_at),
-          expiresAt: new Date(input.expires_at),
-          ...(input.consumed_at ? { consumedAt: new Date(input.consumed_at) } : {}),
-          aggregateVersion: input.aggregate_version,
-        },
-      });
+      const created = await this.prisma.$transaction(async (transaction) => {
+        const preparedAt = new Date(input.prepared_at);
+        const currentScope = await transaction.$queryRaw<Array<{ role_assignment_id: string }>>(
+          Prisma.sql`SELECT role_assignment."id" AS "role_assignment_id"
+            FROM "nurture_care_role_assignment" role_assignment
+            INNER JOIN "nurture_participant" participant
+              ON participant."id" = role_assignment."participant_id"
+              AND participant."workspace_id" = role_assignment."workspace_id"
+              AND participant."status" = 'active'
+              AND participant."deleted_at" IS NULL
+            INNER JOIN "nurture_care_institution" institution
+              ON institution."id" = role_assignment."scope_id"
+              AND institution."workspace_id" = role_assignment."workspace_id"
+              AND institution."status" = 'active'
+              AND institution."deleted_at" IS NULL
+            WHERE role_assignment."id" = ${input.role_assignment_ref}
+              AND role_assignment."workspace_id" = ${input.workspace_id}
+              AND role_assignment."participant_id" = ${input.participant_ref}
+              AND role_assignment."role" = 'institution_admin'
+              AND role_assignment."scope_type" = 'institution'
+              AND role_assignment."scope_id" = ${input.institution_ref}
+              AND role_assignment."status" = 'active'
+              AND role_assignment."deleted_at" IS NULL
+              AND (role_assignment."starts_at" IS NULL
+                OR role_assignment."starts_at" <= (${preparedAt}::timestamptz AT TIME ZONE 'UTC'))
+              AND (role_assignment."ends_at" IS NULL
+                OR role_assignment."ends_at" > (${preparedAt}::timestamptz AT TIME ZONE 'UTC'))
+            FOR SHARE OF role_assignment, participant, institution`,
+        );
+        if (currentScope.length !== 1) {
+          throw new PreparedCommandScopeError();
+        }
+        return transaction.nurtureInstitutionKnowledgePreparedCommand.create({
+          data: {
+            commandRequestId: input.command_request_id,
+            workspaceId: input.workspace_id,
+            participantId: input.participant_ref,
+            institutionId: input.institution_ref,
+            roleAssignmentId: input.role_assignment_ref,
+            clientSurface: input.client_surface,
+            clientCommandIdHash: input.client_command_id_hash,
+            prepareFingerprint: input.prepare_fingerprint,
+            originInvocationRequestIdHash: input.origin_invocation_request_id_hash,
+            confirmationRefHash: input.confirmation_ref_hash,
+            capabilityKey: input.capability_key,
+            snapshotCodecVersion: input.snapshot_codec_version,
+            frozenSnapshotCiphertext: input.frozen_snapshot_ciphertext,
+            status: input.status,
+            preparedAt,
+            expiresAt: new Date(input.expires_at),
+            ...(input.consumed_at ? { consumedAt: new Date(input.consumed_at) } : {}),
+            aggregateVersion: input.aggregate_version,
+          },
+        });
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted });
       return { status: "created", record: toRecord(created) };
     } catch (error) {
       if (!isUniqueConflict(error)) throw error;
@@ -147,6 +180,13 @@ implements NurtureInstitutionKnowledgePreparedCommandLedgerV1 {
       });
       return { status: "consumed" as const, record: toRecord(consumed) };
     }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted });
+  }
+}
+
+class PreparedCommandScopeError extends Error {
+  constructor() {
+    super("prepared command scope is not current");
+    this.name = "PreparedCommandScopeError";
   }
 }
 

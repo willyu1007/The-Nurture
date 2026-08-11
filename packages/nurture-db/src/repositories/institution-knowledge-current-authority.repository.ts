@@ -172,7 +172,7 @@ implements NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1 {
   async readCurrent(
     input: Parameters<NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1["readCurrent"]>[0],
   ): ReturnType<NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1["readCurrent"]> {
-    if (input.limit !== 2) return [];
+    if (input.limit !== 1) return [];
     const at = new Date(input.at);
     return this.prisma.$queryRaw<Array<{
       role_assignment_ref: string;
@@ -197,6 +197,7 @@ implements NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1 {
         AND institution."deleted_at" IS NULL
       WHERE role_assignment."workspace_id" = ${input.workspace_id}
         AND role_assignment."participant_id" = ${input.participant_ref}
+        AND role_assignment."id" = ${input.role_assignment_ref}
         AND role_assignment."role" = 'institution_admin'
         AND role_assignment."scope_type" = 'institution'
         AND role_assignment."scope_id" = ${input.institution_ref}
@@ -207,7 +208,7 @@ implements NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1 {
         AND (role_assignment."ends_at" IS NULL
           OR role_assignment."ends_at" > (${at}::timestamptz AT TIME ZONE 'UTC'))
       ORDER BY role_assignment."id"
-      LIMIT 2`);
+      LIMIT 1`);
   }
 }
 

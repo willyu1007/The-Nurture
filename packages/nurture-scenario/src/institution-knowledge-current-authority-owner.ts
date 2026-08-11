@@ -21,6 +21,7 @@ export type NurtureInstitutionKnowledgeTargetKind = "institution" | "item" | "re
 export type NurtureInstitutionKnowledgeTargetSelectionV1 = {
   target_kind: NurtureInstitutionKnowledgeTargetKind;
   target_ref: string;
+  role_assignment_ref: string;
   target_version?: number;
 };
 
@@ -62,8 +63,9 @@ export type NurtureInstitutionKnowledgeInstitutionAdminRoleReaderV1 = {
     workspace_id: string;
     participant_ref: string;
     institution_ref: string;
+    role_assignment_ref: string;
     at: string;
-    limit: 2;
+    limit: 1;
   }): Promise<readonly NurtureInstitutionKnowledgeInstitutionAdminRoleV1[]>;
 };
 
@@ -188,8 +190,9 @@ implements NurtureInstitutionKnowledgeFormalAuthorityResolverV1 {
         workspace_id: workspaceId,
         participant_ref: participantId,
         institution_ref: currentTarget.target.institution_ref,
+        role_assignment_ref: selection.role_assignment_ref,
         at: evaluatedAt,
-        limit: 2,
+        limit: 1,
       });
     } catch {
       return unavailable("institution_knowledge_role_owner_unavailable");
@@ -224,8 +227,8 @@ implements NurtureInstitutionKnowledgeFormalAuthorityResolverV1 {
   }
 }
 
-const OPTION_VERSION = "ik1";
-const OPTION_CONTEXT = "nurture.institution-knowledge-target-option.v1\0";
+const OPTION_VERSION = "ik2";
+const OPTION_CONTEXT = "nurture.institution-knowledge-target-option.v2\0";
 
 /**
  * Actor-bound target selection codec. Its authenticated payload is routing
@@ -246,6 +249,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
     actor_participant_ref: string;
     kind: "item" | "revision";
     target_ref: string;
+    role_assignment_ref: string;
     version?: number;
   }): string | null {
     return this.issueSelection({
@@ -254,6 +258,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
       selection: {
         target_kind: input.kind,
         target_ref: input.target_ref,
+        role_assignment_ref: input.role_assignment_ref,
         ...(input.version === undefined ? {} : { target_version: input.version }),
       },
     });
@@ -263,6 +268,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
     workspace_id: string;
     participant_ref: string;
     institution_ref: string;
+    role_assignment_ref: string;
     version?: number;
   }): string | null {
     return this.issueSelection({
@@ -271,6 +277,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
       selection: {
         target_kind: "institution",
         target_ref: input.institution_ref,
+        role_assignment_ref: input.role_assignment_ref,
         ...(input.version === undefined ? {} : { target_version: input.version }),
       },
     });
@@ -304,6 +311,7 @@ NurtureInstitutionKnowledgeTargetOptionResolverV1 {
     const payload = Buffer.from(JSON.stringify({
       k: selection.target_kind,
       r: selection.target_ref,
+      a: selection.role_assignment_ref,
       ...(selection.target_version === undefined ? {} : { v: selection.target_version }),
     }), "utf8").toString("base64url");
     const ref = `${OPTION_VERSION}.${payload}.${this.tag(
@@ -330,18 +338,30 @@ function parseSelection(value: unknown): NurtureInstitutionKnowledgeTargetSelect
   if (!record(value)) return null;
   const source = "target_kind" in value
     ? value
-    : { target_kind: value.k, target_ref: value.r, target_version: value.v };
+    : {
+        target_kind: value.k,
+        target_ref: value.r,
+        role_assignment_ref: value.a,
+        target_version: value.v,
+      };
   const keys = Object.keys(source).filter((key) => source[key] !== undefined);
   if (
-    !keys.every((key) => ["target_kind", "target_ref", "target_version"].includes(key))
-    || keys.length < 2
+    !keys.every((key) => [
+      "target_kind",
+      "target_ref",
+      "role_assignment_ref",
+      "target_version",
+    ].includes(key))
+    || keys.length < 3
     || !["institution", "item", "revision"].includes(String(source.target_kind))
     || !opaqueId(source.target_ref)
+    || !opaqueId(source.role_assignment_ref)
     || (source.target_version !== undefined && !nonNegativeVersion(source.target_version))
   ) return null;
   return {
     target_kind: source.target_kind as NurtureInstitutionKnowledgeTargetKind,
     target_ref: source.target_ref,
+    role_assignment_ref: source.role_assignment_ref,
     ...(source.target_version === undefined ? {} : { target_version: source.target_version }),
   };
 }

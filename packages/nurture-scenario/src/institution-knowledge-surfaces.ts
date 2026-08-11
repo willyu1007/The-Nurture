@@ -197,6 +197,7 @@ export type NurtureInstitutionKnowledgeOptionIssuer = {
   issue(input: {
     workspace_id: string;
     actor_participant_ref: string;
+    role_assignment_ref: string;
     kind: "item" | "revision";
     target_ref: string;
     version?: number;
@@ -445,6 +446,7 @@ const presentPreview = (
 const presentCitation = (
   citation: InstitutionKnowledgeCitationV1,
   trusted: NurtureInstitutionKnowledgeTrustedContextV1,
+  roleAssignmentRef: string,
   issuer: NurtureInstitutionKnowledgeOptionIssuer,
 ) => {
   const common = {
@@ -469,12 +471,14 @@ const presentCitation = (
   const itemOptionRef = issuer.issue({
     workspace_id: trusted.workspace_id,
     actor_participant_ref: trusted.actor_participant_ref,
+    role_assignment_ref: roleAssignmentRef,
     kind: "item",
     target_ref: citation.item_ref,
   });
   const revisionOptionRef = issuer.issue({
     workspace_id: trusted.workspace_id,
     actor_participant_ref: trusted.actor_participant_ref,
+    role_assignment_ref: roleAssignmentRef,
     kind: "revision",
     target_ref: citation.revision_ref,
     version: citation.revision_number,
@@ -497,11 +501,12 @@ const presentSafetyNotice = (
 const presentCitations = (
   citations: InstitutionKnowledgeCitationV1[],
   trusted: NurtureInstitutionKnowledgeTrustedContextV1,
+  roleAssignmentRef: string,
   issuer: NurtureInstitutionKnowledgeOptionIssuer,
 ) => {
   const presented = [];
   for (const citation of citations) {
-    const value = presentCitation(citation, trusted, issuer);
+    const value = presentCitation(citation, trusted, roleAssignmentRef, issuer);
     if (!value) return null;
     presented.push(value);
   }
@@ -511,6 +516,7 @@ const presentCitations = (
 export const presentInstitutionKnowledgeAnswer = (
   result: InstitutionKnowledgeAnswerResultV1,
   trusted: NurtureInstitutionKnowledgeTrustedContextV1,
+  roleAssignmentRef: string,
   issuer: NurtureInstitutionKnowledgeOptionIssuer,
 ) => {
   switch (result.status) {
@@ -525,7 +531,7 @@ export const presentInstitutionKnowledgeAnswer = (
         safetyNotice: presentSafetyNotice(result.safety_notice),
       };
     case "abstained_medical_conflict": {
-      const citations = presentCitations(result.citations, trusted, issuer);
+      const citations = presentCitations(result.citations, trusted, roleAssignmentRef, issuer);
       if (!citations) return null;
       return {
         status: result.status,
@@ -541,7 +547,7 @@ export const presentInstitutionKnowledgeAnswer = (
       };
     }
     case "answered": {
-      const citations = presentCitations(result.citations, trusted, issuer);
+      const citations = presentCitations(result.citations, trusted, roleAssignmentRef, issuer);
       if (!citations) return null;
       return {
         status: result.status,
@@ -746,6 +752,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
     const presented = presentInstitutionKnowledgeAnswer(
       result.result,
       trusted,
+      binding.role_assignment_ref,
       this.deps.optionIssuer,
     );
     return presented
@@ -850,6 +857,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
     const itemOptionRef = this.deps.optionIssuer.issue({
       workspace_id: trusted.workspace_id,
       actor_participant_ref: trusted.actor_participant_ref,
+      role_assignment_ref: binding.role_assignment_ref,
       kind: "item",
       target_ref: result.item_ref,
       version: result.item_head,
@@ -857,6 +865,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
     const revisionOptionRef = this.deps.optionIssuer.issue({
       workspace_id: trusted.workspace_id,
       actor_participant_ref: trusted.actor_participant_ref,
+      role_assignment_ref: binding.role_assignment_ref,
       kind: "revision",
       target_ref: result.revision_ref,
       version: result.revision_number,

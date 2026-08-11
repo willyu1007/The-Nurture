@@ -30,6 +30,11 @@
   are not persisted; only keyed hashes are stored.
 - No My-Chat ORM, PermissionContext, credential, or provider secret is stored.
 - No existing table, column, enum member, index, or row is removed or rewritten.
+- Target option contract `ik2` signs the exact role-assignment ref together
+  with the target. A caregiver role or another administrator assignment cannot
+  be silently merged into the selected authority.
+- Ledger creation locks and rechecks the exact active Participant,
+  Institution, and Institution Admin scope before inserting a confirmation.
 
 ## Static verification
 

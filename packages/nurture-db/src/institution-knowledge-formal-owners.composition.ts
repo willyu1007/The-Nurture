@@ -5,6 +5,7 @@ import {
   NurtureInstitutionKnowledgePreparedCommandOwner,
   NurtureInstitutionKnowledgeTargetOptionCodec,
   type NurtureInstitutionKnowledgeFormalAuthorityResolverV1,
+  type NurtureInstitutionKnowledgeOwnerIntegration,
   type NurtureInstitutionKnowledgePreparedCommandOwnerV1,
 } from "@the-nurture/scenario";
 import { PrismaNurtureParticipantBindingReader } from "./c30/participant-binding.js";
@@ -19,6 +20,12 @@ export type PrismaNurtureInstitutionKnowledgeFormalOwners = Readonly<{
   institutionKnowledgeAuthorityResolver: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
   institutionKnowledgePreparedCommandOwner: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
   institutionKnowledgeOptionIssuer: NurtureInstitutionKnowledgeTargetOptionCodec;
+}>;
+
+export type PrismaNurtureInstitutionKnowledgeFormalModuleBinding = Readonly<{
+  institutionKnowledgeOwnerIntegration: NurtureInstitutionKnowledgeOwnerIntegration;
+  institutionKnowledgeAuthorityResolver: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
+  institutionKnowledgePreparedCommandOwner: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
 }>;
 
 /**
@@ -70,5 +77,29 @@ export function createPrismaNurtureInstitutionKnowledgeFormalOwners(input: {
     institutionKnowledgeAuthorityResolver,
     institutionKnowledgePreparedCommandOwner,
     institutionKnowledgeOptionIssuer: targetOptions,
+  });
+}
+
+/**
+ * Creates the one module binding for the local formal owners. The admitted
+ * surface dependencies must use the very same option codec instance; a second
+ * codec/key would create an unverifiable target-option track.
+ */
+export function bindPrismaNurtureInstitutionKnowledgeFormalOwners(input: {
+  formalOwners: PrismaNurtureInstitutionKnowledgeFormalOwners;
+  ownerIntegration: NurtureInstitutionKnowledgeOwnerIntegration;
+}): PrismaNurtureInstitutionKnowledgeFormalModuleBinding {
+  if (
+    input.ownerIntegration.surface_deps.optionIssuer
+    !== input.formalOwners.institutionKnowledgeOptionIssuer
+  ) {
+    throw new Error("Institution Knowledge option issuer must be the formal owner codec instance");
+  }
+  return Object.freeze({
+    institutionKnowledgeOwnerIntegration: input.ownerIntegration,
+    institutionKnowledgeAuthorityResolver:
+      input.formalOwners.institutionKnowledgeAuthorityResolver,
+    institutionKnowledgePreparedCommandOwner:
+      input.formalOwners.institutionKnowledgePreparedCommandOwner,
   });
 }

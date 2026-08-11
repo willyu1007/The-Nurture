@@ -43,12 +43,15 @@ function harness(options: {
   bindings?: NurtureParticipantPrincipalBindingV1[];
 } = {}) {
   const codec = new NurtureInstitutionKnowledgeTargetOptionCodec(INTEGRITY_KEY);
-  const readCurrent = vi.fn(async (input: { institution_ref: string }) => options.roles ?? [{
+  const readCurrent = vi.fn(async (input: {
+    institution_ref: string;
+    role_assignment_ref: string;
+  }) => (options.roles ?? [{
     role_assignment_ref: "role-institution-2",
     role_assignment_revision: 4,
     institution_ref: input.institution_ref,
     institution_revision: 6,
-  }]);
+  }]).filter((entry) => entry.role_assignment_ref === input.role_assignment_ref));
   const resolveCurrent = vi.fn(async () => options.targetStatus === "not_found"
     ? { status: "not_found" as const }
     : options.targetStatus === "stale"
@@ -92,6 +95,7 @@ describe("Institution Knowledge current-authority owner", () => {
       workspace_id: "workspace-1",
       participant_ref: "participant-1",
       institution_ref: "institution-2",
+      role_assignment_ref: "role-institution-2",
       version: 6,
     });
 
@@ -117,11 +121,12 @@ describe("Institution Knowledge current-authority owner", () => {
     expect(test.readCurrent).toHaveBeenCalledWith(expect.objectContaining({
       participant_ref: "participant-1",
       institution_ref: "institution-2",
-      limit: 2,
+      role_assignment_ref: "role-institution-2",
+      limit: 1,
     }));
   });
 
-  it("treats duplicate current admin assignments in the selected institution as unavailable", async () => {
+  it("requires and resolves the exact signed role assignment instead of merging roles", async () => {
     const test = harness({
       roles: [
         role("role-1"),
@@ -132,10 +137,22 @@ describe("Institution Knowledge current-authority owner", () => {
       workspace_id: "workspace-1",
       participant_ref: "participant-1",
       institution_ref: "institution-2",
+      role_assignment_ref: "role-1",
     });
-    await expect(test.owner.resolveCurrent(queryInput(String(option)))).resolves.toEqual({
-      status: "unavailable",
-      reason_code: "institution_admin_role_ambiguous",
+    await expect(test.owner.resolveCurrent(queryInput(String(option)))).resolves.toMatchObject({
+      status: "resolved",
+      authority: { role_assignment_ref: "role-1" },
+    });
+
+    const missingRole = test.codec.issueInstitution({
+      workspace_id: "workspace-1",
+      participant_ref: "participant-1",
+      institution_ref: "institution-2",
+      role_assignment_ref: "role-missing",
+    });
+    await expect(test.owner.resolveCurrent(queryInput(String(missingRole)))).resolves.toEqual({
+      status: "denied",
+      reason_code: "institution_admin_role_not_current",
     });
   });
 
@@ -145,6 +162,7 @@ describe("Institution Knowledge current-authority owner", () => {
       workspace_id: "workspace-1",
       participant_ref: "participant-1",
       institution_ref: "institution-2",
+      role_assignment_ref: "role-institution-2",
     });
     expect(test.codec.resolve({
       workspace_id: "workspace-1",
@@ -160,6 +178,7 @@ describe("Institution Knowledge current-authority owner", () => {
     const revisionOption = test.codec.issue({
       workspace_id: "workspace-1",
       actor_participant_ref: "participant-1",
+      role_assignment_ref: "role-institution-2",
       kind: "revision",
       target_ref: "revision-1",
     });
@@ -175,6 +194,7 @@ describe("Institution Knowledge current-authority owner", () => {
       workspace_id: "workspace-1",
       participant_ref: "participant-1",
       institution_ref: "institution-2",
+      role_assignment_ref: "role-institution-2",
       version: 5,
     });
     await expect(stale.owner.resolveCurrent(queryInput(String(option)))).resolves.toEqual({

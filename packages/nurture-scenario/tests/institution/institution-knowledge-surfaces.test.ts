@@ -395,7 +395,7 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
         ),
         published_at: now,
       }],
-    }, trusted(), deps().optionIssuer);
+    }, trusted(), "role-admin-01", deps().optionIssuer);
     expect(presented).toMatchObject({
       status: "answered",
       citations: [{
