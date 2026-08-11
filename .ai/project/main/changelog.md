@@ -97,3 +97,8 @@ Project: `main`
 - 2026-08-10 task_id=T-007 event=checkpoint id=G4-E-I2-B result=surface-adapter-qualified capabilities=7 handlers=2 composition=web-workbench-disabled tests=951/951 formal_ingress=unrouted next=resolve-Q2-Q4-before-I3 activation=unchanged
 - 2026-08-10 task_id=T-007 event=gate-audit id=G4-E-I3 result=not-ready my_chat_head=4d22aab origin_main=2dc365e generic_pin=567b96c q2=open q3=open q4=open sibling_writes=not-authorized next=external-adoption-or-explicit-sibling-scope activation=unchanged
 - 2026-08-11 task_id=T-007 event=owner-progress id=G4-E-Q2-Q3 result=partial-adoption my_chat_checkpoint=942bd00 q2=closed q3_generation=qualified q3_safety_boundary=qualified q3_provider_rule_pin=open q4=closed next=qualify-deterministic-provider-before-E7 activation=unchanged
+- 2026-08-11 task_id=T-001 slug=nurture-mvp event=status from=done to=archived
+- 2026-08-11 task_id=T-003 slug=nurture-uiux-pitch event=status from=done to=archived
+- 2026-08-11 task_id=T-004 slug=nurture-surface-contract-foundation event=status from=done to=archived
+- 2026-08-11 task_id=T-006 slug=nurture-child-care-boards event=status from=done to=archived
+- 2026-08-11 task_id=T-009 slug=nurture-family-growth-provider event=status from=done to=archived

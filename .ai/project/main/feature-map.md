@@ -12,12 +12,12 @@ Project: `main`
 - Intent: provide a clean, reviewable Nurture family-MVP baseline with production business persistence structurally separated from the backend-private workflow dev host.
 - Scope In: scenario/repository restoration, production/dev-host dual Prisma streams, deterministic tests, frontend workbench, cross-repo revision/source pins, and local hardening.
 - Scope Out: Institution Ecology business schema, My-Chat production runtime, Handoff Ledger, and non-empty activation.
-- Decision: completed through the five-increment G0 merge, fresh-worktree verification, cleanup, and closure hardening; keep the verified task active until archival is explicitly approved.
+- Decision: completed through the five-increment G0 merge, fresh-worktree verification, cleanup, and closure hardening; archived 2026-08-11 after explicit approval.
 - Dependencies: pinned My-Workflow-Base and My-Chat source revisions.
 - Risks: treating the dev harness as production runtime or letting sibling source drift bypass the pin.
 - Success Signal: 86 unit, 15 production DB, 16 dev-host E2E, dual catalog boundaries, seven-job main CI, and clean post-merge verification.
-- Related Tasks: T-001 nurture-mvp (`done`).
-- Next Checkpoint: archive T-001 after explicit approval; no additional G0 implementation remains.
+- Related Tasks: T-001 nurture-mvp (`archived`).
+- Next Checkpoint: none — archived 2026-08-11; no additional G0 implementation remains.
 
 ### F-002 Institution ecology
 - Intent: deliver child-scope-first family/institution care coordination with Nurture-owned business facts and My-Chat-owned account, shell, and durable runtime.
@@ -159,7 +159,7 @@ Project: `main`
   The repaired exact Exit is `G3_EXIT_PASS_RESTORED` at Nurture `0374087…`,
   surface contract `1.15.0` and the 168-file self-pin `b44f4fad…`. Formal owner,
   both joint journeys, full production DB, default-off census and teardown passed;
-  T-006 is done and awaits separate archival approval.
+  T-006 is archived (2026-08-11); its exact handoff remains citable by pin.
 - Stage G4: reuse T-007 and organize delivery as G4-0 Contract & Fact Freeze,
   G4-A Authority/Aggregate Foundation, G4-B Role-bound Mobile Operations,
   G4-C InstitutionAdminWorkbench Core, G4-D Enrollment Journey Workflow,
@@ -368,7 +368,7 @@ Project: `main`
   canonical attendance, letting Admin substitute for class-teacher confirmation, or presenting
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
-- Related Tasks: T-004 (`done`); T-005 (`archived`); T-006 (`done`);
+- Related Tasks: T-004 (`archived`); T-005 (`archived`); T-006 (`archived`);
   T-007 (`in-progress`); T-008 (`planned`).
 - Current posture: T-007 completed 0C, 0D and the full frozen 0E chain at
   private I1. G4-D increments 2–5 are qualified through 33 migrations on
@@ -456,12 +456,11 @@ Project: `main`
   sides at exact pins; one photo released in Nurture appears as an admitted
   My-Chat family material with correction/removal/redaction propagating and
   the teacher queue showing exact receipt states — all default-off.
-- Related Tasks: T-009 nurture-family-growth-provider (`done`).
+- Related Tasks: T-009 nurture-family-growth-provider (`archived`).
 - Next Checkpoint: none inside F-004's provider scope — I0–I8 are closed by
   the 2026-08-08 `REQUAL_PASS` at `860f73f` / `1.17.0` / `sha256:d22851d9…`.
   The remaining consumer half (ingress, media importer, receipt delivery,
-  guardian confirmation) belongs to My-Chat T-031. Archive T-009 only after
-  explicit approval.
+  guardian confirmation) belongs to My-Chat T-031. T-009 archived 2026-08-11.
 
 ### F-005 Family-sharing eligibility owner
 
@@ -509,22 +508,22 @@ Project: `main`
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-001 nurture-mvp | done | dev-docs/active/nurture-mvp |
+| T-001 nurture-mvp | archived | dev-docs/archive/nurture-mvp |
 
 ### F-002 Institution ecology
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-002 nurture-institution-mode | in-progress | dev-docs/active/nurture-institution-mode |
-| T-003 nurture-uiux-pitch | done | dev-docs/active/nurture-uiux-pitch |
+| T-003 nurture-uiux-pitch | archived | dev-docs/archive/nurture-uiux-pitch |
 
 ### F-003 Six-surface store-beta readiness
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-004 nurture-surface-contract-foundation | done | dev-docs/active/nurture-surface-contract-foundation |
+| T-004 nurture-surface-contract-foundation | archived | dev-docs/archive/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | archived | dev-docs/archive/nurture-family-care-conversation |
-| T-006 nurture-child-care-boards | done | dev-docs/active/nurture-child-care-boards |
+| T-006 nurture-child-care-boards | archived | dev-docs/archive/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | in-progress | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |
 
@@ -532,7 +531,7 @@ Project: `main`
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-009 nurture-family-growth-provider | done | dev-docs/active/nurture-family-growth-provider |
+| T-009 nurture-family-growth-provider | archived | dev-docs/archive/nurture-family-growth-provider |
 
 ### F-005 Family-sharing eligibility owner
 

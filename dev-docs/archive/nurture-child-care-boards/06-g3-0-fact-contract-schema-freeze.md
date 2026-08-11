@@ -29,9 +29,9 @@ provider, T-007 policy provider/consumer integration or a Beta Profile Handoff.
 | DB SSOT | `prisma/schema.prisma`; generated context version 2, 60 tables after the landed G3 delta (50 at freeze time) | landed-fact census and future additive migration boundary |
 
 Normative handoffs are
-[T-002 M5](../nurture-institution-mode/16-owner-integration-handoff-m5.md),
-[T-005 G2 Exit](../../archive/nurture-family-care-conversation/14-g2-exit-qualification-and-beta-handoff.md)
-and [T-007 G4-0B](../nurture-institution-surfaces/08-g4-0b-publication-policy-freeze.md).
+[T-002 M5](../../active/nurture-institution-mode/16-owner-integration-handoff-m5.md),
+[T-005 G2 Exit](../nurture-family-care-conversation/14-g2-exit-qualification-and-beta-handoff.md)
+and [T-007 G4-0B](../../active/nurture-institution-surfaces/08-g4-0b-publication-policy-freeze.md).
 The T-005 handoff's final Nurture self-pin is `4cd8b8b5…`; that archive-path-only rotation does
 not change the exact surface artifact or owner/source population above.
 

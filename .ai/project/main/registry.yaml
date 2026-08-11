@@ -71,11 +71,11 @@ requirements:
 tasks:
   - id: T-001
     slug: nurture-mvp
-    status: done
+    status: archived
     milestone_id: M-001
     feature_id: F-001
-    dev_docs_path: dev-docs/active/nurture-mvp
-    updated: 2026-07-13
+    dev_docs_path: dev-docs/archive/nurture-mvp
+    updated: 2026-08-11
   - id: T-002
     slug: nurture-institution-mode
     status: in-progress
@@ -85,18 +85,18 @@ tasks:
     updated: 2026-08-06
   - id: T-003
     slug: nurture-uiux-pitch
-    status: done
+    status: archived
     milestone_id: M-002
     feature_id: F-002
-    dev_docs_path: dev-docs/active/nurture-uiux-pitch
-    updated: 2026-08-08
+    dev_docs_path: dev-docs/archive/nurture-uiux-pitch
+    updated: 2026-08-11
   - id: T-004
     slug: nurture-surface-contract-foundation
-    status: done
+    status: archived
     milestone_id: M-002
     feature_id: F-003
-    dev_docs_path: dev-docs/active/nurture-surface-contract-foundation
-    updated: 2026-08-01
+    dev_docs_path: dev-docs/archive/nurture-surface-contract-foundation
+    updated: 2026-08-11
   - id: T-005
     slug: nurture-family-care-conversation
     status: archived
@@ -106,11 +106,11 @@ tasks:
     updated: 2026-08-02
   - id: T-006
     slug: nurture-child-care-boards
-    status: done
+    status: archived
     milestone_id: M-002
     feature_id: F-003
-    dev_docs_path: dev-docs/active/nurture-child-care-boards
-    updated: 2026-08-05
+    dev_docs_path: dev-docs/archive/nurture-child-care-boards
+    updated: 2026-08-11
   - id: T-007
     slug: nurture-institution-surfaces
     status: in-progress
@@ -127,11 +127,11 @@ tasks:
     updated: 2026-08-05
   - id: T-009
     slug: nurture-family-growth-provider
-    status: done
+    status: archived
     milestone_id: M-003
     feature_id: F-004
-    dev_docs_path: dev-docs/active/nurture-family-growth-provider
-    updated: 2026-08-08
+    dev_docs_path: dev-docs/archive/nurture-family-growth-provider
+    updated: 2026-08-11
   - id: T-010
     slug: nurture-family-sharing-eligibility
     status: in-progress

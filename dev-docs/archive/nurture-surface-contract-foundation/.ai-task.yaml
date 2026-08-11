@@ -2,7 +2,7 @@ version: 1
 task_id: T-004
 project: main
 slug: nurture-surface-contract-foundation
-status: done
+status: archived
 updated: "2026-08-01"
 keywords:
   - six-surfaces
