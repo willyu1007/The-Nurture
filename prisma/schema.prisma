@@ -3028,9 +3028,9 @@ model NurtureInstitutionKnowledgePreparedCommand {
   createdAt                     DateTime                                         @default(now()) @map("created_at")
   updatedAt                     DateTime                                         @updatedAt @map("updated_at")
 
-  participant    NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict)
-  institution    NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  roleAssignment NurtureCareRoleAssignment @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict)
+  participant    NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict, map: "nurture_knowledge_prepared_participant_id_fkey")
+  institution    NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_prepared_institution_id_fkey")
+  roleAssignment NurtureCareRoleAssignment @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_knowledge_prepared_role_assignment_id_fkey")
 
   @@unique([workspaceId, participantId, clientSurface, clientCommandIdHash], map: "uq_nurture_knowledge_prepared_client_command")
   @@index([workspaceId, participantId, status, expiresAt], map: "ix_nurture_knowledge_prepared_participant")
