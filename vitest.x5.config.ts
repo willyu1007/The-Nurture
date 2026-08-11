@@ -10,6 +10,7 @@ export default defineConfig({
     include: [
       "packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts",
       "packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts",
+      "packages/nurture-db/tests/t007-institution-knowledge-e8-joint.integration.test.ts",
     ],
     exclude: ["**/node_modules/**", "**/dist/**"],
     testTimeout: 60_000,

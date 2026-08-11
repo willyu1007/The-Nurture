@@ -30,6 +30,8 @@
   "devDependencies": {
     "@my-chat/db": "0.1.0",
     "@my-chat/domain": "0.1.0",
+    "@my-chat/llm": "0.1.0",
+    "@my-chat/rag": "0.1.0",
     "@my-chat/scenario-integrations": "0.1.0",
     "@my-chat/workers": "0.1.0",
     "@my-chat/workflow-runtime": "0.1.0"

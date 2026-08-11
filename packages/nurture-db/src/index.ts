@@ -24,6 +24,7 @@ export * from "./repositories/institution-knowledge.repository.js";
 export * from "./repositories/institution-knowledge-conflict-candidate.repository.js";
 export * from "./repositories/institution-knowledge-current-authority.repository.js";
 export * from "./repositories/institution-knowledge-prepared-command.repository.js";
+export * from "./repositories/institution-knowledge-read-owner.repository.js";
 export * from "./repositories/family-care-query.repository.js";
 export * from "./repositories/user-attention.repository.js";
 export * from "./repositories/family-care-command.transaction.js";

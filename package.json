@@ -95,7 +95,9 @@
     "overrides": {
       "@my-chat/db": "link:../My-Chat/packages/db",
       "@my-chat/domain": "link:../My-Chat/packages/domain",
+      "@my-chat/llm": "link:../My-Chat/packages/llm",
       "@my-chat/outbox": "link:../My-Chat/packages/outbox",
+      "@my-chat/rag": "link:../My-Chat/packages/rag",
       "@my-chat/permissions": "link:../My-Chat/packages/permissions",
       "@my-chat/scenario-integrations": "link:../My-Chat/packages/scenario-integrations",
       "@my-chat/workers": "link:../My-Chat/apps/workers",

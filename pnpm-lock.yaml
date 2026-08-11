@@ -7,7 +7,9 @@ settings:
 overrides:
   '@my-chat/db': link:../My-Chat/packages/db
   '@my-chat/domain': link:../My-Chat/packages/domain
+  '@my-chat/llm': link:../My-Chat/packages/llm
   '@my-chat/outbox': link:../My-Chat/packages/outbox
+  '@my-chat/rag': link:../My-Chat/packages/rag
   '@my-chat/permissions': link:../My-Chat/packages/permissions
   '@my-chat/scenario-integrations': link:../My-Chat/packages/scenario-integrations
   '@my-chat/workers': link:../My-Chat/apps/workers
@@ -160,6 +162,12 @@ importers:
       '@my-chat/domain':
         specifier: link:../../../My-Chat/packages/domain
         version: link:../../../My-Chat/packages/domain
+      '@my-chat/llm':
+        specifier: link:../../../My-Chat/packages/llm
+        version: link:../../../My-Chat/packages/llm
+      '@my-chat/rag':
+        specifier: link:../../../My-Chat/packages/rag
+        version: link:../../../My-Chat/packages/rag
       '@my-chat/scenario-integrations':
         specifier: link:../../../My-Chat/packages/scenario-integrations
         version: link:../../../My-Chat/packages/scenario-integrations
