@@ -936,6 +936,9 @@ PRODUCTION_OWNER_BINDING_PENDING`.
 | Focused formal/runtime regression | PASS | 7 files / 45 tests. |
 | Manifest/test routing/default-off census | PASS | Generated manifest, lane routing and activation absence checks passed. |
 | Governance/diff hygiene | PASS | Project-governance lint and `git diff --check` passed. |
+| Current source revision | PASS | Formal owner hardening source is `1f71f02e3b3087515f6c5e421152a3efc515c61c`. |
+| Current scenario pin | PASS | Nurture scenario hash is `74b6f1d40f304e09cf37ff333b15bfe7ce127afb677907f263437a877e795768`. |
+| Current adoption lock | PASS | C30 owner-adoption hash is `98677cb3ebb78102161975720917eb69d7344c91737a26fd582c3656ddd9288a`. |
 
 ## Required Evidence
 
