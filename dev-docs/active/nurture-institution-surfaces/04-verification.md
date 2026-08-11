@@ -956,6 +956,21 @@ PRODUCTION_OWNER_BINDING_PENDING`.
 Current verdict: `G4_E_E7_OWNER_SOURCE_COMPLETE_DEFAULT_OFF /
 DB_QUALIFICATION_PENDING / E8_PENDING`.
 
+## 2026-08-11 G4-E E7 disposable database qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Empty-deploy migration qualification | PASS | 36/36 applied and current on `nurture_t007_g4e_e7_qualification_20260811_01`; destroyed with census `0/0`. |
+| Targeted formal-owners PostgreSQL suite | PASS | 4/4 — current authority with wrong-role/revoked-role denial, exact-prepare dedup with reuse rejection, unconsumed-expiry snapshot scrub without client-command revival, mismatched-confirmation conflict with exact consume, concurrent consume/replay convergence. |
+| Full production DB lane | PASS | 44 files / 395 tests. |
+| Drift / status / context | PASS | Datasource-to-datamodel diff "No difference detected."; 36/current; context checksum `af51b1d7…` unchanged. |
+| Structural gates | PASS | `verify:test-routing` (`production-db=44`), `verify:persistence-boundaries`, `verify:port-topology`, `verify:formal-ingress-contract`, `db:assert-boundary`, `verify:g3-0-freeze`. |
+| Pre-apply repairs | RECORDED | `DR-E7-01` CHECK vs frozen expiry scrub (`b0adb64`); `DR-E7-02` foreign-key `map:` names (`223daa7`). Neither changed a durable target; the migration was never durably applied. |
+| Qualification checkpoint | `223daa7` | Record [`83`](./83-g4-e-e7-db-qualification-record.md); evidence `artifacts/db/t007-formal-ingress-owners/00`–`04`. |
+| Runtime effects | NONE / DEFAULT-OFF | Disposable targets only; no durable apply, route, flag, gateway call, secret read, deployment or traffic. |
+
+Current verdict: `G4_E_E7_DB_QUALIFICATION_PASS / E8_PENDING`.
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

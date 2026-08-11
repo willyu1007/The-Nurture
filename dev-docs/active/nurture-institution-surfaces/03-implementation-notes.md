@@ -1388,4 +1388,8 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   sources.
 - No compatibility alias, old internal handler, route, flag, secret read,
   gateway call, deployment or traffic path was added. The Prisma migration is
-  authored and remains `NOT_RUN_APPROVAL_PENDING`.
+  authored and, as of 2026-08-11, disposable-qualified as
+  `G4_E_E7_DB_QUALIFICATION_PASS` at `223daa7` with two pre-apply repairs
+  (`DR-E7-01` CHECK/expiry-scrub, `DR-E7-02` FK `map:` names); see record
+  [`83`](./83-g4-e-e7-db-qualification-record.md). Durable apply remains
+  approval-gated.

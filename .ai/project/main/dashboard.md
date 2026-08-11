@@ -19,15 +19,14 @@ Project: `main`
 - Current surface identity: `nurture.surface-contract@1.20.0` /
   `sha256:35d6340f…` (shared core `sha256:7bd8a82d…`, 65 capabilities /
   6 surfaces).
-- T-007 critical path (in dependency order): qualify the G4-E E7 additive
-  migration on an approved disposable PostgreSQL target (approval granted
-  2026-08-11 in the planning session; record execution evidence in the task
-  bundle when run) → G4-E E8 joint conformance with My-Chat T-040, no traffic →
-  G4-D I3 authenticated owner adapters + formal ingress → I4 joint conformance
-  → G4-F Exit. The prepared-command migration remains
-  `NOT_RUN_APPROVAL_PENDING` until the E7 run; `live_qualified=false` stays a
-  separate activation gate — recorded/synthetic transport is never live
-  evidence.
+- T-007 critical path (in dependency order): E7 disposable qualification is
+  **done** — `G4_E_E7_DB_QUALIFICATION_PASS` at `223daa7` (record 83; 36/36
+  empty deploy, targeted 4/4, full DB lane 395/395, destroy census `0/0`, two
+  pre-apply repairs `DR-E7-01`/`DR-E7-02`). Next: G4-E E8 joint conformance
+  with My-Chat T-040, no traffic → G4-D I3 authenticated owner adapters +
+  formal ingress → I4 joint conformance → G4-F Exit. Durable apply remains
+  approval-gated; `live_qualified=false` stays a separate activation gate —
+  recorded/synthetic transport is never live evidence.
 - T-010: I4-C0 qualified. Next is I4-C1 — produce and review an additive
   Prisma diff without database apply; target approval only after migration
   review.
@@ -46,12 +45,11 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Run the E7 disposable qualification** (exact authority, concurrency
-   consume/replay, expiry scrub, status/drift, destroy) and record it.
-2. **Run G4-E E8 joint conformance without traffic**, then issue the G4-E Exit.
-3. **Begin T-010 I4-C1**: additive Prisma diff, review-only, no apply.
-4. **Execute C30 requalification Step 5** for T-002.
-5. `NurtureInstitutionPolicyService` and the G4-D commands still have no
+1. **Run G4-E E8 joint conformance without traffic**, then issue the G4-E Exit
+   (E7 closed 2026-08-11 as record 83).
+2. **Begin T-010 I4-C1**: additive Prisma diff, review-only, no apply.
+3. **Execute C30 requalification Step 5** for T-002.
+4. `NurtureInstitutionPolicyService` and the G4-D commands still have no
    production caller; I1 evidence is not activation evidence.
 
 ## Notes (manual)

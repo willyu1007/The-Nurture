@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal ingress and complete owner source bound default-off; DB qualification next, then E8** | [`64`](./64-g4-0f-scope-freeze.md)–[`82`](./82-g4-e-e7-formal-ingress-contract-audit.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal ingress and complete owner source bound default-off; E7 DB qualification `PASS` at `223daa7`; E8 next** | [`64`](./64-g4-0f-scope-freeze.md)–[`83`](./83-g4-e-e7-db-qualification-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -31,7 +31,10 @@ fail-closed, explicitly disabled formal trusted handlers; its old internal
 adapter keys are removed. The complete owner composition exists only as
 default-off source: exact signed-role current authority, encrypted bounded
 prepare/confirmation persistence, and principal-bound My-Chat retrieval/final
-access. Its additive migration is not yet disposable-qualified. No I4 joint
+access. Its additive migration is disposable-qualified
+(`G4_E_E7_DB_QUALIFICATION_PASS` at `223daa7`, record
+[`83`](./83-g4-e-e7-db-qualification-record.md)); durable apply remains
+approval-gated. No I4 joint
 conformance, runtime capability activation or traffic exists. 0F now has a mechanically verified generic
 My-Chat Knowledge/PBR/RAG source pin, an accepted three-unit decomposition,
 the exact Nurture-owned lifecycle/provenance contract, retrieval/source/
@@ -291,8 +294,10 @@ composition. [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md) now records
 the resolved contract gap: Base/My-Chat provide the committed verified handler
 registry, Nurture freezes owner-held prepare/execute confirmation, and the
 scenario module exposes only the exact formal trusted handlers. The concrete
-owner source is now implemented as one indivisible binding; the remaining gate
-is disposable-DB qualification followed by E8, not another transport envelope.
+owner source is now implemented as one indivisible binding.
+[`83`](./83-g4-e-e7-db-qualification-record.md) closes the disposable-DB
+qualification with two pre-apply repairs; the remaining gate is E8, not
+another transport envelope.
 Model-weight verification and live secrets are not required for that default-
 off slice.
 
@@ -325,9 +330,12 @@ off slice.
 
 ## Next steps, in dependency order
 
-1. **Qualify the G4-E E7 persistence slice** — on explicit approval, apply the
-   additive migration to a disposable PostgreSQL target; run exact authority,
-   concurrent consume/replay, expiry scrub, status/drift and destroy checks.
+1. ~~Qualify the G4-E E7 persistence slice~~ — done 2026-08-11 as
+   `G4_E_E7_DB_QUALIFICATION_PASS` at `223daa7`
+   ([`83`](./83-g4-e-e7-db-qualification-record.md)): 36/36 empty deploy,
+   4/4 targeted authority/dedup/expiry-scrub/conflict/consume-replay checks,
+   full DB lane 395/395, drift none, destroy census `0/0`, two pre-apply
+   repairs recorded.
 2. **G4-E E8** — run the real Base dispatcher → Nurture authority → My-Chat
    retrieval joint cited-positive, no-source, medical-conflict,
    post-generation currentness, provider-outage, drift and replay conformance,

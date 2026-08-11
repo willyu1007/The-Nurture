@@ -23,6 +23,18 @@
   the action-key allowlist, snapshot bounds, TTL ordering, version positivity,
   and status/`consumed_at` consistency.
 
+## Pre-apply repairs recorded during E7 qualification (2026-08-11)
+
+- The CHECK originally required `snapshot_codec_version >= 1` and a non-empty
+  ciphertext unconditionally, contradicting the frozen repository expiry
+  scrub (status `expired`, codec `0`, empty ciphertext). It now requires
+  exactly the scrubbed form at status `expired` and the original bounds at
+  every other status (`DR-E7-01`, commit `b0adb64`).
+- The three relations gained `map:` attributes so datamodel names match the
+  migration's short foreign-key constraint names, restoring a clean
+  datasource-to-datamodel diff (`DR-E7-02`, commit `223daa7`). No database
+  shape changed; the context checksum above is unchanged.
+
 ## Data and ownership posture
 
 - The frozen command and authority snapshot are encrypted before persistence.
