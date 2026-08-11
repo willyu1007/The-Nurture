@@ -1066,40 +1066,6 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
               ]
             }
           ]
-        },
-        {
-          "endpoint_key": "nurture.institution_knowledge.query",
-          "method": "POST",
-          "operation_key": "query_institution_knowledge",
-          "input_schema_key": "nurture.institution_knowledge.query.input",
-          "input_schema_version": 1,
-          "handler_key": "nurture.institution_knowledge.query.v1",
-          "ingress": [
-            {
-              "ingress_category": "host_transition",
-              "ingress_key": "nurture.institution_knowledge.query",
-              "principal_origins": [
-                "interactive_session"
-              ]
-            }
-          ]
-        },
-        {
-          "endpoint_key": "nurture.institution_knowledge.execute",
-          "method": "POST",
-          "operation_key": "execute_institution_knowledge",
-          "input_schema_key": "nurture.institution_knowledge.execute.input",
-          "input_schema_version": 1,
-          "handler_key": "nurture.institution_knowledge.execute.v1",
-          "ingress": [
-            {
-              "ingress_category": "host_transition",
-              "ingress_key": "nurture.institution_knowledge.execute",
-              "principal_origins": [
-                "interactive_session"
-              ]
-            }
-          ]
         }
       ]
     },

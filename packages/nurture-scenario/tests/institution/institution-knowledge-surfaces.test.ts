@@ -477,7 +477,7 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
       });
   });
 
-  it("keeps the disabled Workbench mapping while removing generic owner handlers", () => {
+  it("registers only disabled Workbench composition and fail-closed handlers", async () => {
     expect(Object.isFrozen(defaultNurtureInstitutionKnowledgeSurfaceDeps)).toBe(true);
     expect(Object.isFrozen(defaultNurtureInstitutionKnowledgeSurfaceDeps.bindings)).toBe(true);
     expect(nurtureScenarioManifest.surface_mapping.web_run_workbench.institution_knowledge)
@@ -491,13 +491,31 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
       .not.toHaveProperty("institution_knowledge");
     expect(nurtureScenarioManifest.surface_mapping.mobile_dashboard)
       .not.toHaveProperty("institution_knowledge");
-    expect(nurtureScenarioModule.internal_api_handlers)
-      .not.toHaveProperty("nurture.internal.query_institution_knowledge");
-    expect(nurtureScenarioModule.internal_api_handlers)
-      .not.toHaveProperty("nurture.internal.execute_institution_knowledge");
-    expect(nurtureScenarioModule.trusted_invocation_handlers)
-      .toHaveProperty("nurture.institution_knowledge.query.v1");
-    expect(nurtureScenarioModule.trusted_invocation_handlers)
-      .toHaveProperty("nurture.institution_knowledge.execute.v1");
+    const internal = nurtureScenarioModule.internal_api_handlers;
+    const meta = {
+      workspace_id: "workspace-01",
+      actor_id: "participant-01",
+      idempotency_key: "command-01",
+      correlation_id: "invocation-01",
+      client_surface: "web_run_workbench" as const,
+    };
+    const previewRequest = {
+      capabilityKey: "query_institution_knowledge_preview",
+      capabilityVersion: "1.0.0",
+      targetOptionRef: "option-institution",
+      operationInput: { revisionOptionRefs: ["option-revision-01"] },
+    };
+    await expect(internal["nurture.internal.query_institution_knowledge"]?.({
+      method: "POST", path: "/synthetic", payload: previewRequest, meta,
+    })).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "institution_knowledge_runtime_unavailable",
+    });
+    await expect(internal["nurture.internal.execute_institution_knowledge"]?.({
+      method: "POST", path: "/synthetic", payload: previewRequest, meta,
+    })).resolves.toEqual({
+      status: "invalid",
+      reason_code: "invalid_institution_knowledge_request",
+    });
   });
 });
