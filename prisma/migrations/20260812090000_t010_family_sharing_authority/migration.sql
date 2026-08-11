@@ -1,5 +1,7 @@
 -- T-010 family-sharing eligibility owner: dedicated category authority and
--- disjoint release/receiving policy rows (I4-C1, decisions D-I4C-01..04).
+-- disjoint release/receiving policy rows (I4-C1, decisions D-I4C-01..04;
+-- reworked after the 2026-08-12 independent review: composite FKs pin exact
+-- workspace/process/enrollment/role scope).
 -- Preview only: this migration is intentionally not applied by this task.
 
 -- CreateEnum
@@ -73,29 +75,41 @@ CREATE INDEX "ix_nurture_family_sharing_policy_scope" ON "nurture_family_sharing
 -- CreateIndex
 CREATE INDEX "ix_nurture_family_sharing_policy_enrollment" ON "nurture_family_sharing_policy"("workspace_id", "enrollment_id", "status");
 
--- AddForeignKey
-ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_process_id_fkey" FOREIGN KEY ("child_care_process_id") REFERENCES "nurture_child_care_process"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "uq_nurture_child_care_process_workspace_id" ON "nurture_child_care_process"("workspace_id", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "uq_nurture_family_workspace_process_id" ON "nurture_family"("workspace_id", "child_care_process_id", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "uq_nurture_enrollment_workspace_process_id" ON "nurture_enrollment"("workspace_id", "child_care_process_id", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "uq_nurture_care_role_assignment_workspace_role_id" ON "nurture_care_role_assignment"("workspace_id", "role", "id");
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_family_id_fkey" FOREIGN KEY ("family_id") REFERENCES "nurture_family"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_process_id_fkey" FOREIGN KEY ("workspace_id", "child_care_process_id") REFERENCES "nurture_child_care_process"("workspace_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "nurture_enrollment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_family_id_fkey" FOREIGN KEY ("workspace_id", "child_care_process_id", "family_id") REFERENCES "nurture_family"("workspace_id", "child_care_process_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_role_assignment_id_fkey" FOREIGN KEY ("authorizing_role_assignment_id") REFERENCES "nurture_care_role_assignment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_enrollment_id_fkey" FOREIGN KEY ("workspace_id", "child_care_process_id", "enrollment_id") REFERENCES "nurture_enrollment"("workspace_id", "child_care_process_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_process_id_fkey" FOREIGN KEY ("child_care_process_id") REFERENCES "nurture_child_care_process"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_authority" ADD CONSTRAINT "nurture_family_sharing_authority_role_assignment_id_fkey" FOREIGN KEY ("workspace_id", "authorizing_role", "authorizing_role_assignment_id") REFERENCES "nurture_care_role_assignment"("workspace_id", "role", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_family_id_fkey" FOREIGN KEY ("family_id") REFERENCES "nurture_family"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_process_id_fkey" FOREIGN KEY ("workspace_id", "child_care_process_id") REFERENCES "nurture_child_care_process"("workspace_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "nurture_enrollment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_family_id_fkey" FOREIGN KEY ("workspace_id", "child_care_process_id", "family_id") REFERENCES "nurture_family"("workspace_id", "child_care_process_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_role_assignment_id_fkey" FOREIGN KEY ("authorizing_role_assignment_id") REFERENCES "nurture_care_role_assignment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_enrollment_id_fkey" FOREIGN KEY ("workspace_id", "child_care_process_id", "enrollment_id") REFERENCES "nurture_enrollment"("workspace_id", "child_care_process_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "nurture_family_sharing_policy" ADD CONSTRAINT "nurture_family_sharing_policy_role_assignment_id_fkey" FOREIGN KEY ("workspace_id", "authorizing_role", "authorizing_role_assignment_id") REFERENCES "nurture_care_role_assignment"("workspace_id", "role", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 -- ---------------------------------------------------------------------------
@@ -138,10 +152,12 @@ ALTER TABLE "nurture_family_sharing_policy"
   ADD CONSTRAINT "ck_nurture_family_sharing_policy_expiry"
   CHECK ("expires_at" IS NULL OR "expires_at" > "effective_from");
 
--- Exactly one current (active) row per exact pair/enrollment/category — and,
--- for policies, per release/receiving axis (D-I4C-02/03: missing or duplicate
--- rows deny; repository ordering never chooses a winner). Writers supersede or
--- revoke the previous row in the same transaction.
+-- At most one ACTIVE row per exact pair/enrollment/category — and, for
+-- policies, per release/receiving axis (D-I4C-02/03). `active` is the
+-- occupied slot: a granting writer atomically retires (supersedes or revokes)
+-- any status-active row, expired or not, in the same transaction; readers
+-- deny on zero temporally-current rows and never break ties by ordering, so
+-- existence stays a reader invariant.
 CREATE UNIQUE INDEX "uq_nurture_family_sharing_authority_current"
   ON "nurture_family_sharing_authority"
   ("workspace_id", "child_care_process_id", "family_id", "enrollment_id", "category")

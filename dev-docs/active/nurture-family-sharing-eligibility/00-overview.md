@@ -4,12 +4,13 @@
 
 - State: in-progress
 - Updated: 2026-08-12
-- Next step: I4-C1 is drafted — additive schema/migration (review-only, not
-  applied), domain record types and the fail-closed read port, DB context
-  refreshed; see `artifacts/db/t010-family-sharing-authority/`. Next: close
-  the independent migration-SQL review, then I4-C2 current-authority reader
-  over these records (no apply; the first apply target is the approved C4
-  disposable).
+- Next step: I4-C1 is drafted, independently reviewed and reworked
+  (2026-08-12): additive schema/migration with composite-FK scope pinning and
+  at-most-one active-slot semantics (review-only, not applied), domain record
+  types, the fail-closed read port and the pinned-invariant verifier; see
+  `artifacts/db/t010-family-sharing-authority/`. Next: I4-C2
+  current-authority reader over these records (no apply; the first apply
+  target is the approved C4 disposable).
 
 ## Goal
 

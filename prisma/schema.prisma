@@ -2264,6 +2264,7 @@ model NurtureChildCareProcess {
   familySharingPolicies    NurtureFamilySharingPolicy[]
 
   @@unique([workspaceId, id, childId], map: "uq_nurture_child_process_integrity")
+  @@unique([workspaceId, id], map: "uq_nurture_child_care_process_workspace_id")
   @@index([workspaceId, childId, status], map: "ix_nurture_child_process_child")
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_child_process_status")
   @@map("nurture_child_care_process")
@@ -2289,6 +2290,7 @@ model NurtureFamily {
   familySharingPolicies    NurtureFamilySharingPolicy[]
 
   @@unique([workspaceId, id, childCareProcessId], map: "uq_nurture_family_process_integrity")
+  @@unique([workspaceId, childCareProcessId, id], map: "uq_nurture_family_workspace_process_id")
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_family_process")
   @@map("nurture_family")
 }
@@ -2493,6 +2495,7 @@ model NurtureEnrollment {
   familySharingAuthorities NurtureFamilySharingAuthority[]
   familySharingPolicies    NurtureFamilySharingPolicy[]
 
+  @@unique([workspaceId, childCareProcessId, id], map: "uq_nurture_enrollment_workspace_process_id")
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
   @@index([workspaceId, careGroupId, status, participationPhase], map: "ix_nurture_enrollment_group_phase")
   @@map("nurture_enrollment")
@@ -2546,6 +2549,7 @@ model NurtureCareRoleAssignment {
   familySharingAuthorities             NurtureFamilySharingAuthority[]
   familySharingPolicies                NurtureFamilySharingPolicy[]
 
+  @@unique([workspaceId, role, id], map: "uq_nurture_care_role_assignment_workspace_role_id")
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
   @@map("nurture_care_role_assignment")
@@ -4243,11 +4247,15 @@ model NurtureAttributionCorrectionCandidate {
 // ============================================================================
 // T-010 I4-C1 — FAMILY-SHARING ELIGIBILITY OWNER AUTHORITY (D-I4C-01..04)
 // Preview only: the companion migration is intentionally not applied by this
-// task. "Current" = status active AND not past expires_at; a writer must
-// supersede or revoke the previous row in the same transaction. The
-// exactly-one-current guarantee per scope (and per policy axis) lives in
-// partial unique indexes that Prisma cannot express — see the raw SQL in
-// prisma/migrations/20260812090000_t010_family_sharing_authority. No raw
+// task. "Current" = status active AND effective_from <= evaluated_at AND not
+// past expires_at. The `active` status is the occupied slot: partial unique
+// indexes (raw SQL — Prisma cannot express them) guarantee AT MOST ONE active
+// row per scope (policies additionally per axis); a granting writer must
+// atomically retire (supersede or revoke) any status-active row — expired or
+// not — in the same transaction, and readers deny on zero current rows, so
+// existence stays a reader invariant, never an ordering choice. Composite FKs
+// pin every row to one exact workspace-local process/family/enrollment and to
+// a role assignment whose actual role equals authorizing_role. No raw
 // platform id or signed evidence body is persisted; lifecycle stays with the
 // two owners (D-I4C-04) and is never copied into these rows.
 // ============================================================================
@@ -4271,10 +4279,10 @@ model NurtureFamilySharingAuthority {
   createdAt                   DateTime                         @default(now()) @map("created_at")
   updatedAt                   DateTime                         @updatedAt @map("updated_at")
 
-  childCareProcess          NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_process_id_fkey")
-  family                    NurtureFamily             @relation(fields: [familyId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_family_id_fkey")
-  enrollment                NurtureEnrollment         @relation(fields: [enrollmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_enrollment_id_fkey")
-  authorizingRoleAssignment NurtureCareRoleAssignment @relation(fields: [authorizingRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_role_assignment_id_fkey")
+  childCareProcess          NurtureChildCareProcess   @relation(fields: [workspaceId, childCareProcessId], references: [workspaceId, id], onDelete: Restrict, map: "nurture_family_sharing_authority_process_id_fkey")
+  family                    NurtureFamily             @relation(fields: [workspaceId, childCareProcessId, familyId], references: [workspaceId, childCareProcessId, id], onDelete: Restrict, map: "nurture_family_sharing_authority_family_id_fkey")
+  enrollment                NurtureEnrollment         @relation(fields: [workspaceId, childCareProcessId, enrollmentId], references: [workspaceId, childCareProcessId, id], onDelete: Restrict, map: "nurture_family_sharing_authority_enrollment_id_fkey")
+  authorizingRoleAssignment NurtureCareRoleAssignment @relation(fields: [workspaceId, authorizingRole, authorizingRoleAssignmentId], references: [workspaceId, role, id], onDelete: Restrict, map: "nurture_family_sharing_authority_role_assignment_id_fkey")
 
   @@index([workspaceId, childCareProcessId, familyId, enrollmentId, category, status], map: "ix_nurture_family_sharing_authority_scope")
   @@index([workspaceId, enrollmentId, status], map: "ix_nurture_family_sharing_authority_enrollment")
@@ -4301,10 +4309,10 @@ model NurtureFamilySharingPolicy {
   createdAt                   DateTime                         @default(now()) @map("created_at")
   updatedAt                   DateTime                         @updatedAt @map("updated_at")
 
-  childCareProcess          NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_process_id_fkey")
-  family                    NurtureFamily             @relation(fields: [familyId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_family_id_fkey")
-  enrollment                NurtureEnrollment         @relation(fields: [enrollmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_enrollment_id_fkey")
-  authorizingRoleAssignment NurtureCareRoleAssignment @relation(fields: [authorizingRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_role_assignment_id_fkey")
+  childCareProcess          NurtureChildCareProcess   @relation(fields: [workspaceId, childCareProcessId], references: [workspaceId, id], onDelete: Restrict, map: "nurture_family_sharing_policy_process_id_fkey")
+  family                    NurtureFamily             @relation(fields: [workspaceId, childCareProcessId, familyId], references: [workspaceId, childCareProcessId, id], onDelete: Restrict, map: "nurture_family_sharing_policy_family_id_fkey")
+  enrollment                NurtureEnrollment         @relation(fields: [workspaceId, childCareProcessId, enrollmentId], references: [workspaceId, childCareProcessId, id], onDelete: Restrict, map: "nurture_family_sharing_policy_enrollment_id_fkey")
+  authorizingRoleAssignment NurtureCareRoleAssignment @relation(fields: [workspaceId, authorizingRole, authorizingRoleAssignmentId], references: [workspaceId, role, id], onDelete: Restrict, map: "nurture_family_sharing_policy_role_assignment_id_fkey")
 
   @@index([workspaceId, childCareProcessId, familyId, enrollmentId, category, axis, status], map: "ix_nurture_family_sharing_policy_scope")
   @@index([workspaceId, enrollmentId, status], map: "ix_nurture_family_sharing_policy_enrollment")

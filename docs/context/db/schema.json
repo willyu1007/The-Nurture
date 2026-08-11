@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-11T23:15:35.742Z",
+  "updatedAt": "2026-08-11T23:32:31.768Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -6536,6 +6536,16 @@
           ],
           "name": null,
           "map": "ix_nurture_role_scope"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "role",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_care_role_assignment_workspace_role_id"
         }
       ]
     },
@@ -7454,6 +7464,15 @@
           ],
           "name": null,
           "map": "uq_nurture_child_process_integrity"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_care_process_workspace_id"
         }
       ]
     },
@@ -11542,6 +11561,16 @@
           ],
           "name": null,
           "map": "ix_nurture_enrollment_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_enrollment_workspace_process_id"
         }
       ]
     },
@@ -14588,6 +14617,16 @@
           ],
           "name": null,
           "map": "ix_nurture_family_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_workspace_process_id"
         },
         {
           "type": "unique",
@@ -19116,9 +19155,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "authorizingRole",
             "authorizingRoleAssignmentId"
           ],
           "references": [
+            "workspaceId",
+            "role",
             "id"
           ]
         },
@@ -19129,9 +19172,11 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
             "childCareProcessId"
           ],
           "references": [
+            "workspaceId",
             "id"
           ]
         },
@@ -19142,9 +19187,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "childCareProcessId",
             "enrollmentId"
           ],
           "references": [
+            "workspaceId",
+            "childCareProcessId",
             "id"
           ]
         },
@@ -19155,9 +19204,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "childCareProcessId",
             "familyId"
           ],
           "references": [
+            "workspaceId",
+            "childCareProcessId",
             "id"
           ]
         }
@@ -19400,9 +19453,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "authorizingRole",
             "authorizingRoleAssignmentId"
           ],
           "references": [
+            "workspaceId",
+            "role",
             "id"
           ]
         },
@@ -19413,9 +19470,11 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
             "childCareProcessId"
           ],
           "references": [
+            "workspaceId",
             "id"
           ]
         },
@@ -19426,9 +19485,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "childCareProcessId",
             "enrollmentId"
           ],
           "references": [
+            "workspaceId",
+            "childCareProcessId",
             "id"
           ]
         },
@@ -19439,9 +19502,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "childCareProcessId",
             "familyId"
           ],
           "references": [
+            "workspaceId",
+            "childCareProcessId",
             "id"
           ]
         }

@@ -55,9 +55,14 @@ export type NurtureFamilySharingPolicyRecordV1 = Readonly<{
  * Persistence-level read port for the C2 current-authority reader. Fail-closed
  * cardinality (D-I4C-02/03): implementations return `null` when zero — or, in
  * a defect state, more than one — current row matches; repository ordering
- * never chooses a winner. "Current" means status `active` and `expires_at`
- * absent or after `evaluated_at`. Results are never cached (`cache:
- * "forbidden"` in the frozen interface).
+ * never chooses a winner. "Current" means status `active` AND
+ * `effective_from <= evaluated_at` AND `expires_at` absent or strictly after
+ * `evaluated_at` — a future-effective active row is not yet current. The
+ * partial unique indexes guarantee at most one `active` slot per scope;
+ * whether a temporally current row exists is this reader's decision, and a
+ * granting writer retires the occupied slot (supersede/revoke, expired or
+ * not) atomically before inserting. Results are never cached
+ * (`cache: "forbidden"` in the frozen interface).
  */
 export type NurtureFamilySharingAuthorityRecordReadPort = Readonly<{
   loadCurrentAuthority(input: {

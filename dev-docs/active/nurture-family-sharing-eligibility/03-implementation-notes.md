@@ -79,3 +79,25 @@
   design.
 - `docs/context/db/schema.json` regenerated; workflow-contract self-pin
   rotated (`003cbe81…`, 281 files).
+
+## 2026-08-12 I4-C1 post-review rework (independent Codex pass, 5 findings addressed)
+
+- Composite FKs replace the single-column FKs: rows now bind
+  `(workspace_id, child_care_process_id)` → process,
+  `(…, family_id)` → family, `(…, enrollment_id)` → enrollment and
+  `(workspace_id, authorizing_role, authorizing_role_assignment_id)` → role
+  assignment, backed by four additive unique indexes on the anchor tables —
+  cross-workspace/cross-process references and role-provenance mismatch are
+  now structurally impossible, not just reader-checked.
+- Currentness definition corrected to include `effective_from <= evaluated_at`
+  (a future-effective active row is not current), and the slot semantics
+  restated honestly: the partial uniques guarantee AT MOST ONE active row;
+  writers retire the occupied slot atomically (including after unattended
+  natural expiry) and existence stays a reader decision.
+- New static verifier `pnpm verify:family-sharing-invariants` pins the
+  hand-authored CHECKs/partial uniques/composite FKs that the generated DB
+  context cannot represent.
+- C30 Step 5 prose, feature-map and dashboard checkpoints reconciled with the
+  drafted state. The sixth finding (decision-identity alignment in the
+  My-Chat currentness port) was fixed on the My-Chat side (`0400c4c`,
+  `ec9f298`).

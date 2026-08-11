@@ -18,19 +18,29 @@
 
 ## Write/rollback shape
 
-- Forward: `CREATE TYPE` ×4, `CREATE TABLE` ×2, named FK/`CHECK` constraints,
-  two b-tree indexes per table, two partial unique indexes. Additive only —
-  no existing row, column or enum is touched.
+- Forward: `CREATE TYPE` ×4, `CREATE TABLE` ×2, four additive unique indexes
+  on the existing anchor tables (FK targets; implied-unique by the `id`
+  primary key so they cannot fail on existing data), named composite
+  FK/`CHECK` constraints, two b-tree indexes per table, two partial unique
+  indexes. Additive only — no existing row, column or enum is touched.
 - Rollback (disposable targets are destroyed instead; listed for
-  completeness): drop the two tables, then the four enum types.
+  completeness): drop the two tables, the four anchor-table unique indexes,
+  then the four enum types.
 
 ## C4 qualification checklist (forward reference)
 
 - Full migration set applies from empty including this migration.
 - Partial-unique behavior: second `active` row per scope (or per axis) is
-  rejected; supersede-then-insert in one transaction succeeds.
+  rejected; supersede-then-insert in one transaction succeeds; **renewal after
+  unattended natural expiry** (status still `active`, `expires_at` past)
+  retires the expired slot first and then succeeds.
+- Composite-FK behavior: cross-workspace family, enrollment under a different
+  process, and a role assignment whose role differs from `authorizing_role`
+  all reject.
 - CHECK behavior: direction-by-category violations, purpose drift, revoked
   status without `revoked_at` (and inverse), `expires_at <= effective_from`
   all reject.
-- Repository reader returns `null`/fail-closed on zero current rows and never
-  orders to pick a winner.
+- Repository reader returns `null`/fail-closed on zero current rows, treats
+  future-effective rows (`effective_from > evaluated_at`) as not current, and
+  never orders to pick a winner.
+- `pnpm verify:family-sharing-invariants` stays green.

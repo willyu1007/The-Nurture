@@ -36,9 +36,10 @@ Project: `main`
   approval-gated; `live_qualified=false` stays a separate activation gate.
   Note: the pin rotation leaves the C30-I3 adoption lock host head at
   `ae563988` — refreshed by the T-002 C30 Step-5 track, not by G4-D I3.
-- T-010: I4-C0 qualified. Next is I4-C1 — produce and review an additive
-  Prisma diff without database apply; target approval only after migration
-  review.
+- T-010: I4-C1 drafted and independently reviewed (2026-08-12, review-only —
+  no apply): authority/policy schema with composite-FK scope pinning and
+  at-most-one active-slot partial uniques. Next is I4-C2 (current-authority
+  reader); apply stays behind the C4 approved-disposable gate.
 - T-002: execute C30 three-repository requalification Step 5 so recorded
   acceptances become current-pin evidence; afterwards only a separately
   authorized C30-I4 scope review is eligible. C31–C35, D, Pilot remain closed.

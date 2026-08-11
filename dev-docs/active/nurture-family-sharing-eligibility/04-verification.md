@@ -57,3 +57,16 @@
 | Database writes | NONE — apply remains behind the C4 approved-disposable gate and a separate durable approval |
 
 Current verdict: `I4_C1_DRAFTED_REVIEW_PENDING / NO_APPLY`.
+
+## 2026-08-12 I4-C1 post-review gates
+
+| Check | Result |
+| --- | --- |
+| Independent review (Codex gpt-5.6-sol, full diff) | 6 findings; 5 addressed in this rework, 1 fixed My-Chat-side (decision-identity verification in the currentness port) |
+| `prisma format` / `prisma validate` (composite-FK schema) | PASS |
+| `pnpm verify:family-sharing-invariants` | PASS — 8 CHECKs, 2 partial uniques, 4 target uniques, 8 composite FKs pinned |
+| DB context re-sync | checksum `0a9d51f1…` |
+| Typecheck / unit / persistence-boundaries / test-routing | PASS (see command log) |
+| Database writes | NONE — preview-only unchanged |
+
+Current verdict: `I4_C1_REVIEWED_REWORKED / NO_APPLY / I4_C2_NEXT`.

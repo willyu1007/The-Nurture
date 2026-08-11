@@ -53,6 +53,7 @@
     "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 181",
     "verify:dev-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/dev-host.json dev-host 25",
     "verify:test-routing": "node scripts/assert-test-routing.mjs",
+    "verify:family-sharing-invariants": "node scripts/assert-family-sharing-invariants.mjs",
     "verify:persistence-boundaries": "node scripts/assert-persistence-boundaries.mjs",
     "verify:formal-ingress-contract": "node scripts/assert-formal-ingress-contract.mjs",
     "verify:g2-exit-contract": "node scripts/assert-g2-exit-contract.mjs",
