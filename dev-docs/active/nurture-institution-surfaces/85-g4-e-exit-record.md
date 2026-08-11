@@ -52,3 +52,11 @@ adapter and the durable-apply approval path before activation-facing work.
 The preview read lane of the new read owner intentionally stays unavailable —
 actor-bound preview options remain owned by the Workbench surface adapters at
 their own gate.
+
+## 2026-08-12 addendum
+
+The `DR-E8-02` port-shape debt named under Honest limitation is closed: the
+My-Chat production composition owns the `{context, sources}`
+authority-currentness port and this repository's E8 suite consumes it with no
+cast (record 84, closure section). The durable-apply approval path remains
+open.

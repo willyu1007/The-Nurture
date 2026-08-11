@@ -308,9 +308,12 @@ qualification with two pre-apply repairs.
 [`84`](./84-g4-e-e8-joint-conformance-record.md) closes E8 joint conformance
 through the real Base dispatcher at `adapter_qualified` (12/12 matrix plus a
 24/24 full x5 lane on fresh disposable targets), and
-[`85`](./85-g4-e-exit-record.md) issues the G4-E Exit. Remaining G4-E-adjacent
-gates are activation-only (`live_qualified`) and the durable-apply approval;
-the open implementation work is G4-D I3/I4 and G4-F.
+[`85`](./85-g4-e-exit-record.md) issues the G4-E Exit; its `DR-E8-02`
+port-shape debt closed on 2026-08-12 — the My-Chat production composition owns
+the authority-currentness port and the E8 suite consumes it with no cast
+(record 84, closure section). Remaining G4-E-adjacent gates are
+activation-only (`live_qualified`) and the durable-apply approval; the open
+implementation work is G4-D I3/I4 and G4-F.
 Model-weight verification and live secrets are not required for that default-
 off slice.
 

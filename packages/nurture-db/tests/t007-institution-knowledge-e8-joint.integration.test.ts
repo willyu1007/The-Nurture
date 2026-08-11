@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { ChatModelStreamEvent, LlmGateway, SelectedChatModel } from "@my-chat/llm";
+import type { SelectedChatModel } from "@my-chat/domain/chat";
+import type { ChatModelStreamEvent, LlmGateway } from "@my-chat/llm";
 import {
   createPrismaClient as createMyChatPrismaClient,
   PrismaIdentityRepository,
@@ -38,6 +39,8 @@ import {
   NurtureInstitutionKnowledgeCurrentnessProvider,
   NurtureInstitutionKnowledgePreviewProvider,
   NurtureInstitutionKnowledgeSourceProvider,
+  type InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1,
+  type NurtureAuthorityKnowledgeSourceCurrentnessProviderV1,
 } from "@the-nurture/scenario";
 import {
   bindPrismaNurtureInstitutionKnowledgeFormalOwners,
@@ -913,36 +916,13 @@ async function buildWorld() {
     preparedCommandIntegrityKey: "e8-prepared-integrity-key-0000000001",
     preparedCommandEncryptionSecret: "e8-prepared-encryption-key-000000001",
   });
-  const authorityCurrentnessAdapter = {
-    validateSources: async (input: {
-      context: { workspace_id: string; institution_ref: string };
-      sources: Array<{
-        source_ref: unknown;
-        source_version: string;
-        content_hash: string;
-      }>;
-    }) => {
-      const validated = await authorityCurrentnessOwner.validateSources({
-        workspace_id: input.context.workspace_id,
-        institution_ref: input.context.institution_ref,
-        purpose: "institution_admin_online_answer",
-        sources: input.sources.map((source) => ({
-          source_ref: source.source_ref,
-          source_version: source.source_version,
-          content_hash: source.content_hash,
-        })),
-      } as never);
-      if (validated.status !== "resolved") return { status: "unavailable" as const };
-      return {
-        status: "resolved" as const,
-        decisions: input.sources.map((source, index) => ({
-          ...source,
-          decision: (validated as { decisions: Array<{ decision: "eligible" | "denied" }> })
-            .decisions[index]?.decision ?? ("denied" as const),
-        })),
-      };
-    },
-  };
+  // DR-E8-02 closed: the production E7 composition owns the {context, sources}
+  // port. Both currentness slots consume it below; the typed assignments are
+  // the compile-time proof that no cast bridges the port shape anymore.
+  const authorityCurrentnessPort: NurtureAuthorityKnowledgeSourceCurrentnessProviderV1 =
+    e7.composition.authority_currentness_port;
+  const finalAuthorityCurrentnessPort: InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1 =
+    e7.composition.authority_currentness_port;
   const bindings = {
     resolve: async (input: {
       request: { capabilityKey: string; targetOptionRef: string } & Record<string, unknown>;
@@ -1022,23 +1002,8 @@ async function buildWorld() {
       adminAuthority as never,
       authoritySourcesOwner as never,
     ),
-    authorityCurrentness: authorityCurrentnessAdapter as never,
-    finalAuthorityCurrentness: {
-      validateSources: async (input: {
-        context: { workspace_id: string; institution_ref: string };
-        sources: Array<{
-          source_ref: unknown;
-          source_version: string;
-          content_hash: string;
-        }>;
-      }) =>
-        e7.composition.authority_currentness_owner.validateSources({
-          workspace_id: input.context.workspace_id,
-          institution_ref: input.context.institution_ref,
-          purpose: "institution_admin_online_answer",
-          sources: input.sources,
-        } as never),
-    } as never,
+    authorityCurrentness: authorityCurrentnessPort,
+    finalAuthorityCurrentness: finalAuthorityCurrentnessPort,
     safetyOwner: e7.composition.answer_safety_owner,
     generationOwner: e7.composition.generation_owner,
     conflictCandidates: createInstitutionKnowledgeConflictCandidateRecorder({

@@ -1000,6 +1000,20 @@ Current verdict: `G4_E_EXIT_PASS_ADAPTER_QUALIFIED / G4_D_I3_NEXT`.
 
 Current verdict: `G4_D_I3_STARTED / NURTURE_OWNER_COMPOSITION_NEXT`.
 
+## 2026-08-12 DR-E8-02 closure and typecheck repair
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Production port ownership (My-Chat side) | PASS | My-Chat `5ee3ffe`: `createNurtureInstitutionKnowledgeAuthorityCurrentnessPort` + `authority_currentness_port` on the default-off E7 composition; owner lanes 5/5 and 19/19, full population 157 files / 1076 tests, lint + typecheck PASS. |
+| E8 suite consumes the production port | PASS | Both currentness slots typed as `NurtureAuthorityKnowledgeSourceCurrentnessProviderV1` / `InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1` with no cast; both suite-local adapters deleted. |
+| Fresh-disposable x5 re-run | PASS | 3 files / 24 tests (E8 12/12) on `postgres:16-alpine` + `pgvector/pgvector:pg16` disposables; containers destroyed, 0 remain. |
+| Unit / production-db / routing | PASS | 1014/1014; 400/400; `verify:test-routing` 169 files, counts exact. |
+| Pin rotation | PASS | `myChat.revision=5ee3ffe`, `x5_joint_api` `d6277003…` (275 files); self-pin `e8314ade…` (279 files — also folds in `a869aaf`'s unrotated read-owner src drift). |
+| Typecheck | PASS, 0 errors | Repaired `a869aaf` test-lane debt: `SelectedChatModel` import source, es2023 `findLastIndex`, formal prepare-input literal widening. |
+| Runtime effects | NONE / DEFAULT-OFF | No durable apply, route, flag, credential, live call or traffic; `live_qualified=false` unchanged. |
+
+Current verdict: `DR_E8_02_CLOSED_PRODUCTION_PORT_OWNED / G4_D_I3_NURTURE_OWNER_COMPOSITION_NEXT`.
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

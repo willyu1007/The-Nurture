@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { ScenarioHumanPrincipalV1 } from "@my-chat/workflow-contracts";
+import type { NurtureInstitutionKnowledgeFormalPrepareInputV1 } from "@the-nurture/scenario";
 import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import {
@@ -606,7 +607,7 @@ function knowledgeItemCommand(
   clientCommandId: string,
   targetOptionRef: string,
   title = "Safe pickup",
-) {
+): NurtureInstitutionKnowledgeFormalPrepareInputV1 {
   return {
     contractVersion: 1 as const,
     clientCommandId,

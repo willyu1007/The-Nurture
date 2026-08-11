@@ -1417,3 +1417,20 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   [`85`](./85-g4-e-exit-record.md) close G4-E as
   `G4_E_EXIT_PASS_ADAPTER_QUALIFIED`. Recorded transport only;
   `live_qualified=false` and the durable-apply approval remain separate gates.
+
+## 2026-08-12 DR-E8-02 closure
+
+- Replaced the E8 suite's two suite-local currentness adapters with the
+  production `authority_currentness_port` that My-Chat `5ee3ffe` now exposes
+  on the default-off E7 composition; both slots bind through typed
+  assignments with no cast.
+- Repaired the `a869aaf` typecheck debt in three test files: the
+  `SelectedChatModel` import now comes from `@my-chat/domain/chat` (the type
+  was never exported by `@my-chat/llm`), the read-owner test replaces the
+  es2023 `findLastIndex` with `map(...).lastIndexOf(...)`, and
+  `knowledgeItemCommand` is annotated as
+  `NurtureInstitutionKnowledgeFormalPrepareInputV1` so its literals stop
+  widening.
+- Rotated the workflow-contract pin (`myChat.revision`, `x5_joint_api`,
+  Nurture self-pin — the latter folding in `a869aaf`'s unrotated read-owner
+  src drift).

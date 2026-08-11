@@ -107,3 +107,4 @@ Project: `main`
 - 2026-08-11 task_id=T-007 event=gate-exit id=G4-E result=G4_E_EXIT_PASS_ADAPTER_QUALIFIED record=85 next=G4-D-I3 activation=unchanged
 - 2026-08-11 task_id=T-007 event=design-freeze id=G4-D-I3 result=G4_D_I3_DESIGN_FROZEN record=86 owners=prospective-contact+native-source+current-owner ingress=trusted-3-operation ledger=e7-isomorphic activation=unchanged
 - 2026-08-12 task_id=T-007 event=quality-review id=G4-E-E7-E8-CODEX result=9-findings-fixed-requalified read_owner=rewritten db=400/400 x5=24/24 e8=12/12 activation=unchanged
+- 2026-08-12 task_id=T-007 event=debt-closure id=DR-E8-02 result=production-port-owned my_chat_pin=5ee3ffe x5=24/24 e8=12/12 unit=1014/1014 db=400/400 typecheck=repaired activation=unchanged

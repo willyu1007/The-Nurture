@@ -315,7 +315,7 @@ describe("PrismaInstitutionKnowledgeReadOwner", () => {
       });
       if (full.status !== "resolved") throw new Error("unreachable");
       const supersededIndex = full.changes.findIndex((c) => c.event_type === "superseded");
-      const republishIndex = full.changes.findLastIndex((c) => c.event_type === "published");
+      const republishIndex = full.changes.map((c) => c.event_type).lastIndexOf("published");
       expect(supersededIndex).toBeGreaterThanOrEqual(0);
       // The superseded of the old publication must sort before the new
       // published event that shares its timestamp and item head.

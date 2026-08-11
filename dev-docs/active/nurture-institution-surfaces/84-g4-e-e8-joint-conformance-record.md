@@ -164,3 +164,28 @@ live-provider qualification (`live_qualified=false` remains a separate
 activation-only gateway smoke), not a durable database apply, not G4-D I3/I4,
 not G4-F, not Candidate Freeze and not traffic authority. Recorded transport
 is never live evidence.
+
+## 2026-08-12 DR-E8-02 closure — production port adoption
+
+- My-Chat `5ee3ffe` promotes the finding-2 thin adapter into the production
+  default-off E7 composition:
+  `createNurtureInstitutionKnowledgeAuthorityCurrentnessPort` re-envelopes the
+  `{context, sources}` shape onto the flat authority citation currentness
+  owner with the pinned `institution_admin_online_answer` purpose, passes
+  `source_ref` tuples through untouched (`DR-E8-03` preserved) and fails
+  closed as `unavailable` on thrown, unresolved or misaligned owner results.
+  The composition exposes it as `authority_currentness_port`.
+- This suite deleted both suite-local currentness adapters and consumes the
+  production port for the pre-generation and final slots through typed
+  assignments (`NurtureAuthorityKnowledgeSourceCurrentnessProviderV1`,
+  `InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1`) with no
+  cast — the compile-time proof the port-shape gap is closed.
+- Re-run on fresh disposable targets (destroyed afterward): full x5 lane
+  3 files / 24 tests PASS with the E8 matrix 12/12 inside it; unit
+  1014/1014; production-db 400/400; routing census exact.
+- Pin rotation: `myChat.revision=5ee3ffe`, `x5_joint_api`
+  `d6277003…` (275 files); the Nurture self-pin rotated to `e8314ade…`
+  (279 files), which also folds in the `a869aaf` read-owner src drift that
+  had not been rotated with that commit.
+- `live_qualified=false`, default-off posture, durable-apply approval path:
+  all unchanged.
