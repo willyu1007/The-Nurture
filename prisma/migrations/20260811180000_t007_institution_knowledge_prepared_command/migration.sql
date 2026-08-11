@@ -46,8 +46,12 @@ CREATE TABLE "nurture_institution_knowledge_prepared_command" (
       'publish_institution_knowledge_revision',
       'revoke_institution_knowledge_revision'
     )
-    AND "snapshot_codec_version" >= 1
-    AND length("frozen_snapshot_ciphertext") BETWEEN 20 AND 1000000
+    AND (("status" = 'expired'
+        AND "snapshot_codec_version" = 0
+        AND "frozen_snapshot_ciphertext" = '')
+      OR ("status" <> 'expired'
+        AND "snapshot_codec_version" >= 1
+        AND length("frozen_snapshot_ciphertext") BETWEEN 20 AND 1000000))
     AND "aggregate_version" >= 1
     AND "prepared_at" < "expires_at"
     AND (("status" = 'consumed' AND "consumed_at" IS NOT NULL)
