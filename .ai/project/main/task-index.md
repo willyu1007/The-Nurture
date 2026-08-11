@@ -19,4 +19,5 @@ Project: `main`
 | T-007 nurture-institution-surfaces | in-progress | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-009 nurture-family-growth-provider | done | F-004 | dev-docs/active/nurture-family-growth-provider |
+| T-010 nurture-family-sharing-eligibility | in-progress | F-005 | dev-docs/active/nurture-family-sharing-eligibility |
 <!-- AUTO-GENERATED:END task-index -->

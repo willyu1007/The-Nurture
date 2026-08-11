@@ -24,6 +24,10 @@ milestones:
     title: "Family growth material delivery"
     status: in-progress
     description: "Deliver explicitly released Nurture materials to My-Chat family growth continuity through the frozen family_growth_material v1 contract: provider envelope, outbox delivery, lifecycle propagation, and admission-receipt consumption."
+  - id: M-004
+    title: "Cross-owner family authorization"
+    status: in-progress
+    description: "Deliver Nurture-owned current family-sharing eligibility and withdrawal cleanup behind exact My-Chat consent composition, private invocation and fail-closed owner rereads."
 
 features:
   - id: F-000
@@ -51,8 +55,18 @@ features:
     status: in-progress
     description: "Implement the Nurture provider side of the frozen My-Chat family_growth_material v1 contract: fail-closed canonical target resolution, release/lifecycle envelopes with JCS payload digests, transactional provider outbox, family rendition exchange, and admission-receipt consumption."
     milestone_id: M-003
+  - id: F-005
+    title: "Family-sharing eligibility owner"
+    status: in-progress
+    description: "Resolve exact pair/category/purpose Nurture eligibility from current role, dedicated authority, release/receiving policy and lifecycle facts; expose it through a default-off private boundary and own withdrawal cleanup for Nurture-derived data."
+    milestone_id: M-004
 
-requirements: []
+requirements:
+  - id: R-001
+    title: "Current exact family-sharing owner decision"
+    status: in-progress
+    description: "Nurture must resolve every family-sharing category from current canonical owner facts and verified pair evidence without treating identity, association or unrelated Grant classes as permission, and must fail closed on drift, ambiguity or outage."
+    feature_id: F-005
 
 tasks:
   - id: T-001
@@ -118,3 +132,21 @@ tasks:
     feature_id: F-004
     dev_docs_path: dev-docs/active/nurture-family-growth-provider
     updated: 2026-08-08
+  - id: T-010
+    slug: nurture-family-sharing-eligibility
+    status: in-progress
+    description: "Implement Nurture's exact current family-sharing eligibility repository, default-off private transport and withdrawal-cleanup ownership without fabricating media/focus Grant authority."
+    milestone_id: M-004
+    feature_id: F-005
+    requirement_ids:
+      - R-001
+    dev_docs_path: dev-docs/active/nurture-family-sharing-eligibility
+    updated: 2026-08-11
+    keywords:
+      - family-sharing-eligibility
+      - cross-owner-authorization
+      - current-pair-evidence
+      - purpose-bound-authority
+      - private-transport
+      - withdrawal-cleanup
+      - fail-closed

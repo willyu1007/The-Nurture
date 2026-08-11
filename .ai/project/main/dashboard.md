@@ -6,6 +6,11 @@ Project: `main`
 
 ### Current Focus
 
+- Independent active task T-010 now owns Nurture family-sharing eligibility.
+  I4-C0 freezes a dedicated category authority, separate release/receiving
+  policy axes, exact signed target selection, C30-based private transport and
+  Nurture withdrawal cleanup. Existing Grant classes remain unchanged;
+  production composition stays unavailable.
 - Primary active task: T-002. C30 landed on 2026-08-08 as one coordinated
   three-repository sequence and closed with `C30_LANDING_REQUAL_PASS`
   (plan `dev-docs/active/nurture-institution-mode/20-c30-cross-repository-landing-plan.md`,
@@ -54,20 +59,22 @@ Project: `main`
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
   default-off.
-- Semantic detail: see `feature-map.md` F-002, F-003 and F-004 briefs.
+- Semantic detail: see `feature-map.md` F-002 through F-005 briefs.
 
 ### Next Governance Checkpoint
 
-1. **Resolve G4-E Q2–Q4.** Identify the adopted My-Chat revision, qualified
+1. **Qualify T-010 I4-C0.** Verify the independent mapping and frozen authority
+   design, then produce an additive Prisma diff without database apply.
+2. **Resolve G4-E Q2–Q4.** Identify the adopted My-Chat revision, qualified
    deterministic safety owner/rule pin and sibling-repository authority before
    any I3 code or formal caller.
-2. **Keep I3/I4 closed on G-09/Q2–Q4.** I2-A/I2-B are complete and default-off;
+3. **Keep I3/I4 closed on G-09/Q2–Q4.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.
-3. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
+4. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
    production caller**; I1 evidence is not activation evidence.
-4. Only a separately authorized `C30-I4` scope review is eligible for T-002.
-5. Preserve T-006, T-009 and T-003 as done and archive them only after
+5. Only a separately authorized `C30-I4` scope review is eligible for T-002.
+6. Preserve T-006, T-009 and T-003 as done and archive them only after
    explicit approval.
 
 ## Notes (manual)
@@ -78,12 +85,13 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 9 (planned: 1, in-progress: 2, blocked: 0, done: 5, archived: 1)
+- Tasks: 10 (planned: 1, in-progress: 3, blocked: 0, done: 5, archived: 1)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
+| T-010 nurture-family-sharing-eligibility | in-progress | F-005 | dev-docs/active/nurture-family-sharing-eligibility |
 | T-007 nurture-institution-surfaces | in-progress | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-003 nurture-uiux-pitch | done | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-009 nurture-family-growth-provider | done | F-004 | dev-docs/active/nurture-family-growth-provider |
