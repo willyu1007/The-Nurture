@@ -8,7 +8,9 @@ import {
 import {
   assertScenarioPrivateInvocationV1,
   ScenarioInvocationValidationError,
+  type ScenarioTrustedInvocationDeclarationV1,
   type ScenarioPrivateInvocationV1,
+  type WorkflowVerifiedScenarioInvocationV1,
 } from "@my-chat/workflow-contracts";
 import {
   nurtureCanonicalJsonBytes,
@@ -24,17 +26,6 @@ export type NurtureDetachedRequestSignatureV1 = {
   signature: string;
 };
 
-export type NurtureInvocationDeclarationV1 = {
-  scenario_key: string;
-  endpoint_key: string;
-  method: "POST";
-  operation_key: string;
-  input_schema_version: number;
-  ingress_category: ScenarioPrivateInvocationV1["route"]["ingress"]["ingress_category"];
-  ingress_key: string;
-  principal_origins: readonly ScenarioPrivateInvocationV1["principal"]["principal_origin"][];
-};
-
 export type NurtureInvocationTrustPolicyV1 = {
   trust_version: 1;
   policy_revision: number;
@@ -48,7 +39,7 @@ export type NurtureInvocationTrustPolicyV1 = {
   public_key: KeyObject | string | Buffer;
   valid_from: string;
   valid_until: string;
-  declarations: readonly NurtureInvocationDeclarationV1[];
+  declarations: readonly ScenarioTrustedInvocationDeclarationV1[];
 };
 
 export type NurtureScenarioNonceConsumptionV1 = {
@@ -97,9 +88,7 @@ export type NurtureDetachedResponseSignatureV1 = {
   signature: string;
 };
 
-export type VerifiedNurtureInvocationV1 = {
-  invocation: ScenarioPrivateInvocationV1;
-  declaration: NurtureInvocationDeclarationV1;
+export type VerifiedNurtureInvocationV1 = WorkflowVerifiedScenarioInvocationV1 & {
   trust_policy_revision: number;
   credential_subject: string;
 };

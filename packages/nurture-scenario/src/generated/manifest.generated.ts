@@ -15,7 +15,7 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
     "base_contract_version": "1.0.0",
     "host_sdk_version": "1.0.0",
     "host_abi_range": "^1.0.0",
-    "source_hash": "d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383"
+    "source_hash": "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7"
   },
   "step_type_registry": [
     {
@@ -986,11 +986,11 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
     "source_dependencies": [
       {
         "source_identity": "platform_child_family_identity_source_v1",
-        "source_hash": "81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4"
+        "source_hash": "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861"
       },
       {
         "source_identity": "scenario_interface_source_v1",
-        "source_hash": "37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf"
+        "source_hash": "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95"
       }
     ],
     "capability_dependencies": [

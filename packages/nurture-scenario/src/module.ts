@@ -30,6 +30,10 @@ import {
   admitNurtureInstitutionKnowledgeOwnerIntegration,
   type NurtureInstitutionKnowledgeOwnerIntegration,
 } from "./institution-knowledge-owner-integration.js";
+import {
+  createNurtureC30TrustedInvocationHandlers,
+  type NurtureC30TrustedInvocationOwner,
+} from "./c30/trusted-handler-registry.js";
 
 /**
  * Canonical default-off production module. The manifest contains no activation
@@ -42,6 +46,7 @@ export const nurtureScenarioModule: WorkflowScenarioModule = {
   adapters: nurtureAdapters,
   presenters: nurturePresenters,
   policies: nurturePolicies,
+  trusted_invocation_handlers: createNurtureC30TrustedInvocationHandlers(),
   internal_api_handlers: {
     ...nurtureInternalApiHandlers,
     ...createInstitutionInternalApiHandlers(defaultNurtureDeps),
@@ -62,6 +67,8 @@ export type NurtureScenarioModuleDeps = {
   enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
   /** G4-E E7 admits owner deps only behind the exact Q2/Q3 pin tuple. */
   institutionKnowledgeOwnerIntegration?: NurtureInstitutionKnowledgeOwnerIntegration;
+  /** Exact C30 owner; omitted production composition remains fail-closed. */
+  c30SubjectPresentationOwner?: NurtureC30TrustedInvocationOwner;
 };
 
 /**
@@ -80,6 +87,9 @@ export const createNurtureScenarioModule = (
     deps.presenterDeps,
   ),
   policies: createNurturePolicies(deps.handlerDeps),
+  trusted_invocation_handlers: createNurtureC30TrustedInvocationHandlers(
+    deps.c30SubjectPresentationOwner,
+  ),
   internal_api_handlers: {
     ...nurtureInternalApiHandlers,
     ...createInstitutionInternalApiHandlers(deps.handlerDeps),
