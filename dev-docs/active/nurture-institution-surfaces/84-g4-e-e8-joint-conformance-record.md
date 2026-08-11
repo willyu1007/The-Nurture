@@ -189,3 +189,14 @@ is never live evidence.
   had not been rotated with that commit.
 - `live_qualified=false`, default-off posture, durable-apply approval path:
   all unchanged.
+
+### 2026-08-12 closure addendum — post-review port hardening
+
+The independent review of the closure found the port's length-only alignment
+insufficient: My-Chat `0400c4c` adds position-for-position decision-identity
+verification (field-wise ref comparison, version, content hash) and
+`ec9f298` fails closed on sparse decision lists. Pin advanced to `ec9f298`
+(`x5_joint_api` `48c0f597…`); full x5 re-run on fresh disposables at that
+pin: 3 files / 24 tests PASS (E8 12/12), targets destroyed. The Nurture-side
+migration set applied to the disposable now also carries the reviewed T-010
+preview migration (78 total apply lines) — disposable-only, unrelated tables.

@@ -1019,3 +1019,14 @@ Current verdict: `DR_E8_02_CLOSED_PRODUCTION_PORT_OWNED / G4_D_I3_NURTURE_OWNER_
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
 knowledge revision、fixture version 与 source pin。不得用匿名化不足的真实数据验证
 aggregate、出勤推理或 RAG。
+
+## 2026-08-12 DR-E8-02 post-review hardening re-run
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Port decision-identity verification | PASS | My-Chat `0400c4c` (reorder/substitution fail closed) + `ec9f298` (sparse lists fail closed); owner-side suites green, full My-Chat population 1080 tests |
+| Fresh-disposable x5 re-run at final pin | PASS | 3 files / 24 tests (E8 12/12); containers destroyed |
+| Pin | PASS | `myChat.revision=ec9f298`, `x5_joint_api` `48c0f597…`, self-pin `6d7edd17…` (281 files) |
+| Runtime effects | NONE / DEFAULT-OFF | unchanged; `live_qualified=false` |
+
+Current verdict: `DR_E8_02_CLOSED_PRODUCTION_PORT_OWNED / G4_D_I3_NURTURE_OWNER_COMPOSITION_NEXT`.
