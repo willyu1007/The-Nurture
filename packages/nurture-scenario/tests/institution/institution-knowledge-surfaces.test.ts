@@ -477,14 +477,16 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
       });
   });
 
-  it("keeps the disabled Workbench mapping while removing generic owner handlers", () => {
+  it("keeps one disabled formal Workbench mapping and no generic owner handlers", () => {
     expect(Object.isFrozen(defaultNurtureInstitutionKnowledgeSurfaceDeps)).toBe(true);
     expect(Object.isFrozen(defaultNurtureInstitutionKnowledgeSurfaceDeps.bindings)).toBe(true);
     expect(nurtureScenarioManifest.surface_mapping.web_run_workbench.institution_knowledge)
       .toEqual({
         contract_version: "1.0.0",
-        query_handler_key: "nurture.internal.query_institution_knowledge",
-        command_handler_key: "nurture.internal.execute_institution_knowledge",
+        ingress_category: "host_transition",
+        query_endpoint_key: "nurture.institution_knowledge.query",
+        prepare_endpoint_key: "nurture.institution_knowledge.command.prepare",
+        execute_endpoint_key: "nurture.institution_knowledge.command.execute",
         enablement_policy: "disabled",
       });
     expect(nurtureScenarioManifest.surface_mapping.chat_workflow_control)

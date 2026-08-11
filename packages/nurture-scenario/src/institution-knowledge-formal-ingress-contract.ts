@@ -15,21 +15,30 @@ export const NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_INGRESS_V1 = Object.freeze({
   ingress_category: "host_transition",
   query: Object.freeze({
     endpoint_key: "nurture.institution_knowledge.query",
+    method: "POST",
     operation_key: "query_institution_knowledge",
     input_schema_key: "nurture.institution_knowledge.query.input",
     input_schema_version: 1,
+    handler_key: "nurture.institution_knowledge.query.formal.v1",
+    ingress_key: "nurture.institution_knowledge.query",
   }),
   prepare: Object.freeze({
     endpoint_key: "nurture.institution_knowledge.command.prepare",
+    method: "POST",
     operation_key: "prepare_institution_knowledge_command",
     input_schema_key: "nurture.institution_knowledge.command.prepare.input",
     input_schema_version: 1,
+    handler_key: "nurture.institution_knowledge.command.prepare.formal.v1",
+    ingress_key: "nurture.institution_knowledge.command.prepare",
   }),
   execute: Object.freeze({
     endpoint_key: "nurture.institution_knowledge.command.execute",
+    method: "POST",
     operation_key: "execute_prepared_institution_knowledge_command",
     input_schema_key: "nurture.institution_knowledge.command.execute.input",
     input_schema_version: 1,
+    handler_key: "nurture.institution_knowledge.command.execute.formal.v1",
+    ingress_key: "nurture.institution_knowledge.command.execute",
   }),
   idempotency: "owner_command_request_id_replayed_with_exact_confirmation",
   confirmation: "owner_held_frozen_payload",
@@ -68,6 +77,11 @@ export type NurtureInstitutionKnowledgeFormalAuthorityResolverV1 = {
   resolveCurrent(input: {
     principal: ScenarioHumanPrincipalV1;
     invocation_request_id: string;
+    declared_operation_key: string;
+    capability_key:
+      | NurtureInstitutionKnowledgeQueryKey
+      | NurtureInstitutionKnowledgeActionKey;
+    target_option_ref: string;
   }): Promise<
     | { status: "resolved"; authority: NurtureInstitutionKnowledgeLocalAuthorityV1 }
     | { status: "denied" | "unavailable"; reason_code: string }
@@ -79,6 +93,7 @@ export type NurtureInstitutionKnowledgePreparedCommandOwnerV1 = {
     principal: ScenarioHumanPrincipalV1;
     invocation_request_id: string;
     client_surface: "web_run_workbench";
+    authority: NurtureInstitutionKnowledgeLocalAuthorityV1;
     command: NurtureInstitutionKnowledgeFormalPrepareInputV1;
   }): Promise<
     | {

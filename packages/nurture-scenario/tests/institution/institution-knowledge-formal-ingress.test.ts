@@ -21,6 +21,10 @@ const authority = {
 
 describe("Institution Knowledge formal trusted handlers", () => {
   it("prepares only through the fixed Workbench surface", async () => {
+    const resolveCurrent = vi.fn(async () => ({
+      status: "resolved" as const,
+      authority,
+    }));
     const prepare = vi.fn(async () => ({
       status: "ready_to_confirm" as const,
       command_request_id: "command-request-01",
@@ -30,6 +34,7 @@ describe("Institution Knowledge formal trusted handlers", () => {
     }));
     const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
       surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+      authorityResolver: { resolveCurrent },
       preparedCommandOwner: {
         prepare,
         consumeConfirmed: async () => ({ status: "unavailable", reason_code: "unused" }),
@@ -44,7 +49,13 @@ describe("Institution Knowledge formal trusted handlers", () => {
     )).resolves.toMatchObject({ status: "ready_to_confirm" });
     expect(prepare).toHaveBeenCalledWith(expect.objectContaining({
       client_surface: "web_run_workbench",
+      authority,
       command: expect.objectContaining({ clientCommandId: "client-command-01" }),
+    }));
+    expect(resolveCurrent).toHaveBeenCalledWith(expect.objectContaining({
+      declared_operation_key: "prepare_institution_knowledge_command",
+      capability_key: "publish_institution_knowledge_revision",
+      target_option_ref: "revision-option-01",
     }));
   });
 
@@ -53,14 +64,16 @@ describe("Institution Knowledge formal trusted handlers", () => {
       status: "denied" as const,
       reason_code: "sentinel_after_authority_recheck",
     }));
-    const createForPrincipal = vi.fn(() => ({
-      retrieveCandidates: async () => ({ status: "resolved" as const, candidates: [] }),
+    const resolveCurrent = vi.fn(async () => ({
+      status: "resolved" as const,
+      authority,
     }));
     const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
       surfaceDeps: {
         ...defaultNurtureInstitutionKnowledgeSurfaceDeps,
         bindings: { resolve },
       },
+      authorityResolver: { resolveCurrent },
       preparedCommandOwner: {
         prepare: async () => ({ status: "unavailable", reason_code: "unused" }),
         consumeConfirmed: async () => ({
@@ -73,7 +86,6 @@ describe("Institution Knowledge formal trusted handlers", () => {
           authority,
         }),
       },
-      authorizedRetrievalOwnerFactory: { createForPrincipal },
     });
     await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.execute]?.(
       verified("execute", executeInput()),
@@ -90,16 +102,22 @@ describe("Institution Knowledge formal trusted handlers", () => {
         client_surface: "web_run_workbench",
       },
     }));
-    expect(createForPrincipal).toHaveBeenCalledTimes(1);
+    expect(resolveCurrent).toHaveBeenCalledWith(expect.objectContaining({
+      declared_operation_key: "execute_prepared_institution_knowledge_command",
+      capability_key: "publish_institution_knowledge_revision",
+      target_option_ref: "revision-option-01",
+    }));
   });
 
   it("rejects command/confirmation drift before business binding", async () => {
     const resolve = vi.fn();
+    const resolveCurrent = vi.fn(async () => ({ status: "resolved" as const, authority }));
     const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
       surfaceDeps: {
         ...defaultNurtureInstitutionKnowledgeSurfaceDeps,
         bindings: { resolve },
       },
+      authorityResolver: { resolveCurrent },
       preparedCommandOwner: {
         prepare: async () => ({ status: "unavailable", reason_code: "unused" }),
         consumeConfirmed: async () => ({
@@ -112,11 +130,6 @@ describe("Institution Knowledge formal trusted handlers", () => {
           authority,
         }),
       },
-      authorizedRetrievalOwnerFactory: {
-        createForPrincipal: () => ({
-          retrieveCandidates: async () => ({ status: "resolved", candidates: [] }),
-        }),
-      },
     });
     await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.execute]?.(
       verified("execute", executeInput()),
@@ -125,6 +138,144 @@ describe("Institution Knowledge formal trusted handlers", () => {
       reason_code: "prepared_command_binding_drift",
     });
     expect(resolve).not.toHaveBeenCalled();
+    expect(resolveCurrent).not.toHaveBeenCalled();
+  });
+
+  it("serves preview without requiring the My-Chat retrieval owner", async () => {
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: {
+        ...defaultNurtureInstitutionKnowledgeSurfaceDeps,
+        bindings: {
+          resolve: async () => ({
+            status: "resolved",
+            binding: {
+              capability_key: "query_institution_knowledge_preview",
+              target_option_ref: "institution-option-01",
+              workspace_id: authority.workspace_id,
+              actor_participant_ref: authority.participant_ref,
+              surface_key: authority.surface_key,
+              active_role: authority.active_role,
+              institution_ref: authority.institution_ref,
+              role_assignment_ref: authority.role_assignment_ref,
+              evaluated_at: authority.evaluated_at,
+              authority_links: [],
+            },
+          }),
+        },
+        preview: { preview: async () => ({ status: "resolved", options: [] }) },
+      },
+      authorityResolver: {
+        resolveCurrent: async () => ({ status: "resolved", authority }),
+      },
+    });
+    await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.query]?.(
+      verified("query", {
+        contractVersion: 1,
+        request: {
+          capabilityKey: "query_institution_knowledge_preview",
+          capabilityVersion: "1.0.0",
+          targetOptionRef: "institution-option-01",
+          operationInput: { revisionOptionRefs: ["revision-option-01"] },
+        },
+      }),
+    )).resolves.toEqual({ status: "ok", result: { options: [] } });
+  });
+
+  it("fails closed on direct-registry declaration drift before owner calls", async () => {
+    const prepare = vi.fn();
+    const resolveCurrent = vi.fn();
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+      authorityResolver: { resolveCurrent },
+      preparedCommandOwner: {
+        prepare,
+        consumeConfirmed: async () => ({ status: "unavailable", reason_code: "unused" }),
+      },
+    });
+    const drifted = [
+      verified("prepare", { contractVersion: 1, clientCommandId: "client-command-01", request: commandIntent() }),
+      verified("prepare", { contractVersion: 1, clientCommandId: "client-command-01", request: commandIntent() }),
+      verified("prepare", { contractVersion: 1, clientCommandId: "client-command-01", request: commandIntent() }),
+    ];
+    Reflect.set(drifted[0].declaration, "method", "GET");
+    Reflect.set(drifted[1].invocation.route, "scenario_key", "other");
+    Reflect.set(drifted[2].invocation.route, "method", "GET");
+    for (const invocation of drifted) {
+      await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.prepare]?.(
+        invocation,
+      )).resolves.toEqual({
+        status: "unavailable",
+        reason_code: "institution_knowledge_formal_declaration_drift",
+      });
+    }
+    expect(resolveCurrent).not.toHaveBeenCalled();
+    expect(prepare).not.toHaveBeenCalled();
+  });
+
+  it("rechecks current authority and denies a prepared authority-version drift", async () => {
+    const resolve = vi.fn();
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: {
+        ...defaultNurtureInstitutionKnowledgeSurfaceDeps,
+        bindings: { resolve },
+      },
+      authorityResolver: {
+        resolveCurrent: async () => ({
+          status: "resolved",
+          authority: { ...authority, authority_version: "authority-v8" },
+        }),
+      },
+      preparedCommandOwner: {
+        prepare: async () => ({ status: "unavailable", reason_code: "unused" }),
+        consumeConfirmed: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-01",
+          frozen_request: {
+            ...commandIntent(),
+            confirmationRef: "owner-confirmation-ref-01",
+          },
+          authority,
+        }),
+      },
+    });
+    await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.execute]?.(
+      verified("execute", executeInput()),
+    )).resolves.toEqual({
+      status: "denied",
+      reason_code: "institution_authority_snapshot_drift",
+    });
+    expect(resolve).not.toHaveBeenCalled();
+  });
+
+  it("keeps every formal lane unavailable when production owners are absent", async () => {
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+    });
+    const inputs = {
+      query: {
+        contractVersion: 1,
+        request: {
+          capabilityKey: "query_institution_knowledge_preview",
+          capabilityVersion: "1.0.0",
+          targetOptionRef: "institution-option-01",
+          operationInput: { revisionOptionRefs: ["revision-option-01"] },
+        },
+      },
+      prepare: {
+        contractVersion: 1,
+        clientCommandId: "client-command-01",
+        request: commandIntent(),
+      },
+      execute: executeInput(),
+    } as const;
+    for (const lane of ["query", "prepare", "execute"] as const) {
+      await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS[lane]]?.(
+        verified(lane, inputs[lane]),
+      )).resolves.toEqual({
+        status: "unavailable",
+        reason_code: "institution_knowledge_formal_ingress_unavailable",
+      });
+    }
   });
 });
 

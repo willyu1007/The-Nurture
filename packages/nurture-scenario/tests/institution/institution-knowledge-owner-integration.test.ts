@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import type { WorkflowRuntimePort } from "@my-chat/workflow-contracts";
+import type {
+  WorkflowRuntimePort,
+  WorkflowVerifiedScenarioInvocationV1,
+} from "@my-chat/workflow-contracts";
 import { defaultNurtureDeps, defaultPresenterDeps } from "../../src/deps.js";
 import {
   admitNurtureInstitutionKnowledgeOwnerIntegration,
@@ -17,6 +20,8 @@ import {
 } from "../../src/institution-knowledge-surfaces.js";
 import { createNurtureScenarioModule } from "../../src/module.js";
 import { nurtureScenarioManifest } from "../../src/registry.js";
+import { NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS } from
+  "../../src/institution-knowledge-formal-ingress.js";
 
 const queryRequest = {
   capabilityKey: "query_institution_knowledge_preview",
@@ -25,16 +30,8 @@ const queryRequest = {
   operationInput: { revisionOptionRefs: ["option-revision-01"] },
 };
 
-const meta = {
-  workspace_id: "workspace-01",
-  actor_id: "participant-01",
-  idempotency_key: "command-01",
-  correlation_id: "invocation-01",
-  client_surface: "web_run_workbench" as const,
-};
-
 describe("G4-E E7 exact owner integration admission", () => {
-  it("binds exact Q2/Q3 owner deps only to the existing internal handler", async () => {
+  it("binds exact Q2/Q3 owner deps only to the formal trusted handler", async () => {
     const resolve = vi.fn(async () => ({
       status: "denied" as const,
       reason_code: "sentinel_owner_binding_denied",
@@ -49,11 +46,26 @@ describe("G4-E E7 exact owner integration admission", () => {
       presenterDeps: defaultPresenterDeps,
       workerRuntime: {} as WorkflowRuntimePort,
       institutionKnowledgeOwnerIntegration: integration(surfaceDeps),
+      institutionKnowledgeAuthorityResolver: {
+        resolveCurrent: async () => ({
+          status: "resolved",
+          authority: {
+            workspace_id: "workspace-01",
+            participant_ref: "participant-01",
+            institution_ref: "institution-01",
+            role_assignment_ref: "role-assignment-01",
+            active_role: "institution_admin",
+            surface_key: "institution_workbench",
+            authority_version: "authority-v1",
+            evaluated_at: "2026-08-11T00:00:00.000Z",
+          },
+        }),
+      },
     });
 
-    await expect(module.internal_api_handlers[
-      "nurture.internal.query_institution_knowledge"
-    ]?.({ method: "POST", path: "/synthetic", payload: queryRequest, meta }))
+    await expect(module.trusted_invocation_handlers[
+      NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.query
+    ]?.(verifiedQuery(queryRequest)))
       .resolves.toEqual({
         status: "denied",
         reason_code: "sentinel_owner_binding_denied",
@@ -184,4 +196,68 @@ function driftLeaf(target: Record<string, unknown>, path: string[]): void {
   owner[key] = typeof current === "boolean" ? !current
     : typeof current === "number" ? current + 1
     : `${String(current)}-drift`;
+}
+
+function verifiedQuery(request: typeof queryRequest): WorkflowVerifiedScenarioInvocationV1 {
+  const endpointKey = "nurture.institution_knowledge.query";
+  const operationKey = "query_institution_knowledge";
+  return {
+    declaration: {
+      scenario_key: "nurture",
+      endpoint_key: endpointKey,
+      method: "POST",
+      operation_key: operationKey,
+      input_schema_version: 1,
+      ingress_category: "host_transition",
+      ingress_key: endpointKey,
+      principal_origins: ["interactive_session"],
+    },
+    invocation: {
+      invocation_version: 1,
+      contract_version: 1,
+      contract_hash: "a".repeat(64),
+      issuer: "my_chat",
+      assertion_audience: "nurture",
+      caller_binding: { caller_subject: "my-chat-host" },
+      principal: {
+        principal_version: 1,
+        principal_kind: "human_user",
+        principal_origin: "interactive_session",
+        account_ref: ref("user", "user-01"),
+        actor_ref: ref("actor", "actor-01"),
+        workspace_ref: ref("workspace", "workspace-01"),
+      },
+      route: {
+        scenario_key: "nurture",
+        endpoint_key: endpointKey,
+        method: "POST",
+        ingress: {
+          ingress_version: 1,
+          ingress_category: "host_transition",
+          ingress_key: endpointKey,
+        },
+      },
+      request: {
+        request_id: "invocation-01",
+        correlation_id: "correlation-01",
+        issued_at: "2026-08-11T00:00:00.000Z",
+        expires_at: "2026-08-11T00:01:00.000Z",
+        nonce: "nonce-01",
+      },
+      operation: {
+        operation_key: operationKey,
+        input_schema_version: 1,
+        input: { contractVersion: 1, request },
+      },
+    },
+  };
+}
+
+function ref(objectType: string, objectId: string) {
+  return {
+    schema_version: 1 as const,
+    namespace: "my_chat",
+    object_type: objectType,
+    object_id: objectId,
+  };
 }

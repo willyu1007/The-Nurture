@@ -241,8 +241,12 @@ describe("G4-E I2-A institution knowledge wire contract", () => {
     ]);
     expect(
       nurtureScenarioManifest.surface_mapping.web_run_workbench.institution_knowledge,
-    ).toMatchObject({
+    ).toEqual({
       contract_version: "1.0.0",
+      ingress_category: "host_transition",
+      query_endpoint_key: "nurture.institution_knowledge.query",
+      prepare_endpoint_key: "nurture.institution_knowledge.command.prepare",
+      execute_endpoint_key: "nurture.institution_knowledge.command.execute",
       enablement_policy: "disabled",
     });
     expect(nurtureScenarioManifest.surface_mapping.chat_workflow_control)

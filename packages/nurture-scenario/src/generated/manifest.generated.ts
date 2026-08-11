@@ -751,8 +751,10 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
       },
       "institution_knowledge": {
         "contract_version": "1.0.0",
-        "query_handler_key": "nurture.internal.query_institution_knowledge",
-        "command_handler_key": "nurture.internal.execute_institution_knowledge",
+        "ingress_category": "host_transition",
+        "query_endpoint_key": "nurture.institution_knowledge.query",
+        "prepare_endpoint_key": "nurture.institution_knowledge.command.prepare",
+        "execute_endpoint_key": "nurture.institution_knowledge.command.execute",
         "enablement_policy": "disabled"
       }
     },

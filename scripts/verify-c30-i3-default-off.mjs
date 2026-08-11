@@ -73,6 +73,32 @@ assert(
   "a legacy Scenario capability is enabled",
 );
 
+const expectedTrustedHandlerKeys = [
+  "nurture.c30.list_subject_contexts.transport",
+  "nurture.c30.resolve_subject_context.transport",
+  "nurture.c30.present_subject_context.transport",
+  "nurture.institution_knowledge.query.formal.v1",
+  "nurture.institution_knowledge.command.prepare.formal.v1",
+  "nurture.institution_knowledge.command.execute.formal.v1",
+];
+assert(
+  JSON.stringify(contracts.trusted_invocation.operations.map(({ handler_key }) => handler_key)) ===
+    JSON.stringify(expectedTrustedHandlerKeys),
+  "trusted invocation handler population drifted",
+);
+assert(
+  JSON.stringify(manifest.surface_mapping?.web_run_workbench?.institution_knowledge) ===
+    JSON.stringify({
+      contract_version: "1.0.0",
+      ingress_category: "host_transition",
+      query_endpoint_key: "nurture.institution_knowledge.query",
+      prepare_endpoint_key: "nurture.institution_knowledge.command.prepare",
+      execute_endpoint_key: "nurture.institution_knowledge.command.execute",
+      enablement_policy: "disabled",
+    }),
+  "Institution Knowledge must have one exact disabled formal Workbench mapping",
+);
+
 const c30RouteTokens = new Set([
   ...contracts.trusted_invocation.operations.map(({ endpoint_key }) => endpoint_key),
   ...contracts.trusted_invocation.operations.map(({ handler_key }) => handler_key),
@@ -181,6 +207,7 @@ const evidence = {
     .flatMap(({ action_keys }) => action_keys).length,
   enabled_manifest_capabilities: manifest.capabilities
     .filter(({ enablement_policy }) => enablement_policy !== "disabled").length,
+  trusted_invocation_handlers: contracts.trusted_invocation.operations.length,
   positive_c30_internal_routes: internalRoutes.filter(({ handler_key }) =>
     c30RouteTokens.has(handler_key)).length,
   positive_c30_application_registrations: positiveRouteHits.length,
