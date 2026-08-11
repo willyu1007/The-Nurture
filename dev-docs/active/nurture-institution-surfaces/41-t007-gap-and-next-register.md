@@ -2,7 +2,7 @@
 
 ## Status
 
-- Date: 2026-08-10
+- Date: 2026-08-11
 - Task: T-007
 - Purpose: the **live** list of what is not built and what comes next.
 
@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; I3/I4 gated** | [`64`](./64-g4-0f-scope-freeze.md)–[`75`](./75-g4-e-i2-b-surface-adapter-record.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; My-Chat Q2/Q3 owner boundary adopted; I3/I4 gated on the concrete safety provider** | [`64`](./64-g4-0f-scope-freeze.md)–[`78`](./78-g4-e-q2-q3-owner-progress.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -37,8 +37,11 @@ audit removes candidate-as-hold and lifecycle-command ambiguity, and 0F exits
 with `G4_0F_EXIT_PASS`. G4-E now has private lifecycle/provenance,
 retrieval/currentness/preview and answer-safety/conflict-candidate domain plus
 five tables qualified on a destroyed disposable PostgreSQL target. E5 adds the
-exact source-only `1.20.0` public wire artifact; it still has no caller, real model/
-safety owner binding, Host index runtime, formal ingress, activation or traffic.
+exact source-only `1.20.0` public wire artifact. The My-Chat T-040 sequence
+through `942bd00` now supplies durable Q2 ingestion/currentness, canonical Q3
+generation replay and the provider-neutral safety owner/write boundary. Nurture
+still has no caller, concrete deterministic safety provider/rule pin, formal
+ingress, activation or traffic.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
 adds explicit policy/FIFO/override/offer/reservation/cancellation semantics and
@@ -263,10 +266,14 @@ and destroyed-target evidence pass. [`74`](./74-g4-e-i2-a-contract-artifact-reco
 adds the exact seven-capability I2-A artifact without a caller: one read-only
 preview, one effectful answer action and five lifecycle actions. [`75`](./75-g4-e-i2-b-surface-adapter-record.md)
 maps all seven to existing I1 behavior through exact validators/presenters and
-two disabled internal Workbench handlers. I3/I4 remain closed on the adopted
-My-Chat scenario deltas and deterministic answer-safety owner/rule pin;
-synthetic compatibility mappings cannot close them. [`76`](./76-g4-e-i3-owner-gate-audit.md)
-confirms the current My-Chat checkout still supplies neither adoption.
+two disabled internal Workbench handlers. The historical E7 audit
+[`76`](./76-g4-e-i3-owner-gate-audit.md) found no scenario owner delta at
+`4d22aab`. That external-state finding is superseded by the authorized T-040
+sequence adopted in [`78`](./78-g4-e-q2-q3-owner-progress.md): Q2 is closed,
+Q3 generation replay and the provider-neutral safety boundary are implemented
+and Q4 is closed. I3/I4 remain closed only because no concrete non-generative
+safety provider/rule artifact and replay pin exists; synthetic, keyword or
+model-self-rating compatibility mappings cannot close that gate.
 
 ## Closed since the 0D Exit
 
@@ -297,15 +304,20 @@ confirms the current My-Chat checkout still supplies neither adoption.
 
 ## Next steps, in dependency order
 
-1. **Resolve G4-E Q2–Q4** — identify the adopted My-Chat revision, qualified
-   deterministic safety owner/rule pin and sibling-repository change authority.
-2. **G4-E I3/I4** — only after those gates close, bind the exact real owner
-   adapters and formal ingress, then run joint conformance/Exit.
-3. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
+1. **Close the remaining G4-E Q3 provider gate** — select and qualify one
+   concrete non-generative deterministic provider plus immutable rule-set
+   ref/version/hash and positive/denial/unavailable/drift replay fixtures. Q2
+   and Q4 are closed; do not reopen them or add a compatibility classifier.
+2. **G4-E E7** — after that exact pin exists, bind the adopted My-Chat Q2/Q3
+   owners and formal scenario-service ingress as one default-off composition.
+3. **G4-E E8** — run joint cited-positive, no-source, medical-conflict,
+   post-generation currentness, provider-outage, drift and replay conformance,
+   then issue the G4-E Exit record without activating traffic.
+4. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the
    default-off runtime gate while qualifying on an approved disposable DB.
-4. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
+5. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
    after the I3 owner and ingress paths qualify.
 
 G-03's remaining authority/source fact is an external owner gate, not an

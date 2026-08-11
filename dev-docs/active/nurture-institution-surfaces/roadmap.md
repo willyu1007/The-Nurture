@@ -31,10 +31,13 @@
   [`75`](./75-g4-e-i2-b-surface-adapter-record.md). Exact validators,
   presenters and I1 adapters are composed only through disabled internal
   Workbench handlers.
-- E7 I3 gate audit: `G4_E_I3_NOT_READY_EXTERNAL_GATES`; see
-  [`76`](./76-g4-e-i3-owner-gate-audit.md). My-Chat checkout `4d22aab` contains
-  no adopted scenario delta or qualified deterministic answer-safety owner.
-- Current node: E7 I3 owner-integration gate, waiting on Q2–Q4 evidence/authority.
+- E7 I3 gate audit: historical `G4_E_I3_NOT_READY_EXTERNAL_GATES`; see
+  [`76`](./76-g4-e-i3-owner-gate-audit.md). The later authorized My-Chat T-040
+  sequence supersedes its external-state finding: Q2, Q3 replay and the
+  provider-neutral safety boundary are adopted at `942bd00`, and Q4 is closed
+  ([`78`](./78-g4-e-q2-q3-owner-progress.md)).
+- Current node: pre-E7 Q3 gate, waiting only on a concrete non-generative
+  deterministic provider/rule artifact and replay qualification.
 - I3/I4 cannot start from synthetic compatibility owners or the moving checkout.
 
 ## Planning-mode context and merge policy
@@ -86,12 +89,16 @@
   `localhost:5433/nurture_t007_g4e_i1_qualification_20260810_01`; the exact
   target passed qualification and was destroyed with final database/session
   counts `0/0` ([`73`](./73-g4-e-i1-audit-qualification-record.md)).
-- Q2 — Before I3: which exact My-Chat revision adopts the Institution source,
-  retrieval, currentness and replayable generation deltas?
+- Q2 — **Resolved for E7.** My-Chat T-040 commits through `942bd00` implement
+  exact source admission/invalidation, durable reconciliation and replayable
+  generation; all are ancestors of inspected My-Chat `main`
+  ([`78`](./78-g4-e-q2-q3-owner-progress.md)).
 - Q3 — Before I3: which exact deterministic answer-safety provider and
-  rule-set/version are owner-qualified?
-- Q4 — Before any sibling-repository change: is My-Chat/Base mutation explicitly
-  in scope, or must those owner deltas arrive as external handoff artifacts?
+  rule-set/version/hash and replay fixtures are owner-qualified? The
+  provider-neutral adapter is implemented; this concrete positive provider is
+  still open.
+- Q4 — **Resolved.** The user explicitly authorized My-Chat/Base sibling
+  mutation and the My-Chat T-040 owner sequence was implemented.
 
 ### Assumptions
 
@@ -99,9 +106,9 @@
   connecting to a database (risk: low).
 - A2: I2 may publish an exact default-off Surface artifact and synthetic
   adapters without claiming owner readiness (risk: low).
-- A3: Q1 is closed for E4. Unresolved Q2–Q4 block I3/I4 but do not justify
-  compatibility adapters or local Host-runtime substitutes (risk: high if
-  ignored).
+- A3: Q1, Q2 and Q4 are closed. The remaining Q3 provider/rule pin blocks
+  E7/E8 and does not justify compatibility adapters, a keyword classifier or
+  local Host-runtime substitute (risk: high if ignored).
 - A4: Each numbered implementation node is a revertible commit boundary with
   one `Task: T-007` trailer; the next node starts only from a clean worktree
   after verification and project sync (risk: low).
@@ -214,8 +221,9 @@ expected project-structure impact.
 8. **E7 — G4-E I3 Owner Integration Readiness**
    - Deliverable: exact adopted My-Chat/safety owner pins/adapters, formal
      scenario-service ingress and disposable PostgreSQL qualification.
-   - Acceptance criteria: Q2–Q4 resolved, real owner positive/negative/replay/
-     drift paths pass; no synthetic-only readiness claim.
+   - Acceptance criteria: resolved Q2/Q4 pins plus the qualified Q3 provider/
+     rule artifact are composed; real owner positive/negative/replay/drift
+     paths pass with no synthetic-only readiness claim.
 9. **E8 — G4-E I4 Joint Conformance and Exit**
    - Deliverable: formal ingress end-to-end conformance, branch audit, G4-E
      Exit record and updated T-007 gap register.

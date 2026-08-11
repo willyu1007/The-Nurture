@@ -564,8 +564,15 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   ([`74`](./74-g4-e-i2-a-contract-artifact-record.md)). E6 now maps all seven
   through exact validators, presenters and existing I1 behavior using only
   disabled internal Workbench composition
-  ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)). Real owner/runtime
-  binding remains gated on Q2–Q4.
+  ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)). The authorized My-Chat
+  T-040 owner sequence closes Q2 durable source ingestion/currentness and
+  implements Q3 replay plus the provider-neutral deterministic safety boundary
+  at `942bd00`; Q4 sibling authority is also closed
+  ([`78`](./78-g4-e-q2-q3-owner-progress.md)). E7 remains gated only on a
+  concrete non-generative provider/rule artifact and its exact replay
+  qualification. After that pin exists, bind the Q2/Q3 owners and formal
+  ingress as one default-off E7 unit; E8 then runs joint positive/negative/
+  drift/replay/currentness conformance before any activation decision.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料

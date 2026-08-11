@@ -5,11 +5,16 @@
 - State: in-progress
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-10
-- Next step: **complete the remaining G4-E Q2 durable source ingestion and Q3
-  generation/safety adoption gates; Q4 sibling-mutation authority is closed
-  ([`77`](./77-g4-e-q2-source-snapshot-owner-delta.md)); then bind E7 and run
-  E8 Joint Conformance while capabilities remain default-off**. The exact generic
+- Updated: 2026-08-11
+- Next step: **qualify one concrete non-generative deterministic safety
+  provider and immutable rule artifact, then bind the adopted My-Chat Q2/Q3
+  owners in E7 and run E8 Joint Conformance while capabilities remain
+  default-off**. Q2 durable ingestion/currentness and Q3 structured-generation/
+  provider-neutral safety owners are landed through `My-Chat@942bd00`; Q4
+  sibling-mutation authority is closed, while Q3's positive provider/rule pin
+  remains the single Knowledge owner gate
+  ([`77`](./77-g4-e-q2-source-snapshot-owner-delta.md),
+  [`78`](./78-g4-e-q2-q3-owner-progress.md)). The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
   ([`64`](./64-g4-0f-scope-freeze.md)); 0F-1 freezes the Nurture-owned item,
@@ -64,10 +69,12 @@
   confirmation/scope binding, existing I1 services/specs and role-safe presenters.
   Exactly two internal Workbench handlers are declared disabled; no formal
   caller exists ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)).
-  The E7 audit confirms that My-Chat `4d22aab` has no adopted Institution
-  Knowledge delta or qualified deterministic safety owner; sibling mutation
-  authority is also absent, so I3/I4 remain closed
-  ([`76`](./76-g4-e-i3-owner-gate-audit.md)).
+  The historical E7 audit correctly found no owner delta at My-Chat
+  `4d22aab` ([`76`](./76-g4-e-i3-owner-gate-audit.md)); the later authorized
+  T-040 sequence supersedes that external-state finding. Q2 and the
+  provider-neutral Q3 boundary are now adopted at `942bd00`, but no concrete
+  deterministic provider/rule artifact is qualified, so I3/I4 remain closed
+  ([`78`](./78-g4-e-q2-q3-owner-progress.md)).
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered

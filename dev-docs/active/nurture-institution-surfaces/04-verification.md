@@ -794,6 +794,26 @@ Verdict: `G4_E_I3_NOT_READY_EXTERNAL_GATES`. Detailed evidence: [`76`](./76-g4-e
 
 Detailed evidence: [`77`](./77-g4-e-q2-source-snapshot-owner-delta.md).
 
+## 2026-08-11 — G4-E Q2/Q3 My-Chat owner progress sync
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Commit reachability | PASS | `7f06432`, `44f93fe`, `a899249` and `942bd00` are all ancestors of inspected My-Chat `main`. |
+| Relevant later drift | PASS | `git diff --name-only 942bd00..main` across Knowledge/scenario owner paths shows no later Nurture Knowledge owner change; listed scenario diffs belong to independent family-sharing work. |
+| Q2 qualification adoption | PASS | My-Chat T-040 records admission 5/5 and durable reconciliation 8/8 after fresh 37/38-migration replays; all disposable targets were destroyed. |
+| Q3 generation adoption | PASS | My-Chat records 5/5 PostgreSQL, 51/51 LLM/scenario and 135/135 DB-unit evidence after all 39 migrations. |
+| Q3 safety boundary adoption | PARTIAL | Provider-neutral adapter/canonical write pass 6/6 PostgreSQL and 57/57 affected tests; no concrete deterministic provider/rule artifact is qualified. |
+| Nurture effect | NONE | Documentation and adoption state only; no adapter, ingress, DB, provider call, deployment, activation or traffic. |
+| Task docs / governance | PASS | Strict task lint passes 130/130 with zero warnings; strict project-governance lint passes. |
+| Relative link targets | PASS | Inline Node read-only check covered all 80 top-level task Markdown files; every local relative target exists. |
+| Optional link-check script | NOT AVAILABLE | `.ai/scripts/validate-doc-links.mjs` does not exist; script census confirms `lint-docs.mjs` is the maintained documentation checker. This is not an acceptance failure. |
+
+No external test suite was rerun during this documentation sync. The exact
+commands/results above are adopted from committed My-Chat T-040 verification
+and disposable-database artifacts; this Nurture pass independently verified
+their commit reachability and current relevant-file drift. Detailed evidence:
+[`78`](./78-g4-e-q2-q3-owner-progress.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

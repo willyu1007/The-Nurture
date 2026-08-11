@@ -52,9 +52,12 @@ Project: `main`
   through all 35 migrations and 391/391 DB tests on a destroyed disposable
   target. E5 now adds the source-only seven-capability Knowledge wire artifact;
   E6 maps all seven to existing I1 behavior through exact validators,
-  presenters and disabled internal Workbench handlers. I3 waits for exact
-  Q2–Q4 external owner/safety adoption; the read-only E7 audit found no adopted
-  scenario delta or deterministic safety owner at My-Chat `4d22aab`.
+  presenters and disabled internal Workbench handlers. The later authorized
+  My-Chat T-040 sequence through `942bd00` closes Q2 durable ingestion/
+  currentness, adds Q3 canonical generation replay and qualifies the
+  provider-neutral safety boundary; Q4 sibling authority is closed. I3 now
+  waits only for a concrete non-generative deterministic safety provider and
+  immutable rule artifact before the exact owners/formal ingress can be bound.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -65,12 +68,13 @@ Project: `main`
 
 1. **Qualify T-010 I4-C0.** Verify the independent mapping and frozen authority
    design, then produce an additive Prisma diff without database apply.
-2. **Resolve G4-E Q2–Q4.** Identify the adopted My-Chat revision, qualified
-   deterministic safety owner/rule pin and sibling-repository authority before
-   any I3 code or formal caller.
-3. **Keep I3/I4 closed on G-09/Q2–Q4.** I2-A/I2-B are complete and default-off;
-   authenticated My-Chat evidence/private ingress and joint replay/negative
-   conformance require an explicit upstream adoption decision.
+2. **Close the remaining G4-E Q3 provider gate.** Qualify one concrete
+   non-generative provider plus immutable rule-set ref/version/hash and exact
+   replay fixtures; do not reopen closed Q2/Q4 or add a compatibility
+   classifier.
+3. **Keep G4-E I3/I4 default-off until the Q3 pin exists.** Then bind the
+   adopted My-Chat owners/formal ingress and run joint positive, negative,
+   currentness, outage, drift and replay conformance.
 4. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
    production caller**; I1 evidence is not activation evidence.
 5. Only a separately authorized `C30-I4` scope review is eligible for T-002.
@@ -91,8 +95,8 @@ Project: `main`
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-010 nurture-family-sharing-eligibility | in-progress | F-005 | dev-docs/active/nurture-family-sharing-eligibility |
 | T-007 nurture-institution-surfaces | in-progress | F-003 | dev-docs/active/nurture-institution-surfaces |
+| T-010 nurture-family-sharing-eligibility | in-progress | F-005 | dev-docs/active/nurture-family-sharing-eligibility |
 | T-003 nurture-uiux-pitch | done | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-009 nurture-family-growth-provider | done | F-004 | dev-docs/active/nurture-family-growth-provider |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |

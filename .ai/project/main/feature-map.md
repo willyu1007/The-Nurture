@@ -384,11 +384,16 @@ Project: `main`
   schema or runtime effect. E3 passes statically with strict structured answer,
   deterministic safety/currentness and one immutable fifth-table conflict
   candidate. Both G4-E migrations are disposable-qualified and remain
-  unapplied anywhere durable.
-- Next Checkpoint: execute G4-E E5 I2-A public Surface artifact, then E6
-  default-off adapters; independently, explicit G-09 adoption may open G4-D I3 authenticated
+  unapplied anywhere durable. E5/E6 add the exact `1.20.0` seven-capability
+  artifact and disabled Workbench adapters. The adopted My-Chat T-040 sequence
+  through `942bd00` closes Q2 ingestion/currentness and implements Q3 replay
+  plus its provider-neutral safety boundary; Q4 sibling authority is closed.
+- Next Checkpoint: qualify the remaining concrete non-generative deterministic
+  safety provider/rule artifact and replay pin, then bind the exact My-Chat
+  owners/formal ingress in default-off E7 and run E8 joint conformance.
+  Independently, explicit G-09 adoption may open G4-D I3 authenticated
   prospective-contact/native-source/current-owner and formal-ingress binding.
-  I4 joint conformance follows only after I3 qualifies.
+  I4 joint conformance follows only after each I3 path qualifies.
   T-008 remains planned until the complete T-007 G4 Exit; Candidate Freeze,
   deployment, activation and external traffic remain closed.
 

@@ -1155,3 +1155,21 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Scenario typecheck/manifest and the 13/13 targeted retrieval suite pass. No
   database, provider call, indexing, activation or traffic occurred.
 - Detailed evidence: [`77`](./77-g4-e-q2-source-snapshot-owner-delta.md).
+
+## 2026-08-11 — G4-E Q2/Q3 My-Chat owner progress sync
+
+- Adopted the four-commit My-Chat T-040 owner sequence ending at `942bd00`:
+  exact source admission/invalidation, durable cursor/reconciliation, canonical
+  structured-generation replay and the provider-neutral deterministic safety
+  owner/write contract. All four commits are ancestors of inspected My-Chat
+  `main`.
+- Q2 is closed and Q4 sibling mutation authority has been exercised. Q3 is
+  narrowed to one explicit gate: a concrete non-generative provider plus
+  immutable rule-set identity/hash and replay fixtures.
+- Preserved one safety SSOT. The existing Aliyun Bailian generative profile is
+  not reclassified as deterministic safety, and a generic content-risk API is
+  not treated as the closed Nurture medical/private/source-conflict rule owner.
+- No Nurture adapter, ingress, database, deployment, activation or traffic
+  change occurred in this sync. E7 remains default-off until the exact Q3 pin
+  exists; E8 remains the formal joint-conformance gate.
+- Detailed evidence: [`78`](./78-g4-e-q2-q3-owner-progress.md).
