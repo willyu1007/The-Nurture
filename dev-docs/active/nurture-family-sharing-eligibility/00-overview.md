@@ -3,9 +3,13 @@
 ## Status
 
 - State: in-progress
-- Updated: 2026-08-11
-- Next step: review and freeze the I4-C0 authority/policy/transport design,
-  then produce a Prisma schema diff without applying it.
+- Updated: 2026-08-12
+- Next step: I4-C1 is drafted — additive schema/migration (review-only, not
+  applied), domain record types and the fail-closed read port, DB context
+  refreshed; see `artifacts/db/t010-family-sharing-authority/`. Next: close
+  the independent migration-SQL review, then I4-C2 current-authority reader
+  over these records (no apply; the first apply target is the approved C4
+  disposable).
 
 ## Goal
 

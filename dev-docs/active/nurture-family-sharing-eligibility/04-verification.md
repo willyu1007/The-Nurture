@@ -42,3 +42,18 @@
 - Backout: documentation/project mapping can be reverted without data impact.
   Once canonical authority or cleanup receipts exist, schema history must be
   preserved and defects forward-fixed.
+
+## 2026-08-12 I4-C1 gates
+
+| Check | Result |
+| --- | --- |
+| `prisma format` / `prisma validate` (placeholder URL, no connection) | PASS |
+| Migration SQL review artifact | `artifacts/db/t010-family-sharing-authority/01-schema-diff-preview.md` + `02-migration-plan.md`; additive-only, no DROP/ALTER-TYPE/backfill |
+| DB context sync | `pnpm db:context` regenerated `docs/context/db/schema.json`; registry checksum `1c18d236…` |
+| Typecheck / unit | 0 errors; unit suite PASS (no new test files, routing census unchanged 169) |
+| `verify:persistence-boundaries` | PASS (no `workflow_` leakage; nurture-prefixed tables only) |
+| `verify:workflow-contract-pin` | PASS after self-pin rotation to `003cbe81…` (281 files) |
+| Non-change assertions | `NurtureGrantDataClass`/`NurtureGrantDirection` byte-identical; frozen digest `0cc3ccc8…` untouched |
+| Database writes | NONE — apply remains behind the C4 approved-disposable gate and a separate durable approval |
+
+Current verdict: `I4_C1_DRAFTED_REVIEW_PENDING / NO_APPLY`.

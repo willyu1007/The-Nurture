@@ -57,3 +57,25 @@
 ## Pitfalls and dead ends
 
 - Keep the detailed append-only log in `05-pitfalls.md`.
+
+## 2026-08-12 I4-C1 schema, domain and ports (review-only)
+
+- Added the dedicated category-authority persistence draft:
+  `NurtureFamilySharingAuthority` + `NurtureFamilySharingPolicy` with new
+  `NurtureFamilySharing*` enums (not the Grant vocabulary), named `Restrict`
+  FKs to process/family/enrollment/role-assignment, and provenance
+  (authorizing role + role-assignment id, authority/policy versions,
+  effective/expiry/revoke lifecycle). Purpose is column-bound and CHECKed to
+  `family_nurture_sharing_authorization`.
+- The exactly-one-current guarantee lives in partial unique indexes
+  (`WHERE status = 'active'`, per scope+category, policies additionally per
+  axis); expiry is temporal, writers supersede/revoke in one transaction, and
+  the migration is committed preview-only — no database was written.
+- Domain layer (`domain/family-sharing/authority-records.ts`): record types
+  and `NurtureFamilySharingAuthorityRecordReadPort` with fail-closed
+  cardinality for the C2 reader; no Prisma import.
+- Cleanup command/receipt table deliberately not drafted: the
+  `NurtureCommandExecution` reuse argument belongs to the C3 transport
+  design.
+- `docs/context/db/schema.json` regenerated; workflow-contract self-pin
+  rotated (`003cbe81…`, 281 files).

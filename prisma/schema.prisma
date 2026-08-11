@@ -988,6 +988,34 @@ enum NurtureFamilyGrowthReceiptStatus {
   conflict
 }
 
+// T-010 I4-C1 family-sharing eligibility owner. Dedicated category authority:
+// these enums deliberately do NOT reuse NurtureGrantDataClass or
+// NurtureGrantDirection (frozen decision D-I4C-01; the Grant vocabulary is
+// family_to_org/org_to_family and must stay untouched).
+enum NurtureFamilySharingCategory {
+  daily_activity
+  media
+  focus_collaboration
+}
+
+enum NurtureFamilySharingDirection {
+  nurture_to_family
+  family_to_nurture
+}
+
+enum NurtureFamilySharingPolicyAxis {
+  release
+  receiving
+}
+
+// Expiry is temporal (expires_at), never a stored status: a writer either
+// revokes or supersedes; readers treat past-expiry active rows as not current.
+enum NurtureFamilySharingRecordStatus {
+  active
+  revoked
+  superseded
+}
+
 // ============================================================================
 // SCENARIO-LOCAL — PROFILE PROJECTIONS (5b decision 1)
 // ============================================================================
@@ -1849,19 +1877,19 @@ model NurtureParticipant {
   updatedAt        DateTime                 @updatedAt @map("updated_at")
   deletedAt        DateTime?                @map("deleted_at")
 
-  roleAssignments                 NurtureCareRoleAssignment[]
-  threadMemberships               NurtureFamilyCareThreadParticipant[]
-  messages                        NurtureFamilyCareMessage[]
-  messageCorrections              NurtureFamilyCareMessageCorrection[]
-  itemEvents                      NurtureFamilyCareItemEvent[]
-  interactionContexts             NurtureInteractionContext[]
-  principalBindings               NurtureParticipantPrincipalBinding[]
-  c30PairOperations               NurtureC30PairOperation[]
-  c30ActionOperations             NurtureC30ActionOperation[]
-  c30ProtectedContentCreated      NurtureC30ProtectedContent[]               @relation("NurtureC30ProtectedContentCreator")
-  c30ProtectedContentTransitioned NurtureC30ProtectedContent[]               @relation("NurtureC30ProtectedContentTransitionActor")
-  institutionKnowledgeRevisions   NurtureInstitutionKnowledgeRevision[]      @relation("NurtureKnowledgeRevisionAuthor")
-  institutionKnowledgeEvents      NurtureInstitutionKnowledgeRevisionEvent[] @relation("NurtureKnowledgeEventActor")
+  roleAssignments                      NurtureCareRoleAssignment[]
+  threadMemberships                    NurtureFamilyCareThreadParticipant[]
+  messages                             NurtureFamilyCareMessage[]
+  messageCorrections                   NurtureFamilyCareMessageCorrection[]
+  itemEvents                           NurtureFamilyCareItemEvent[]
+  interactionContexts                  NurtureInteractionContext[]
+  principalBindings                    NurtureParticipantPrincipalBinding[]
+  c30PairOperations                    NurtureC30PairOperation[]
+  c30ActionOperations                  NurtureC30ActionOperation[]
+  c30ProtectedContentCreated           NurtureC30ProtectedContent[]                 @relation("NurtureC30ProtectedContentCreator")
+  c30ProtectedContentTransitioned      NurtureC30ProtectedContent[]                 @relation("NurtureC30ProtectedContentTransitionActor")
+  institutionKnowledgeRevisions        NurtureInstitutionKnowledgeRevision[]        @relation("NurtureKnowledgeRevisionAuthor")
+  institutionKnowledgeEvents           NurtureInstitutionKnowledgeRevisionEvent[]   @relation("NurtureKnowledgeEventActor")
   institutionKnowledgePreparedCommands NurtureInstitutionKnowledgePreparedCommand[]
 
   @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
@@ -2232,6 +2260,8 @@ model NurtureChildCareProcess {
   c30ActionOperations      NurtureC30ActionOperation[]
   familyAnchorAssociations NurtureFamilyAnchorAssociation[]
   attendanceEntries        NurtureAttendanceEntry[]
+  familySharingAuthorities NurtureFamilySharingAuthority[]
+  familySharingPolicies    NurtureFamilySharingPolicy[]
 
   @@unique([workspaceId, id, childId], map: "uq_nurture_child_process_integrity")
   @@index([workspaceId, childId, status], map: "ix_nurture_child_process_child")
@@ -2251,10 +2281,12 @@ model NurtureFamily {
   updatedAt            DateTime            @updatedAt @map("updated_at")
   deletedAt            DateTime?           @map("deleted_at")
 
-  childCareProcess   NurtureChildCareProcess          @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  threads            NurtureFamilyCareThread[]
-  items              NurtureFamilyCareItem[]
-  anchorAssociations NurtureFamilyAnchorAssociation[]
+  childCareProcess         NurtureChildCareProcess          @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  threads                  NurtureFamilyCareThread[]
+  items                    NurtureFamilyCareItem[]
+  anchorAssociations       NurtureFamilyAnchorAssociation[]
+  familySharingAuthorities NurtureFamilySharingAuthority[]
+  familySharingPolicies    NurtureFamilySharingPolicy[]
 
   @@unique([workspaceId, id, childCareProcessId], map: "uq_nurture_family_process_integrity")
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_family_process")
@@ -2447,17 +2479,19 @@ model NurtureEnrollment {
   updatedAt            DateTime                             @updatedAt @map("updated_at")
   deletedAt            DateTime?                            @map("deleted_at")
 
-  childCareProcess NurtureChildCareProcess           @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  institution      NurtureCareInstitution            @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  careGroup        NurtureCareGroup                  @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  grants           NurtureChildLinkGrant[]
-  receipts         NurtureChildLinkReceipt[]
-  threads          NurtureFamilyCareThread[]
-  items            NurtureFamilyCareItem[]
-  messages         NurtureFamilyCareMessage[]
-  dailyCareLogs    NurtureDailyCareLog[]
-  publishTargets   NurturePublishProcessTarget[]
-  formalProposals  NurtureEnrollmentFormalProposal[]
+  childCareProcess         NurtureChildCareProcess           @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  institution              NurtureCareInstitution            @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup                NurtureCareGroup                  @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  grants                   NurtureChildLinkGrant[]
+  receipts                 NurtureChildLinkReceipt[]
+  threads                  NurtureFamilyCareThread[]
+  items                    NurtureFamilyCareItem[]
+  messages                 NurtureFamilyCareMessage[]
+  dailyCareLogs            NurtureDailyCareLog[]
+  publishTargets           NurturePublishProcessTarget[]
+  formalProposals          NurtureEnrollmentFormalProposal[]
+  familySharingAuthorities NurtureFamilySharingAuthority[]
+  familySharingPolicies    NurtureFamilySharingPolicy[]
 
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
   @@index([workspaceId, careGroupId, status, participationPhase], map: "ix_nurture_enrollment_group_phase")
@@ -2482,33 +2516,35 @@ model NurtureCareRoleAssignment {
   updatedAt              DateTime                        @updatedAt @map("updated_at")
   deletedAt              DateTime?                       @map("deleted_at")
 
-  participant                     NurtureParticipant                         @relation(fields: [participantId], references: [id], onDelete: Restrict)
-  threadMemberships               NurtureFamilyCareThreadParticipant[]
-  messages                        NurtureFamilyCareMessage[]
-  assignedItems                   NurtureFamilyCareItem[]                    @relation("ItemAssignedRole")
-  ackedItems                      NurtureFamilyCareItem[]                    @relation("ItemAckedRole")
-  authoredCorrections             NurtureFamilyCareMessageCorrection[]
-  dailyCareLogs                   NurtureDailyCareLog[]
-  uploadedAssets                  NurtureMediaAssetRef[]
-  confirmedAttributions           NurtureChildMediaAttribution[]
-  captures                        NurtureCareCapture[]
-  publishEditHolds                NurturePublishEditHold[]
-  publicationReleases             NurturePublicationRelease[]
-  attendanceSubmitted             NurtureDailyAttendanceSubmission[]         @relation("AttendanceSubmittedBy")
-  attendanceReopened              NurtureDailyAttendanceSubmission[]         @relation("AttendanceReopenedBy")
-  attendanceCloseoutPolicies      NurtureAttendanceCloseoutPolicy[]
-  supportSignalPolicies           NurtureInstitutionSupportSignalPolicy[]
-  contentRevisions                NurtureContentRevision[]
-  attributionCorrectionCandidates NurtureAttributionCorrectionCandidate[]
-  enrollmentTouchpoints           NurtureEnrollmentTouchpoint[]
-  institutionWorkflowTransitions  NurtureInstitutionWorkflowTransition[]
-  enrollmentWaitlistPolicies      NurtureEnrollmentWaitlistPolicy[]
-  enrollmentWaitlistOverrides     NurtureEnrollmentWaitlistOverride[]
-  enrollmentTrialOffers           NurtureEnrollmentTrialOffer[]
-  enrollmentFormalProposals       NurtureEnrollmentFormalProposal[]
-  institutionKnowledgeRevisions   NurtureInstitutionKnowledgeRevision[]
-  institutionKnowledgeEvents      NurtureInstitutionKnowledgeRevisionEvent[]
+  participant                          NurtureParticipant                           @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  threadMemberships                    NurtureFamilyCareThreadParticipant[]
+  messages                             NurtureFamilyCareMessage[]
+  assignedItems                        NurtureFamilyCareItem[]                      @relation("ItemAssignedRole")
+  ackedItems                           NurtureFamilyCareItem[]                      @relation("ItemAckedRole")
+  authoredCorrections                  NurtureFamilyCareMessageCorrection[]
+  dailyCareLogs                        NurtureDailyCareLog[]
+  uploadedAssets                       NurtureMediaAssetRef[]
+  confirmedAttributions                NurtureChildMediaAttribution[]
+  captures                             NurtureCareCapture[]
+  publishEditHolds                     NurturePublishEditHold[]
+  publicationReleases                  NurturePublicationRelease[]
+  attendanceSubmitted                  NurtureDailyAttendanceSubmission[]           @relation("AttendanceSubmittedBy")
+  attendanceReopened                   NurtureDailyAttendanceSubmission[]           @relation("AttendanceReopenedBy")
+  attendanceCloseoutPolicies           NurtureAttendanceCloseoutPolicy[]
+  supportSignalPolicies                NurtureInstitutionSupportSignalPolicy[]
+  contentRevisions                     NurtureContentRevision[]
+  attributionCorrectionCandidates      NurtureAttributionCorrectionCandidate[]
+  enrollmentTouchpoints                NurtureEnrollmentTouchpoint[]
+  institutionWorkflowTransitions       NurtureInstitutionWorkflowTransition[]
+  enrollmentWaitlistPolicies           NurtureEnrollmentWaitlistPolicy[]
+  enrollmentWaitlistOverrides          NurtureEnrollmentWaitlistOverride[]
+  enrollmentTrialOffers                NurtureEnrollmentTrialOffer[]
+  enrollmentFormalProposals            NurtureEnrollmentFormalProposal[]
+  institutionKnowledgeRevisions        NurtureInstitutionKnowledgeRevision[]
+  institutionKnowledgeEvents           NurtureInstitutionKnowledgeRevisionEvent[]
   institutionKnowledgePreparedCommands NurtureInstitutionKnowledgePreparedCommand[]
+  familySharingAuthorities             NurtureFamilySharingAuthority[]
+  familySharingPolicies                NurtureFamilySharingPolicy[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -4202,4 +4238,75 @@ model NurtureAttributionCorrectionCandidate {
   @@index([workspaceId, sourceAttributionId, occurredAt], map: "ix_nurture_attribution_correction_source")
   @@index([workspaceId, raisedByRoleAssignmentId, occurredAt], map: "ix_nurture_attribution_correction_actor")
   @@map("nurture_attribution_correction_candidate")
+}
+
+// ============================================================================
+// T-010 I4-C1 — FAMILY-SHARING ELIGIBILITY OWNER AUTHORITY (D-I4C-01..04)
+// Preview only: the companion migration is intentionally not applied by this
+// task. "Current" = status active AND not past expires_at; a writer must
+// supersede or revoke the previous row in the same transaction. The
+// exactly-one-current guarantee per scope (and per policy axis) lives in
+// partial unique indexes that Prisma cannot express — see the raw SQL in
+// prisma/migrations/20260812090000_t010_family_sharing_authority. No raw
+// platform id or signed evidence body is persisted; lifecycle stays with the
+// two owners (D-I4C-04) and is never copied into these rows.
+// ============================================================================
+
+model NurtureFamilySharingAuthority {
+  id                          String                           @id @default(uuid())
+  workspaceId                 String                           @map("workspace_id")
+  childCareProcessId          String                           @map("child_care_process_id")
+  familyId                    String                           @map("family_id")
+  enrollmentId                String                           @map("enrollment_id")
+  category                    NurtureFamilySharingCategory
+  direction                   NurtureFamilySharingDirection
+  purpose                     String                           @default("family_nurture_sharing_authorization")
+  status                      NurtureFamilySharingRecordStatus @default(active)
+  effectiveFrom               DateTime                         @map("effective_from")
+  expiresAt                   DateTime?                        @map("expires_at")
+  revokedAt                   DateTime?                        @map("revoked_at")
+  authorizingRole             NurtureCareRole                  @map("authorizing_role")
+  authorizingRoleAssignmentId String                           @map("authorizing_role_assignment_id")
+  authorityVersion            Int                              @default(1) @map("authority_version")
+  createdAt                   DateTime                         @default(now()) @map("created_at")
+  updatedAt                   DateTime                         @updatedAt @map("updated_at")
+
+  childCareProcess          NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_process_id_fkey")
+  family                    NurtureFamily             @relation(fields: [familyId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_family_id_fkey")
+  enrollment                NurtureEnrollment         @relation(fields: [enrollmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_enrollment_id_fkey")
+  authorizingRoleAssignment NurtureCareRoleAssignment @relation(fields: [authorizingRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_authority_role_assignment_id_fkey")
+
+  @@index([workspaceId, childCareProcessId, familyId, enrollmentId, category, status], map: "ix_nurture_family_sharing_authority_scope")
+  @@index([workspaceId, enrollmentId, status], map: "ix_nurture_family_sharing_authority_enrollment")
+  @@map("nurture_family_sharing_authority")
+}
+
+model NurtureFamilySharingPolicy {
+  id                          String                           @id @default(uuid())
+  workspaceId                 String                           @map("workspace_id")
+  childCareProcessId          String                           @map("child_care_process_id")
+  familyId                    String                           @map("family_id")
+  enrollmentId                String                           @map("enrollment_id")
+  category                    NurtureFamilySharingCategory
+  direction                   NurtureFamilySharingDirection
+  axis                        NurtureFamilySharingPolicyAxis
+  purpose                     String                           @default("family_nurture_sharing_authorization")
+  status                      NurtureFamilySharingRecordStatus @default(active)
+  effectiveFrom               DateTime                         @map("effective_from")
+  expiresAt                   DateTime?                        @map("expires_at")
+  revokedAt                   DateTime?                        @map("revoked_at")
+  authorizingRole             NurtureCareRole                  @map("authorizing_role")
+  authorizingRoleAssignmentId String                           @map("authorizing_role_assignment_id")
+  policyVersion               Int                              @default(1) @map("policy_version")
+  createdAt                   DateTime                         @default(now()) @map("created_at")
+  updatedAt                   DateTime                         @updatedAt @map("updated_at")
+
+  childCareProcess          NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_process_id_fkey")
+  family                    NurtureFamily             @relation(fields: [familyId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_family_id_fkey")
+  enrollment                NurtureEnrollment         @relation(fields: [enrollmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_enrollment_id_fkey")
+  authorizingRoleAssignment NurtureCareRoleAssignment @relation(fields: [authorizingRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_family_sharing_policy_role_assignment_id_fkey")
+
+  @@index([workspaceId, childCareProcessId, familyId, enrollmentId, category, axis, status], map: "ix_nurture_family_sharing_policy_scope")
+  @@index([workspaceId, enrollmentId, status], map: "ix_nurture_family_sharing_policy_enrollment")
+  @@map("nurture_family_sharing_policy")
 }

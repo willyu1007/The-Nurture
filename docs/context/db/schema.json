@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-11T16:35:31.200Z",
+  "updatedAt": "2026-08-11T23:15:35.742Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -699,6 +699,36 @@
         "tombstoned",
         "rejected",
         "conflict"
+      ]
+    },
+    {
+      "name": "NurtureFamilySharingCategory",
+      "values": [
+        "daily_activity",
+        "media",
+        "focus_collaboration"
+      ]
+    },
+    {
+      "name": "NurtureFamilySharingDirection",
+      "values": [
+        "nurture_to_family",
+        "family_to_nurture"
+      ]
+    },
+    {
+      "name": "NurtureFamilySharingPolicyAxis",
+      "values": [
+        "release",
+        "receiving"
+      ]
+    },
+    {
+      "name": "NurtureFamilySharingRecordStatus",
+      "values": [
+        "active",
+        "revoked",
+        "superseded"
       ]
     },
     {
@@ -6363,6 +6393,24 @@
           "references": []
         },
         {
+          "field": "familySharingAuthorities",
+          "to": "NurtureFamilySharingAuthority",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familySharingPolicies",
+          "to": "NurtureFamilySharingPolicy",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "institutionKnowledgeEvents",
           "to": "NurtureInstitutionKnowledgeRevisionEvent",
           "optional": false,
@@ -7270,6 +7318,24 @@
         {
           "field": "familyAnchorAssociations",
           "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familySharingAuthorities",
+          "to": "NurtureFamilySharingAuthority",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familySharingPolicies",
+          "to": "NurtureFamilySharingPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -11361,6 +11427,24 @@
           "references": []
         },
         {
+          "field": "familySharingAuthorities",
+          "to": "NurtureFamilySharingAuthority",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familySharingPolicies",
+          "to": "NurtureFamilySharingPolicy",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "formalProposals",
           "to": "NurtureEnrollmentFormalProposal",
           "optional": false,
@@ -14456,6 +14540,24 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "familySharingAuthorities",
+          "to": "NurtureFamilySharingAuthority",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familySharingPolicies",
+          "to": "NurtureFamilySharingPolicy",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         },
         {
           "field": "items",
@@ -18810,6 +18912,564 @@
           ],
           "name": null,
           "map": "ix_13"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilySharingAuthority",
+      "dbName": "nurture_family_sharing_authority",
+      "schema": null,
+      "columns": [
+        {
+          "name": "authorityVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorizingRole",
+          "type": "NurtureCareRole",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorizing_role",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorizingRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorizing_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "category",
+          "type": "NurtureFamilySharingCategory",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "direction",
+          "type": "NurtureFamilySharingDirection",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "purpose",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "\"family_nurture_sharing_authorization\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilySharingRecordStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "authorizingRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "authorizingRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "family",
+          "to": "NurtureFamily",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "familyId",
+            "enrollmentId",
+            "category",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_sharing_authority_scope"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "enrollmentId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_sharing_authority_enrollment"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilySharingPolicy",
+      "dbName": "nurture_family_sharing_policy",
+      "schema": null,
+      "columns": [
+        {
+          "name": "authorizingRole",
+          "type": "NurtureCareRole",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorizing_role",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorizingRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorizing_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "axis",
+          "type": "NurtureFamilySharingPolicyAxis",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "category",
+          "type": "NurtureFamilySharingCategory",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "direction",
+          "type": "NurtureFamilySharingDirection",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "policyVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purpose",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "\"family_nurture_sharing_authorization\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilySharingRecordStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "authorizingRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "authorizingRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "family",
+          "to": "NurtureFamily",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "familyId",
+            "enrollmentId",
+            "category",
+            "axis",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_sharing_policy_scope"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "enrollmentId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_sharing_policy_enrollment"
         }
       ]
     },
