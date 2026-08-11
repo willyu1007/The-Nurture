@@ -949,7 +949,7 @@ PRODUCTION_OWNER_BINDING_PENDING`.
 | Scenario and DB typecheck | PASS | `pnpm --filter @the-nurture/scenario typecheck`; `pnpm --filter @the-nurture/db typecheck`. |
 | My-Chat principal-bound retrieval | PASS | 2 focused files / 13 tests plus scenario-integrations typecheck and changed-file ESLint. Retrieval and final access each rebuild canonical PermissionContext. |
 | Single owner composition | PASS | The module accepts only `institutionKnowledgeFormalOwnerBinding`; no separate authority/prepared/retrieval injection track remains. |
-| Current source and locks | PASS | My-Chat `ae563988`; Nurture source `d7c4e35`; scenario hash `007eff43…4d09`; C30 adoption hash `d2e06971…28f8`, sealed by `5013f12`. |
+| Current source and locks | PASS | My-Chat `ae563988`; Nurture owner source `10e8e69`; scenario hash `51e2fd35…afb0`; unchanged C30 profile source `d7c4e35` remains sealed as adoption hash `d2e06971…28f8` by `5013f12`. |
 | Runtime effects | NONE / DEFAULT-OFF | No DB connection or apply, live gateway call, route, flag, deployment, secret read or traffic. |
 | Database qualification | `NOT_RUN_APPROVAL_PENDING` | Schema/migration and integration test are authored. Disposable PostgreSQL execution requires explicit approval and is not claimed by this record. |
 
