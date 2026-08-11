@@ -19,17 +19,23 @@ Project: `main`
 - Current surface identity: `nurture.surface-contract@1.20.0` /
   `sha256:35d6340f…` (shared core `sha256:7bd8a82d…`, 65 capabilities /
   6 surfaces).
-- T-007 critical path: **G4-E is closed** —
-  `G4_E_EXIT_PASS_ADAPTER_QUALIFIED` at `8d41be1` (records 83/84/85). E7
-  disposable qualification passed at `223daa7`; E8 joint conformance drove
-  the real Base dispatcher through the real Nurture owners and the real
-  My-Chat retrieval/generation/safety owners on fresh disposable targets —
-  12/12 matrix plus the full x5 lane 24/24 (T-009 8/8 and T-002 x5 4/4
-  included). The new production `PrismaInstitutionKnowledgeReadOwner` closed
-  record 82's read-owner blocker. Next: G4-D I3 authenticated owner adapters
-  + formal ingress → I4 joint conformance → G4-F Exit. Durable apply remains
-  approval-gated; `live_qualified=false` stays a separate activation gate —
-  recorded/synthetic transport is never live evidence.
+- T-007 critical path: **G4-E is closed** (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`,
+  records 83/84/85) and an independent Codex review of the E7/E8 range is
+  resolved — nine findings fixed and re-qualified on fresh disposables
+  (production DB 400/400, x5 24/24, E8 12/12); the read owner was rewritten for
+  deterministic feed ordering, opaque cursors, watermark reconciliation and
+  page batching (records 84 post-review, 04-verification 2026-08-12).
+  **G4-D I3 has started** (design record 86): the authenticated My-Chat
+  prospective-contact owner
+  (`my-chat.nurture-enrollment-prospective-contact-owner@1.0.0`, My-Chat
+  `83c4647`) is landed and disposable-qualified, and the pin is rotated to
+  adopt it. Next: the Nurture-side owner composition (contact/native-source/
+  current-owner), the enrollment prepared-command ledger + repository and the
+  formal scenario-service ingress, all landing together with their consumer;
+  then I3 qualification, I4 joint conformance and G4-F. Durable apply remains
+  approval-gated; `live_qualified=false` stays a separate activation gate.
+  Note: the pin rotation leaves the C30-I3 adoption lock host head at
+  `ae563988` — refreshed by the T-002 C30 Step-5 track, not by G4-D I3.
 - T-010: I4-C0 qualified. Next is I4-C1 — produce and review an additive
   Prisma diff without database apply; target approval only after migration
   review.
@@ -48,9 +54,10 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Implement G4-D I3** (authenticated My-Chat owner adapters + formal
-   ingress, disposable-DB qualification), then I4 joint conformance
-   (G4-E closed 2026-08-11 as records 83/84/85).
+1. **Continue G4-D I3** (started 2026-08-12, design record 86; My-Chat
+   contact owner landed): implement the Nurture owner composition, the
+   enrollment prepared-command ledger and the formal ingress, qualify on a
+   disposable DB, then run I4 joint conformance.
 2. **Begin T-010 I4-C1**: additive Prisma diff, review-only, no apply.
 3. **Execute C30 requalification Step 5** for T-002.
 4. `NurtureInstitutionPolicyService` and the G4-D commands still have no

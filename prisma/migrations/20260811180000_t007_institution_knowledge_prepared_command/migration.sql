@@ -55,7 +55,8 @@ CREATE TABLE "nurture_institution_knowledge_prepared_command" (
     AND "aggregate_version" >= 1
     AND "prepared_at" < "expires_at"
     AND (("status" = 'consumed' AND "consumed_at" IS NOT NULL)
-      OR ("status" <> 'consumed' AND "consumed_at" IS NULL))
+      OR ("status" = 'prepared' AND "consumed_at" IS NULL)
+      OR "status" = 'expired')
   )
 );
 

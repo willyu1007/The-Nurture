@@ -987,6 +987,19 @@ Current verdict: `G4_E_E7_DB_QUALIFICATION_PASS / E8_PENDING`.
 
 Current verdict: `G4_E_EXIT_PASS_ADAPTER_QUALIFIED / G4_D_I3_NEXT`.
 
+## 2026-08-12 post-review hardening and G4-D I3 start
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Independent Codex review of the E7/E8 range | 9 findings, all resolved | `DR-E8-04` CHECK/consumed-expiry, `DR-E8-05` read-owner rewrite (feed ordering, draft exclusion, opaque cursors, watermark reconciliation, page batching), `DR-E8-06` NUL escaping; see record 84 post-review section. |
+| Fresh-disposable re-qualification | PASS | production DB lane 400/400 across 45 files; full x5 lane 24/24 (E8 12/12, T-009 8/8, T-002 4/4); targets destroyed, ports free. |
+| New read-owner integration test | PASS | 4 cases: opaque-ref publication read, limit-1 keyset completeness, real republish tie ordering + next_cursor walk, reconciliation `evaluated_at`/ref stability + foreign-scope fail-closed. |
+| Structural gates | PASS | `verify:test-routing` (`production-db=45`), `verify:g3-0-freeze`, `verify:workflow-contract-pin` (self-pin `eecc1c6b…`, 279 files), `db:validate`. |
+| G4-D I3 My-Chat provider | LANDED, qualified | `my-chat.nurture-enrollment-prospective-contact-owner@1.0.0` at My-Chat `83c4647` (design record 86); pin rotated. Nurture-side ledger/composition/ingress is the next step and is not committed ahead of its consumer. |
+| Runtime effects | NONE / DEFAULT-OFF | No durable apply, route, flag, credential, live call, deployment or traffic. |
+
+Current verdict: `G4_D_I3_STARTED / NURTURE_OWNER_COMPOSITION_NEXT`.
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

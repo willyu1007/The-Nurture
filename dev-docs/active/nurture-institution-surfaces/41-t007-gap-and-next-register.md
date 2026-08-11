@@ -232,14 +232,22 @@ the family no-rank/no-category boundary. Query and command internal keys reject
 cross-lane payloads; canonical Workflow Run or local scope drift fails
 unavailable.
 
-Real prospective-contact and native business-message source adapters remain I3
-gates. The authenticated My-Chat formalization evidence adapter and formal
-scenario-service ingress are also unimplemented I3 gates. G-09 is closed; the
-module's two adapter keys fail closed by default and the manifest marks their
-chat/mobile/Web composition disabled. No Host bridge, real owner binding,
-database operation, activation or traffic exists; `workflowRunRef` accepts only
-the exact My-Chat-owned canonical ref, and the private workflow ref is never
-projected.
+I3 is designed and started ([`86`](./86-g4-d-i3-design-freeze.md)): the lane is
+the trusted verified-invocation ingress (G4-E shape), the providers decompose
+into one binding, and confirmation runs through an E7-isomorphic enrollment
+prepared-command ledger. The first landed piece is the authenticated My-Chat
+prospective-contact owner
+(`my-chat.nurture-enrollment-prospective-contact-owner@1.0.0`, My-Chat
+`83c4647`, disposable-qualified) plus the pin rotation that adopts it. Still
+open as Nurture-side I3 work: the native business-message source adapter (over
+the existing communication owner-read port), the current-owner/formalization
+evidence adapter, the prepared-command ledger + repository, the formal
+scenario-service ingress and its censuses. G-09 is closed; the module's two
+adapter keys fail closed by default and the manifest marks their
+chat/mobile/Web composition disabled. No Host bridge is yet wired into the
+Nurture composition, no database operation, activation or traffic exists;
+`workflowRunRef` accepts only the exact My-Chat-owned canonical ref, and the
+private workflow ref is never projected.
 
 The revision-bearing local C30 adoption lock remains historical G4-D evidence.
 The current cross-repository Workflow/source population is adopted separately

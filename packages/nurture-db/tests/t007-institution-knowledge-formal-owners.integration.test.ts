@@ -438,6 +438,61 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
       await cleanupScope(scope.workspaceId);
     }
   });
+
+  it("expires a consumed command after TTL while retaining the consumption audit time", async () => {
+    const scope = await seedInstitutionAdminScope("consumed-expiry");
+    const clock = { ms: Date.parse("2026-08-11T10:00:00.000Z") };
+    const owners = createOwners(() => new Date(clock.ms));
+    try {
+      const principal = humanPrincipal(scope);
+      const targetOptionRef = issueTarget(owners, scope);
+      const authority = await resolvePreparedAuthority(
+        owners,
+        principal,
+        targetOptionRef,
+        `consumed-expiry-authority-${scope.suffix}`,
+      );
+      const prepared = await owners.institutionKnowledgePreparedCommandOwner.prepare({
+        principal,
+        invocation_request_id: `prepare-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        authority,
+        command: knowledgeItemCommand(`client-command-${scope.suffix}`, targetOptionRef),
+      });
+      expect(prepared).toMatchObject({ status: "ready_to_confirm" });
+      if (prepared.status !== "ready_to_confirm") throw new Error("prepare failed");
+      const execute = {
+        principal,
+        invocation_request_id: `execute-${scope.suffix}`,
+        client_surface: "web_run_workbench" as const,
+        command: {
+          contractVersion: 1 as const,
+          commandRequestId: prepared.command_request_id,
+          confirmationRef: prepared.confirmation_ref,
+        },
+      };
+      await expect(owners.institutionKnowledgePreparedCommandOwner.consumeConfirmed(execute))
+        .resolves.toMatchObject({ status: "resolved" });
+
+      clock.ms += 10 * 60_000;
+      await expect(owners.institutionKnowledgePreparedCommandOwner.consumeConfirmed(execute))
+        .resolves.toEqual({
+          status: "denied",
+          reason_code: "prepared_command_expired",
+        });
+      const row = await prisma.nurtureInstitutionKnowledgePreparedCommand.findUniqueOrThrow({
+        where: { commandRequestId: prepared.command_request_id },
+      });
+      expect(row).toMatchObject({
+        status: "expired",
+        snapshotCodecVersion: 0,
+        frozenSnapshotCiphertext: "",
+      });
+      expect(row.consumedAt).not.toBeNull();
+    } finally {
+      await cleanupScope(scope.workspaceId);
+    }
+  });
 });
 
 type SeededScope = {

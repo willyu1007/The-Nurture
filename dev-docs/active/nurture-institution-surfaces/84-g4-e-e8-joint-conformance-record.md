@@ -121,6 +121,42 @@ acceptance suite (4/4) on the same fresh targets.
    aborts; the previously observed x5-acceptance failure was this scheduling
    artifact, not an adoption gap — serialized, it passes 4/4.
 
+## 2026-08-12 post-review hardening (independent Codex pass)
+
+An independent review of the E7/E8 range produced nine findings; all are
+resolved and re-qualified on fresh disposable targets (production DB lane
+400/400, full x5 lane 24/24 including E8 12/12):
+
+- `DR-E8-04` (was P1) — the prepared-command CHECK rejected expiring an
+  already-consumed row (the status/`consumed_at` clause required NULL for
+  every non-`consumed` status), so a consume→TTL→replay returned `unavailable`
+  instead of `prepared_command_expired`. The clause now admits the expired
+  state with its retained consumption audit time; a PostgreSQL test covers the
+  sequence. The migration was never durably applied, so no checksum drifts.
+- `DR-E8-05` (was P1×5) — `PrismaInstitutionKnowledgeReadOwner` was rewritten:
+  the change feed now sorts the bounded event set by the semantic tuple
+  (occurred_at, opaque item id, event ordinal) so a same-timestamp
+  publication_superseded/published pair cannot invert; review/changes-requested
+  events enter the feed only when they land on the item's current published
+  revision (drafts never appear, and the advertised source is always the
+  current publication); pagination cursors are opaque and carry no persistence
+  row id; `listCurrentPublications` orders and pages by the opaque source id,
+  carries the evaluation watermark in a scope-bound reconciliation ref so every
+  page reports a stable `evaluated_at`, and loads a page's revisions/events/
+  links with grouped queries instead of three-per-row. A dedicated integration
+  test pins the pagination completeness, the republish tie ordering, the
+  opaque-cursor shape and the reconciliation stability.
+- `DR-E8-06` (was P2) — the source file's literal NUL separators are escaped so
+  Git treats it as text.
+
+Known coverage limitation (recorded, not silently accepted): this E8 suite
+seeds the My-Chat `knowledgeSource` rows directly rather than driving them
+through the production source consumer's reconciliation lane, so the change
+feed / reconciliation contract is qualified by the dedicated read-owner
+integration test above, not by E8 itself. Closing that gap inside E8 (seed
+Nurture facts → synchronize through the real provider/consumer → answer) is
+carried as follow-up hardening for the G4-F integration join.
+
 ## Boundaries
 
 This record is joint conformance at `adapter_qualified` only. It is not a
