@@ -1,17 +1,17 @@
 {
-  "schemaVersion": 2,
-  "hashAlgorithm": "sha256-path-content-v1",
+  "schemaVersion": 3,
+  "hashAlgorithm": "sha256-path-utf8-lf-content-v2",
   "compatibility": {
     "baseAndMyChatContractParityRequired": true
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "4350086993d837baa8030564f4e19593dedd96b0",
+    "revision": "536638a204865ebdc43bca70992388352789a36f",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f",
+    "contractSha256": "85cf56e24227e730f23f5b5f68684aec507d04b017e8746e4d078a2dd2151225",
     "sourcePins": [
       {
         "key": "web_workbench",
@@ -30,12 +30,12 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "6d909bcfde64d4152add902679ba29907cc91883",
+    "revision": "d585ada320fddfc3c3347eb3b1528dad12afd2b1",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f",
+    "contractSha256": "85cf56e24227e730f23f5b5f68684aec507d04b017e8746e4d078a2dd2151225",
     "sourcePins": [
       {
         "key": "x5_joint_api",
@@ -76,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "46a8a9592d5f355ee80fab2f2af3c3008b78d8864583aa84c13f9ad36faf9931"
+        "sha256": "a1284894e86cfcadfe1f10a251bf40cedd5171f52ecd04c30ebf320156fdd094"
       },
       {
         "key": "wave4_binding_host",
@@ -131,6 +131,6 @@
       "prisma/migrations",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "47f69dcd12e60fa7776f6cf68ecf907e7712b6597f1f178d29ba40c563cc22c3"
+    "contractSha256": "6d8677041977f6c4a42f0343bef51fe5af1e207dce791e8ae3c635a3f7aad9ba"
   }
 }
