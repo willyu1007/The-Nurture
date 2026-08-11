@@ -18,11 +18,11 @@ assert(contracts && typeof contracts === "object", "scenario_contracts is absent
 const expectedSources = [
   [
     "platform_child_family_identity_source_v1",
-    "81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4",
+    "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861",
   ],
   [
     "scenario_interface_source_v1",
-    "37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf",
+    "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95",
   ],
 ];
 assert(

@@ -42,8 +42,10 @@ const profileDefinitions = [
     files: [
       "packages/nurture-scenario/src/c30/canonical-json.ts",
       "packages/nurture-scenario/src/c30/participant-binding.ts",
+      "packages/nurture-scenario/src/c30/trusted-handler-registry.ts",
       "packages/nurture-scenario/src/c30/trusted-invocation.ts",
       "packages/nurture-scenario/tests/c30/participant-binding.test.ts",
+      "packages/nurture-scenario/tests/c30/trusted-handler-registry.test.ts",
       "packages/nurture-scenario/tests/c30/trusted-invocation.test.ts",
     ],
   },
@@ -180,16 +182,16 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      head_revision: "4350086993d837baa8030564f4e19593dedd96b0",
-      source_revision: "15ff031ed16897920c13fe24c9849531d98607ad",
-      aggregate_source_hash: "d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383",
+      head_revision: "536638a204865ebdc43bca70992388352789a36f",
+      source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
+      aggregate_source_hash: "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7",
     },
     host: {
-      // Advanced 2026-08-08 by the C30 landing: the host adoption is merged
-      // into My-Chat main and its own lock was re-frozen at 51ad97f.
-      head_revision: "51ad97f721bf74cced3ec75d24f3066c4ef6ab1c",
-      runtime_revision: "8228c2ab6bcf48a18499b094699e272633d5d3af",
-      aggregate_source_hash: "a95bb9835ad27081336628764b1fbfa86402dd27adb3aa88ce3404d424402029",
+      // 2a2bb3c seals the trusted registry adoption. Later default-off owner
+      // commits are content-inert for the C30 Host adoption source profiles.
+      head_revision: "d585ada320fddfc3c3347eb3b1528dad12afd2b1",
+      runtime_revision: "a57e1aedf960e008f34f06c3f898e5cfc35fc522",
+      aggregate_source_hash: "cfd2f1d1c4e060aa468b20e71120a1e9e73abb7e4809f01faa0802cba2e1edb7",
     },
     source_hash: sha256(
       sourceProfiles.map(({ source_identity, source_hash }) =>

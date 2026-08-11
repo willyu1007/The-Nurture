@@ -7,7 +7,7 @@ import { lstat, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const HASH_ALGORITHM = 'sha256-path-content-v1';
+const HASH_ALGORITHM = 'sha256-path-utf8-lf-content-v2';
 const REQUIRED_NURTURE_EXACT_PATHS = [
   'package.json',
   'pnpm-lock.yaml',
@@ -102,7 +102,11 @@ export async function computeContractHash(repoRoot, contractPaths) {
   for (const relativePath of uniqueFiles) {
     hash.update(relativePath);
     hash.update('\0');
-    hash.update(await readFile(resolveInside(repoRoot, relativePath)));
+    const bytes = await readFile(resolveInside(repoRoot, relativePath));
+    const source = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+      .replace(/^\uFEFF/u, '')
+      .replace(/\r\n?/gu, '\n');
+    hash.update(source, 'utf8');
     hash.update('\0');
   }
   return { algorithm: HASH_ALGORITHM, sha256: hash.digest('hex'), files: uniqueFiles };
@@ -113,13 +117,30 @@ function readHead(repoRoot) {
 }
 
 function assertPinShape(pin) {
-  if (pin?.schemaVersion !== 2) throw new Error('Unsupported pin schemaVersion');
+  assertExactKeys(pin, [
+    'compatibility',
+    'hashAlgorithm',
+    'myChat',
+    'myWorkflowBase',
+    'nurtureScenario',
+    'schemaVersion',
+  ], 'pin');
+  if (pin?.schemaVersion !== 3) throw new Error('Unsupported pin schemaVersion');
   if (pin?.hashAlgorithm !== HASH_ALGORITHM) throw new Error(`Unsupported hashAlgorithm: ${pin?.hashAlgorithm}`);
+  assertExactKeys(pin.compatibility, ['baseAndMyChatContractParityRequired'], 'compatibility');
   if (pin?.compatibility?.baseAndMyChatContractParityRequired !== true) {
     throw new Error('Base/My-Chat contract parity must be explicitly required');
   }
   for (const key of ['myWorkflowBase', 'myChat']) {
     const dependency = pin[key];
+    assertExactKeys(dependency, [
+      'contractPaths',
+      'contractRoot',
+      'contractSha256',
+      'repository',
+      'revision',
+      'sourcePins',
+    ], key);
     if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(dependency?.repository ?? '') || !/^[0-9a-f]{40}$/.test(dependency.revision ?? '')) {
       throw new Error(`Invalid ${key} repository or revision`);
     }
@@ -131,6 +152,7 @@ function assertPinShape(pin) {
       throw new Error(`Invalid ${key} contract pin`);
     }
     for (const sourcePin of dependency.sourcePins ?? []) {
+      assertExactKeys(sourcePin, ['key', 'paths', 'root', 'sha256'], `${key}.sourcePins`);
       if (
         !/^[a-z0-9_]+$/.test(sourcePin?.key ?? '') ||
         typeof sourcePin.root !== 'string' ||
@@ -158,6 +180,11 @@ function assertPinShape(pin) {
   ) {
     throw new Error('Invalid nurtureScenario contract pin');
   }
+  assertExactKeys(
+    pin.nurtureScenario,
+    ['contractPaths', 'contractRoot', 'contractSha256'],
+    'nurtureScenario',
+  );
   if (pin.nurtureScenario.contractRoot !== '.') {
     throw new Error('The-Nurture scenario contractRoot must be the repository root');
   }
@@ -168,6 +195,17 @@ function assertPinShape(pin) {
     if (!covered) {
       throw new Error(`The-Nurture exact runtime path is not pinned: ${requiredPath}`);
     }
+  }
+}
+
+function assertExactKeys(value, expected, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`Invalid ${label} fields`);
+  }
+  const actual = Object.keys(value).sort();
+  const exact = [...expected].sort();
+  if (actual.length !== exact.length || actual.some((key, index) => key !== exact[index])) {
+    throw new Error(`Unknown or missing ${label} fields: ${actual.join(',')}`);
   }
 }
 

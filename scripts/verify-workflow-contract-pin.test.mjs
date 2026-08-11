@@ -38,6 +38,33 @@ test('contract hash is stable across input order and directory traversal', async
   assert.deepEqual(directoryHash.files, ['contract/a.ts', 'contract/b.ts']);
 });
 
+test('contract hash normalizes UTF-8 BOM and line endings', async (context) => {
+  const left = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-lf-'));
+  const right = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-crlf-'));
+  context.after(() => Promise.all([rm(left, { recursive: true, force: true }), rm(right, { recursive: true, force: true })]));
+  await writeFile(path.join(left, 'value.ts'), 'export const value = 1;\n');
+  await writeFile(path.join(right, 'value.ts'), '\uFEFFexport const value = 1;\r\n');
+
+  const lf = await computeContractHash(left, ['value.ts']);
+  const crlf = await computeContractHash(right, ['value.ts']);
+  assert.equal(lf.sha256, crlf.sha256);
+});
+
+test('committed LF blob and CRLF working tree hash identically', async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-git-eol-'));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(path.join(root, 'value.ts'), 'export const value = 1;\n');
+  execFileSync('git', ['init', '--quiet', root]);
+  execFileSync('git', ['-C', root, 'config', 'user.name', 'Contract Pin Test']);
+  execFileSync('git', ['-C', root, 'config', 'user.email', 'contract-pin@example.invalid']);
+  execFileSync('git', ['-C', root, 'add', 'value.ts']);
+  execFileSync('git', ['-C', root, 'commit', '--quiet', '-m', 'test contract']);
+  const committed = await computeContractHash(root, ['value.ts']);
+  await writeFile(path.join(root, 'value.ts'), 'export const value = 1;\r\n');
+  const working = await computeContractHash(root, ['value.ts']);
+  assert.equal(working.sha256, committed.sha256);
+});
+
 test('contract hash changes when content or relative path changes', async (context) => {
   const left = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-left-'));
   const right = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-right-'));
@@ -128,8 +155,8 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
   const scenarioHash = await computeContractHash(nurtureRepo, nurtureContractPaths);
   const pinPath = path.join(root, 'pin.json');
   const pin = {
-      schemaVersion: 2,
-      hashAlgorithm: 'sha256-path-content-v1',
+      schemaVersion: 3,
+      hashAlgorithm: 'sha256-path-utf8-lf-content-v2',
       compatibility: { baseAndMyChatContractParityRequired: true },
       myWorkflowBase: {
         repository: 'example/workflow-base',
@@ -176,6 +203,20 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
   await writeFile(pinPath, JSON.stringify(pin));
 
   await verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath });
+  await writeFile(pinPath, JSON.stringify({
+    ...pin,
+    hashAlgorithm: 'sha256-path-content-v1',
+  }));
+  await assert.rejects(
+    () => verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath }),
+    /Unsupported hashAlgorithm/,
+  );
+  await writeFile(pinPath, JSON.stringify({ ...pin, legacyContractHash: dependencyHash.sha256 }));
+  await assert.rejects(
+    () => verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath }),
+    /Unknown or missing pin fields/,
+  );
+  await writeFile(pinPath, JSON.stringify(pin));
   const narrowedPaths = nurtureContractPaths.filter((entry) => entry !== 'packages/nurture-db');
   const narrowedHash = await computeContractHash(nurtureRepo, narrowedPaths);
   await writeFile(
