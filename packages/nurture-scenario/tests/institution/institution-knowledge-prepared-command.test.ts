@@ -125,6 +125,10 @@ describe("Institution Knowledge prepared-command owner", () => {
       snapshot_codec_version: 0,
       frozen_snapshot_ciphertext: "",
     });
+    await expect(test.owner.prepare(prepareInput())).resolves.toEqual({
+      status: "not_prepared",
+      reason_code: "prepared_command_expired",
+    });
   });
 
   it("rejects wrong confirmation reuse without exposing the frozen payload", async () => {

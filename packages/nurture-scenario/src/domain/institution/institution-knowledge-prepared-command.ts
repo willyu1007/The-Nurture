@@ -496,9 +496,11 @@ function exactKeys(value: Record<string, unknown>, expected: readonly string[]):
 }
 
 function validRecord(value: NurtureInstitutionKnowledgePreparedCommandRecordV1): boolean {
-  const consumedPairIsValid = value.status === "consumed"
-    ? value.consumed_at !== undefined && instant(value.consumed_at)
-    : value.consumed_at === undefined;
+  const consumedPairIsValid = value.status === "prepared"
+    ? value.consumed_at === undefined
+    : value.status === "consumed"
+      ? value.consumed_at !== undefined && instant(value.consumed_at)
+      : value.consumed_at === undefined || instant(value.consumed_at);
   return opaqueId(value.command_request_id)
     && opaqueId(value.workspace_id)
     && opaqueId(value.participant_ref)
