@@ -187,7 +187,7 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
     expect(readable.rows[0]?.title).toBe("Spring outing");
 
     // Without key material the protected-content boundary stays closed: the
-    // queue shows no title rather than ciphertext.
+    // queue uses a non-sensitive contract-safe label rather than ciphertext.
     const withoutKey = new PrismaPublishLaneReadPort(prisma);
     const sealed = await withoutKey.listTeacherPublishQueue({
       workspace_id: world.workspaceId,
@@ -196,7 +196,7 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
       snapshot_at: SNAPSHOT_AT,
       take: 10,
     });
-    expect(sealed.rows[0]?.title).toBe("");
+    expect(sealed.rows[0]?.title).toBe("Class update");
   });
 
   it("counts released targets per target rather than collapsing to published", async () => {
@@ -268,6 +268,13 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
     });
     expect(page.rows[0]?.target_count).toBe(2);
     expect(page.rows[0]?.released_target_count).toBe(1);
+    expect(page.rows[0]?.action_grants).toEqual([
+      expect.objectContaining({
+        capability_key: "release_publish_process",
+        capability_version: "1.0.0",
+        availability: "available",
+      }),
+    ]);
   });
 
   it("omits a scheduled time until the owner has actually resolved one", async () => {
@@ -333,7 +340,7 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
     expect(page.state_counts.draft).toBe(1);
   });
 
-  it("advertises no action while the write lane cannot execute one", async () => {
+  it("advertises no action for states without an executable owner write", async () => {
     const world = await seedGroup();
     for (const state of ["draft", "released", "cancelled"] as const) {
       await seedProcess(world, { state });
@@ -347,9 +354,9 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
       take: 10,
     });
     expect(page.rows).toHaveLength(3);
-    // `save_publish_process_draft` has no owner write and no ingress route, so
-    // a card offering it would 400 on click. The board must not promise what
-    // the system cannot do — restore this with B8, not before.
+    // A released row with no remaining target is already satisfied. Draft,
+    // fully released and cancelled rows must not regain the obsolete
+    // save-draft placeholder or promise another unsupported action.
     expect(page.rows.flatMap((row) => row.action_grants)).toEqual([]);
   });
 

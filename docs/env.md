@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-01T14:25:08Z`
+Generated at (UTC): `2026-08-11T01:06:14Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -15,13 +15,17 @@ Generated at (UTC): `2026-08-01T14:25:08Z`
 | `DATABASE_URL` | `active` | `url` | yes | yes | `` | `database_url` | `*` | `` | `` | `` | PostgreSQL connection URL for Nurture-owned production schema and migrations. |
 | `DEV_HOST_DATABASE_URL` | `active` | `url` | yes | yes | `` | `dev_host_database_url` | `dev` | `` | `` | `` | PostgreSQL connection URL for backend-private workflow dev-host schema and migrations. |
 | `DEV_HOST_PORT` | `active` | `int` | no | no | `3001` | `` | `dev` | `` | `` | `` | Loopback-only Fastify workflow dev-host listen port; never used by the formal scenario service. |
+| `FAMILY_GROWTH_EVENTS_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `family_growth_events_service_token` | `*` | `` | `` | `` | Nurture-to-My-Chat bearer for family-growth event delivery (family_growth_transport@1.0.0); absent = delivery worker off. |
+| `FAMILY_GROWTH_RENDITION_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `family_growth_rendition_service_token` | `*` | `` | `` | `` | My-Chat-to-Nurture bearer validated by the rendition exchange (family_growth_transport@1.0.0); absent = endpoints refuse all requests. |
+| `FAMILY_GROWTH_RENDITION_SERVICE_TOKEN_PREVIOUS` | `active` | `string` | no | yes | `` | `family_growth_rendition_service_token_previous` | `*` | `` | `` | `` | Rotation window twin of FAMILY_GROWTH_RENDITION_SERVICE_TOKEN; cleared after rotation completes. |
 | `MY_CHAT_INTERNAL_BASE_URL` | `active` | `url` | no | no | `` | `` | `*` | `` | `` | `` | My-Chat host base URL for host-ward internal reads (ST-5 derived age/stage); the shared internal service token authenticates the call. Absence keeps derived reads disabled. |
 | `NURTURE_BACKEND_URL` | `active` | `url` | no | no | `http://localhost:3200` | `` | `dev` | `` | `` | `` | Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field. |
 | `NURTURE_BINDING_EVIDENCE_KEY` | `active` | `string` | no | yes | `` | `nurture_binding_evidence_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) enabling the scenario-binding owner endpoint; absence keeps the endpoint disabled and never degrades to an unhashed path. |
 | `NURTURE_HARNESS_INTEGRITY_KEY` | `active` | `string` | no | yes | `` | `nurture_harness_integrity_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) for Harness confirmation input-integrity tags and owner-issued target refs; absence keeps both Harness routes disabled. |
-| `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `active` | `bool` | no | no | `False` | `` | `*` | `` | `` | `` | Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption. |
+| `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption. |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `nurture_internal_service_token` | `*` | `` | `` | `` | Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged. |
 | `NURTURE_PROTECTED_CONTENT_KEY` | `active` | `string` | no | yes | `` | `nurture_protected_content_key` | `*` | `` | `` | `` | AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext. |
+| `NURTURE_TEACHER_RELEASE_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation. |
 | `PORT` | `active` | `int` | yes | no | `8000` | `` | `*` | `` | `` | `` | Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately. |
 | `SERVICE_NAME` | `active` | `string` | yes | no | `the-nurture` | `` | `*` | `` | `` | `` | Nurture owner service name used by logs and deployment metadata. |
 

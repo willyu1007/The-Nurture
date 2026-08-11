@@ -1,11 +1,8 @@
 import { defineConfig } from "vitest/config";
+import { workspaceResolve } from "./vitest.workspace.resolve.js";
 
 export default defineConfig({
-  resolve: {
-    extensionAlias: {
-      ".js": [".ts", ".js"],
-    },
-  },
+  resolve: workspaceResolve,
   test: {
     include: ["packages/nurture-db/**/*.test.ts"],
     exclude: [

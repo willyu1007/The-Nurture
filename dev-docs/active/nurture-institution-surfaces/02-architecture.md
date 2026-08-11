@@ -1004,3 +1004,20 @@ trial-start 不完整、错误 trial CareGroup、accepted offer 取消后 reserv
 过期 trial 未延长、错误 `status/participationPhase` 组合、formalization gate 不完整、
 owner evidence unavailable/expired、binding drift、expected-version conflict 和
 source pin 不匹配均返回稳定的 fail-closed 或明确待处理状态。
+
+## Teacher release private owner boundary
+
+My-Chat reaches the Nurture teacher queue/release loop through exactly one
+private composition: `nurture.teacher-release-owner@3.0.0`, digest
+`sha256:b17970ed6ad8b1db36737348c54c14cae00a02bf4074b902fcc9c5d81cf5ae73`.
+It depends on exact `nurture.surface-contract@1.20.0` and exposes only
+query, fixed-target review, prepare and confirm routes under `/v3`.
+
+Every operation starts from authenticated Host Workspace/user/request context
+and reruns Nurture's current Participant/role/CareGroup resolution. My-Chat
+cannot supply Nurture participant, role, scope or policy facts. Target review is
+the complete process target set, not subset selection; prepare binds the
+actor-bound snapshot and confirm revalidates its fact digest before effects.
+The My-Chat public Dashboard DTO remains `contract_version: 2`, a separate
+owner/version identity. Private v1/v2 routes and decoders are removed rather
+than maintained as a compatibility lane.

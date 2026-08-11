@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-01T14:25:08Z",
+  "generated_at_utc": "2026-08-11T01:06:14Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -82,6 +82,7 @@
     "FAMILY_GROWTH_EVENTS_SERVICE_TOKEN": {
       "default": null,
       "deprecate_after": null,
+      "description": "Nurture-to-My-Chat bearer for family-growth event delivery (family_growth_transport@1.0.0); absent = delivery worker off.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null
@@ -91,14 +92,14 @@
       "required": false,
       "scopes": null,
       "secret": true,
+      "secret_ref": "family_growth_events_service_token",
       "state": "active",
-      "type": "string",
-      "description": "Nurture-to-My-Chat bearer for family-growth event delivery (family_growth_transport@1.0.0); absent = delivery worker off.",
-      "secret_ref": "family_growth_events_service_token"
+      "type": "string"
     },
     "FAMILY_GROWTH_RENDITION_SERVICE_TOKEN": {
       "default": null,
       "deprecate_after": null,
+      "description": "My-Chat-to-Nurture bearer validated by the rendition exchange (family_growth_transport@1.0.0); absent = endpoints refuse all requests.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null
@@ -108,14 +109,14 @@
       "required": false,
       "scopes": null,
       "secret": true,
+      "secret_ref": "family_growth_rendition_service_token",
       "state": "active",
-      "type": "string",
-      "description": "My-Chat-to-Nurture bearer validated by the rendition exchange (family_growth_transport@1.0.0); absent = endpoints refuse all requests.",
-      "secret_ref": "family_growth_rendition_service_token"
+      "type": "string"
     },
     "FAMILY_GROWTH_RENDITION_SERVICE_TOKEN_PREVIOUS": {
       "default": null,
       "deprecate_after": null,
+      "description": "Rotation window twin of FAMILY_GROWTH_RENDITION_SERVICE_TOKEN; cleared after rotation completes.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null
@@ -125,10 +126,9 @@
       "required": false,
       "scopes": null,
       "secret": true,
+      "secret_ref": "family_growth_rendition_service_token_previous",
       "state": "active",
-      "type": "string",
-      "description": "Rotation window twin of FAMILY_GROWTH_RENDITION_SERVICE_TOKEN; cleared after rotation completes.",
-      "secret_ref": "family_growth_rendition_service_token_previous"
+      "type": "string"
     },
     "MY_CHAT_INTERNAL_BASE_URL": {
       "default": null,
@@ -250,6 +250,23 @@
       "secret_ref": "nurture_protected_content_key",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_TEACHER_RELEASE_OWNER_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "PORT": {
       "default": 8000,

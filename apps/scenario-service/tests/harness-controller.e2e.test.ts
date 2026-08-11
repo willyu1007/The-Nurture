@@ -37,6 +37,9 @@ const fakeEngine = (overrides: Partial<HarnessEngine>): HarnessEngine => ({
   readInstitutionBusinessCommunication: async () => {
     throw new Error("readInstitutionBusinessCommunication must not run");
   },
+  presentReleaseTargets: async () => {
+    throw new Error("presentReleaseTargets must not run");
+  },
   ...overrides,
 });
 

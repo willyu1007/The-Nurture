@@ -10,8 +10,10 @@ import { PUBLISH_PROCESS_TARGET_KIND } from "../../src/harness/publish-process.j
 import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js";
 import type { ResolvedPublishScheduleV1 } from "../../src/harness/publish-schedule.js";
 import {
+  computeReleaseTargetSnapshotVersion,
   derivePartialReleaseFollowUp,
   prepareReleasePublishProcess,
+  presentReleaseTargets,
   releasePublishProcess,
   type CommitTargetReleaseResultV1,
   type ReleaseFactsV1,
@@ -39,6 +41,13 @@ const target = (
 ): ReleaseTargetFactsV1 => ({
   target_key: "child-1~enrollment-1~grant-1",
   child_care_process_id: "child-1",
+  safe_label: "小雨家庭",
+  target_version: 3,
+  child_care_process_version: 4,
+  family_label_version: 2,
+  child_label_version: 2,
+  enrollment_version: 5,
+  grant_version: 6,
   enrollment_active: true,
   grant_allows: true,
   data_class_allowed: true,
@@ -391,6 +400,95 @@ describe("G3-D release loop", () => {
   });
 });
 
+describe("Q4 fixed release target review", () => {
+  it("presents the complete fixed set with safe labels and neutral unavailable targets", async () => {
+    const dependencies = deps(
+      facts({
+        targets: [
+          target({ target_key: "target-a", safe_label: "小雨家庭" }),
+          target({ target_key: "target-b", safe_label: "小雨家庭" }),
+          target({
+            target_key: "target-c",
+            safe_label: "不应泄露的家庭名",
+            grant_allows: false,
+          }),
+        ],
+      }),
+    );
+
+    const result = await presentReleaseTargets(dependencies, scope, {
+      process_ref: processRef(),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status !== "ready") return;
+    expect(result.presentation).toMatchObject({
+      selectionMode: "fixed_process_targets",
+      processRef: processRef(),
+      generatedAt: "2026-08-01T09:30:00.000Z",
+      expiresAt: "2026-08-01T09:35:00.000Z",
+      targets: [
+        {
+          availability: "available",
+          displayLabel: "小雨家庭",
+          safeDisambiguation: "同名目标 1",
+        },
+        {
+          availability: "available",
+          displayLabel: "小雨家庭",
+          safeDisambiguation: "同名目标 2",
+        },
+        {
+          availability: "unavailable",
+          safeReasonCode: "target_unavailable",
+        },
+      ],
+    });
+    expect(result.presentation.targetSnapshotRef).toMatch(
+      /^1\.\d{13}\.[0-9a-f]{64}$/,
+    );
+    expect(result.presentation.snapshotVersion).toMatch(/^1\./);
+    expect(JSON.stringify(result)).not.toContain("target-a");
+    expect(JSON.stringify(result)).not.toContain("不应泄露的家庭名");
+  });
+
+  it("fails closed when an eligible target has no safe owner label", async () => {
+    const dependencies = deps(
+      facts({ targets: [target({ safe_label: undefined })] }),
+    );
+
+    await expect(
+      presentReleaseTargets(dependencies, scope, {
+        process_ref: processRef(),
+      }),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "target_label_unavailable",
+    });
+  });
+
+  it("rejects a changed reviewed target set before the first effect", async () => {
+    const reviewedFacts = facts();
+    const attempt = release(
+      facts({ targets: [target({ grant_version: 7 })] }),
+    );
+
+    const decision = await releasePublishProcess(attempt.dependencies, scope, {
+      process_ref: processRef(),
+      command_request_id: "command:release-1",
+      trigger: "immediate",
+      expected_target_snapshot_version:
+        computeReleaseTargetSnapshotVersion(reviewedFacts),
+    });
+
+    expect(decision).toEqual({
+      status: "denied",
+      reason_code: "stale_confirmation",
+    });
+    expect(attempt.dependencies.commits).toHaveLength(0);
+  });
+});
+
 describe("G3-D release formal-ingress entry", () => {
   const prepareContexts = (): NurtureInteractionContextService =>
     new NurtureInteractionContextService({
@@ -429,6 +527,71 @@ describe("G3-D release formal-ingress entry", () => {
       release_revision: 4,
     });
     expect(decision.command_request_id).toMatch(/^command:/);
+  });
+
+  it("requires an unexpired actor-bound target snapshot when one is supplied", async () => {
+    const dependencies = deps(facts());
+    const presented = await presentReleaseTargets(dependencies, scope, {
+      process_ref: processRef(),
+    });
+    expect(presented.status).toBe("ready");
+    if (presented.status !== "ready") return;
+    const request = {
+      ...scope,
+      surface: "board",
+      target_option_ref: processRef(),
+      target_snapshot_ref: presented.presentation.targetSnapshotRef,
+    };
+
+    await expect(
+      prepareReleasePublishProcess(
+        { ...dependencies, contexts: prepareContexts() },
+        request,
+      ),
+    ).resolves.toMatchObject({ status: "ready_to_confirm" });
+    await expect(
+      prepareReleasePublishProcess(
+        { ...dependencies, contexts: prepareContexts() },
+        {
+          ...request,
+          target_snapshot_ref: `${request.target_snapshot_ref.slice(0, -1)}${
+            request.target_snapshot_ref.endsWith("0") ? "1" : "0"
+          }`,
+        },
+      ),
+    ).resolves.toEqual({
+      status: "needs_input",
+      fields: ["target_snapshot"],
+    });
+    await expect(
+      prepareReleasePublishProcess(
+        {
+          ...dependencies,
+          now: () => new Date("2026-08-01T09:36:00.000Z"),
+          contexts: prepareContexts(),
+        },
+        request,
+      ),
+    ).resolves.toEqual({
+      status: "needs_input",
+      fields: ["target_snapshot"],
+    });
+    await expect(
+      prepareReleasePublishProcess(
+        { ...dependencies, contexts: prepareContexts() },
+        {
+          ...request,
+          participant_id: "caregiver-2",
+          target_option_ref: processRef({
+            workspace_id: scope.workspace_id,
+            participant_id: "caregiver-2",
+          }),
+        },
+      ),
+    ).resolves.toEqual({
+      status: "needs_input",
+      fields: ["target_snapshot"],
+    });
   });
 
   it("refuses a queued process the same way the attempt would", async () => {
@@ -568,4 +731,3 @@ describe("T-009 family-growth pre-commit preparation", () => {
     expect("family_growth" in (dependencies.commits[0] as object)).toBe(false);
   });
 });
-

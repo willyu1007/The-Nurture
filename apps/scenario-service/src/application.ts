@@ -29,6 +29,8 @@ import {
   createFamilyGrowthRenditionRuntime,
   type FamilyGrowthRenditionRuntime,
 } from "./family-growth-runtime.js";
+import type { TeacherReleaseOwnerComposition } from "./teacher-release-owner-composition.js";
+import { createTeacherReleaseOwnerComposition } from "./teacher-release-owner-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -45,6 +47,7 @@ export async function createScenarioServiceApplication(input?: {
   bindingOwnerServiceAuth?: BindingOwnerServiceAuth;
   harnessRuntime?: HarnessRuntime;
   familyGrowthRendition?: FamilyGrowthRenditionRuntime;
+  teacherReleaseOwnerComposition?: TeacherReleaseOwnerComposition;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
@@ -67,6 +70,13 @@ export async function createScenarioServiceApplication(input?: {
     });
   const familyGrowthRendition =
     input?.familyGrowthRendition ?? createFamilyGrowthRenditionRuntime();
+  const teacherReleaseOwnerComposition =
+    input?.teacherReleaseOwnerComposition ??
+    createTeacherReleaseOwnerComposition({
+      enabled: config.teacherReleaseOwnerEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      harnessRuntime,
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       bindingOwner: {
@@ -78,6 +88,10 @@ export async function createScenarioServiceApplication(input?: {
         serviceAuth: bindingOwnerServiceAuth,
       },
       familyGrowthRendition,
+      teacherReleaseOwner: {
+        composition: teacherReleaseOwnerComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
     }),
     {
       abortOnError: false,

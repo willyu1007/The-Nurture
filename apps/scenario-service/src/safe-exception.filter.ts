@@ -24,6 +24,9 @@ const allowedErrors = new Set([
   "invalid_harness_request",
   "unknown_capability",
   "institution_business_communication_read_disabled",
+  "teacher_release_owner_disabled",
+  "invalid_teacher_release_owner_request",
+  "teacher_release_owner_contract_mismatch",
   // family_growth_transport@1.0.0 §5 — the frozen rendition-exchange taxonomy.
   "service_unauthorized",
   "rendition_ref_invalid",
@@ -66,7 +69,8 @@ export class SafeExceptionFilter implements ExceptionFilter {
       (!isOperationalException(exception) || status >= 500) &&
       error !== "binding_owner_disabled" &&
       error !== "harness_disabled" &&
-      error !== "institution_business_communication_read_disabled"
+      error !== "institution_business_communication_read_disabled" &&
+      error !== "teacher_release_owner_disabled"
     ) {
       this.logger.unhandledException(requestContext);
     }

@@ -814,6 +814,28 @@ and disposable-database artifacts; this Nurture pass independently verified
 their commit reachability and current relevant-file drift. Detailed evidence:
 [`78`](./78-g4-e-q2-q3-owner-progress.md).
 
+## 2026-08-11 — teacher-release owner v3 migration
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture/semantic review | PASS after repair | Removed stale Surface/private pins, unreachable recovery variants, formatting-only churn, invalid DB test call order and obsolete evidence files. Private v3 and public DTO v2 remain separate identities. |
+| Nurture typecheck | PASS | Root TypeScript check completed after the final v3 digest narrowing. |
+| Nurture full unit | PASS | 88 files / 973 tests. |
+| Scenario Service unit | PASS | 13 files / 83 tests, including composition, formal HTTP, auth/default-off and strict codec negatives. |
+| Disposable PostgreSQL migration | PASS | All 35 migrations applied to an isolated target; status current and datasource-to-datamodel diff empty. |
+| Scenario Service DB owner journeys | PASS | 52/52, including real query → targets → prepare → confirm. |
+| Full production DB lane | PASS | 43 files / 391 tests. |
+| My-Chat consumer | PASS | Scenario-integration typecheck and 6/6 strict HTTP source tests. |
+| Exact cross-repository pin | PASS | Base/My-Chat Workflow contract parity retained; My-Chat revision `6d909bc` and exact source populations adopted; Nurture self-pin recomputed. |
+| Structural gates | PASS | Test routing 160 files (88 unit / 43 DB / 11 dev-host / 16 Scenario Service / 2 joint), persistence, formal ingress, port topology, manifest, Surface schema/conformance and G2 checks. |
+| Environment feature suite | PASS | Contract validate/generate/context refresh and lowercase-boolean regression pass. |
+| Cleanup/effect boundary | PASS | Disposable DB removed; no v1/v2 private route or decoder, schema delta, durable DB apply, deployment, activation or traffic. |
+
+Verdict: `TEACHER_RELEASE_OWNER_V3_PASS / MY_CHAT_CONSUMER_PASS /
+G_09_ADOPTION_CLOSED / DEFAULT_OFF / NO_DUAL_TRACK`.
+
+Detailed evidence: [`79`](./79-teacher-release-owner-v3-migration.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

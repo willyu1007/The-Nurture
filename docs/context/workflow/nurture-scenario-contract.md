@@ -694,6 +694,26 @@ The `user_attention` owner endpoint is service-authenticated and returns only cu
 
 The `scenario_binding_write` owner endpoint (`POST /internal/nurture/scenario-binding/authorize`) is service-authenticated with the same bearer token and issues the private binding-owner receipt to the Host resolver. Deterministic anchor reservation, active Participant/Guardian row locks, current authority validation, receipt insert or exact replay, and commit share one Nurture owner transaction; denial rolls back a newly attempted reservation, and concurrent suspension or revocation cannot overtake issuance. The role id and aggregate version become authorization-source evidence with a five-minute expiry. Reservation is deterministic per exact platform subject (workspace, subject type, subject id), the reservation key and all request identities are persisted only as HMAC evidence hashes, exact replay returns the identical receipt, and the anchor value never leaves the private server-to-server carrier. `NURTURE_BINDING_EVIDENCE_KEY` (at least 32 characters) enables the endpoint; absence keeps it disabled with `binding_owner_disabled` and never degrades to an unauthenticated or unhashed path.
 
+The Q4 `nurture.teacher-release-owner@3.0.0` private interface composes the
+teacher publish queue, fixed-process target review and release prepare/confirm
+operations behind four service-authenticated `POST` routes under
+`/internal/nurture/teacher-release-owner/v3/`. Its canonical descriptor and
+closed wire schema are pinned by digest
+`sha256:b17970ed6ad8b1db36737348c54c14cae00a02bf4074b902fcc9c5d81cf5ae73`.
+Every operation starts only from current My-Chat user + Workspace identity and
+reruns the Nurture resolver; no caller-supplied Participant, role assignment,
+role, Institution, CareGroup, Enrollment, Grant, Child, Family or policy claim
+is accepted. Only a current `caregiver|lead_caregiver` exact CareGroup scope is
+composed into `query_teacher_publish_queue@1.0.0` and
+`release_publish_process@1.0.0`. Responses are no-store, strictly projected,
+and omit raw owner identifiers, generic execution refs and owner policy reason
+codes. Target review is a human-readable rendering of the complete target set
+already stored on the process, not a subset selector. It issues a five-minute,
+actor-bound snapshot that `prepare` must present and `confirm` revalidates
+before any target effect. `NURTURE_TEACHER_RELEASE_OWNER_ENABLED` remains false by default;
+publication and joint qualification do not authorize deployment activation or
+traffic.
+
 - `public_draft` -> `my_chat.forum`
 - `knowledge_candidate` -> `my_chat.knowledge_base`
 - `notification` -> `my_chat.notification`
@@ -742,6 +762,12 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
 - Institution owner reads re-resolve current participant/role/care-group scope and recheck enrollment, thread membership, the item-linked grant, source lifecycle, and redaction before every display.
 - The default/dev scenario module remains pre-activation. The canonical vNext manifest may be loaded only through `createNurtureActivationScenarioModule` and only when the My-Chat development composition advertises `workflow_handoff_materialization_v1` and provides the claimed requirement, Actor-to-user, bridge, and materializing runtime ports.
 - `NURTURE_INTERNAL_SERVICE_TOKEN` is configured on both sides of the owner-read boundary; absence disables activation owner reads and never falls back to an unauthenticated route.
+- My-Chat adopts the exact Q6 teacher-release-owner interface pin through its
+  strict server adapter. Joint qualification covers the real resolver,
+  repository, queue, prepare/confirm, replay, ambiguity, cursor drift, stale
+  confirmation, authority loss between operations, default-off behavior,
+  service auth and transport failure. Dashboard API/Mobile activation remains
+  a separate My-Chat implementation and release decision.
 - Shared mobile/chat/dashboard surfaces do not become the canonical source for Nurture family-care messages or care items.
 - Health safety policies are tested before pregnancy or care-plan workflows are enabled.
 - DB namespace, migrations, indexes, rollback/export, and seed-data boundaries are reviewed before cloud apply.

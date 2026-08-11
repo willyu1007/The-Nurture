@@ -51,6 +51,18 @@ def write_text(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
+def format_env_scalar(value: Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
+def format_comment_scalar(value: Any) -> str:
+    if isinstance(value, bool):
+        return format_env_scalar(value)
+    return repr(value)
+
+
 def load_yaml(path: Path) -> Any:
     return yaml_min.safe_load(read_text(path))
 
@@ -611,7 +623,7 @@ def generate_env_example(root: Path, contract: Dict[str, Any]) -> str:
         if secret:
             comment_parts.append(f"secret_ref={secret_ref}")
         elif default is not None:
-            comment_parts.append(f"default={default!r}")
+            comment_parts.append(f"default={format_comment_scalar(default)}")
 
         lines.append(f"# {name}: " + "; ".join(comment_parts))
 
@@ -619,9 +631,9 @@ def generate_env_example(root: Path, contract: Dict[str, Any]) -> str:
         if secret:
             value = f"<secret:{secret_ref}>" if secret_ref else "<secret>"
         elif example is not None:
-            value = str(example)
+            value = format_env_scalar(example)
         elif default is not None:
-            value = str(default)
+            value = format_env_scalar(default)
         else:
             value = "<required>" if required else ""
 
@@ -680,7 +692,7 @@ def generate_env_docs_md(root: Path, envs: Sequence[str], contract: Dict[str, An
             rf = mig.get("rename_from")
             rename_from_s = rf.strip() if isinstance(rf, str) and rf.strip() else ""
         desc = (spec.get("description") or "").replace("|", "\\|")
-        default_s = "" if default is None else str(default).replace("|", "\\|")
+        default_s = "" if default is None else format_env_scalar(default).replace("|", "\\|")
         secret_ref_s = "" if not secret_ref else str(secret_ref).replace("|", "\\|")
         lines.append(
             f"| `{name}` | `{state}` | `{vtype}` | {required} | {secret} | `{default_s}` | `{secret_ref_s}` | `{scopes_s}` | `{deprecate_after_s}` | `{replacement_s}` | `{rename_from_s}` | {desc} |"

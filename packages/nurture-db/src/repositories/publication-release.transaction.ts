@@ -36,6 +36,28 @@ const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 const RELEASE_COMMAND_CONTRACT_VERSION = 1;
 const MAX_SERIALIZABLE_ATTEMPTS = 3;
 
+const releaseTargetSafeLabel = (
+  familyLabel: string | null | undefined,
+  childLabel: string | null | undefined,
+): string | undefined => {
+  const normalize = (value: string | null | undefined): string | undefined => {
+    if (typeof value !== "string") return undefined;
+    const normalized = value.replace(/\s+/gu, " ").trim();
+    return normalized.length > 0 &&
+      normalized.length <= 80 &&
+      ![...normalized].some((character) => {
+        const codePoint = character.codePointAt(0);
+        return codePoint !== undefined && (codePoint <= 31 || codePoint === 127);
+      })
+      ? normalized
+      : undefined;
+  };
+  const family = normalize(familyLabel);
+  if (family) return family;
+  const child = normalize(childLabel);
+  return child && child.length <= 78 ? `${child}家庭` : undefined;
+};
+
 type CommitTargetReleaseInput = {
   workspace_id: string;
   participant_id: string;
@@ -149,6 +171,12 @@ export class PrismaPublicationReleasePort
           include: {
             grant: true,
             enrollment: true,
+            childCareProcess: {
+              include: {
+                child: true,
+                families: true,
+              },
+            },
             release: { include: { receipt: { select: { id: true } } } },
           },
           orderBy: [{ targetKey: "asc" }],
@@ -209,11 +237,39 @@ export class PrismaPublicationReleasePort
       (target) => !target.release || target.release.receipt !== null,
     );
 
+    const workspaceFamilyPrefix = `${input.workspace_id}:`;
     const targets: ReleaseTargetFactsV1[] = process.targets.map((target) => {
+      const familyId = target.familyRefKey.startsWith(workspaceFamilyPrefix)
+        ? target.familyRefKey.slice(workspaceFamilyPrefix.length)
+        : target.familyRefKey;
+      const family = target.childCareProcess.families.find(
+        (candidate) =>
+          candidate.id === familyId &&
+          candidate.status === "active" &&
+          candidate.deletedAt === null,
+      );
+      const safeLabel = family
+        ? releaseTargetSafeLabel(
+            family.displayName,
+            target.childCareProcess.child.displayName,
+          )
+        : undefined;
       return {
         target_key: target.targetKey,
         child_care_process_id: target.childCareProcessId,
-        enrollment_active: target.enrollment.status === "active" && target.enrollment.deletedAt === null,
+        ...(safeLabel ? { safe_label: safeLabel } : {}),
+        target_version: target.aggregateVersion,
+        child_care_process_version:
+          target.childCareProcess.aggregateVersion,
+        ...(family
+          ? { family_label_version: family.aggregateVersion }
+          : {}),
+        child_label_version: target.childCareProcess.child.aggregateVersion,
+        enrollment_version: target.enrollment.aggregateVersion,
+        grant_version: target.grant.aggregateVersion,
+        enrollment_active:
+          target.enrollment.status === "active" &&
+          target.enrollment.deletedAt === null,
         grant_allows: target.grant.status === "active" && target.grant.deletedAt === null,
         data_class_allowed: target.grant.dataClasses.includes(process.dataClass),
         purpose_allowed: target.grant.purposes.includes(process.purposeKey),

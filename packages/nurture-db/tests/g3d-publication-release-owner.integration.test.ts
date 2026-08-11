@@ -857,6 +857,18 @@ describe("G3-D owner reads: release facts", () => {
     expect(before?.targets.every((target) => target.grant_allows)).toBe(true);
     expect(before?.targets.every((target) => target.data_class_allowed)).toBe(true);
     expect(before?.authorizing_role_current).toBe(true);
+    expect(before?.targets.map((target) => target.safe_label)).toEqual([
+      "Family A",
+      "Family B",
+    ]);
+    expect(before?.targets[0]).toMatchObject({
+      target_version: 0,
+      child_care_process_version: 0,
+      family_label_version: 0,
+      child_label_version: 0,
+      enrollment_version: 0,
+      grant_version: 0,
+    });
 
     await prisma.nurtureChildLinkGrant.update({
       where: { id: world.children[0]!.grant.id },

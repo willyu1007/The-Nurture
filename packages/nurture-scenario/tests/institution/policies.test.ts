@@ -168,6 +168,43 @@ describe("institution resolver", () => {
     });
   });
 
+  it("resolves the teacher publish queue only through an exact caregiver CareGroup scope", async () => {
+    const result = await makeResolver([binding("role-1", "group-1")]).resolve(
+      envelope({ display_state: { selected_view_key: "teacher_publish_queue" } }),
+    );
+    expect(result).toMatchObject({
+      status: "resolved",
+      context: {
+        actor: {
+          participant_id: "participant-1",
+          role_kind: "caregiver",
+          scope_type: "care_group",
+        },
+        work_scope: { kind: "care_group", care_group_id: "group-1" },
+        policy_seed: { action_key: "query_teacher_publish_queue" },
+      },
+    });
+  });
+
+  it("does not widen the teacher publish queue to an institution-admin binding", async () => {
+    const adminBinding: NurtureActorBinding = {
+      ...binding("role-admin", "group-1"),
+      role_kind: "institution_admin",
+      scope_type: "institution",
+      scope_id: "institution-1",
+      work_scope: { kind: "institution", institution_id: "institution-1" },
+    };
+    await expect(
+      makeResolver([adminBinding]).resolve(
+        envelope({ display_state: { selected_view_key: "teacher_publish_queue" } }),
+      ),
+    ).resolves.toEqual({
+      status: "blocked",
+      reason_code: "no_reachable_context",
+      safe_user_state: "unavailable",
+    });
+  });
+
   it("derives an unambiguous workspace from current Nurture participation when host omits it", async () => {
     const input = envelope();
     delete input.host.workspace_id;

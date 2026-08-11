@@ -611,3 +611,49 @@
 - **Prevention:** a candidate may inform human work without becoming a status,
   permission, hold or lifecycle. Any candidate side effect must be replayed
   through the enclosing operation to prove the result class stays coherent.
+
+## 2026-08-11 — A private dependency rotation is not a public DTO rotation
+
+- **Symptom:** the retained Q4/Q6 branches named private owner v1/v2, Surface
+  `1.18.0` and a My-Chat public DTO v2 close together. A direct branch merge
+  would have made stale private pins look like supported compatibility paths.
+- **Root cause:** private provider identity, dependent Surface identity and
+  public component identity were not consistently named as three separate
+  contracts in maintained handoff text.
+- **What was tried:** preserving old private routes during migration was
+  considered, but there was no approved compatibility consumer and doing so
+  would create two trusted decoders and two provider selections.
+- **Fix/workaround:** squash-port only the valuable net implementation, rotate
+  the sole private interface to v3/Surface `1.20.0`, keep My-Chat public DTO v2
+  unchanged and delete the superseded private route/evidence artifacts.
+- **Prevention:** every cross-owner adoption record names all three identities
+  independently. Never derive a public DTO version from a private interface
+  version, and never retain an old trusted route without an explicit consumer.
+
+## 2026-08-11 — Exact recovery maps must not inherit wider Harness unions
+
+- **Symptom:** the private descriptor/type advertised `decision=invalid` and
+  `recovery=retry_same_command`, although none of its four safe public reasons
+  could produce either value.
+- **Root cause:** the first private DTO copied the wider internal Harness result
+  union while its runtime validator already enforced a narrower reason map.
+- **What was tried:** pair validation prevented invalid wire values, but left
+  dead states in exported types and contract documentation.
+- **Fix/workaround:** derive the private alternatives from the exact reason map,
+  narrow both repositories before publication and recompute the v3 digest.
+- **Prevention:** contract unions are reviewed for reachability, not only type
+  validity. A value absent from every declared reason mapping is removed.
+
+## 2026-08-11 — Generated environment booleans must match runtime syntax
+
+- **Symptom:** generated examples emitted Python-style `True`/`False` while the
+  TypeScript runtime parser accepts lowercase `true`/`false` only.
+- **Root cause:** the environment generator used generic scalar stringification
+  and lacked boolean fixtures.
+- **What was tried:** regenerating outputs reproduced the mismatch, proving it
+  was a canonical generator defect rather than hand-edited output drift.
+- **Fix/workaround:** add one scalar formatter in the canonical skill, cover
+  enabled/disabled booleans in the environment feature suite and regenerate all
+  derived outputs.
+- **Prevention:** generated examples must round-trip through the runtime parser;
+  every scalar type has an explicit fixture and canonical textual form.

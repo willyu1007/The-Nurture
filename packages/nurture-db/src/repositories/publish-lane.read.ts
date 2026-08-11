@@ -17,7 +17,11 @@ import type {
   RawPublishQueueRow,
   TeacherPublishQueueReadPort,
 } from "@the-nurture/scenario/harness";
-import { assertProtectedContentEnvelopeV1 } from "@the-nurture/scenario/harness";
+import {
+  assertProtectedContentEnvelopeV1,
+  PUBLISH_PROCESS_TARGET_KIND,
+  RELEASE_PUBLISH_PROCESS_CAPABILITY,
+} from "@the-nurture/scenario/harness";
 import { publishDraftCommandIdentity } from "./publish-process.transaction.js";
 import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
@@ -88,22 +92,24 @@ export class PrismaPublishLaneReadPort
   constructor(
     private readonly prisma: BoardPrisma,
     /**
-     * Absent by default. Without key material the queue shows no title rather
-     * than a sealed payload — the no-store protected-content boundary stays
-     * closed instead of leaking ciphertext into a public result.
+     * Without key material the queue uses a generic label rather than a sealed
+     * payload. The public contract requires a non-empty safe label, while the
+     * no-store protected-content boundary stays closed.
      */
     private readonly protectedContent?: ProtectedContentWritePort,
   ) {}
 
   private safeTitle(payload: unknown): string {
-    if (!this.protectedContent || payload === null || typeof payload !== "object") return "";
+    if (!this.protectedContent || payload === null || typeof payload !== "object") {
+      return "Class update";
+    }
     let envelope: ProtectedContentEnvelopeV1;
     try {
       assertProtectedContentEnvelopeV1(payload);
       envelope = payload as ProtectedContentEnvelopeV1;
       return this.protectedContent.unseal(envelope);
     } catch {
-      return "";
+      return "Class update";
     }
   }
 
@@ -198,26 +204,38 @@ export class PrismaPublishLaneReadPort
     const stateCounts = { ...emptyCounts };
     for (const row of grouped) stateCounts[row.state] = row._count._all;
 
-    const rows: RawPublishQueueRow[] = processes.map((process) => ({
-      process_key: process.processKey,
-      state: process.state,
-      data_class: process.dataClass as (typeof PUBLISHABLE_DATA_CLASSES)[number],
-      title: this.safeTitle(process.currentRevision?.titleProtectionPayload ?? null),
-      current_revision: process.currentRevision?.revision ?? 0,
-      target_count: process.targets.length,
-      released_target_count: process.targets.filter((target) => target.release !== null).length,
-      occurred_at: process.updatedAt.toISOString(),
-      // A schedule is shown only once the institution actually resolved one.
-      ...(process.scheduledAt ? { scheduled_at: process.scheduledAt.toISOString() } : {}),
-      edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
-      authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
-      // No action is advertised while the publish write lane has no owner write
-      // and no ingress route. A board that offers "Save draft" on a card whose
-      // capability answers `unknown_capability` has made a promise the system
-      // cannot keep — the same placeholder the freeze refuses on the ingress
-      // side, arriving from the read side instead. Restore the grant with B8.
-      action_grants: [],
-    }));
+    const rows: RawPublishQueueRow[] = processes.map((process) => {
+      const releasedTargetCount = process.targets.filter(
+        (target) => target.release !== null,
+      ).length;
+      const releaseAvailable =
+        process.currentRevision !== null &&
+        process.targets.length > releasedTargetCount &&
+        (process.state === "pending_release" || process.state === "released");
+      return {
+        process_key: process.processKey,
+        state: process.state,
+        data_class: process.dataClass as (typeof PUBLISHABLE_DATA_CLASSES)[number],
+        title: this.safeTitle(process.currentRevision?.titleProtectionPayload ?? null),
+        current_revision: process.currentRevision?.revision ?? 0,
+        target_count: process.targets.length,
+        released_target_count: releasedTargetCount,
+        occurred_at: process.updatedAt.toISOString(),
+        // A schedule is shown only once the institution actually resolved one.
+        ...(process.scheduledAt ? { scheduled_at: process.scheduledAt.toISOString() } : {}),
+        edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
+        authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
+        action_grants: releaseAvailable
+          ? [{
+              capability_key: RELEASE_PUBLISH_PROCESS_CAPABILITY.key,
+              capability_version: RELEASE_PUBLISH_PROCESS_CAPABILITY.version,
+              availability: "available" as const,
+              target_option_id: process.processKey,
+              target_kind: PUBLISH_PROCESS_TARGET_KIND,
+            }]
+          : [],
+      };
+    });
 
     const page = rows.slice(0, input.take);
 

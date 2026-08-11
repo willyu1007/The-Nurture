@@ -66,6 +66,10 @@ export function run(ctx) {
     return { name, status: 'FAIL', error: 'missing env/.env.example' };
   }
   assertIncludes(readUtf8(paths.envExample), 'DATABASE_URL', 'Expected DATABASE_URL in env/.env.example');
+  assertIncludes(readUtf8(paths.envExample), 'FEATURE_ENABLED=true', 'Expected lowercase true in env/.env.example');
+  assertIncludes(readUtf8(paths.envExample), 'FEATURE_DISABLED=false', 'Expected lowercase false in env/.env.example');
+  assertNotIncludes(readUtf8(paths.envExample), 'FEATURE_ENABLED=True', 'Uppercase True is not a portable env boolean');
+  assertNotIncludes(readUtf8(paths.envExample), 'FEATURE_DISABLED=False', 'Uppercase False is not a portable env boolean');
 
   if (!fs.existsSync(paths.envDoc)) {
     return { name, status: 'FAIL', error: 'missing docs/env.md' };

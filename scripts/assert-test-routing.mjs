@@ -19,6 +19,7 @@ async function collect(directory) {
 
 const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await collect(path.join(repoRoot, 'apps')))];
 const routes = { unit: [], productionDb: [], devHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
+const expectedCounts = { unit: 88, productionDb: 43, devHost: 11, scenarioService: 16, x5Joint: 2 };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
   else if (
@@ -32,16 +33,11 @@ for (const file of files.sort()) {
 }
 
 if (routes.unclassified.length > 0) throw new Error(`Unclassified tests: ${routes.unclassified.join(', ')}`);
-if (
-  routes.unit.length !== 86 ||
-  routes.productionDb.length !== 43 ||
-  routes.devHost.length !== 11 ||
-  routes.scenarioService.length !== 14 ||
-  routes.x5Joint.length !== 2
-) {
-  throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/86 productionDb=${routes.productionDb.length}/43 devHost=${routes.devHost.length}/11 scenarioService=${routes.scenarioService.length}/14 x5Joint=${routes.x5Joint.length}/2`,
-  );
+const mismatches = Object.entries(expectedCounts)
+  .filter(([route, expected]) => routes[route].length !== expected)
+  .map(([route, expected]) => `${route}=${routes[route].length}/${expected}`);
+if (mismatches.length > 0) {
+  throw new Error(`Test file census changed: ${mismatches.join(' ')}`);
 }
 process.stdout.write(
   `[ok] test routing files=${files.length} unit=${routes.unit.length} production-db=${routes.productionDb.length} dev-host=${routes.devHost.length} scenario-service=${routes.scenarioService.length} x5-joint=${routes.x5Joint.length}\n`,

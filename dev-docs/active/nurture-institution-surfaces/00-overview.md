@@ -57,8 +57,11 @@
   fail-closed module/manifest composition
   ([`63`](./63-g4-d-i2-b-surface-adapter-record.md)). Every descriptor remains
   behind the unqualified Enrollment Journey runtime gate. Real contact/native-
-  source and authenticated My-Chat owner adapters remain I3 work blocked by
-  G-09. All three 0F unit contracts, their 0G audit and branch Exit pass. E1
+  source and authenticated My-Chat owner adapters remain unimplemented I3
+  work. G-09's cross-repository workflow/source adoption is now closed by the
+  exact My-Chat teacher-release v3 migration; that removes the stale-pin gate
+  but does not implement those G4-D adapters. All three 0F unit contracts,
+  their 0G audit and branch Exit pass. E1
   through E4 remain private/default-off: no model call, indexing, public
   caller, activation or traffic, and the only G4-E DB operation was the
   destroyed disposable qualification. G4-E E5 now rotates the additive

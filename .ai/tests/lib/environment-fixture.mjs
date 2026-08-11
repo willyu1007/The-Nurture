@@ -87,6 +87,16 @@ function writeEnvironmentContract(rootDir, envs) {
       `    required: true\n` +
       `    default: "https://api.example.com"\n` +
       `    description: Base URL for external API.\n` +
+      `  FEATURE_ENABLED:\n` +
+      `    type: bool\n` +
+      `    required: true\n` +
+      `    default: true\n` +
+      `    description: Enabled boolean fixture.\n` +
+      `  FEATURE_DISABLED:\n` +
+      `    type: bool\n` +
+      `    required: true\n` +
+      `    default: false\n` +
+      `    description: Disabled boolean fixture.\n` +
       `  DATABASE_URL:\n` +
       `    type: url\n` +
       `    required: true\n` +

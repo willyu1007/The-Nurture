@@ -13,6 +13,7 @@ describe("scenario-service configuration", () => {
       bodyLimitBytes: 65_536,
       requestTimeoutMs: 5_000,
       institutionBusinessCommunicationReadEnabled: false,
+      teacherReleaseOwnerEnabled: false,
     });
   });
 
@@ -26,10 +27,22 @@ describe("scenario-service configuration", () => {
       { NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED: "TRUE" },
       "NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED",
     ],
+    [
+      { NURTURE_TEACHER_RELEASE_OWNER_ENABLED: "TRUE" },
+      "NURTURE_TEACHER_RELEASE_OWNER_ENABLED",
+    ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
       `Invalid scenario-service configuration: ${field}`,
     );
+  });
+
+  it("loads the teacher release owner gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_TEACHER_RELEASE_OWNER_ENABLED: "true",
+      }).teacherReleaseOwnerEnabled,
+    ).toBe(true);
   });
 
   it("loads the protected Admin owner-read gate only from an exact true literal", () => {

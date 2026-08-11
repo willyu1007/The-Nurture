@@ -157,13 +157,13 @@ assertEqual(
 assertEqual(
   workflowPin.myChat?.revision,
   // Rotated once in the T-009 I6 batch (D-T009-04), then again on 2026-08-08
-  // by the C30 cross-repository landing. Advanced 2026-08-09 to 567b96cd with
-  // no semantic change: of the four intervening commits three are docs and the
-  // fourth removes `packages/domain/media-access`, which no pin covers. The
-  // only byte change inside a pinned path is a transitional-notice comment on
-  // `packages/domain/growth-record/index.ts`, and the Base/My-Chat contract
-  // parity hash is unmoved — which is what this gate exists to protect.
-  "567b96cd5ddf2a0534fee21dd87f677439f40b78",
+  // by the C30 cross-repository landing. Advanced 2026-08-11 to the exact
+  // My-Chat mainline containing both the
+  // `nurture.teacher-release-owner@3.0.0` consumer and the subsequently landed
+  // family-authorization owner closure. The shared Base/My-Chat workflow
+  // contract remains byte-identical; the separately pinned My-Chat owner
+  // populations rotate to their exact current source.
+  "6d909bcfde64d4152add902679ba29907cc91883",
   "My-Chat revision",
 );
 assertEqual(

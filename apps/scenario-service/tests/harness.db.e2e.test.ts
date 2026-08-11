@@ -2,6 +2,7 @@ import type { AddressInfo } from "node:net";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createNurtureTeacherReleaseOwnerHttpSource } from "@my-chat/scenario-integrations";
 import {
   INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE,
   issueCareItemTargetRef,
@@ -57,15 +58,17 @@ beforeAll(async () => {
     NURTURE_HARNESS_INTEGRITY_KEY: INTEGRITY_KEY,
     NURTURE_PROTECTED_CONTENT_KEY: CONTENT_KEY,
     NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED: "true",
+    NURTURE_TEACHER_RELEASE_OWNER_ENABLED: "true",
   };
+  const config = loadScenarioServiceConfig(runtimeEnv);
   const harnessRuntime = createHarnessRuntime({
     env: runtimeEnv,
     serviceAuth,
     institutionBusinessCommunicationReadEnabled:
-      loadScenarioServiceConfig(runtimeEnv)
-        .institutionBusinessCommunicationReadEnabled,
+      config.institutionBusinessCommunicationReadEnabled,
   });
   const { app } = await createScenarioServiceApplication({
+    config,
     bindingOwnerServiceAuth: serviceAuth,
     harnessRuntime,
     logSink: () => undefined,
@@ -3571,11 +3574,19 @@ describe("G3-D release fan-out on the formal ingress", () => {
     const resolvedAt = new Date();
     const scheduledAt = new Date(resolvedAt.getTime() + 60 * 60 * 1000);
     const notAfter = new Date(resolvedAt.getTime() + 3 * 60 * 60 * 1000);
-    const policy = await prisma.nurtureInstitutionPublicationPolicy.create({
-      data: policyDataForInstitution(scope, {
-        effectiveFrom: new Date(resolvedAt.getTime() - 60 * 60 * 1000),
-      }),
-    });
+    const policy =
+      (await prisma.nurtureInstitutionPublicationPolicy.findFirst({
+        where: {
+          workspaceId: scope.workspaceId,
+          institutionId: scope.institution.id,
+          policyVersion: 1,
+        },
+      })) ??
+      (await prisma.nurtureInstitutionPublicationPolicy.create({
+        data: policyDataForInstitution(scope, {
+          effectiveFrom: new Date(resolvedAt.getTime() - 60 * 60 * 1000),
+        }),
+      }));
     const process = await prisma.nurturePublishProcess.create({
       data: {
         workspaceId: scope.workspaceId,
@@ -3632,7 +3643,7 @@ describe("G3-D release fan-out on the formal ingress", () => {
             targetKey: `target:${randomUUID()}`,
             childCareProcessId: scope.process.id,
             enrollmentId: scope.enrollment.id,
-            familyRefKey: `${scope.workspaceId}:${scope.process.id}:${index}`,
+            familyRefKey: `${scope.workspaceId}:${scope.family.id}`,
             grantId: grant.id,
           },
         }),
@@ -3654,6 +3665,313 @@ describe("G3-D release fan-out on the formal ingress", () => {
       PUBLISH_PROCESS_TARGET_KIND,
       processKey,
     );
+
+  it("jointly composes My-Chat Host identity through the real resolver, queue and release owner", async () => {
+    const scope = await seedScope();
+    await seedQueuedRelease(scope);
+    const source = createNurtureTeacherReleaseOwnerHttpSource({
+      baseUrl,
+      serviceToken: TOKEN,
+    });
+    const identity = {
+      workspaceId: scope.workspaceId,
+      myChatUserId: scope.caregiver.myChatUserId,
+      hostRequestId: `host:${randomUUID()}`,
+    };
+
+    const queried = await source.query(identity);
+    expect(queried.status).toBe("ready");
+    if (queried.status !== "ready" || queried.result.status !== "ok") {
+      throw new Error("teacher release owner query did not resolve");
+    }
+    expect(queried.result.output.counts.pending_release).toBe(1);
+    const item = queried.result.output.items[0];
+    expect(item?.actions).toEqual([
+      expect.objectContaining({
+        capabilityKey: "release_publish_process",
+        availability: "available",
+      }),
+    ]);
+    const actionOptionRef = item?.actions[0]?.targetOptionRef;
+    if (!item || !actionOptionRef) throw new Error("release action was not owner-issued");
+
+    const reviewed = await source.targets({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: item.processRef,
+      actionOptionRef,
+    });
+    if (reviewed.status !== "ready") {
+      throw new Error("teacher release owner targets did not resolve");
+    }
+
+    const prepared = await source.prepare({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: item.processRef,
+      actionOptionRef,
+      targetSnapshotRef: reviewed.result.detail.targetSnapshotRef,
+    });
+    expect(prepared.status).toBe("ready");
+    if (prepared.status !== "ready" || prepared.result.status !== "ready_to_confirm") {
+      throw new Error("teacher release owner prepare did not resolve");
+    }
+
+    const confirmed = await source.confirm({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      invocationRequestId: `invocation:${randomUUID()}`,
+      commandRequestId: prepared.result.command_request_id,
+      confirmationRef: prepared.result.confirmation_ref,
+    });
+    expect(confirmed).toMatchObject({
+      status: "ready",
+      result: {
+        status: "committed",
+        committed_result: {
+          summary: { total: 1, committed: 1, rejected: 0, outcomeUnknown: 0 },
+        },
+      },
+    });
+
+    const replayed = await source.confirm({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      invocationRequestId: `invocation:${randomUUID()}`,
+      commandRequestId: prepared.result.command_request_id,
+      confirmationRef: prepared.result.confirmation_ref,
+    });
+    expect(replayed).toMatchObject({
+      status: "ready",
+      result: { status: "not_committed", reason_code: "confirmation_replayed" },
+    });
+
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: scope.caregiverRole.id },
+      data: { status: "revoked", endsAt: new Date() },
+    });
+    await expect(
+      source.query({ ...identity, hostRequestId: `host:${randomUUID()}` }),
+    ).resolves.toEqual({ status: "unavailable", safe_reason_code: "unavailable" });
+  });
+
+  it("jointly fails closed on owner ambiguity and authority changes between operations", async () => {
+    const ambiguousScope = await seedScope();
+    await seedQueuedRelease(ambiguousScope);
+    const secondGroup = await prisma.nurtureCareGroup.create({
+      data: {
+        workspaceId: ambiguousScope.workspaceId,
+        institutionId: ambiguousScope.institution.id,
+        name: "Class B",
+        status: "active",
+      },
+    });
+    await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: ambiguousScope.workspaceId,
+        participantId: ambiguousScope.caregiver.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: secondGroup.id,
+        status: "active",
+      },
+    });
+    const source = createNurtureTeacherReleaseOwnerHttpSource({
+      baseUrl,
+      serviceToken: TOKEN,
+    });
+    await expect(source.query({
+      workspaceId: ambiguousScope.workspaceId,
+      myChatUserId: ambiguousScope.caregiver.myChatUserId,
+      hostRequestId: `host:${randomUUID()}`,
+    })).resolves.toMatchObject({
+      status: "needs_clarification",
+      safe_reason_code: "ambiguous_context",
+      interaction: { kind: "single_choice" },
+    });
+
+    const revokedBeforePrepare = await seedScope();
+    await seedQueuedRelease(revokedBeforePrepare);
+    const beforePrepareIdentity = {
+      workspaceId: revokedBeforePrepare.workspaceId,
+      myChatUserId: revokedBeforePrepare.caregiver.myChatUserId,
+      hostRequestId: `host:${randomUUID()}`,
+    };
+    const queryBeforePrepare = await source.query(beforePrepareIdentity);
+    if (queryBeforePrepare.status !== "ready" || queryBeforePrepare.result.status !== "ok") {
+      throw new Error("teacher release owner query did not resolve before revoke");
+    }
+    const beforePrepareItem = queryBeforePrepare.result.output.items[0];
+    const beforePrepareAction = beforePrepareItem?.actions[0]?.targetOptionRef;
+    if (!beforePrepareItem || !beforePrepareAction) {
+      throw new Error("owner-issued release action missing before revoke");
+    }
+    const beforePrepareReview = await source.targets({
+      ...beforePrepareIdentity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: beforePrepareItem.processRef,
+      actionOptionRef: beforePrepareAction,
+    });
+    if (beforePrepareReview.status !== "ready") {
+      throw new Error("teacher release owner targets did not resolve before revoke");
+    }
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: revokedBeforePrepare.caregiverRole.id },
+      data: { status: "revoked", endsAt: new Date() },
+    });
+    await expect(source.prepare({
+      ...beforePrepareIdentity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: beforePrepareItem.processRef,
+      actionOptionRef: beforePrepareAction,
+      targetSnapshotRef: beforePrepareReview.result.detail.targetSnapshotRef,
+    })).resolves.toEqual({ status: "unavailable", safe_reason_code: "unavailable" });
+
+    const revokedBeforeConfirm = await seedScope();
+    await seedQueuedRelease(revokedBeforeConfirm);
+    const beforeConfirmIdentity = {
+      workspaceId: revokedBeforeConfirm.workspaceId,
+      myChatUserId: revokedBeforeConfirm.caregiver.myChatUserId,
+      hostRequestId: `host:${randomUUID()}`,
+    };
+    const queryBeforeConfirm = await source.query(beforeConfirmIdentity);
+    if (queryBeforeConfirm.status !== "ready" || queryBeforeConfirm.result.status !== "ok") {
+      throw new Error("teacher release owner query did not resolve before prepare");
+    }
+    const beforeConfirmItem = queryBeforeConfirm.result.output.items[0];
+    const beforeConfirmAction = beforeConfirmItem?.actions[0]?.targetOptionRef;
+    if (!beforeConfirmItem || !beforeConfirmAction) {
+      throw new Error("owner-issued release action missing before prepare");
+    }
+    const beforeConfirmReview = await source.targets({
+      ...beforeConfirmIdentity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: beforeConfirmItem.processRef,
+      actionOptionRef: beforeConfirmAction,
+    });
+    if (beforeConfirmReview.status !== "ready") {
+      throw new Error("teacher release owner targets did not resolve before prepare");
+    }
+    const prepared = await source.prepare({
+      ...beforeConfirmIdentity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: beforeConfirmItem.processRef,
+      actionOptionRef: beforeConfirmAction,
+      targetSnapshotRef: beforeConfirmReview.result.detail.targetSnapshotRef,
+    });
+    if (prepared.status !== "ready" || prepared.result.status !== "ready_to_confirm") {
+      throw new Error("teacher release owner prepare did not resolve before revoke");
+    }
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: revokedBeforeConfirm.caregiverRole.id },
+      data: { status: "revoked", endsAt: new Date() },
+    });
+    await expect(source.confirm({
+      ...beforeConfirmIdentity,
+      hostRequestId: `host:${randomUUID()}`,
+      invocationRequestId: `invocation:${randomUUID()}`,
+      commandRequestId: prepared.result.command_request_id,
+      confirmationRef: prepared.result.confirmation_ref,
+    })).resolves.toEqual({ status: "unavailable", safe_reason_code: "unavailable" });
+  });
+
+  it("jointly preserves stale-confirmation recovery through the owner transport", async () => {
+    const scope = await seedScope();
+    const queued = await seedQueuedRelease(scope);
+    const source = createNurtureTeacherReleaseOwnerHttpSource({
+      baseUrl,
+      serviceToken: TOKEN,
+    });
+    const identity = {
+      workspaceId: scope.workspaceId,
+      myChatUserId: scope.caregiver.myChatUserId,
+      hostRequestId: `host:${randomUUID()}`,
+    };
+    const queried = await source.query(identity);
+    if (queried.status !== "ready" || queried.result.status !== "ok") {
+      throw new Error("teacher release owner query did not resolve");
+    }
+    const item = queried.result.output.items[0];
+    const actionOptionRef = item?.actions[0]?.targetOptionRef;
+    if (!item || !actionOptionRef) throw new Error("owner-issued release action missing");
+    const reviewed = await source.targets({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: item.processRef,
+      actionOptionRef,
+    });
+    if (reviewed.status !== "ready") {
+      throw new Error("teacher release owner targets did not resolve");
+    }
+    const prepared = await source.prepare({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      processRef: item.processRef,
+      actionOptionRef,
+      targetSnapshotRef: reviewed.result.detail.targetSnapshotRef,
+    });
+    if (prepared.status !== "ready" || prepared.result.status !== "ready_to_confirm") {
+      throw new Error("teacher release owner prepare did not resolve");
+    }
+    const nextRevision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: queued.process.id,
+        revision: queued.revision.revision + 1,
+        contentDigest: "sha256:changed-after-prepare",
+        organizerInputRevision: queued.revision.organizerInputRevision,
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: queued.process.id },
+      data: { currentRevisionId: nextRevision.id },
+    });
+    await expect(source.confirm({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      invocationRequestId: `invocation:${randomUUID()}`,
+      commandRequestId: prepared.result.command_request_id,
+      confirmationRef: prepared.result.confirmation_ref,
+    })).resolves.toMatchObject({
+      status: "ready",
+      result: {
+        status: "not_committed",
+        reason_code: "stale_confirmation",
+        recovery: "reprepare",
+      },
+    });
+  });
+
+  it("jointly rejects a cursor after its current owner head changes", async () => {
+    const scope = await seedScope();
+    await seedQueuedRelease(scope);
+    await seedQueuedRelease(scope);
+    const source = createNurtureTeacherReleaseOwnerHttpSource({
+      baseUrl,
+      serviceToken: TOKEN,
+    });
+    const identity = {
+      workspaceId: scope.workspaceId,
+      myChatUserId: scope.caregiver.myChatUserId,
+      hostRequestId: `host:${randomUUID()}`,
+    };
+    const first = await source.query({ ...identity, pageSize: 1 });
+    if (first.status !== "ready" || first.result.status !== "ok") {
+      throw new Error("teacher release owner first page did not resolve");
+    }
+    const cursor = first.result.output.pageInfo.nextCursor;
+    if (!cursor) throw new Error("teacher release owner cursor was not issued");
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: scope.caregiverRole.id },
+      data: { role: "lead_caregiver" },
+    });
+    await expect(source.query({
+      ...identity,
+      hostRequestId: `host:${randomUUID()}`,
+      pageSize: 1,
+      cursor,
+    })).resolves.toEqual({ status: "ready", result: { status: "refresh_required" } });
+  });
 
   it("reschedules through the formal ingress against the persisted T-007 policy", async () => {
     const scope = await seedScope();

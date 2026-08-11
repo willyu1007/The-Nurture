@@ -85,6 +85,7 @@ import {
   computeHarnessInputIntegrityTag,
   prepareOrganizeCareCaptureBatch,
   prepareReleasePublishProcess,
+  presentReleaseTargets,
   createOrganizeCareCaptureBatchSpec,
   queryTeacherPublishQueue,
   readInstitutionBusinessCommunication,
@@ -102,6 +103,7 @@ import {
   type LifecyclePrepareDecision,
   type NurtureCommandSpec,
   type SubmitPrepareDecision,
+  type ReleaseTargetPresentationDecisionV1,
 } from "@the-nurture/scenario/harness";
 import {
   PrismaCaregiverBoardReadPort,
@@ -141,25 +143,36 @@ import {
 
 const PROTECTED_CONTENT_KEY_REF = "nurture-protected-content-v1";
 
+export type HarnessInternalPrepareRequestV1 = HarnessPrepareRequestV1 & {
+  target_snapshot_ref?: string;
+};
+
 export type HarnessEngine = {
-  prepare(request: HarnessPrepareRequestV1): Promise<HarnessPrepareResponseV1>;
+  prepare(
+    request: HarnessInternalPrepareRequestV1,
+  ): Promise<HarnessPrepareResponseV1>;
   execute(request: HarnessExecuteRequestV1): Promise<HarnessExecuteResponseV1>;
   query(request: HarnessQueryRequestV1): Promise<HarnessQueryResponseV1>;
   readResult(request: HarnessReadResultRequestV1): Promise<HarnessQueryResponseV1>;
   readInstitutionBusinessCommunication(
     request: InstitutionBusinessCommunicationReadRequestV1,
   ): Promise<InstitutionBusinessCommunicationReadResponseV1>;
+  presentReleaseTargets(request: {
+    workspace_id: string;
+    actor_participant_id: string;
+    process_ref: string;
+  }): Promise<ReleaseTargetPresentationDecisionV1>;
 };
 
 export class HarnessRuntime implements OnApplicationShutdown {
   constructor(
     readonly engine: HarnessEngine | undefined,
-    private readonly ownedDatabaseClient?: Pick<NurturePrismaClient, "$disconnect">,
+    readonly databaseClient?: NurturePrismaClient,
     readonly institutionBusinessCommunicationReadEnabled = false,
   ) {}
 
   async onApplicationShutdown(): Promise<void> {
-    await this.ownedDatabaseClient?.$disconnect();
+    await this.databaseClient?.$disconnect();
   }
 }
 
@@ -476,13 +489,16 @@ export function createHarnessEngine(input: {
     <Decision extends Parameters<typeof toPrepareResponse>[0]>(
       run: (request: PrepareScope & OptionalTargetRequest) => Promise<Decision>,
     ) =>
-    async (request: HarnessPrepareRequestV1, scope: PrepareScope) =>
+    async (request: HarnessInternalPrepareRequestV1, scope: PrepareScope) =>
       toPrepareResponse(
         await run({
           ...scope,
           operation_input: request.operation_input,
           ...(request.target_option_ref
             ? { target_option_ref: request.target_option_ref }
+            : {}),
+          ...(request.target_snapshot_ref
+            ? { target_snapshot_ref: request.target_snapshot_ref }
             : {}),
         }),
       );
@@ -493,7 +509,7 @@ export function createHarnessEngine(input: {
       run: (request: PrepareScope & RequiredTargetRequest) => Promise<Decision>,
     ) =>
     async (
-      request: HarnessPrepareRequestV1,
+      request: HarnessInternalPrepareRequestV1,
       scope: PrepareScope,
     ): Promise<HarnessPrepareResponseV1> =>
       request.target_option_ref
@@ -1062,6 +1078,17 @@ export function createHarnessEngine(input: {
   } satisfies Record<HarnessCapabilityKey, HarnessActionDescriptor>;
 
   return {
+    async presentReleaseTargets(request) {
+      return presentReleaseTargets(
+        { integrity_key: input.integrityKey, reads: publicationReleaseReads },
+        {
+          workspace_id: request.workspace_id,
+          participant_id: request.actor_participant_id,
+        },
+        { process_ref: request.process_ref },
+      );
+    },
+
     async prepare(request) {
       return actions[request.capability_key].prepare(request, {
         workspace_id: request.workspace_id,
@@ -1433,6 +1460,8 @@ export function createHarnessEngine(input: {
       return notCommitted("invalid", "invalid_operation_input");
     }
     const processKey = payload.target_refs.publish_process;
+    const expectedTargetSnapshotVersion =
+      payload.target_refs.publish_target_snapshot;
     const expectedRevision = payload.expected_heads.draft_revision;
     if (!processKey || expectedRevision === undefined) {
       return notCommitted("blocked", "invalid_confirmation");
@@ -1442,6 +1471,12 @@ export function createHarnessEngine(input: {
       canonicalizeReleasePublishProcessCommand({
         process_key: processKey,
         expected_release_revision: expectedRevision,
+        ...(expectedTargetSnapshotVersion
+          ? {
+              expected_target_snapshot_version:
+                expectedTargetSnapshotVersion,
+            }
+          : {}),
         trigger: "immediate",
       }),
     );
@@ -1470,6 +1505,12 @@ export function createHarnessEngine(input: {
         command_request_id: request.command_request_id,
         trigger: "immediate",
         expected_release_revision: expectedRevision,
+        ...(expectedTargetSnapshotVersion
+          ? {
+              expected_target_snapshot_version:
+                expectedTargetSnapshotVersion,
+            }
+          : {}),
       },
     );
     if (decision.status === "denied") {
@@ -1548,7 +1589,11 @@ type PrepareScope = {
   host_conversation_ref?: string;
 };
 
-type OptionalTargetRequest = { operation_input: unknown; target_option_ref?: string };
+type OptionalTargetRequest = {
+  operation_input: unknown;
+  target_option_ref?: string;
+  target_snapshot_ref?: string;
+};
 type RequiredTargetRequest = { operation_input: unknown; target_option_ref: string };
 
 type BuildInput = {
@@ -1568,7 +1613,7 @@ type BuiltPayload = { payload: unknown; spec: NurtureCommandSpec<never> };
 
 type HarnessActionDescriptor = {
   prepare(
-    request: HarnessPrepareRequestV1,
+    request: HarnessInternalPrepareRequestV1,
     scope: PrepareScope,
   ): Promise<HarnessPrepareResponseV1>;
 } & (

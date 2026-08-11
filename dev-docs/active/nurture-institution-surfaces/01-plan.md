@@ -88,8 +88,9 @@
   clean 33-migration qualification passes targeted 9/9 and full 389/389 DB
   lanes with no datasource drift.
 - G4-D's frozen I1 chain is complete. The following I2-A/I2-B checkpoints
-  complete the local public contract and default-off surface composition;
-  authenticated My-Chat owner integration at I3 remains blocked by G-09. The
+  complete the local public contract and default-off surface composition.
+  G-09's exact My-Chat adoption is now closed; authenticated My-Chat owner
+  integration at I3 remains unimplemented and separately default-off. The
   independent 0F freeze may proceed in parallel.
   The live order remains in
   [`41`](./41-t007-gap-and-next-register.md).
@@ -114,8 +115,8 @@
   adds no public handler, presenter runtime, manifest/module registration,
   database operation, activation or traffic.
 - The following I2-B checkpoint supplies the handler/presenter/default-off
-  module composition. I3 real owner integration remains blocked by G-09; 0F
-  may still proceed independently.
+  module composition. I3 real owner integration remains unimplemented; the
+  exact external pin is no longer its blocker. 0F may still proceed independently.
 
 ## Execution checkpoint — 2026-08-10 G4-D I2-B surface adapters
 
@@ -137,8 +138,24 @@
   is explicitly disabled on chat, mobile and Web, while the Surface Contract
   runtime dependency gate remains unqualified. No route, real owner adapter,
   Prisma/DB operation, activation or traffic was added.
-- I3 authenticated owner/formal-ingress binding remains blocked by G-09. 0F
-  remains the independent local implementation option.
+- I3 authenticated owner/formal-ingress binding remains unimplemented and
+  default-off; G-09 adoption is closed. 0F remains the independent local
+  implementation option.
+
+## Execution checkpoint — 2026-08-11 teacher-release owner v3 migration
+
+- Squash-migrated the retained Q4 fixed-target presenter and Q6 owner
+  composition from the historical branches onto current `main`, then rotated
+  the sole private interface to `nurture.teacher-release-owner@3.0.0` over
+  Surface `1.20.0`.
+- My-Chat consumes the exact four-route v3 interface while its public Dashboard
+  DTO remains independently versioned at `contract_version: 2`. No private
+  v1/v2 route, decoder, fixture fallback or direct Harness proxy remains.
+- The provider remains default-off. This migration adds no schema/migration,
+  durable database apply, deployment, secret mutation, activation or traffic.
+- The exact My-Chat workflow/source pin now adopts the qualified consumer
+  revision, closing G-09. G4-D I3 and G4-E E7/E8 remain separate implementation
+  work and are not implied by this adoption.
 
 ## Stage G4 Delivery Structure — Accepted
 

@@ -70,6 +70,29 @@ variables:
     required: false
     default: false
     description: Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption.
+  NURTURE_TEACHER_RELEASE_OWNER_ENABLED:
+    type: bool
+    required: false
+    default: false
+    description: Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation.
+  FAMILY_GROWTH_EVENTS_SERVICE_TOKEN:
+    type: string
+    required: false
+    secret: true
+    secret_ref: family_growth_events_service_token
+    description: Nurture-to-My-Chat bearer for family-growth event delivery (family_growth_transport@1.0.0); absent = delivery worker off.
+  FAMILY_GROWTH_RENDITION_SERVICE_TOKEN:
+    type: string
+    required: false
+    secret: true
+    secret_ref: family_growth_rendition_service_token
+    description: My-Chat-to-Nurture bearer validated by the rendition exchange (family_growth_transport@1.0.0); absent = endpoints refuse all requests.
+  FAMILY_GROWTH_RENDITION_SERVICE_TOKEN_PREVIOUS:
+    type: string
+    required: false
+    secret: true
+    secret_ref: family_growth_rendition_service_token_previous
+    description: Rotation window twin of FAMILY_GROWTH_RENDITION_SERVICE_TOKEN; cleared after rotation completes.
   MY_CHAT_INTERNAL_BASE_URL:
     type: url
     required: false

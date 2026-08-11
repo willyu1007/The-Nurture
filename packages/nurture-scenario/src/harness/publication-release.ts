@@ -17,7 +17,7 @@ import {
   type PublishProcessStateV1,
 } from "./publish-process.js";
 import type { ResolvedPublishScheduleV1 } from "./publish-schedule.js";
-import { randomUUID } from "node:crypto";
+import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import {
   familyGrowthEmissionRejectionReasonCode,
   type FamilyGrowthPreparedReleaseEmissionV1,
@@ -81,6 +81,15 @@ export type ReleaseDecisionV1 =
 export type ReleaseTargetFactsV1 = {
   target_key: string;
   child_care_process_id: string;
+  /** Current owner-produced display label. It never participates in authority. */
+  safe_label?: string;
+  /** Owner fact heads used only to bind the human review snapshot. */
+  target_version?: number;
+  child_care_process_version?: number;
+  family_label_version?: number;
+  child_label_version?: number;
+  enrollment_version?: number;
+  grant_version?: number;
   enrollment_active: boolean;
   grant_allows: boolean;
   data_class_allowed: boolean;
@@ -166,6 +175,176 @@ export type PublicationReleaseDependencies = {
    */
   family_growth?: FamilyGrowthReleaseEmissionPreparerV1;
   now?: () => Date;
+};
+
+export const RELEASE_TARGET_SNAPSHOT_TTL_MS = 5 * 60_000;
+export const RELEASE_TARGET_SNAPSHOT_KIND = "publish_target_snapshot";
+
+export type ReleaseTargetPresentationV1 = {
+  selectionMode: "fixed_process_targets";
+  processRef: string;
+  targetSnapshotRef: string;
+  snapshotVersion: string;
+  generatedAt: string;
+  expiresAt: string;
+  targets: Array<
+    | {
+        targetRef: string;
+        availability: "available" | "already_released";
+        displayLabel: string;
+        safeDisambiguation?: string;
+      }
+    | {
+        targetRef: string;
+        availability: "unavailable";
+        safeReasonCode: "target_unavailable";
+      }
+  >;
+};
+
+export type ReleaseTargetPresentationDecisionV1 =
+  | { status: "ready"; presentation: ReleaseTargetPresentationV1 }
+  | { status: "denied"; reason_code: string };
+
+const isSafeTargetLabel = (value: string | undefined): value is string =>
+  typeof value === "string" &&
+  value === value.trim() &&
+  value.length > 0 &&
+  value.length <= 80 &&
+  !hasControlCharacter(value);
+
+const hasControlCharacter = (value: string): boolean =>
+  [...value].some((character) => {
+    const codePoint = character.codePointAt(0);
+    return codePoint !== undefined && (codePoint <= 31 || codePoint === 127);
+  });
+
+/**
+ * Internal version of the exact human-reviewed target set. It is never sent
+ * directly: the presenter emits only actor-bound opaque refs derived from it.
+ */
+export const computeReleaseTargetSnapshotVersion = (
+  facts: ReleaseFactsV1,
+): string =>
+  createHash("sha256")
+    .update(
+      JSON.stringify({
+        process_state: facts.process_state,
+        current_revision: facts.current_revision,
+        frozen_revision: facts.frozen_revision ?? null,
+        media: [...facts.media]
+          .sort((left, right) =>
+            left.media_asset_id.localeCompare(right.media_asset_id),
+          )
+          .map((asset) => ({
+            media_asset_id: asset.media_asset_id,
+            media_revision: asset.media_revision,
+            current_media_revision: asset.current_media_revision,
+            lifecycle: asset.lifecycle,
+            visible_children: [...asset.visible_children]
+              .sort((left, right) =>
+                `${left.child_care_process_id ?? ""}:${left.attribution_status ?? ""}:${left.clearly_visible}`.localeCompare(
+                  `${right.child_care_process_id ?? ""}:${right.attribution_status ?? ""}:${right.clearly_visible}`,
+                ),
+              )
+              .map((child) => ({
+                child_care_process_id:
+                  child.child_care_process_id ?? null,
+                attribution_status: child.attribution_status ?? null,
+                clearly_visible: child.clearly_visible,
+              })),
+          })),
+        targets: [...facts.targets]
+          .sort((left, right) => left.target_key.localeCompare(right.target_key))
+          .map((target) => ({
+            target_key: target.target_key,
+            child_care_process_id: target.child_care_process_id,
+            safe_label: target.safe_label ?? null,
+            target_version: target.target_version ?? null,
+            child_care_process_version:
+              target.child_care_process_version ?? null,
+            family_label_version: target.family_label_version ?? null,
+            child_label_version: target.child_label_version ?? null,
+            enrollment_version: target.enrollment_version ?? null,
+            grant_version: target.grant_version ?? null,
+            enrollment_active: target.enrollment_active,
+            grant_allows: target.grant_allows,
+            data_class_allowed: target.data_class_allowed,
+            purpose_allowed: target.purpose_allowed,
+            exposure_allows_child_ids: [
+              ...target.exposure_allows_child_ids,
+            ].sort(),
+            already_committed: target.already_committed
+              ? {
+                  publication_ref: target.already_committed.publication_ref,
+                  receipt_ref: target.already_committed.receipt_ref,
+                }
+              : null,
+          })),
+      }),
+      "utf8",
+    )
+    .digest("hex");
+
+const releaseTargetSnapshotMac = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  snapshotVersion: string,
+  expiresAtMs: number,
+): string =>
+  createHmac("sha256", integrityKey)
+    .update(
+      `nurture.${RELEASE_TARGET_SNAPSHOT_KIND}.v1\0${scope.workspace_id}\0${scope.participant_id}\0${snapshotVersion}\0${expiresAtMs}`,
+      "utf8",
+    )
+    .digest("hex");
+
+export const issueReleaseTargetSnapshotRef = (input: {
+  integrity_key: string;
+  scope: BoardScopeV1;
+  snapshot_version: string;
+  now: Date;
+}): { ref: string; expires_at: string } => {
+  const expiresAtMs = input.now.getTime() + RELEASE_TARGET_SNAPSHOT_TTL_MS;
+  return {
+    ref: `1.${expiresAtMs}.${releaseTargetSnapshotMac(
+      input.integrity_key,
+      input.scope,
+      input.snapshot_version,
+      expiresAtMs,
+    )}`,
+    expires_at: new Date(expiresAtMs).toISOString(),
+  };
+};
+
+export const releaseTargetSnapshotRefMatches = (input: {
+  integrity_key: string;
+  scope: BoardScopeV1;
+  snapshot_version: string;
+  ref: string;
+  now: Date;
+}): boolean => {
+  const match = /^1\.(\d{13})\.([0-9a-f]{64})$/u.exec(input.ref);
+  if (!match) return false;
+  const expiresAtMs = Number(match[1]);
+  const providedMac = match[2];
+  if (
+    !Number.isSafeInteger(expiresAtMs) ||
+    expiresAtMs <= input.now.getTime() ||
+    !providedMac
+  ) {
+    return false;
+  }
+  const expectedMac = releaseTargetSnapshotMac(
+    input.integrity_key,
+    input.scope,
+    input.snapshot_version,
+    expiresAtMs,
+  );
+  return timingSafeEqual(
+    Buffer.from(providedMac, "hex"),
+    Buffer.from(expectedMac, "hex"),
+  );
 };
 
 const actorEligible = (authority: CaregiverFactAuthorityV1): boolean =>
@@ -255,6 +434,125 @@ const resolveReleaseAttemptContext = async (
 };
 
 /**
+ * Human-readable review of the fixed target set already owned by one
+ * PublishProcess. This is intentionally not a subset-selection command.
+ */
+export const presentReleaseTargets = async (
+  deps: PublicationReleaseDependencies,
+  scope: BoardScopeV1,
+  request: { process_ref: string },
+): Promise<ReleaseTargetPresentationDecisionV1> => {
+  const context = await resolveReleaseAttemptContext(deps, scope, {
+    process_ref: request.process_ref,
+    trigger: "immediate",
+  });
+  if ("denied" in context) {
+    return { status: "denied", reason_code: context.denied };
+  }
+
+  const eligibility = derivePublishEligibility(deps.integrity_key, scope, {
+    process_state: context.facts.process_state,
+    media: context.facts.media,
+    targets: context.facts.targets,
+  });
+  const eligibilityByRef = new Map(
+    eligibility.targets.map((target) => [target.targetRef, target]),
+  );
+  const orderedTargets = [...context.facts.targets].sort((left, right) =>
+    left.target_key.localeCompare(right.target_key),
+  );
+  const eligibleLabels = orderedTargets.flatMap((target) => {
+    const targetRef = issuePublishTargetRef(
+      deps.integrity_key,
+      scope,
+      target.target_key,
+    );
+    const derived = eligibilityByRef.get(targetRef);
+    return derived?.eligible && isSafeTargetLabel(target.safe_label)
+      ? [target.safe_label]
+      : [];
+  });
+  const labelCounts = new Map<string, number>();
+  for (const label of eligibleLabels) {
+    labelCounts.set(label, (labelCounts.get(label) ?? 0) + 1);
+  }
+  if (
+    orderedTargets.some((target) => {
+      const targetRef = issuePublishTargetRef(
+        deps.integrity_key,
+        scope,
+        target.target_key,
+      );
+      return (
+        eligibilityByRef.get(targetRef)?.eligible === true &&
+        !isSafeTargetLabel(target.safe_label)
+      );
+    })
+  ) {
+    return { status: "denied", reason_code: "target_label_unavailable" };
+  }
+
+  const snapshotVersion = computeReleaseTargetSnapshotVersion(context.facts);
+  const issued = issueReleaseTargetSnapshotRef({
+    integrity_key: deps.integrity_key,
+    scope,
+    snapshot_version: snapshotVersion,
+    now: context.now,
+  });
+  const duplicateOrdinals = new Map<string, number>();
+  const targets: ReleaseTargetPresentationV1["targets"] =
+    orderedTargets.map((target) => {
+      const targetRef = issuePublishTargetRef(
+        deps.integrity_key,
+        scope,
+        target.target_key,
+      );
+      const derived = eligibilityByRef.get(targetRef);
+      if (!derived?.eligible || !isSafeTargetLabel(target.safe_label)) {
+        return {
+          targetRef,
+          availability: "unavailable" as const,
+          safeReasonCode: "target_unavailable" as const,
+        };
+      }
+      const duplicated = (labelCounts.get(target.safe_label) ?? 0) > 1;
+      const duplicateOrdinal =
+        (duplicateOrdinals.get(target.safe_label) ?? 0) + 1;
+      if (duplicated) {
+        duplicateOrdinals.set(target.safe_label, duplicateOrdinal);
+      }
+      return {
+        targetRef,
+        availability: target.already_committed
+          ? ("already_released" as const)
+          : ("available" as const),
+        displayLabel: target.safe_label,
+        ...(duplicated
+          ? { safeDisambiguation: `同名目标 ${duplicateOrdinal}` }
+          : {}),
+      };
+    });
+
+  return {
+    status: "ready",
+    presentation: {
+      selectionMode: "fixed_process_targets",
+      processRef: request.process_ref,
+      targetSnapshotRef: issued.ref,
+      snapshotVersion: issueBoardOpaqueRef(
+        deps.integrity_key,
+        scope,
+        "publish_target_snapshot_version",
+        snapshotVersion,
+      ),
+      generatedAt: context.now.toISOString(),
+      expiresAt: issued.expires_at,
+      targets,
+    },
+  };
+};
+
+/**
  * Runs one release attempt over every target of a process.
  *
  * A `pending_release` process publishes its current saved revision; a process
@@ -275,6 +573,8 @@ export const releasePublishProcess = async (
      * teacher never confirmed.
      */
     expected_release_revision?: number;
+    /** Internal digest bound by the Q4 human target review. */
+    expected_target_snapshot_version?: string;
   },
 ): Promise<ReleaseDecisionV1> => {
   const context = await resolveReleaseAttemptContext(deps, scope, request);
@@ -283,6 +583,13 @@ export const releasePublishProcess = async (
   if (
     request.expected_release_revision !== undefined &&
     request.expected_release_revision !== releaseRevision
+  ) {
+    return { status: "denied", reason_code: "stale_confirmation" };
+  }
+  if (
+    request.expected_target_snapshot_version !== undefined &&
+    request.expected_target_snapshot_version !==
+      computeReleaseTargetSnapshotVersion(facts)
   ) {
     return { status: "denied", reason_code: "stale_confirmation" };
   }
@@ -451,6 +758,7 @@ export const derivePartialReleaseFollowUp = (
 export type ReleasePublishProcessCommandV1 = {
   process_key: string;
   expected_release_revision: number;
+  expected_target_snapshot_version?: string;
   trigger: ReleaseTriggerV1;
 };
 
@@ -459,6 +767,12 @@ export const canonicalizeReleasePublishProcessCommand = (
 ): unknown => ({
   process_key: input.process_key,
   expected_release_revision: input.expected_release_revision,
+  ...(input.expected_target_snapshot_version
+    ? {
+        expected_target_snapshot_version:
+          input.expected_target_snapshot_version,
+      }
+    : {}),
   trigger: input.trigger,
 });
 
@@ -490,6 +804,7 @@ export const prepareReleasePublishProcess = async (
     host_conversation_ref?: string;
     operation_input?: unknown;
     target_option_ref?: string;
+    target_snapshot_ref?: string;
   },
 ): Promise<ReleasePrepareDecision> => {
   // The frozen contract's input is empty; the target is the sealed process
@@ -513,10 +828,28 @@ export const prepareReleasePublishProcess = async (
     trigger: "immediate",
   });
   if ("denied" in context) return { status: "denied", reason_code: context.denied };
+  const targetSnapshotVersion = computeReleaseTargetSnapshotVersion(
+    context.facts,
+  );
+  if (
+    request.target_snapshot_ref !== undefined &&
+    !releaseTargetSnapshotRefMatches({
+      integrity_key: deps.integrity_key,
+      scope,
+      snapshot_version: targetSnapshotVersion,
+      ref: request.target_snapshot_ref,
+      now: context.now,
+    })
+  ) {
+    return { status: "needs_input", fields: ["target_snapshot"] };
+  }
 
   const command: ReleasePublishProcessCommandV1 = {
     process_key: context.processKey,
     expected_release_revision: context.releaseRevision,
+    ...(request.target_snapshot_ref
+      ? { expected_target_snapshot_version: targetSnapshotVersion }
+      : {}),
     trigger: "immediate",
   };
   const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
@@ -531,7 +864,12 @@ export const prepareReleasePublishProcess = async (
       capability_key: RELEASE_PUBLISH_PROCESS_CAPABILITY.key,
       capability_version: RELEASE_PUBLISH_PROCESS_CAPABILITY.version,
       command_request_id: commandRequestId,
-      target_refs: { publish_process: context.processKey },
+      target_refs: {
+        publish_process: context.processKey,
+        ...(request.target_snapshot_ref
+          ? { publish_target_snapshot: targetSnapshotVersion }
+          : {}),
+      },
       // The registry's `draft_revision must_equal` head: the revision the
       // teacher is releasing. Enforced by the attempt itself, which refuses
       // `stale_confirmation` when a save landed in between.

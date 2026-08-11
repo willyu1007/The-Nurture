@@ -1173,3 +1173,34 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   change occurred in this sync. E7 remains default-off until the exact Q3 pin
   exists; E8 remains the formal joint-conformance gate.
 - Detailed evidence: [`78`](./78-g4-e-q2-q3-owner-progress.md).
+
+## 2026-08-11 — teacher-release owner v3 migration and quality convergence
+
+- Squash-ported the net Q4/Q6 implementation from the two historical T-007
+  branches onto current main instead of merging their stale Surface `1.18`
+  history. The sole private interface is now
+  `nurture.teacher-release-owner@3.0.0` over current Surface `1.20.0`.
+- Added the owner-resolved query → targets → prepare → confirm composition to
+  Scenario Service behind `NURTURE_TEACHER_RELEASE_OWNER_ENABLED=false`.
+  Service auth and current owner resolution run before every operation; caller-
+  supplied Participant/role/scope and foreign response fields fail closed.
+- Fixed target review uses display-safe labels and an actor-bound five-minute
+  snapshot of the complete process set. Prepare binds the snapshot; confirm
+  rechecks the exact target/label/Grant/Enrollment/media/revision heads before
+  the first effect. No subset selector or alternate release command exists.
+- Deep review tightened canonical UTC milliseconds, ID/ref bounds, exact
+  recursive keys, queue maximum, result census and reason-specific recovery.
+  The private type no longer advertises unreachable `decision=invalid` or
+  `recovery=retry_same_command` values.
+- Corrected the DB owner tests to execute the real targets-before-prepare path,
+  removed formatting-only repository churn, moved Vitest source resolution to
+  one root-owned helper and deleted superseded Q4/Q6 evidence artifacts.
+- Repaired the environment-contract generator so booleans are emitted as
+  lowercase `true`/`false`, added regression fixtures and regenerated the
+  contract/example/context outputs. Existing family-growth runtime secrets that
+  were missing from the SSOT are now declared; no secret value was written.
+- My-Chat's strict consumer was rotated atomically to v3 and its maintained task
+  docs now distinguish private owner v3 from public Dashboard DTO v2. The exact
+  My-Chat Workflow/source revision was adopted, closing G-09 without activating
+  any traffic.
+- Detailed evidence: [`79`](./79-teacher-release-owner-v3-migration.md).

@@ -164,6 +164,8 @@ const inferIntent = (input: NurtureHostInvocationEnvelope): string => {
       return "open_class_family_inbox";
     case "teacher_attention_board":
       return "open_today_attention_board";
+    case "teacher_publish_queue":
+      return "query_teacher_publish_queue";
     default:
       return "continue_nurture_work";
   }
@@ -177,6 +179,13 @@ const inferDistribution = (
 };
 
 const bindingSupportsIntent = (binding: NurtureActorBinding, intentKey: string): boolean => {
+  if (intentKey === "query_teacher_publish_queue") {
+    return (
+      ["caregiver", "lead_caregiver"].includes(binding.role_kind) &&
+      binding.scope_type === "care_group" &&
+      binding.work_scope.kind === "care_group"
+    );
+  }
   if (intentKey === "open_class_family_inbox" || intentKey === "open_today_attention_board") {
     return (
       ["caregiver", "lead_caregiver", "institution_admin"].includes(binding.role_kind) &&

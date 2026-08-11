@@ -166,23 +166,22 @@ status and zero datasource drift on the exact approved disposable target. The
 target was destroyed and confirmed absent with zero sessions; no shared or
 persistent database received either migration ([`73`](./73-g4-e-i1-audit-qualification-record.md)).
 
-### G-09 — The My-Chat pin needs an adoption decision
+### G-09 — Closed: exact My-Chat workflow/source adoption
 
-`verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
-`567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. The lock rerun observed `66720cd` with no
-`packages/workflow-contracts` diff from the pin; C30's independent
-upstream lock still expects `51ad97f`
-([`46`](./46-g4-b-increment-12-record.md), [`48`](./48-g4-c-increment-2-record.md)).
-Neither external head is treated as a Nurture pin.
+The authorized teacher-release migration qualified and adopted My-Chat
+revision `6d909bc`, retaining byte-identical Base/My-Chat Workflow contracts
+and rotating the exact `x5_joint_api`/binding-host source hashes. The Nurture
+self-pin also covers the current provider/runtime population. Exact pin, G2
+contract and owner-boundary checks are green.
 
-Advancing the pin is an **adoption** of another task's work, not a refresh, and
-it needs whoever owns that work to qualify it. Until then this gate stays red
-for a stated reason rather than being made green by copying a hash.
+This closes only the stale cross-repository adoption gate. It does not create
+G4-D prospective-contact/native-message/formalization adapters, G4-E safety
+provider binding, formal ingress, deployment, activation or traffic.
 
-Cited by: [`40`](./40-g4-b-increment-7-record.md),
-[`42`](./42-g4-b-increment-8-record.md),
-[`44`](./44-g4-b-increment-10-record.md).
+Cited by: [`79`](./79-teacher-release-owner-v3-migration.md). Earlier red-pin
+observations in [`40`](./40-g4-b-increment-7-record.md),
+[`42`](./42-g4-b-increment-8-record.md) and
+[`44`](./44-g4-b-increment-10-record.md) remain historical evidence.
 
 ### G-10 — Enrollment Journey I2-A/I2-B are complete; I3–I4 remain
 
@@ -224,17 +223,17 @@ unavailable.
 
 Real prospective-contact and native business-message source adapters remain I3
 gates. The authenticated My-Chat formalization evidence adapter and formal
-scenario-service ingress are also I3 gates and remain blocked by G-09. The
+scenario-service ingress are also unimplemented I3 gates. G-09 is closed; the
 module's two adapter keys fail closed by default and the manifest marks their
 chat/mobile/Web composition disabled. No Host bridge, real owner binding,
 database operation, activation or traffic exists; `workflowRunRef` accepts only
 the exact My-Chat-owned canonical ref, and the private workflow ref is never
 projected.
 
-The revision-bearing local C30 adoption lock is current at quality-repair
-revision `1a79e13`, aggregate source hash `ef33c0bd…`; the Nurture exact-runtime
-pin is `25b7ad2f…` over 250 files. This closes the local commit-boundary
-maintenance step without adopting the divergent My-Chat head.
+The revision-bearing local C30 adoption lock remains historical G4-D evidence.
+The current cross-repository Workflow/source population is adopted separately
+by [`79`](./79-teacher-release-owner-v3-migration.md); neither pin substitutes
+for the missing G4-D I3 owner implementations.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
@@ -313,7 +312,7 @@ model-self-rating compatibility mappings cannot close that gate.
 3. **G4-E E8** — run joint cited-positive, no-source, medical-conflict,
    post-generation currentness, provider-outage, drift and replay conformance,
    then issue the G4-E Exit record without activating traffic.
-4. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
+4. **G4-D I3** — bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the
    default-off runtime gate while qualifying on an approved disposable DB.
@@ -325,5 +324,5 @@ actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09 is a cross-repository adoption decision, not a hash refresh inside T-007.
-It blocks G4-D I3/I4 but does not block the independent 0F freeze.
+G-09 is closed. G4-D I3/I4 now wait on their concrete owner-adapter and formal-
+ingress implementation, not on a stale external revision pin.

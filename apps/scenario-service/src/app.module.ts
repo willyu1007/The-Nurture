@@ -20,6 +20,12 @@ import {
   FamilyGrowthRenditionController,
 } from "./family-growth-rendition.controller.js";
 import type { FamilyGrowthRenditionRuntime } from "./family-growth-runtime.js";
+import {
+  TEACHER_RELEASE_OWNER_CONFIG,
+  TeacherReleaseOwnerController,
+  type TeacherReleaseOwnerConfig,
+  TeacherReleaseOwnerServiceAuthGuard,
+} from "./teacher-release-owner.controller.js";
 
 @Module({
   controllers: [
@@ -27,6 +33,7 @@ import type { FamilyGrowthRenditionRuntime } from "./family-growth-runtime.js";
     BindingOwnerController,
     HarnessController,
     FamilyGrowthRenditionController,
+    TeacherReleaseOwnerController,
   ],
 })
 export class AppModule {
@@ -34,6 +41,7 @@ export class AppModule {
     bindingOwner: BindingOwnerGuardConfig;
     harness: HarnessGuardConfig;
     familyGrowthRendition: FamilyGrowthRenditionRuntime;
+    teacherReleaseOwner: TeacherReleaseOwnerConfig;
   }): DynamicModule {
     return {
       module: AppModule,
@@ -61,6 +69,11 @@ export class AppModule {
           useValue: input.harness.runtime,
         },
         HarnessServiceAuthGuard,
+        {
+          provide: TEACHER_RELEASE_OWNER_CONFIG,
+          useValue: Object.freeze({ ...input.teacherReleaseOwner }),
+        },
+        TeacherReleaseOwnerServiceAuthGuard,
       ],
     };
   }
