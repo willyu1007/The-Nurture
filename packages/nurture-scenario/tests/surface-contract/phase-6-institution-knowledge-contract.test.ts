@@ -224,14 +224,19 @@ describe("G4-E I2-A institution knowledge wire contract", () => {
     }
   });
 
-  it("admits only the E6 disabled internal composition and no formal caller", () => {
+  it("admits only the disabled trusted composition and no public route", () => {
     expect(
       Object.keys(nurtureScenarioModule.internal_api_handlers).filter((key) =>
         key.includes("institution_knowledge"),
       ),
+    ).toEqual([]);
+    expect(
+      Object.keys(nurtureScenarioModule.trusted_invocation_handlers).filter((key) =>
+        key.includes("institution_knowledge"),
+      ),
     ).toEqual([
-      "nurture.internal.query_institution_knowledge",
-      "nurture.internal.execute_institution_knowledge",
+      "nurture.institution_knowledge.query.v1",
+      "nurture.institution_knowledge.execute.v1",
     ]);
     expect(
       nurtureScenarioManifest.surface_mapping.web_run_workbench.institution_knowledge,

@@ -22,10 +22,7 @@ import {
   defaultNurtureEnrollmentJourneySurfaceDeps,
   type NurtureEnrollmentJourneySurfaceDeps,
 } from "./enrollment-journey-surfaces.js";
-import {
-  createNurtureInstitutionKnowledgeInternalApiHandlers,
-  defaultNurtureInstitutionKnowledgeSurfaceDeps,
-} from "./institution-knowledge-surfaces.js";
+import { defaultNurtureInstitutionKnowledgeSurfaceDeps } from "./institution-knowledge-surfaces.js";
 import {
   admitNurtureInstitutionKnowledgeOwnerIntegration,
   type NurtureInstitutionKnowledgeOwnerIntegration,
@@ -34,6 +31,11 @@ import {
   createNurtureC30TrustedInvocationHandlers,
   type NurtureC30TrustedInvocationOwner,
 } from "./c30/trusted-handler-registry.js";
+import {
+  createNurtureInstitutionKnowledgeTrustedInvocationHandlers,
+  type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactory,
+  type NurtureInstitutionKnowledgeParticipantResolver,
+} from "./institution-knowledge-trusted-ingress.js";
 
 /**
  * Canonical default-off production module. The manifest contains no activation
@@ -46,15 +48,17 @@ export const nurtureScenarioModule: WorkflowScenarioModule = {
   adapters: nurtureAdapters,
   presenters: nurturePresenters,
   policies: nurturePolicies,
-  trusted_invocation_handlers: createNurtureC30TrustedInvocationHandlers(),
+  trusted_invocation_handlers: {
+    ...createNurtureC30TrustedInvocationHandlers(),
+    ...createNurtureInstitutionKnowledgeTrustedInvocationHandlers({
+      surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+    }),
+  },
   internal_api_handlers: {
     ...nurtureInternalApiHandlers,
     ...createInstitutionInternalApiHandlers(defaultNurtureDeps),
     ...createNurtureEnrollmentJourneyInternalApiHandlers(
       defaultNurtureEnrollmentJourneySurfaceDeps,
-    ),
-    ...createNurtureInstitutionKnowledgeInternalApiHandlers(
-      defaultNurtureInstitutionKnowledgeSurfaceDeps,
     ),
   },
 };
@@ -67,6 +71,8 @@ export type NurtureScenarioModuleDeps = {
   enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
   /** G4-E E7 admits owner deps only behind the exact Q2/Q3 pin tuple. */
   institutionKnowledgeOwnerIntegration?: NurtureInstitutionKnowledgeOwnerIntegration;
+  institutionKnowledgeParticipantResolver?: NurtureInstitutionKnowledgeParticipantResolver;
+  institutionKnowledgeAuthorizedRetrievalOwnerFactory?: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactory;
   /** Exact C30 owner; omitted production composition remains fail-closed. */
   c30SubjectPresentationOwner?: NurtureC30TrustedInvocationOwner;
 };
@@ -77,30 +83,32 @@ export type NurtureScenarioModuleDeps = {
  */
 export const createNurtureScenarioModule = (
   deps: NurtureScenarioModuleDeps,
-): WorkflowScenarioModule => ({
-  manifest: nurtureScenarioManifest,
-  handlers: createNurtureHandlers(deps.handlerDeps),
-  actions: nurtureActions,
-  adapters: { ...nurtureAdapters, worker_runtime: deps.workerRuntime },
-  presenters: createNurturePresenters(
-    nurtureScenarioManifest,
-    deps.presenterDeps,
-  ),
-  policies: createNurturePolicies(deps.handlerDeps),
-  trusted_invocation_handlers: createNurtureC30TrustedInvocationHandlers(
-    deps.c30SubjectPresentationOwner,
-  ),
-  internal_api_handlers: {
-    ...nurtureInternalApiHandlers,
-    ...createInstitutionInternalApiHandlers(deps.handlerDeps),
-    ...createNurtureEnrollmentJourneyInternalApiHandlers(
-      deps.enrollmentJourneySurfaceDeps ??
-        defaultNurtureEnrollmentJourneySurfaceDeps,
-    ),
-    ...createNurtureInstitutionKnowledgeInternalApiHandlers(
-      admitNurtureInstitutionKnowledgeOwnerIntegration(
-        deps.institutionKnowledgeOwnerIntegration,
+): WorkflowScenarioModule => {
+  const surfaceDeps = admitNurtureInstitutionKnowledgeOwnerIntegration(
+    deps.institutionKnowledgeOwnerIntegration,
+  );
+  return {
+    manifest: nurtureScenarioManifest,
+    handlers: createNurtureHandlers(deps.handlerDeps),
+    actions: nurtureActions,
+    adapters: { ...nurtureAdapters, worker_runtime: deps.workerRuntime },
+    presenters: createNurturePresenters(nurtureScenarioManifest, deps.presenterDeps),
+    policies: createNurturePolicies(deps.handlerDeps),
+    trusted_invocation_handlers: {
+      ...createNurtureC30TrustedInvocationHandlers(deps.c30SubjectPresentationOwner),
+      ...createNurtureInstitutionKnowledgeTrustedInvocationHandlers({
+        surfaceDeps,
+        participantResolver: deps.institutionKnowledgeParticipantResolver,
+        authorizedRetrievalOwnerFactory:
+          deps.institutionKnowledgeAuthorizedRetrievalOwnerFactory,
+      }),
+    },
+    internal_api_handlers: {
+      ...nurtureInternalApiHandlers,
+      ...createInstitutionInternalApiHandlers(deps.handlerDeps),
+      ...createNurtureEnrollmentJourneyInternalApiHandlers(
+        deps.enrollmentJourneySurfaceDeps ?? defaultNurtureEnrollmentJourneySurfaceDeps,
       ),
-    ),
-  },
-});
+    },
+  };
+};
