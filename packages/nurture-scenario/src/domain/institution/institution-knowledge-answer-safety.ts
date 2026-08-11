@@ -21,7 +21,7 @@ import {
 
 export const INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_CONTRACT = {
   key: "nurture.institution-knowledge-answer-safety",
-  version: "1.0.0",
+  version: "2.0.0",
 } as const;
 
 export const INSTITUTION_KNOWLEDGE_CLAIM_KINDS = [
@@ -106,7 +106,31 @@ export type InstitutionKnowledgeGenerationDraftV1 = {
   claims: InstitutionKnowledgeGenerationClaimDraftV1[];
 };
 
-export type InstitutionKnowledgeAnswerSafetyOwnerPortV1 = {
+export const INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_SERVICE_PIN_V2 = Object.freeze({
+  gateway_id: "my-chat-llm-gateway",
+  gateway_version: "1.0.0",
+  provider_id: "aliyun-bailian",
+  provider_api_version: "dashscope-compatible-api-v1",
+  model_id: "qwen-plus-2025-12-01",
+  model_version: "2025-12-01",
+  deployment_id: "aliyun-bailian-cn-qwen-plus-2025-12-01",
+  prompt_template_id: "nurture-institution-knowledge-safety",
+  prompt_version: "1",
+  owner_contract_key: "my-chat.nurture-institution-knowledge-answer-safety-owner",
+  owner_contract_version: "2.0.0",
+  answer_safety_contract_key: "nurture.institution-knowledge-answer-safety",
+  answer_safety_contract_version: "2.0.0",
+} as const);
+
+export const INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_DECISION_RULE_PIN_V2 =
+  Object.freeze({
+    answer_policy_version: "1.0.0",
+    rule_set_ref: "nurture-institution-answer-safety-service",
+    rule_version: "1.0.0",
+  } as const);
+
+export type InstitutionKnowledgeAnswerSafetyOwnerPortV2 = {
+  readonly service_pin: typeof INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_SERVICE_PIN_V2;
   evaluateRequestAndSources(input: {
     rule_set_ref: string;
     rule_version: string;
@@ -680,7 +704,7 @@ export const answerInstitutionKnowledgeV1 = async (input: {
   final_nurture_currentness: NurtureInstitutionKnowledgeSourceCurrentnessProviderV1;
   final_authority_currentness: InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1;
   admin_authority: NurtureInstitutionAdminKnowledgeAuthorityV1;
-  safety_owner: InstitutionKnowledgeAnswerSafetyOwnerPortV1;
+  safety_owner: InstitutionKnowledgeAnswerSafetyOwnerPortV2;
   generation_owner: InstitutionKnowledgeGenerationOwnerPortV1;
   conflict_recorder: InstitutionKnowledgeConflictCandidateRecorderV1;
 }): Promise<InstitutionKnowledgeAnswerOperationResultV1> => {

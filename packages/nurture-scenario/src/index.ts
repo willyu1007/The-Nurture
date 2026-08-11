@@ -3,6 +3,12 @@ export {
   createNurtureScenarioModule,
   type NurtureScenarioModuleDeps,
 } from "./module.js";
+export {
+  admitNurtureInstitutionKnowledgeOwnerIntegration,
+  NURTURE_INSTITUTION_KNOWLEDGE_MY_CHAT_Q2_OWNER_PIN,
+  NURTURE_INSTITUTION_KNOWLEDGE_Q3_ADAPTER_QUALIFICATION_PIN,
+  type NurtureInstitutionKnowledgeOwnerIntegration,
+} from "./institution-knowledge-owner-integration.js";
 export { nurtureScenarioManifest } from "./registry.js";
 export { nurtureActions } from "./actions/shared-actions.js";
 export { nurtureAdapters } from "./adapters/chat-workflow.adapter.js";

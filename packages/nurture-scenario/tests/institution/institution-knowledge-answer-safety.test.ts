@@ -1,13 +1,14 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import {
+  INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_SERVICE_PIN_V2,
   NurtureCommandRunner,
   answerInstitutionKnowledgeV1,
   createInMemoryNurtureCommandRepository,
   createInstitutionKnowledgeConflictCandidateRecorder,
   createInstitutionKnowledgePortableAnswer,
   institutionKnowledgeConflictCandidateIdentityHash,
-  type InstitutionKnowledgeAnswerSafetyOwnerPortV1,
+  type InstitutionKnowledgeAnswerSafetyOwnerPortV2,
   type InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1,
   type InstitutionKnowledgeConflictCandidateRecorderV1,
   type InstitutionKnowledgeGenerationOwnerPortV1,
@@ -131,7 +132,8 @@ const finalAuthorityCurrentness = (
 
 const clearSafety = (
   requestStatus: "general_clear" | "medical_clear" = "general_clear",
-): InstitutionKnowledgeAnswerSafetyOwnerPortV1 => ({
+): InstitutionKnowledgeAnswerSafetyOwnerPortV2 => ({
+  service_pin: INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_SERVICE_PIN_V2,
   evaluateRequestAndSources: vi.fn(async () => ({
     status: requestStatus,
     rule_set_ref: "answer-safety-rules",
@@ -262,14 +264,14 @@ describe("G4-E answer safety orchestration", () => {
       conflict_recorder: noSourceRecorder,
     }))).resolves.toEqual({
       status: "resolved",
-      result: { status: "abstained_no_source", contract_version: "1.0.0" },
+      result: { status: "abstained_no_source", contract_version: "2.0.0" },
     });
     expect(noSourceGeneration.generate).not.toHaveBeenCalled();
     expect(noSourceRecorder.record).not.toHaveBeenCalled();
 
     const unsafeGeneration = generation();
     const unsafeRecorder = recorder();
-    const unsafeSafety: InstitutionKnowledgeAnswerSafetyOwnerPortV1 = {
+    const unsafeSafety: InstitutionKnowledgeAnswerSafetyOwnerPortV2 = {
       ...clearSafety(),
       evaluateRequestAndSources: vi.fn(async () => ({
         status: "unsafe_request" as const,
@@ -303,7 +305,7 @@ describe("G4-E answer safety orchestration", () => {
       final_nurture_currentness: nurtureCurrentness("denied"),
     }))).resolves.toEqual({
       status: "resolved",
-      result: { status: "abstained_source_changed", contract_version: "1.0.0" },
+      result: { status: "abstained_source_changed", contract_version: "2.0.0" },
     });
 
     await expect(answerInstitutionKnowledgeV1(dependencies([authorityCandidate()], {
@@ -311,13 +313,13 @@ describe("G4-E answer safety orchestration", () => {
       final_authority_currentness: finalAuthorityCurrentness("denied"),
     }))).resolves.toEqual({
       status: "resolved",
-      result: { status: "abstained_source_changed", contract_version: "1.0.0" },
+      result: { status: "abstained_source_changed", contract_version: "2.0.0" },
     });
   });
 
   it("routes an unsafe draft to fixed notices without exposing draft text or writing a candidate", async () => {
     const conflictRecorder = recorder();
-    const safety: InstitutionKnowledgeAnswerSafetyOwnerPortV1 = {
+    const safety: InstitutionKnowledgeAnswerSafetyOwnerPortV2 = {
       ...clearSafety(),
       validateDraft: vi.fn(async () => ({
         status: "unsafe" as const,
@@ -335,7 +337,7 @@ describe("G4-E answer safety orchestration", () => {
       status: "resolved",
       result: {
         status: "abstained_safety",
-        contract_version: "1.0.0",
+        contract_version: "2.0.0",
         reason_codes: ["prescriptive_medication_or_dose"],
         safety_notice: {
           reason_keys: ["not_a_prescription", "seek_qualified_medical_help"],
@@ -358,7 +360,7 @@ describe("G4-E answer safety orchestration", () => {
         decision_fingerprint: DECISION_HASH,
         model_self_rating: "safe",
       })),
-    } satisfies InstitutionKnowledgeAnswerSafetyOwnerPortV1;
+    } satisfies InstitutionKnowledgeAnswerSafetyOwnerPortV2;
     await expect(answerInstitutionKnowledgeV1(dependencies([nurtureCandidate()], {
       safety_owner: malformed,
     }))).resolves.toEqual({ status: "unavailable" });
@@ -367,7 +369,7 @@ describe("G4-E answer safety orchestration", () => {
   it("finally revalidates conflict evidence and records one immutable candidate per finding", async () => {
     const candidates = [nurtureCandidate(), authorityCandidate()];
     const conflictRecorder = recorder();
-    const conflictSafety: InstitutionKnowledgeAnswerSafetyOwnerPortV1 = {
+    const conflictSafety: InstitutionKnowledgeAnswerSafetyOwnerPortV2 = {
       ...clearSafety(),
       evaluateRequestAndSources: vi.fn(async () => ({
         status: "material_source_conflict" as const,
@@ -410,7 +412,7 @@ describe("G4-E answer safety orchestration", () => {
 
   it("never reports an unrecorded conflict candidate", async () => {
     const candidates = [nurtureCandidate(), authorityCandidate()];
-    const safety: InstitutionKnowledgeAnswerSafetyOwnerPortV1 = {
+    const safety: InstitutionKnowledgeAnswerSafetyOwnerPortV2 = {
       ...clearSafety(),
       evaluateRequestAndSources: vi.fn(async () => ({
         status: "material_source_conflict" as const,

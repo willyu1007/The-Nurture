@@ -25,8 +25,11 @@ import {
 import {
   createNurtureInstitutionKnowledgeInternalApiHandlers,
   defaultNurtureInstitutionKnowledgeSurfaceDeps,
-  type NurtureInstitutionKnowledgeSurfaceDeps,
 } from "./institution-knowledge-surfaces.js";
+import {
+  admitNurtureInstitutionKnowledgeOwnerIntegration,
+  type NurtureInstitutionKnowledgeOwnerIntegration,
+} from "./institution-knowledge-owner-integration.js";
 
 /**
  * Canonical default-off production module. The manifest contains no activation
@@ -57,8 +60,8 @@ export type NurtureScenarioModuleDeps = {
   workerRuntime: WorkflowRuntimePort;
   /** I2-B is fail-closed unless an explicit synthetic or future I3 owner set is supplied. */
   enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
-  /** G4-E I2-B uses the same fail-closed composition boundary. */
-  institutionKnowledgeSurfaceDeps?: NurtureInstitutionKnowledgeSurfaceDeps;
+  /** G4-E E7 admits owner deps only behind the exact Q2/Q3 pin tuple. */
+  institutionKnowledgeOwnerIntegration?: NurtureInstitutionKnowledgeOwnerIntegration;
 };
 
 /**
@@ -85,8 +88,9 @@ export const createNurtureScenarioModule = (
         defaultNurtureEnrollmentJourneySurfaceDeps,
     ),
     ...createNurtureInstitutionKnowledgeInternalApiHandlers(
-      deps.institutionKnowledgeSurfaceDeps ??
-        defaultNurtureInstitutionKnowledgeSurfaceDeps,
+      admitNurtureInstitutionKnowledgeOwnerIntegration(
+        deps.institutionKnowledgeOwnerIntegration,
+      ),
     ),
   },
 });

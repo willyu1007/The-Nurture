@@ -358,7 +358,7 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
       status: "ok",
       result: {
         status: "abstained_no_source",
-        contractVersion: "1.0.0",
+        contractVersion: "2.0.0",
       },
     });
   });
@@ -366,7 +366,7 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
   it("presents cited answers without leaking private item or revision refs", () => {
     const presented = presentInstitutionKnowledgeAnswer({
       status: "answered",
-      contract_version: "1.0.0",
+      contract_version: "2.0.0",
       generation_ref: "generation-01",
       generated_at: now,
       assistance_kind: "ai_generated_with_retrieved_sources",

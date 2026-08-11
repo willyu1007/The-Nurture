@@ -1,9 +1,10 @@
 import type { WorkflowCommandMeta } from "@my-chat/workflow-contracts";
 import type { NurtureCommandSpec } from "./domain/commands/command-kernel.js";
 import {
+  INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_SERVICE_PIN_V2,
   answerInstitutionKnowledgeV1,
   type InstitutionKnowledgeAnswerResultV1,
-  type InstitutionKnowledgeAnswerSafetyOwnerPortV1,
+  type InstitutionKnowledgeAnswerSafetyOwnerPortV2,
   type InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1,
   type InstitutionKnowledgeCitationV1,
   type InstitutionKnowledgeGenerationOwnerPortV1,
@@ -196,7 +197,7 @@ export type NurtureInstitutionKnowledgeSurfaceDeps = {
   nurtureCurrentness: NurtureInstitutionKnowledgeSourceCurrentnessProviderV1;
   authorityCurrentness: NurtureAuthorityKnowledgeSourceCurrentnessProviderV1;
   finalAuthorityCurrentness: InstitutionKnowledgeAuthorityCitationCurrentnessOwnerPortV1;
-  safetyOwner: InstitutionKnowledgeAnswerSafetyOwnerPortV1;
+  safetyOwner: InstitutionKnowledgeAnswerSafetyOwnerPortV2;
   generationOwner: InstitutionKnowledgeGenerationOwnerPortV1;
   conflictCandidates: InstitutionKnowledgeConflictCandidateRecorderV1;
   optionIssuer: NurtureInstitutionKnowledgeOptionIssuer;
@@ -583,6 +584,7 @@ export const defaultNurtureInstitutionKnowledgeSurfaceDeps: NurtureInstitutionKn
       validateSources: async () => ({ status: "unavailable" as const }),
     }),
     safetyOwner: Object.freeze({
+      service_pin: INSTITUTION_KNOWLEDGE_ANSWER_SAFETY_SERVICE_PIN_V2,
       evaluateRequestAndSources: async () => ({ status: "unavailable" as const }),
       validateDraft: async () => ({ status: "unavailable" as const }),
     }),

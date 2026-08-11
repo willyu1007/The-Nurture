@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "qualificationContract": {
+    "key": "nurture.institution-knowledge-answer-safety-provider-qualification",
+    "version": "2.1.0"
+  },
+  "answerSafetyContract": {
+    "key": "nurture.institution-knowledge-answer-safety",
+    "version": "2.0.0"
+  },
+  "providerClass": "my_chat_gateway_structured_safety_service",
+  "ownership": {
+    "decisionSemanticsAndFixtures": "the_nurture",
+    "gatewayServiceAndCanonicalDecisionLedger": "my_chat",
+    "generationModel": "my_chat_llm_gateway"
+  },
+  "requiredServicePins": [
+    "gateway_id",
+    "gateway_version",
+    "provider_id",
+    "provider_api_version",
+    "model_id",
+    "model_version",
+    "deployment_id",
+    "prompt_template_id",
+    "prompt_version",
+    "owner_contract_key",
+    "owner_contract_version",
+    "answer_safety_contract_key",
+    "answer_safety_contract_version"
+  ],
+  "decisionContract": {
+    "requestStatuses": [
+      "general_clear",
+      "medical_clear",
+      "unsafe_request",
+      "material_source_conflict",
+      "unavailable"
+    ],
+    "draftStatuses": [
+      "safe",
+      "unsafe",
+      "unavailable"
+    ],
+    "reasonCodes": [
+      "child_specific_or_private_fact",
+      "person_specific_diagnosis",
+      "prescriptive_medication_or_dose",
+      "emergency_replacement",
+      "unsupported_deterministic_step"
+    ],
+    "conflictClasses": [
+      "contradictory_action",
+      "contradictory_sequence",
+      "contradictory_escalation",
+      "contraindication_conflict"
+    ]
+  },
+  "regression": {
+    "canonicalInputEncoding": "utf8_sorted_object_keys_semantic_array_order_v1",
+    "minimumInvocationAttempts": 2,
+    "responseMode": "strict_structured_json",
+    "sameExpectedOutcomeRequired": true,
+    "bitwiseDeterminism": "not_claimed",
+    "movingServiceAlias": "forbidden",
+    "requestDigestAlgorithm": "sha256_canonical_gateway_service_fixture_v1",
+    "responseDigestAlgorithm": "sha256_canonical_structured_decision_v1",
+    "independentInvocationIdsRequired": true,
+    "qualificationEffect": "service_backed_regression_qualification"
+  },
+  "qualificationEffects": {
+    "currentVerifierMaximum": "adapter_qualified",
+    "adapterQualified": "closes_q3_implementation_gate_allows_e7_e8_default_off",
+    "liveQualified": "requires_verified_my_chat_gateway_service_calls",
+    "requiredLiveCallFields": [
+      "provider_request_id",
+      "requested_model_id",
+      "resolved_model_id",
+      "requested_deployment_id",
+      "resolved_deployment_id",
+      "request_digest",
+      "response_digest"
+    ],
+    "capabilityPosture": "default_off"
+  },
+  "forbiddenSubstitutes": [
+    "moving_latest_alias",
+    "incomplete_fixture_regression",
+    "malformed_structured_decision",
+    "success_on_service_unavailable"
+  ],
+  "admission": {
+    "mode": "exact_service_prompt_fixture_regression",
+    "partialFixturePass": "forbidden",
+    "fallbackProvider": "forbidden",
+    "defaultOn": "forbidden"
+  }
+}
