@@ -121,3 +121,4 @@ Project: `main`
 - 2026-08-13 task_id=T-008 event=authorization id=G5-0 result=separately-authorized scope=readiness-inventory-and-beta-profile sequence=after-T-011-W1-W2 c31=deferred-until-after-g5-a activation=unchanged
 - 2026-08-13 task_id=T-010 slug=nurture-family-sharing-eligibility event=status from=in-progress to=archived
 - 2026-08-13 task_id=T-011 slug=nurture-cross-repo-contract-supply event=registered dev_docs_path=dev-docs/active/nurture-cross-repo-contract-supply
+- 2026-08-13 task_id=T-002 event=pin-reseal id=C30 result=revision-only-reseal my_chat=1db3f03 content_hashes=unchanged drift_paths=ci-and-dev-docs-only activation=unchanged
