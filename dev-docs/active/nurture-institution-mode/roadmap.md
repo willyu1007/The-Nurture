@@ -12,10 +12,10 @@ My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、st
 
 | Track | State | Next gate |
 | --- | --- | --- |
-| T-002 C30 current pins | `C30_CURRENT_PIN_REQUAL_PASS`, default-off; Base `536638a`, My-Chat `ae33b313`, Nurture pin source `bb0f1a8`, record 26 | Preserve exact source/schema/default-off locks; no activation. |
-| T-007 / My-Chat T-041 settlement | I4-A settlement, Prisma owners/Admin matrix and first real Host-carrier signed positive qualified; complete x5 37/37 | Continue native-source, command-family, Guardian/mobile and complete negative/replay/head coverage. |
+| T-002 C30 current pins | `C30_CURRENT_PIN_REQUAL_PASS`, default-off; Base `536638a`, My-Chat `2d415ce`, Nurture pin source `de4897f`, record 26 | Preserve exact source/schema/default-off locks; no activation. |
+| T-007 / My-Chat T-041 settlement | `G4_D_I4_EXIT_PASS_DEFAULT_OFF`; production native source, Guardian/mobile/formalization/replay and complete x5 37/37 qualified | Execute G4-F integration/handoff census only. |
 | T-010 family sharing | `I4_C4_EXIT_PASS_DEFAULT_OFF`; 12/12 guarded production-shape, 5/5 joint cleanup | Governance handoff/closure only; durable apply is separate. |
-| T-007 G4-F | Closed | Opens only after the complete G4-D I4 matrix passes. |
+| T-007 G4-F | Open for final join | Issue only after integration/privacy/default-off/governance and cleanup censuses pass. |
 
 The two qualification containers have been destroyed. C31-C35, T-008
 Candidate Freeze, deployment, capability activation, Pilot and external

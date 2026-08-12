@@ -13,8 +13,9 @@
   response-loss, unknown and writer-fence matrix. T-010 passes 39/39 fresh
   migrations, 12/12 production-shape cases, zero synthetic residue and 5/5
   joint grant/withdrawal/cleanup cases. C30 Step 5 passes at Base `536638a`,
-  My-Chat `ae33b313` and the current Nurture source locks. The real Host-carrier
-  signed positive path raises x5 to 37/37; its current C30 reseal is
+  My-Chat `2d415ce` and the current Nurture source locks. The complete
+  Guardian/mobile/native-source I4 path keeps x5 at 37/37 for three consecutive
+  runs; its current C30 reseal is
   [`26-c30-signed-owner-carrier-pin-addendum.md`](./26-c30-signed-owner-carrier-pin-addendum.md),
   preserving records 24–25 as underlying carrier/policy evidence.
   The current disposable containers were destroyed after qualification; ports
@@ -24,10 +25,8 @@
   binding was invalidated; record 26 is authoritative for the current Nurture
   source pin and preserves records 22–25 as underlying qualification evidence.
   All capabilities remain default-off and no durable environment was touched.
-- Next step: continue the native-source, remaining command-family,
-  Guardian/mobile and complete negative/replay/head matrix from the qualified
-  real Host-carrier signed positive path. Only the complete I4 matrix may open
-  G4-F. T-010 is ready for governance handoff/closure, while My-Chat T-039
+- Next step: T-007 may execute G4-F now that G4-D I4 and the exact C30 source
+  reseal pass. T-010 is ready for governance handoff/closure, while My-Chat T-039
   continues device-independent local-ready work without treating fixtures as
   Live evidence. C31-C35, T-008 Candidate Freeze, durable environment apply,
   deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
@@ -92,11 +91,11 @@
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: T-002 current-pin qualification binds Base `536638a`, My-Chat
-  `ae33b313` and Nurture lock source `bb0f1a8` at owner aggregate
-  `bcbe6b33…`.
+  `2d415ce` and Nurture lock source `de4897f` at owner aggregate
+  `856cd6c6…`.
   [`26-c30-signed-owner-carrier-pin-addendum.md`](./26-c30-signed-owner-carrier-pin-addendum.md)
   is the current evidence. G1 remains historical prerequisite evidence; every
-  consumer remains default-disabled. C31, G4-F, D implementation, Pilot-0-E,
+  consumer remains default-disabled. C31, D implementation, Pilot-0-E,
   Pilot-1, persistent database apply, artifact publication, capability
   activation and external traffic remain separately unauthorized.
 - C30-I0 exact topology: Base `20c4b7a…` (immutable joint-pin verifier repair),

@@ -7,19 +7,24 @@
 
 ## Next concrete actions
 
-1. Continue native-source, remaining command-family, Guardian/mobile and the
-   complete negative/replay/head matrix from the qualified real Host-carrier
-   signed positive path.
-2. Run that complete matrix at the exact current pins; open G4-F only on PASS.
+1. Execute T-007 G4-F's final integration/privacy/default-off/governance and
+   cleanup census at the resealed exact pins.
+2. Preserve G4-D I4 as default-off qualification, not activation evidence.
 3. Close the T-010 governance handoff without treating its default-off
    qualification as durable apply or activation.
 4. Keep C31-C35, T-008, capability/Workspace activation, deployment, Pilot and
    traffic closed until separately authorized.
 
-The current C30 qualification binds Base `536638a`, My-Chat `ae33b313`, Nurture
-lock source `bb0f1a8…` and owner lock `bcbe6b33…`; record 26 is authoritative.
+The current C30 qualification binds Base `536638a`, My-Chat `2d415ce`, Nurture
+lock source `de4897f…` and owner lock `856cd6c6…`; record 26 is authoritative.
 
 ## What changed
+
+- 2026-08-12: Adopted final My-Chat T-041 provider source `2d415ce`, Nurture
+  G4-D I4 source `21cfb3b` and T-002 pin source `de4897f`. The C30 Host runtime
+  aggregate remains `aac525c4…`; `x5_joint_api` becomes `f49459af…`, the
+  Nurture scenario self-pin becomes `e4b26610…` and the owner aggregate becomes
+  `856cd6c6…`. Record 26 is current and opens only T-007's G4-F join.
 
 - 2026-08-12: Adopted the real My-Chat Enrollment Journey current-owner carrier
   source at `ae33b313`, qualified the signed positive two-database path in
