@@ -48,19 +48,19 @@
 
 | Check | Result |
 | --- | --- |
-| Exact inputs | PASS — Base `536638a`, My-Chat `4673712`, contract parity `85cf56e2…`, Nurture scenario `efdfb54a…`, owner lock `a9dea27e…`. |
+| Exact inputs | PASS — Base `536638a`, My-Chat `42c94825`, contract parity `85cf56e2…`, Nurture scenario `6337639e…`, owner lock `f4d8c752…`. |
 | Joint prerequisite protocols | PASS — T-007/T-041 signed settlement file 7/7; T-010 guarded C4 12/12 with zero residue; family-sharing joint 5/5; full x5 36/36. |
 | Owner/C30 gates | PASS — formal owner integration 68/68, every assert gate, upstream/owner/default-off and exact pin checks. |
 | Fresh schemas | PASS — Nurture 39/39 and My-Chat 43/43 migrations, both current with no schema diff; DB context contracts current. |
-| Nurture regressions | PASS — unit 97/1047; production DB 50/439; dev host 11/27; scenario service 14/95 plus DB 3/68; x5 5/36; typecheck. |
+| Nurture regressions | PASS — unit 97/1049; production DB 50/439; focused current-owner DB 6/6; x5 three consecutive runs at 5/36; typecheck and structural gates. |
 | My-Chat/Base regressions | PASS — My-Chat typecheck/ESLint and 164/1147 ordinary tests; Base workflow conformance 441/441. |
 | Cleanup/effects | PASS — the two named disposable containers were destroyed and ports 55450/55438 are free; no durable apply, activation, deployment or traffic. |
 
 Current verdict: `C30_CURRENT_PIN_REQUAL_PASS / DEFAULT_OFF /
 T007_I4_REMAINDER_NEXT / G4_F_CLOSED`.
 Normative record:
-[`23-c30-signed-route-pin-addendum.md`](./23-c30-signed-route-pin-addendum.md),
-with record 22 retained as the underlying database qualification.
+[`24-c30-owner-carrier-pin-addendum.md`](./24-c30-owner-carrier-pin-addendum.md),
+with records 22–23 retained as underlying qualification evidence.
 
 ## C30-I4-A/B provider adoption — 2026-08-11
 

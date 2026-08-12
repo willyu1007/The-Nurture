@@ -13,19 +13,19 @@
   response-loss, unknown and writer-fence matrix. T-010 passes 39/39 fresh
   migrations, 12/12 production-shape cases, zero synthetic residue and 5/5
   joint grant/withdrawal/cleanup cases. C30 Step 5 passes at Base `536638a`,
-  My-Chat `4673712` and the current Nurture source locks. The signed-route pin
+  My-Chat `42c94825` and the current Nurture source locks. The owner-carrier pin
   addendum is in
-  [`23-c30-signed-route-pin-addendum.md`](./23-c30-signed-route-pin-addendum.md).
+  [`24-c30-owner-carrier-pin-addendum.md`](./24-c30-owner-carrier-pin-addendum.md).
   Both disposable containers were destroyed; ports `55450` and `55438` are
   free.
 - **Landing status (2026-08-12):** C30 has current-pin three-repository
   evidence again. The 2026-08-08 record remains historical after its revision
-  binding was invalidated; record 23 is authoritative for the current pin and
-  preserves record 22 as the underlying database qualification.
+  binding was invalidated; record 24 is authoritative for the current pin and
+  preserves records 22–23 as underlying qualification evidence.
   All capabilities remain default-off and no durable environment was touched.
-- Next step: complete the still-unimplemented T-007 G4-D I4 remainder:
-  native-source/current-owner transport, remaining commands and the
-  Guardian/mobile/head matrix. Only the complete passing I4 matrix may open
+- Next step: implement the T-007 Prisma current-owner derivation adapter and
+  positive signed command/revoke/expiry/head matrix, then continue the
+  native-source and Guardian/mobile remainder. Only the complete I4 matrix may open
   G4-F. T-010 is ready for governance handoff/closure, while My-Chat T-039
   continues device-independent local-ready work without treating fixtures as
   Live evidence. C31-C35, T-008 Candidate Freeze, durable environment apply,
@@ -91,9 +91,9 @@
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: T-002 current-pin qualification binds Base `536638a`, My-Chat
-  `4673712`, contract parity `85cf56e2…`, `x5_joint_api=312d0477…`,
-  `wave4_binding_host=65d6b0a0…` and Nurture self-pin `efdfb54a…`.
-  [`23-c30-signed-route-pin-addendum.md`](./23-c30-signed-route-pin-addendum.md)
+  `42c94825`, contract parity `85cf56e2…`, `x5_joint_api=d7cf510b…`,
+  `wave4_binding_host=65d6b0a0…` and Nurture self-pin `6337639e…`.
+  [`24-c30-owner-carrier-pin-addendum.md`](./24-c30-owner-carrier-pin-addendum.md)
   is the current evidence. G1 remains historical prerequisite evidence; every
   consumer remains default-disabled. C31, G4-F, D implementation, Pilot-0-E,
   Pilot-1, persistent database apply, artifact publication, capability

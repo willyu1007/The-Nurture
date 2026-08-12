@@ -7,18 +7,26 @@
 
 ## Next concrete actions
 
-1. Complete the T-007 G4-D I4 native-source/current-owner transport, remaining
-   commands and Guardian/mobile/head matrix.
+1. Implement the T-007 Prisma current-owner derivation adapter and positive
+   signed command/revoke/expiry/head matrix, then continue native-source and
+   Guardian/mobile coverage.
 2. Run that complete matrix at the exact current pins; open G4-F only on PASS.
 3. Close the T-010 governance handoff without treating its default-off
    qualification as durable apply or activation.
 4. Keep C31-C35, T-008, capability/Workspace activation, deployment, Pilot and
    traffic closed until separately authorized.
 
-The current C30 qualification binds Base `536638a`, My-Chat `4673712`, Nurture
-scenario `efdfb54a…` and owner lock `a9dea27e…`; record 23 is authoritative.
+The current C30 qualification binds Base `536638a`, My-Chat `42c94825`, Nurture
+scenario `6337639e…` and owner lock `f4d8c752…`; record 24 is authoritative.
 
 ## What changed
+
+- 2026-08-12: Requalified the request-scoped owner-carrier schema at My-Chat
+  `42c94825` and Nurture `82e87df`. The C30 Host runtime aggregate remains
+  `aac525c4…`; the exact Nurture owner lock is resealed at source `1150071…`
+  and aggregate `f4d8c752…`. Record 24 supersedes only the current
+  repository/source pin and preserves records 22–23. All capabilities remain
+  default-off.
 
 - 2026-08-12: Requalified the content-inert My-Chat signed-route repair at
   `4673712`. The C30 Host runtime aggregate remains `aac525c4…`; the exact

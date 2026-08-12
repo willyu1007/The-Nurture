@@ -12,8 +12,8 @@ My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、st
 
 | Track | State | Next gate |
 | --- | --- | --- |
-| T-002 C30 current pins | `C30_CURRENT_PIN_REQUAL_PASS`, default-off; Base `536638a`, My-Chat `4673712`, record 23 | Preserve exact source/schema/default-off locks; no activation. |
-| T-007 / My-Chat T-041 settlement | I4-A signed settlement file 7/7; complete x5 36/36 | Implement request-scoped current-owner transport, remaining commands and Guardian/mobile/head negatives. |
+| T-002 C30 current pins | `C30_CURRENT_PIN_REQUAL_PASS`, default-off; Base `536638a`, My-Chat `42c94825`, record 24 | Preserve exact source/schema/default-off locks; no activation. |
+| T-007 / My-Chat T-041 settlement | I4-A settlement qualified; request-scoped carrier/local derivation port implemented; complete x5 36/36 | Implement the Prisma derivation adapter, positive command matrix and Guardian/mobile/head negatives. |
 | T-010 family sharing | `I4_C4_EXIT_PASS_DEFAULT_OFF`; 12/12 guarded production-shape, 5/5 joint cleanup | Governance handoff/closure only; durable apply is separate. |
 | T-007 G4-F | Closed | Opens only after the complete G4-D I4 matrix passes. |
 
