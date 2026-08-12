@@ -7,6 +7,7 @@ import {
   parseNurtureEnrollmentJourneyFormalExecuteInputV2,
   parseNurtureEnrollmentJourneyFormalPrepareInputV1,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
+  parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1,
   type NurtureEnrollmentJourneyFormalAuthorityResolverV1,
   type NurtureEnrollmentJourneyLocalAuthorityV1,
   type NurtureEnrollmentJourneyPreparedCommandOwnerV1,
@@ -24,6 +25,8 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS = Object.freeze({
   query: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.query.handler_key,
   prepare: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.prepare.handler_key,
   execute: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.execute.handler_key,
+  settlementStatus:
+    NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.settlementStatus.handler_key,
 } as const);
 
 export type NurtureEnrollmentJourneyFormalIngressDeps = {
@@ -43,7 +46,33 @@ export function createNurtureEnrollmentJourneyFormalInvocationHandlers(
       (verified) => prepare(verified, deps),
     [NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute]:
       (verified) => execute(verified, deps),
+    [NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementStatus]:
+      (verified) => settlementStatus(verified, deps),
   });
+}
+
+async function settlementStatus(
+  verified: WorkflowVerifiedScenarioInvocationV1,
+  deps: NurtureEnrollmentJourneyFormalIngressDeps,
+): Promise<unknown> {
+  if (!matchesOperation(verified, "settlementStatus")) {
+    return declarationDrift();
+  }
+  const input =
+    parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1(
+      verified.invocation.operation.input,
+    );
+  if (!input) return invalid();
+  if (!deps.workflowRunSettlementOwner) return unavailable();
+  try {
+    return await deps.workflowRunSettlementOwner.readStatus({
+      workspace_id: verified.invocation.principal.workspace_ref.object_id,
+      command_request_id: input.commandRequestId,
+      host_reservation: input.hostWorkflowRunReservation,
+    });
+  } catch {
+    return unavailable();
+  }
 }
 
 async function query(
@@ -407,7 +436,7 @@ function sameAuthority(
 
 function matchesOperation(
   verified: WorkflowVerifiedScenarioInvocationV1,
-  lane: "query" | "prepare" | "execute",
+  lane: "query" | "prepare" | "execute" | "settlementStatus",
 ): boolean {
   const contract = NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1[lane];
   const invocation = verified.invocation;

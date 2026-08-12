@@ -1597,3 +1597,25 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
 - No route, capability activation, persistent migration apply, deployment or
   traffic was added. A separate historical status operation and My-Chat proof
   verifier are still required before Host confirmation is admitted.
+
+## 2026-08-12 seventh-round historical status and Host verifier
+
+- Added one exact Enrollment Journey trusted operation,
+  `read_enrollment_journey_workflow_run_settlement_status`, under the existing
+  signed Base private-invocation envelope. The manifest and generated manifest
+  declare only the v1 status input and formal handler.
+- The status input is closed to the original Nurture command request id and the
+  complete Host reservation evidence. Extra authority, participant, contact or
+  business fields are rejected.
+- The handler derives Workspace from the verified principal and calls only
+  `workflowRunSettlementOwner.readStatus`. It does not touch prepared-command
+  expiry or current Scenario authority, so a committed receipt remains
+  discoverable after response loss, expiry or later role revocation.
+- My-Chat now supplies a concrete signed-invocation client and exact proof
+  verifier. The verifier receives the immutable reservation evidence hash from
+  the Host ledger, rereads Nurture status through a detached-response-verified
+  call and admits only byte-exact terminal proof for the same Run ref.
+- The `confirmed_no_effect` ledger state can be verified if present, but this
+  increment does not expose the writer-fenced mutation that creates it. Host
+  abandon composition therefore remains fail-closed. No DB apply, route, DI,
+  activation or traffic was added.

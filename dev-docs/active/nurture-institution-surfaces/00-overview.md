@@ -6,17 +6,20 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **carry the committed My-Chat reservation evidence through the
-  signed private operation input, register it before protected owner reads,
-  mark the Nurture settlement committed inside the command transaction, and
-  compose the Host proof verifier before admitting G4-D I4-A**. I3 is
+- Next step: **add the writer-fenced signed `confirmed_no_effect`
+  reconciliation operation, compose reserve -> execute/status -> settle in the
+  default-off Host coordinator, then run the serialized two-database race and
+  response-loss suite**. The signed historical status operation and exact
+  My-Chat proof verifier are implemented locally; status bypasses prepared TTL
+  and current authority while remaining bound to the original command and
+  reservation evidence. I3 is
   qualified by record [`87`](./87-g4-d-i3-qualification-record.md). Both
   dedicated ledgers and their additive migrations are implemented locally;
   neither migration is applied. The superseded immediate queued-Run issuer,
   its Nurture adapter and the negative protocol-gap x5 vehicle are removed.
-  Production start inquiry remains fail-closed before contact/protected/effect
-  work until the signed transport and atomic adoption land. Positive
-  two-database qualification still requires an approved disposable pair, and
+  The product path remains default-off because no Host coordinator, route or
+  activation is bound. Positive two-database qualification still requires an
+  approved disposable pair, and
   I4/G4-F remain open. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,

@@ -98,6 +98,17 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1 = Object.freeze({
     handler_key: "nurture.enrollment_journey.command.execute.formal.v2",
     ingress_key: "nurture.enrollment_journey.command.execute",
   }),
+  settlementStatus: Object.freeze({
+    endpoint_key: "nurture.enrollment_journey.workflow_run_settlement.status",
+    method: "POST",
+    operation_key: "read_enrollment_journey_workflow_run_settlement_status",
+    input_schema_key:
+      "nurture.enrollment_journey.workflow_run_settlement.status.input",
+    input_schema_version: 1,
+    handler_key:
+      "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
+    ingress_key: "nurture.enrollment_journey.workflow_run_settlement.status",
+  }),
   idempotency: "owner_command_request_id_replayed_with_exact_confirmation",
   confirmation: "owner_held_frozen_payload_consumed_with_the_effect",
 } as const);
@@ -131,6 +142,17 @@ export type NurtureEnrollmentJourneyFormalExecuteInputV2 =
       clientCommandId: string;
       request: NurtureEnrollmentJourneyCommandIntentV1<NurtureEnrollmentJourneyDirectCommandKey>;
     };
+
+/**
+ * Historical reconciliation is deliberately independent from prepared-command
+ * expiry and current Scenario authority. The exact Host reservation evidence
+ * remains mandatory so this read cannot become a command-id existence oracle.
+ */
+export type NurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1 = {
+  contractVersion: 1;
+  commandRequestId: string;
+  hostWorkflowRunReservation: NurtureWorkflowRunReservationEvidenceV1;
+};
 
 export type NurtureEnrollmentJourneyLocalAuthorityV1 = {
   workspace_id: string;
@@ -300,6 +322,31 @@ export function parseNurtureEnrollmentJourneyFormalExecuteInputV2(
           NurtureEnrollmentJourneyFormalExecuteInputV2,
           { clientCommandId: string }
         >["request"],
+      }
+    : null;
+}
+
+export function parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1(
+  value: unknown,
+): NurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1 | null {
+  if (
+    !exactRecord(value, [
+      "commandRequestId",
+      "contractVersion",
+      "hostWorkflowRunReservation",
+    ]) ||
+    value.contractVersion !== 1 ||
+    !opaqueId(value.commandRequestId)
+  ) return null;
+  const hostWorkflowRunReservation =
+    parseNurtureWorkflowRunReservationEvidenceV1(
+      value.hostWorkflowRunReservation,
+    );
+  return hostWorkflowRunReservation
+    ? {
+        contractVersion: 1,
+        commandRequestId: value.commandRequestId,
+        hostWorkflowRunReservation,
       }
     : null;
 }

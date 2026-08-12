@@ -1158,6 +1158,23 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
               ]
             }
           ]
+        },
+        {
+          "endpoint_key": "nurture.enrollment_journey.workflow_run_settlement.status",
+          "method": "POST",
+          "operation_key": "read_enrollment_journey_workflow_run_settlement_status",
+          "input_schema_key": "nurture.enrollment_journey.workflow_run_settlement.status.input",
+          "input_schema_version": 1,
+          "handler_key": "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
+          "ingress": [
+            {
+              "ingress_category": "host_transition",
+              "ingress_key": "nurture.enrollment_journey.workflow_run_settlement.status",
+              "principal_origins": [
+                "interactive_session"
+              ]
+            }
+          ]
         }
       ]
     },

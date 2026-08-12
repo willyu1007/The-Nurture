@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "b2e8114913a0cccbd64f475b9561f0e29a29ba52",
+    "revision": "c558802b2b9103d374f4c57953007b85bfeb206f",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -76,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "696c8ec28012689dd6764e08ae2f80ad476844840308ce3b7cfe68c951d88184"
+        "sha256": "bb6228827b839b66522efb912cef468ff274f4541c8f7c80ac7b8bcd095634a4"
       },
       {
         "key": "wave4_binding_host",
@@ -131,6 +131,6 @@
       "prisma/migrations",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "7323c87e518139146beb88ce967dc90834ab8a857ef16d162b0cd66d1ca6f84d"
+    "contractSha256": "f148c3d6a520d95ca7c89ea51ee70d2615f738d7730d1bec6365e2f38fdda4ae"
   }
 }

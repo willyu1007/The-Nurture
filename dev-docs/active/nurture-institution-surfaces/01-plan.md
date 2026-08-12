@@ -811,3 +811,20 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
   receipt before Host confirm.
 - Step 5 remains blocked on approved disposable databases and completion of
   step 4. Unknown outcomes remain reserved/quarantined.
+
+### Seventh-round progress against this order
+
+- Step 3 now has a dedicated manifest-declared signed status operation. Its
+  handler reads only the historical settlement owner with the verified
+  Workspace, original command request id and exact Host reservation evidence;
+  it does not call prepared-command or current-authority owners.
+- Step 4 now has the exact My-Chat signed client and proof verifier. The
+  verifier reconstructs the original reservation evidence from the Host
+  ledger and accepts only a detached-response-verified terminal status whose
+  Run ref and proof bytes match exactly.
+- The committed branch can now be confirmed without replaying formal execute.
+  Writer-fenced `confirmed_no_effect` still needs a separately declared signed
+  mutation before the abandon branch can be composed. No route, DI binding,
+  activation, migration apply or traffic is added.
+- Step 5 remains blocked on an approved disposable database pair. I4-A, I4 and
+  G4-F remain open.

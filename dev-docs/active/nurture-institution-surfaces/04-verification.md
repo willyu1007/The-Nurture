@@ -1173,3 +1173,21 @@ I4_NOT_QUALIFIED`.
 Current verdict: `SIGNED_TRANSPORT_AND_ATOMIC_SETTLEMENT_IMPLEMENTED /
 LOCAL_CONTRACTS_GREEN / HISTORICAL_STATUS_AND_HOST_VERIFIER_PENDING /
 NO_DB_APPLY / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 historical-status / Host-verifier verification
+
+| Check | Result |
+| --- | --- |
+| Nurture focused formal-status + manifest contract | PASS - 2 files / 19 tests |
+| Nurture full unit lane | PASS - 97 files / 1039 tests |
+| Nurture scenario package typecheck + generated manifest check | PASS |
+| Nurture formal-ingress structural gate | PASS - 7 routes |
+| Nurture routing census | PASS - 178 files: 97 unit / 50 production DB / 11 dev host / 17 scenario service / 3 x5 |
+| My-Chat reservation lifecycle + signed verifier focused tests | PASS - 2 files / 14 tests |
+| My-Chat workflow-runtime + scenario-integrations regression | PASS - 34 files / 353 tests |
+| My-Chat workflow-runtime and scenario-integrations typechecks | PASS |
+| database apply / two-database x5 | NOT RUN - no approved targets; no database write |
+
+Current verdict: `HISTORICAL_SIGNED_STATUS_AND_HOST_PROOF_VERIFIER_IMPLEMENTED /
+NO_EFFECT_MUTATION_AND_JOINT_DB_PENDING / DEFAULT_OFF / NO_DB_APPLY /
+I4_NOT_QUALIFIED`.

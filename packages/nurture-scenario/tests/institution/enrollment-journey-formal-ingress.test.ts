@@ -8,6 +8,7 @@ import {
   parseNurtureEnrollmentJourneyFormalExecuteInputV2,
   parseNurtureEnrollmentJourneyFormalPrepareInputV1,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
+  parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1,
 } from "../../src/enrollment-journey-formal-ingress-contract.js";
 import {
   createNurtureEnrollmentJourneyFormalInvocationHandlers,
@@ -96,6 +97,32 @@ describe("Enrollment Journey formal ingress", () => {
     })).toBeNull();
   });
 
+  it("parses only exact historical settlement status input", () => {
+    const input = {
+      contractVersion: 1,
+      commandRequestId: "command-request-1",
+      hostWorkflowRunReservation: hostReservation(),
+    };
+    expect(
+      parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1(input),
+    ).toEqual(input);
+    expect(
+      parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1({
+        ...input,
+        authorityVersion: "forbidden-current-authority",
+      }),
+    ).toBeNull();
+    expect(
+      parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1({
+        ...input,
+        hostWorkflowRunReservation: {
+          ...hostReservation(),
+          reservation_evidence_sha256: "invalid",
+        },
+      }),
+    ).toBeNull();
+  });
+
   it("fails closed on declaration drift before touching any owner", async () => {
     const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
       surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
@@ -138,6 +165,67 @@ describe("Enrollment Journey formal ingress", () => {
       status: "unavailable",
       reason_code: "enrollment_journey_formal_ingress_unavailable",
     });
+  });
+
+  it("reads historical settlement without prepared TTL or current authority", async () => {
+    const authorityCalls: unknown[] = [];
+    const ownerCalls: unknown[] = [];
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+      authorityResolver: {
+        resolveCurrent: async (input: unknown) => {
+          authorityCalls.push(input);
+          return { status: "unavailable", reason_code: "revoked" };
+        },
+      },
+      workflowRunSettlementOwner: {
+        register: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        readStatus: async (input: unknown) => {
+          ownerCalls.push(input);
+          return {
+            status: "committed",
+            settlement_ref: {
+              schema_version: 1,
+              namespace: "nurture",
+              object_type: "workflow_run_settlement",
+              object_id: "settlement-1",
+              version: 2,
+            },
+            run_ref: hostReservation().run_ref,
+            outcome: "committed",
+            proof: {
+              proof_version: 1,
+              outcome: "committed",
+              writer_fence_receipt_ref: "receipt-1",
+              receipt_sha256: "c".repeat(64),
+            },
+          };
+        },
+        confirmNoEffect: async () => ({ status: "unavailable", reason_code: "not_used" }),
+      } as never,
+    });
+    const status = verifiedInvocation("settlementStatus");
+    status.invocation.operation.input = {
+      contractVersion: 1,
+      commandRequestId: "command-request-1",
+      hostWorkflowRunReservation: hostReservation(),
+    };
+
+    await expect(
+      handlers[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementStatus]?.(
+        status,
+      ),
+    ).resolves.toMatchObject({
+      status: "committed",
+      outcome: "committed",
+      run_ref: hostReservation().run_ref,
+    });
+    expect(authorityCalls).toEqual([]);
+    expect(ownerCalls).toEqual([{
+      workspace_id: "workspace-1",
+      command_request_id: "command-request-1",
+      host_reservation: hostReservation(),
+    }]);
   });
 
   it("carries verified Host invocation metadata into trusted binding context", async () => {
@@ -426,7 +514,7 @@ function intent(capabilityKey: string, operationInput: Record<string, unknown>) 
 }
 
 function verifiedInvocation(
-  lane: "query" | "prepare" | "execute",
+  lane: "query" | "prepare" | "execute" | "settlementStatus",
 ): WorkflowVerifiedScenarioInvocationV1 {
   const contract = NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1[lane];
   return {
