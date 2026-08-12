@@ -158,7 +158,7 @@ assertEqual(
   // Requalified on 2026-08-12 after the Host current-owner carrier producer.
   // The shared Base/My-Chat workflow contract and C30 Host profile remain
   // byte-identical.
-  "ae33b31363b86b0664412e0d053104780048c342",
+  "2d415cecea6c40cb41daf10bca0638bfaa0c504e",
   "My-Chat revision",
 );
 assertEqual(

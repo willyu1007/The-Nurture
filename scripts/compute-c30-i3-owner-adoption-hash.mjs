@@ -190,7 +190,7 @@ const computeLock = () => {
       // Step-5 requalification binds the current clean Host head while the
       // runtime revision points at the committed source population sealed by
       // My-Chat's independently verified adoption lock.
-      head_revision: "ae33b31363b86b0664412e0d053104780048c342",
+      head_revision: "2d415cecea6c40cb41daf10bca0638bfaa0c504e",
       runtime_revision: "149424c9a05a28aa8c1654258bb919a434208732",
       aggregate_source_hash: "aac525c4f13953671040ce759da8eadf0f55dee9063db8b6389282f78635617d",
     },
