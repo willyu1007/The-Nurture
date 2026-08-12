@@ -11,6 +11,8 @@ export default defineConfig({
       "**/x5-joint-acceptance.integration.test.ts",
       "**/t009-family-growth-joint.integration.test.ts",
       "**/t007-institution-knowledge-e8-joint.integration.test.ts",
+      "**/t007-workflow-run-settlement-joint.integration.test.ts",
+      "**/t010-family-sharing-joint.integration.test.ts",
     ],
     // The suite shares one disposable database and the command kernel runs
     // Serializable transactions; parallel files trigger SSI false conflicts.
