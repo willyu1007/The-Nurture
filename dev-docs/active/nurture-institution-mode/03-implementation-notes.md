@@ -15,10 +15,17 @@
 4. Keep C31-C35, T-008, capability/Workspace activation, deployment, Pilot and
    traffic closed until separately authorized.
 
-The current C30 qualification binds Base `536638a`, My-Chat `6d4baee`, Nurture
-scenario `54353008…` and owner lock `4fccdc1c…`; record 22 is authoritative.
+The current C30 qualification binds Base `536638a`, My-Chat `4673712`, Nurture
+scenario `efdfb54a…` and owner lock `a9dea27e…`; record 23 is authoritative.
 
 ## What changed
+
+- 2026-08-12: Requalified the content-inert My-Chat signed-route repair at
+  `4673712`. The C30 Host runtime aggregate remains `aac525c4…`; the exact
+  Nurture owner lock is resealed at source `33d3147…` and aggregate
+  `a9dea27e…`. Record 23 supersedes only the current repository/source pin and
+  preserves record 22's disposable database evidence. All capabilities remain
+  default-off.
 
 - 2026-08-12: Requalified C30 Step 5 at current pins and recorded
   `C30_CURRENT_PIN_REQUAL_PASS` in record 22. The run consumed the separately

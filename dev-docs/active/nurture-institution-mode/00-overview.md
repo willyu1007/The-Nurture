@@ -13,13 +13,15 @@
   response-loss, unknown and writer-fence matrix. T-010 passes 39/39 fresh
   migrations, 12/12 production-shape cases, zero synthetic residue and 5/5
   joint grant/withdrawal/cleanup cases. C30 Step 5 passes at Base `536638a`,
-  My-Chat `6d4baee` and the current Nurture source locks. Exact evidence is in
-  [`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md).
+  My-Chat `4673712` and the current Nurture source locks. The signed-route pin
+  addendum is in
+  [`23-c30-signed-route-pin-addendum.md`](./23-c30-signed-route-pin-addendum.md).
   Both disposable containers were destroyed; ports `55450` and `55438` are
   free.
 - **Landing status (2026-08-12):** C30 has current-pin three-repository
   evidence again. The 2026-08-08 record remains historical after its revision
-  binding was invalidated; record 22 is authoritative for the current pin.
+  binding was invalidated; record 23 is authoritative for the current pin and
+  preserves record 22 as the underlying database qualification.
   All capabilities remain default-off and no durable environment was touched.
 - Next step: complete the still-unimplemented T-007 G4-D I4 remainder:
   native-source/current-owner transport, remaining commands and the
@@ -89,9 +91,9 @@
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: T-002 current-pin qualification binds Base `536638a`, My-Chat
-  `6d4baee`, contract parity `85cf56e2…`, `x5_joint_api=39a9689c…`,
-  `wave4_binding_host=65d6b0a0…` and Nurture self-pin `54353008…`.
-  [`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md)
+  `4673712`, contract parity `85cf56e2…`, `x5_joint_api=312d0477…`,
+  `wave4_binding_host=65d6b0a0…` and Nurture self-pin `efdfb54a…`.
+  [`23-c30-signed-route-pin-addendum.md`](./23-c30-signed-route-pin-addendum.md)
   is the current evidence. G1 remains historical prerequisite evidence; every
   consumer remains default-disabled. C31, G4-F, D implementation, Pilot-0-E,
   Pilot-1, persistent database apply, artifact publication, capability
