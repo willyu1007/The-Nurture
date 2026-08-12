@@ -155,10 +155,10 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Requalified on 2026-08-12 after the owner-carrier execute-schema repair.
+  // Requalified on 2026-08-12 after the Host current-owner carrier producer.
   // The shared Base/My-Chat workflow contract and C30 Host profile remain
   // byte-identical.
-  "42c94825f31cf274e08b4cc9de68425b48498fa6",
+  "ae33b31363b86b0664412e0d053104780048c342",
   "My-Chat revision",
 );
 assertEqual(

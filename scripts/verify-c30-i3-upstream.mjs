@@ -12,7 +12,7 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  hostHead: "42c94825f31cf274e08b4cc9de68425b48498fa6",
+  hostHead: "ae33b31363b86b0664412e0d053104780048c342",
 };
 
 const run = (command, args, cwd) =>
