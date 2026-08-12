@@ -530,7 +530,7 @@ Project: `main`
 | T-005 nurture-family-care-conversation | archived | dev-docs/archive/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | archived | dev-docs/archive/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | archived | dev-docs/archive/nurture-institution-surfaces |
-| T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |
+| T-008 nurture-store-beta-readiness | in-progress | dev-docs/active/nurture-store-beta-readiness |
 | T-011 nurture-cross-repo-contract-supply | in-progress | dev-docs/active/nurture-cross-repo-contract-supply |
 
 ### F-004 Family growth material provider

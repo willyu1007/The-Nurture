@@ -72,13 +72,14 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 11 (planned: 1, in-progress: 2, blocked: 0, done: 0, archived: 8)
+- Tasks: 11 (planned: 0, in-progress: 3, blocked: 0, done: 0, archived: 8)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
 | T-007 nurture-institution-surfaces | archived | F-003 | dev-docs/archive/nurture-institution-surfaces |
+| T-008 nurture-store-beta-readiness | in-progress | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-010 nurture-family-sharing-eligibility | archived | F-005 | dev-docs/archive/nurture-family-sharing-eligibility |
 | T-011 nurture-cross-repo-contract-supply | in-progress | F-003 | dev-docs/active/nurture-cross-repo-contract-supply |
 | T-001 nurture-mvp | archived | F-001 | dev-docs/archive/nurture-mvp |
@@ -87,6 +88,5 @@ Project: `main`
 | T-006 nurture-child-care-boards | archived | F-003 | dev-docs/archive/nurture-child-care-boards |
 | T-009 nurture-family-growth-provider | archived | F-004 | dev-docs/archive/nurture-family-growth-provider |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
-| T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
 <!-- AUTO-GENERATED:END dashboard -->

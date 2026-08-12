@@ -2,16 +2,17 @@
 
 ## Status
 
-- State: planned
+- State: in-progress
 - Task: T-008
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-05
-- Next step: Beta Profile v0 已冻结为
-  `nurture.six-surface-beta-profile@0.1.0`（见
-  [`06-beta-profile-v0.md`](./06-beta-profile-v0.md)）。T-004～T-006 exact
-  handoff 已就绪；T-008 继续等待完整 T-007 G4 Exit。G5-0 仅在 T-007 handoff
-  就绪且本任务被单独授权后确认/终版化 profile 并展开 pre-candidate inventory，
-  不提前分配 Candidate identity。
+- Updated: 2026-08-13
+- Next step: G5-0 已在单独授权（2026-08-13，见项目 changelog）下启动：
+  readiness inventory、drift ledger 与 carry-forward census 见
+  [`07-g5-0-readiness-inventory.md`](./07-g5-0-readiness-inventory.md)。
+  T-007 G4-F Exit 与 Beta Profile Handoff 已就绪（records 95/96）。G5-0 只做
+  profile 确认/终版化与 pre-candidate inventory，不分配 Candidate identity、
+  不实现 release-control runtime；G5-A Freeze 前必须先结论 T-011 W1
+  guardian-decision callback 联合设计。
 
 ## Goal
 

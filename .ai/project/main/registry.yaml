@@ -125,11 +125,11 @@ tasks:
     updated: 2026-08-13
   - id: T-008
     slug: nurture-store-beta-readiness
-    status: planned
+    status: in-progress
     milestone_id: M-002
     feature_id: F-003
     dev_docs_path: dev-docs/active/nurture-store-beta-readiness
-    updated: 2026-08-05
+    updated: 2026-08-13
   - id: T-009
     slug: nurture-family-growth-provider
     status: archived
