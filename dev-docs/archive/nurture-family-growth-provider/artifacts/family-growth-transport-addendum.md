@@ -1,12 +1,12 @@
 # Family Growth Transport Addendum — family_growth_transport@1.0.0
 
 Status: FROZEN 2026-08-07 (user decision, all six open items settled).
-This document binds the transport mechanics only; the
+The transport addendum binds the transport mechanics only; the
 `family_growth_material_*` v1 envelope (My-Chat `d4ed0ce`) stays frozen and
-is not modified by this addendum. An identical copy lives in My-Chat
-`dev-docs/active/growth-record/artifacts/`; both copies carry the same
-content digest. Breaking transport changes bump this addendum's version
-only; the envelope compatibility rules are unchanged.
+is not modified by the transport addendum. An identical copy lives in My-Chat
+`dev-docs/archive/growth-record/artifacts/`; both copies carry the same
+content digest. Breaking transport changes bump the `family_growth_transport`
+version only; the envelope compatibility rules are unchanged.
 
 ## Parties
 

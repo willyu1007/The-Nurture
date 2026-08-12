@@ -247,7 +247,7 @@ Running log; newest first.
 
 - 2026-08-07 (night): I0 frozen; I3b + I5 landed.
   - Transport addendum frozen at `family_growth_transport@1.0.0`
-    (D-T009-09), mirrored to My-Chat with matching digest `38bc6239…`.
+    (D-T009-09), mirrored to My-Chat with matching digest `6c4f6959…`.
   - I3b: pure delivery engine in the scenario domain
     (`delivery.ts`: frozen backoff/settlement constants,
     `decideFamilyGrowthDelivery` — only a valid 200 receipt naming the

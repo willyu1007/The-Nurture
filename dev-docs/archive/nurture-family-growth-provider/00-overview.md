@@ -25,7 +25,7 @@ This is the N1–N8 delivery list from
 
 1. Contract authority: My-Chat commit
    `d4ed0ce1c58c2f6204bb501cc977ee469e7de890`,
-   `dev-docs/active/growth-record/artifacts/family-growth-material-contract-v1.schema.json`
+   `dev-docs/archive/growth-record/artifacts/family-growth-material-contract-v1.schema.json`
    (+ the prose contract beside it). The envelope schema is frozen at `1.0.0`;
    T-009 must not copy-and-extend it.
 2. My-Chat consumer state (at `c5ac6c7`): ingress/admission/material/revision/

@@ -157,7 +157,7 @@ line is a contract-visible choice:
 
 User decision 2026-08-07 settled all six open items; the addendum is frozen
 as `artifacts/family-growth-transport-addendum.md` (identical copy in
-My-Chat `dev-docs/active/growth-record/artifacts/`, sha256 `38bc6239…`).
+My-Chat `dev-docs/archive/growth-record/artifacts/`, sha256 `6c4f6959…`).
 The load-bearing choices: dedicated direction+capability Bearer tokens with
 a `{current, previous}` rotation window; ONLY a valid 200 receipt settles an
 event and everything else retries as `outcome_unknown` (30s→1h exponential

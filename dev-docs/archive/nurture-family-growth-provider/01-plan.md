@@ -7,7 +7,7 @@ own DoD; nothing activates by default at any point.
 ## I0 — Joint transport freeze (with My-Chat)
 
 - Frozen artifact: `artifacts/family-growth-transport-addendum.md` (identical
-  copy in My-Chat `dev-docs/active/growth-record/artifacts/`).
+  copy in My-Chat `dev-docs/archive/growth-record/artifacts/`).
 - Settle: endpoint paths, service-auth mechanism, receipt-in-response rule,
   rendition exchange (short-lived URL TTL, digest verification), retry/backoff
   parameters, error taxonomy.
