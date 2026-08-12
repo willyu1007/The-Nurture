@@ -37,3 +37,37 @@ This file prevents repeated mistakes within this task.
 - Prevention: every future cleanup/release lifecycle owner MUST acquire its
   exact idempotency-key arbitration before the first irreversible or externally
   visible side effect; uniqueness at receipt commit time is insufficient.
+
+### 2026-08-12 — mock-shaped identity fixtures do not qualify PostgreSQL
+
+- Symptom: the first approved C4 run failed before owner behavior because
+  anchor/association identifiers violated database UUID checks; after that
+  repair, pair insertion lacked the required participant-binding and command-
+  execution provenance.
+- Root cause: the earlier contract tests exercised typed repository seams with
+  arbitrary strings and did not instantiate the complete production FK graph.
+- What was tried: weakening the qualification SQL or omitting the pair head
+  was rejected because it would stop exercising the exact C2/C3 owner path.
+- Fix: use real UUIDs where the schema requires them and seed the exact current
+  participant binding plus immutable command execution before the committed
+  pair operation. Cleanup deletes the pair before the command and the binding
+  before the participant.
+- Prevention: every production-shape DB fixture must be derived from migration
+  checks and FK order, not from mock-friendly domain examples.
+
+### 2026-08-12 — generic cleanup ledgers must not claim typed actors
+
+- Symptom: cleanup purges ran, but receipt insertion failed the
+  `ck_nurture_c30_command_typed_actor` CHECK and the transaction rolled back.
+- Root cause: the cleanup ledger wrote `scenarioKey=nurture` and a family-
+  sharing execution driver without the typed Participant/role fields required
+  for Scenario business commands. Cleanup is actually a service-principal,
+  bounded derived-store lifecycle operation.
+- What was tried: inventing a Participant/role from the family pair was
+  rejected because identity association is not cleanup authority.
+- Fix: persist the immutable cleanup command as a generic service-principal
+  ledger entry with `scenarioKey` and `executionDriver` null; the request
+  fingerprint and local scope remain exact.
+- Prevention: reuse of a command ledger must select one complete database
+  invariant branch. Never set typed-actor discriminator fields without all
+  provenance required by that branch.

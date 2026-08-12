@@ -168,3 +168,25 @@ receipt returned by its ledger: exact command/fingerprint/categories,
 deterministic receipt ref, canonical completion time, and one ordered receipt
 for every registered local store. A repository cannot substitute a malformed
 success result. This adds no schema, target access, apply or activation.
+
+## 2026-08-12 I4-C4 execution and joint conformance
+
+| Check | Result |
+| --- | --- |
+| guarded C4 runner | PASS — exact approval token and named disposable URL only |
+| Nurture migration replay | PASS — 39/39 from empty |
+| C4 production-shape vehicle | PASS — 12/12 |
+| C4 residual census | PASS — zero synthetic business rows |
+| My-Chat/Nurture authorization joint suite | PASS — 5/5 |
+| complete serialized x5 lane | PASS — 5 files / 35 tests |
+| repository-root TypeScript | PASS |
+| routing census | PASS — 180 files: 97 unit / 50 production DB / 11 dev host / 17 scenario service / 5 x5 |
+| production composition | PASS, default-off — My-Chat transport remains explicitly unavailable and Nurture private runtime remains disabled by default |
+
+The joint cases cover grant, stale authority, provider outage, exact replay,
+commit response loss, unknown-outcome reconciliation, withdrawal without a
+post-intent owner read, cleanup outbox admission, cleanup response loss and
+no over-delete of Nurture canonical pair facts.
+
+Verdict: `I4_C4_EXIT_PASS_DEFAULT_OFF / EXACT_OWNER_CONSUMER_AND_CLEANUP_QUALIFIED /
+DURABLE_APPLY_ACTIVATION_TRAFFIC_CLOSED`.

@@ -166,8 +166,6 @@ function executionData(
     payloadHash: input.request_fingerprint,
     payloadCanonicalizationVersion: 1,
     businessActorRef: input.service_ref,
-    scenarioKey: "nurture",
-    executionDriver: "family_sharing_cleanup_v1",
     primaryScopeRef: {
       schema_version: 1,
       namespace: "nurture",

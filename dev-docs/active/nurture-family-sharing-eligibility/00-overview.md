@@ -4,17 +4,14 @@
 
 - State: in-progress
 - Updated: 2026-08-12
-- Next step: the environment-free I4-C4 production-shape qualification vehicle
-  is ready (2026-08-12). It requires an explicit approved, empty PostgreSQL
-  database named for T-010; it never falls back to `DATABASE_URL`. The vehicle
-  applies the complete migration history, executes the real exact-pair/C2 SQL,
-  DB nonce and cleanup-ledger paths, injects duplicate cardinality inside a
-  rolled-back PostgreSQL transaction, verifies response-loss replay,
-  same-key/different-fingerprint serialization, partial failure and no
-  over-delete, then proves synthetic data cleanup. Six environment-free safety
-  tests pass. No disposable target was available or approved, so migration and
-  production-shape execution remain pending; no database was contacted,
-  applied or activated.
+- Next step: prepare the exact default-off handoff and project-governance
+  closure. I4-C4 passed on the explicitly approved synthetic-only disposable
+  target: 39/39 migrations, 12/12 production-shape tests and zero business-row
+  residue. The My-Chat/Nurture two-database authorization suite passes 5/5 for
+  grant, stale authority, provider outage, response-loss reconciliation,
+  withdrawal and replay-safe cleanup; the complete x5 lane passes 35/35.
+  Production composition remains deliberately unavailable. Durable apply,
+  deployment, activation and traffic require separate decisions.
 
 ## Goal
 
@@ -66,7 +63,7 @@ and T-007 continue independently in their existing worktrees.
   `private, no-store` responses without protected identifiers.
 - [x] Nurture explicitly owns withdrawal cleanup for its derived media/focus
   stores and returns an idempotent cleanup receipt.
-- [ ] Fresh-database migration, owner-negative coverage and joint My-Chat
+- [x] Fresh-database migration, owner-negative coverage and joint My-Chat
   grant/withdrawal/outage/stale/replay/response-loss/cleanup conformance pass.
-- [ ] Production composition remains unavailable until all activation gates
+- [x] Production composition remains unavailable until all activation gates
   are separately approved.

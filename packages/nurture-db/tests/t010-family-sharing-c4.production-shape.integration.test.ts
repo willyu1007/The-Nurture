@@ -28,6 +28,7 @@ const prisma = target ? createPrismaClient(target.url) : undefined;
 type QualificationFixture = Readonly<{
   workspaceId: string;
   participantId: string;
+  participantBindingId: string;
   roleAssignmentId: string;
   childAnchorId: string;
   familyAnchorId: string;
@@ -39,6 +40,7 @@ type QualificationFixture = Readonly<{
   institutionId: string;
   careGroupId: string;
   enrollmentId: string;
+  commandExecutionId: string;
   pairOperationId: string;
 }>;
 
@@ -316,12 +318,13 @@ if (target) describe("T-010 I4-C4 production-shape PostgreSQL qualification", ()
     expect(JSON.stringify(scopes)).not.toContain("anchor");
     expect(JSON.stringify(scopes)).not.toContain("association");
     expect(await protectedPairCounts(database, local)).toEqual(protectedCountsBefore);
-    expect(await database.nurtureCommandExecution.count({
+    expect(await database.nurtureCommandExecution.findMany({
       where: {
         workspaceId: local.workspaceId,
         commandKey: "cleanup_family_sharing_withdrawal",
       },
-    })).toBe(1);
+      select: { scenarioKey: true, executionDriver: true },
+    })).toEqual([{ scenarioKey: null, executionDriver: null }]);
   });
 
   it("writes no cleanup success receipt after a partial purge failure", async () => {
@@ -528,17 +531,19 @@ async function seedQualificationFixture(database: Prisma.TransactionClient): Pro
   const item = {
     workspaceId: `t010-c4-workspace-${run}`,
     participantId: `t010-c4-participant-${run}`,
+    participantBindingId: randomUUID(),
     roleAssignmentId: `t010-c4-role-${run}`,
-    childAnchorId: `t010-c4-child-anchor-${run}`,
-    familyAnchorId: `t010-c4-family-anchor-${run}`,
-    childAssociationId: `t010-c4-child-association-${run}`,
-    familyAssociationId: `t010-c4-family-association-${run}`,
+    childAnchorId: randomUUID(),
+    familyAnchorId: randomUUID(),
+    childAssociationId: randomUUID(),
+    familyAssociationId: randomUUID(),
     childId: `t010-c4-child-${run}`,
     processId: `t010-c4-process-${run}`,
     familyId: `t010-c4-family-${run}`,
     institutionId: `t010-c4-institution-${run}`,
     careGroupId: `t010-c4-group-${run}`,
     enrollmentId: `t010-c4-enrollment-${run}`,
+    commandExecutionId: randomUUID(),
     pairOperationId: `t010-c4-pair-${run}`,
   } satisfies QualificationFixture;
 
@@ -548,6 +553,17 @@ async function seedQualificationFixture(database: Prisma.TransactionClient): Pro
     myChatUserId: `t010-c4-user-${run}`,
     status: "active",
     aggregateVersion: 3,
+  } });
+  await database.nurtureParticipantPrincipalBinding.create({ data: {
+    id: item.participantBindingId,
+    participantId: item.participantId,
+    workspaceId: item.workspaceId,
+    accountObjectId: `t010-c4-account-${run}`,
+    actorObjectId: `t010-c4-actor-${run}`,
+    bindingVersion: 1,
+    status: "active",
+    currentKey: "current",
+    aggregateVersion: 1,
   } });
   await Promise.all([
     database.nurtureChildBindingAnchor.create({ data: {
@@ -644,11 +660,27 @@ async function seedQualificationFixture(database: Prisma.TransactionClient): Pro
     currentKey: "current",
     aggregateVersion: 14,
   } });
+  await database.nurtureCommandExecution.create({ data: {
+    id: item.commandExecutionId,
+    workspaceId: item.workspaceId,
+    commandRequestIdHash: digest(`command-request:${run}`),
+    originInvocationRequestIdHash: digest(`origin-invocation:${run}`),
+    commandKey: "t010_family_sharing_qualification",
+    commandScope: "c30_pair",
+    commandContractVersion: 1,
+    payloadHash: digest(`payload:${run}`),
+    businessActorRef: item.participantId,
+    businessOutcome: "applied",
+    outputRefs: [],
+    handoffRequestSnapshotsPayload: [],
+    committedAt: new Date("2026-08-12T07:59:00.000Z"),
+  } });
   await database.nurtureC30PairOperation.create({ data: {
     id: item.pairOperationId,
     workspaceId: item.workspaceId,
     scenarioKey: "nurture",
     participantId: item.participantId,
+    participantBindingId: item.participantBindingId,
     accountObjectId: `t010-c4-account-${run}`,
     actorObjectId: `t010-c4-actor-${run}`,
     childAnchorId: item.childAnchorId,
@@ -675,6 +707,7 @@ async function seedQualificationFixture(database: Prisma.TransactionClient): Pro
     state: "committed",
     childAssociationId: item.childAssociationId,
     familyAssociationId: item.familyAssociationId,
+    commandExecutionId: item.commandExecutionId,
     scenarioCommitEvidenceHash: digest(`scenario-commit:${run}`),
     participantVersion: 3,
     childCareProcessVersion: 8,
@@ -850,10 +883,10 @@ async function removeQualificationFixture(
   database: PrismaClient,
   item: QualificationFixture,
 ): Promise<void> {
-  await database.nurtureCommandExecution.deleteMany({ where: { workspaceId: item.workspaceId } });
   await database.nurtureFamilySharingPolicy.deleteMany({ where: { workspaceId: item.workspaceId } });
   await database.nurtureFamilySharingAuthority.deleteMany({ where: { workspaceId: item.workspaceId } });
   await database.nurtureC30PairOperation.deleteMany({ where: { id: item.pairOperationId } });
+  await database.nurtureCommandExecution.deleteMany({ where: { workspaceId: item.workspaceId } });
   await database.nurtureFamilyAnchorAssociation.deleteMany({ where: { id: item.familyAssociationId } });
   await database.nurtureChildAnchorAssociation.deleteMany({ where: { id: item.childAssociationId } });
   await database.nurtureEnrollment.deleteMany({ where: { id: item.enrollmentId } });
@@ -865,6 +898,9 @@ async function removeQualificationFixture(
   await database.nurtureChild.deleteMany({ where: { id: item.childId } });
   await database.nurtureChildBindingAnchor.deleteMany({ where: { id: item.childAnchorId } });
   await database.nurtureFamilyBindingAnchor.deleteMany({ where: { id: item.familyAnchorId } });
+  await database.nurtureParticipantPrincipalBinding.deleteMany({
+    where: { id: item.participantBindingId },
+  });
   await database.nurtureParticipant.deleteMany({ where: { id: item.participantId } });
 }
 

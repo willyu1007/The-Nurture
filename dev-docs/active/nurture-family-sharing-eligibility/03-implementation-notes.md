@@ -249,3 +249,25 @@ trusting a repository status flag. Exact command, fingerprint, categories,
 deterministic receipt ref, completion time, and the ordered registered-store
 receipt set must all match. A substituted or truncated receipt returns generic
 unavailable and cannot be reported as cleanup success.
+
+## 2026-08-12 I4-C4 disposable and joint qualification
+
+- Executed the guarded runner against
+  `t010_i4c4_disposable_20260812`. It applied all 39 migrations from empty,
+  ran the six environment-free and six PostgreSQL cases, then proved zero
+  synthetic participant/execution/nonce residue.
+- Added a shared production-shape fixture helper and a serialized two-database
+  x5 suite. The joint owner is My-Chat's pinned exact contract consumer backed
+  by Nurture's real current-authority repository; My-Chat uses its real parent
+  context, authorization repository, receipts and outbox.
+- Five joint cases prove fresh grant and owner-free exact replay, authority
+  version drift, provider outage, committed-response loss with
+  `outcome_unknown -> replayed`, and withdrawal during owner outage followed
+  by one Nurture cleanup purge plus exact cleanup replay.
+- The cleanup bridge is qualification-only and consumes the real My-Chat
+  withdrawal outbox payload. Production My-Chat and Nurture compositions stay
+  unbound/default-off; the qualification does not create a route, worker,
+  secret, rollout flag or traffic authority.
+
+Current state:
+`I4_C4_EXIT_PASS_DEFAULT_OFF / HANDOFF_READY / DURABLE_APPLY_AND_ACTIVATION_CLOSED`.
