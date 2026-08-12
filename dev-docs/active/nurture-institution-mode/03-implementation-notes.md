@@ -7,19 +7,27 @@
 
 ## Next concrete actions
 
-1. Implement the real My-Chat current-owner carrier producer and signed
-   positive two-database path, then continue native-source, remaining command
-   and Guardian/mobile coverage.
+1. Continue native-source, remaining command-family, Guardian/mobile and the
+   complete negative/replay/head matrix from the qualified real Host-carrier
+   signed positive path.
 2. Run that complete matrix at the exact current pins; open G4-F only on PASS.
 3. Close the T-010 governance handoff without treating its default-off
    qualification as durable apply or activation.
 4. Keep C31-C35, T-008, capability/Workspace activation, deployment, Pilot and
    traffic closed until separately authorized.
 
-The current C30 qualification binds Base `536638a`, My-Chat `42c94825`, Nurture
-source `a6727df…` and owner lock `04c3176c…`; record 25 is authoritative.
+The current C30 qualification binds Base `536638a`, My-Chat `ae33b313`, Nurture
+lock source `bb0f1a8…` and owner lock `bcbe6b33…`; record 26 is authoritative.
 
 ## What changed
+
+- 2026-08-12: Adopted the real My-Chat Enrollment Journey current-owner carrier
+  source at `ae33b313`, qualified the signed positive two-database path in
+  T-007 `9ab05e6`, and resealed C30 from T-002 pin source `bb0f1a8`. The Host
+  runtime aggregate remains `aac525c4…`; `x5_joint_api` becomes
+  `20768714…`, the owner aggregate becomes `bcbe6b33…`, and the stale Nurture
+  scenario self-pin found by the verifier is repaired to `48ede771…`. Record
+  26 is current. All capabilities remain default-off.
 
 - 2026-08-12: Resealed the schema-bearing C30 source profiles after T-007
   `a6727df` added the Prisma trial Grant policy owner and refreshed the DB

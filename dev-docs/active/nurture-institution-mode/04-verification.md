@@ -44,6 +44,25 @@
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
 
+## C30 signed owner-carrier current-pin qualification — 2026-08-12
+
+| Check | Result |
+| --- | --- |
+| upstream exact heads and source profiles | PASS — Base `536638a`, My-Chat `ae33b313` |
+| workflow contract/source pin | PASS — parity `85cf56e2…`; x5 `20768714…`; wave4 unchanged; Nurture self `48ede771…` |
+| owner-adoption lock | PASS — source `bb0f1a8`, aggregate `bcbe6b33...` |
+| C30 default-off census | PASS — every positive production population remains zero |
+| G2 exact contract pin | PASS |
+| signed owner-carrier joint path | PASS — focused 8/8; x5 37/37 three times |
+| repository regressions | PASS — Nurture unit 1049/typecheck; My-Chat unit 1154/typecheck/ESLint |
+| effect boundary | PASS — metadata-only reseal; no durable apply, route, activation, deployment or traffic |
+
+Current verdict: `C30_CURRENT_PIN_REQUAL_PASS / DEFAULT_OFF /
+T007_REMAINING_I4_MATRIX_NEXT / G4_F_CLOSED`.
+Normative record:
+[`26-c30-signed-owner-carrier-pin-addendum.md`](./26-c30-signed-owner-carrier-pin-addendum.md),
+with records 22–25 retained as underlying qualification evidence.
+
 ## C30 trial-owner/schema current-pin qualification — 2026-08-12
 
 | Check | Result |
