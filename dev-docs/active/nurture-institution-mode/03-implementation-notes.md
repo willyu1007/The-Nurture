@@ -7,9 +7,9 @@
 
 ## Next concrete actions
 
-1. Implement the T-007 Prisma current-owner derivation adapter and positive
-   signed command/revoke/expiry/head matrix, then continue native-source and
-   Guardian/mobile coverage.
+1. Implement the real My-Chat current-owner carrier producer and signed
+   positive two-database path, then continue native-source, remaining command
+   and Guardian/mobile coverage.
 2. Run that complete matrix at the exact current pins; open G4-F only on PASS.
 3. Close the T-010 governance handoff without treating its default-off
    qualification as durable apply or activation.
@@ -17,9 +17,16 @@
    traffic closed until separately authorized.
 
 The current C30 qualification binds Base `536638a`, My-Chat `42c94825`, Nurture
-scenario `6337639e…` and owner lock `f4d8c752…`; record 24 is authoritative.
+source `a6727df…` and owner lock `04c3176c…`; record 25 is authoritative.
 
 ## What changed
+
+- 2026-08-12: Resealed the schema-bearing C30 source profiles after T-007
+  `a6727df` added the Prisma trial Grant policy owner and refreshed the DB
+  context. The C30 Host aggregate is unchanged; the Nurture owner aggregate is
+  now `04c3176c…`. Record 25 supersedes record 24 only for current Nurture
+  source identity. The reseal is metadata-only and every capability remains
+  default-off.
 
 - 2026-08-12: Requalified the request-scoped owner-carrier schema at My-Chat
   `42c94825` and Nurture `82e87df`. The C30 Host runtime aggregate remains

@@ -44,6 +44,24 @@
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
 
+## C30 trial-owner/schema current-pin qualification — 2026-08-12
+
+| Check | Result |
+| --- | --- |
+| upstream exact heads and source profiles | PASS |
+| owner-adoption lock | PASS — source `a6727df`, aggregate `04c3176c...` |
+| C30 default-off census | PASS — every positive production population remains zero |
+| G2 exact contract pin | PASS |
+| T-007 regression | PASS — unit 1049, production DB 442, x5 36/36 three times |
+| migration/cleanup evidence | PASS — Nurture 40/40, My-Chat 43/43; disposable containers absent |
+| Effect boundary | PASS — metadata-only reseal; no durable apply, route, activation, deployment or traffic |
+
+Current verdict: `C30_CURRENT_PIN_REQUAL_PASS / DEFAULT_OFF /
+T007_SIGNED_HOST_CARRIER_REMAINDER_NEXT / G4_F_CLOSED`.
+Normative record:
+[`25-c30-trial-owner-policy-pin-addendum.md`](./25-c30-trial-owner-policy-pin-addendum.md),
+with records 22–24 retained as underlying qualification evidence.
+
 ## C30 current-pin three-repository requalification — 2026-08-12
 
 | Check | Result |
