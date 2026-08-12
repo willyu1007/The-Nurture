@@ -3,6 +3,8 @@ import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import {
   canonicalJsonV1,
   hashCommandRequestId,
+  NurtureDeterministicRollback,
+  type NurtureCommandSpec,
 } from "../commands/command-kernel.js";
 
 const OPAQUE_ID = /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,199}$/u;
@@ -151,33 +153,73 @@ export function createNurtureWorkflowRunSettlementOwner(input: {
   });
 }
 
+export type NurtureWorkflowRunSettlementOwnerV1 = ReturnType<
+  typeof createNurtureWorkflowRunSettlementOwner
+>;
+
 export function workflowRunSettlementBinding(
   input: SettlementOwnerInput,
 ): NurtureWorkflowRunSettlementBindingV1 | null {
   return bindingFrom(input);
 }
 
+/**
+ * Adds the settlement commit to the command's existing finalizer without
+ * changing the command payload or its canonical hash. Both finalizers run
+ * after CommandExecution creation and inside the same owning transaction.
+ */
+export function withNurtureWorkflowRunSettlementFinalizer<Input>(
+  source: NurtureCommandSpec<Input>,
+  binding: NurtureWorkflowRunSettlementBindingV1,
+): NurtureCommandSpec<Input> {
+  return {
+    ...source,
+    afterExecutionCreated: async (transaction, payload, context, applied) => {
+      await source.afterExecutionCreated?.(
+        transaction,
+        payload,
+        context,
+        applied,
+      );
+      const settlement = transaction.workflowRunSettlement;
+      if (!settlement) {
+        throw new NurtureDeterministicRollback(
+          "workflow_run_settlement_transaction_unavailable",
+          "technical_error",
+        );
+      }
+      await settlement.markCommitted({
+        ...binding,
+        command_execution_id: applied.execution.id,
+      });
+    },
+  };
+}
+
 function bindingFrom(
   input: SettlementOwnerInput,
 ): NurtureWorkflowRunSettlementBindingV1 | null {
+  const hostReservation = parseNurtureWorkflowRunReservationEvidenceV1(
+    input.host_reservation,
+  );
   if (
     !OPAQUE_ID.test(input.workspace_id) ||
     !OPAQUE_ID.test(input.command_request_id) ||
-    !validHostReservation(input.host_reservation)
+    !hostReservation
   ) return null;
   return Object.freeze({
     workspace_id: input.workspace_id,
     logical_operation_id_hash: sha256(
-      `nurture.workflow-run-logical-operation.v1\0${input.workspace_id}\0${input.host_reservation.logical_operation_id}`,
+      `nurture.workflow-run-logical-operation.v1\0${input.workspace_id}\0${hostReservation.logical_operation_id}`,
     ),
     reservation_ref_hash: sha256(
-      `nurture.workflow-run-reservation-ref.v1\0${canonicalJsonV1(input.host_reservation.reservation_ref)}`,
+      `nurture.workflow-run-reservation-ref.v1\0${canonicalJsonV1(hostReservation.reservation_ref)}`,
     ),
     reservation_evidence_sha256:
-      input.host_reservation.reservation_evidence_sha256,
-    run_object_id: input.host_reservation.run_ref.object_id,
+      hostReservation.reservation_evidence_sha256,
+    run_object_id: hostReservation.run_ref.object_id,
     binding_fingerprint_sha256:
-      input.host_reservation.binding_fingerprint_sha256,
+      hostReservation.binding_fingerprint_sha256,
     command_request_id_hash: hashCommandRequestId(
       input.workspace_id,
       input.command_request_id,
@@ -228,22 +270,33 @@ function runRef(record: NurtureWorkflowRunSettlementRecordV1): CanonicalRef {
   };
 }
 
-function validHostReservation(
-  value: NurtureWorkflowRunReservationEvidenceV1,
-): boolean {
-  return isRecord(value) && exactKeys(value, [
+export function parseNurtureWorkflowRunReservationEvidenceV1(
+  value: unknown,
+): NurtureWorkflowRunReservationEvidenceV1 | null {
+  if (!isRecord(value) || !exactKeys(value, [
     "binding_fingerprint_sha256",
     "evidence_version",
     "logical_operation_id",
     "reservation_evidence_sha256",
     "reservation_ref",
     "run_ref",
-  ]) && value.evidence_version === 1 &&
-    OPAQUE_ID.test(value.logical_operation_id) &&
-    SHA256.test(value.binding_fingerprint_sha256) &&
-    SHA256.test(value.reservation_evidence_sha256) &&
-    exactRef(value.reservation_ref, "workflow_run_reservation", true) &&
-    exactRef(value.run_ref, "workflow_run", false);
+  ]) || value.evidence_version !== 1 ||
+    typeof value.logical_operation_id !== "string" ||
+    typeof value.binding_fingerprint_sha256 !== "string" ||
+    typeof value.reservation_evidence_sha256 !== "string" ||
+    !OPAQUE_ID.test(value.logical_operation_id) ||
+    !SHA256.test(value.binding_fingerprint_sha256) ||
+    !SHA256.test(value.reservation_evidence_sha256) ||
+    !exactRef(value.reservation_ref, "workflow_run_reservation", true) ||
+    !exactRef(value.run_ref, "workflow_run", false)) return null;
+  return Object.freeze({
+    evidence_version: 1,
+    logical_operation_id: value.logical_operation_id,
+    reservation_ref: Object.freeze({ ...value.reservation_ref }),
+    run_ref: Object.freeze({ ...value.run_ref }),
+    binding_fingerprint_sha256: value.binding_fingerprint_sha256,
+    reservation_evidence_sha256: value.reservation_evidence_sha256,
+  });
 }
 
 function validRecord(
@@ -276,10 +329,10 @@ function validRecord(
 }
 
 function exactRef(
-  value: CanonicalRef,
+  value: unknown,
   objectType: string,
   versioned: boolean,
-): boolean {
+): value is CanonicalRef {
   if (!isRecord(value)) return false;
   const keys = versioned
     ? ["namespace", "object_id", "object_type", "schema_version", "version"]

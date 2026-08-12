@@ -5,7 +5,7 @@ import type {
 import { describe, expect, it } from "vitest";
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
-  parseNurtureEnrollmentJourneyFormalExecuteInputV1,
+  parseNurtureEnrollmentJourneyFormalExecuteInputV2,
   parseNurtureEnrollmentJourneyFormalPrepareInputV1,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
 } from "../../src/enrollment-journey-formal-ingress-contract.js";
@@ -60,24 +60,39 @@ describe("Enrollment Journey formal ingress", () => {
   });
 
   it("parses the execute union: ledgered confirmation or direct intent", () => {
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV1({
-      contractVersion: 1,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV2({
+      contractVersion: 2,
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: hostReservation(),
     })).not.toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV1({
-      contractVersion: 1,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV2({
+      contractVersion: 2,
       clientCommandId: "client-1",
       request: intent("record_or_skip_visit", { disposition: "recorded" }),
     })).not.toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV1({
-      contractVersion: 1,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV2({
+      contractVersion: 2,
       clientCommandId: "client-1",
       request: intent("close_inquiry", { reasonKey: "family_declined" }),
     })).toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV1({
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV2({
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+    })).toBeNull();
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV2({
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: {
+        ...hostReservation(),
+        actor_id: "forbidden-host-field",
+      },
+    })).toBeNull();
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV2({
       contractVersion: 1,
       commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
     })).toBeNull();
   });
 
@@ -172,6 +187,224 @@ describe("Enrollment Journey formal ingress", () => {
       client_surface: "web_run_workbench",
     }]);
   });
+
+  it("carries only signed v2 Host reservation evidence into inquiry execution", async () => {
+    const trustedContexts: unknown[] = [];
+    const authority = {
+      workspace_id: "workspace-1",
+      participant_ref: "nurture-local-participant-1",
+      institution_ref: "institution-1",
+      role_assignment_ref: "role-1",
+      active_role: "institution_admin" as const,
+      surface_key: "institution_workbench" as const,
+      authority_version: "1",
+      evaluated_at: "2026-08-12T00:00:00.000Z",
+    };
+    const frozenRequest = {
+      ...intent("start_enrollment_inquiry", {
+        preferredLabel: "Prospective family",
+        birthYearMonth: "2024-03",
+        ageBandKey: undefined,
+        expectedEntryStartDate: "2026-09-01",
+        expectedEntryEndDate: "2026-10-01",
+        targetClassTypeKey: "toddler",
+        targetAgeBandKey: "age_2_3",
+        targetCareGroupOptionRef: undefined,
+        careScheduleNeedKeys: ["full_day"],
+        sourceChannel: "walk_in",
+        safetyLabelKeys: [],
+        initialContactAt: "2026-08-12T00:00:00.000Z",
+        nextTouchpointAt: "2026-08-13T00:00:00.000Z",
+      }),
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+    } as never;
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: {
+        ...defaultNurtureEnrollmentJourneySurfaceDeps,
+        bindings: {
+          resolve: async ({ trusted }) => {
+            trustedContexts.push(trusted);
+            return {
+              status: "resolved",
+              binding: {
+                surface_key: "institution_workbench",
+                active_role: "institution_admin",
+                institution_ref: "institution-1",
+                role_assignment_ref: "role-1",
+                workflow_run_ref: hostReservation().run_ref,
+                heads: {},
+                refs: {},
+                contact_owner_snapshot: {
+                  contract_version: "1.0.0",
+                  contact_ref: canonical("my_chat", "prospective_contact", "contact-1"),
+                  safe_label: "Prospective family",
+                  verified_at: "2026-08-12T00:00:00.000Z",
+                },
+                protected_birth_year_month: {
+                  algVersion: 1,
+                  keyRef: "protected-key",
+                  ciphertext: "ciphertext",
+                  integrityTag: "integrity-tag",
+                },
+              },
+            } as const;
+          },
+        },
+        commands: {
+          execute: async () => ({
+            status: "committed",
+            disposition: "executed",
+            workflow: {
+              contract_version: "1.0.0",
+              workspace_id: "workspace-1",
+              institution_ref: "institution-1",
+              workflow_ref: "workflow-1",
+              workflow_run_ref: hostReservation().run_ref,
+              workflow_type: "EnrollmentJourneyWorkflowV1",
+              workflow_head: 1,
+              lifecycle: "active",
+              current_stage: "inquiry",
+              waiting_state: "ready",
+              pending_transition: "none",
+              terminal_outcome: "none",
+              completed_milestones: ["inquiry_started"],
+              started_at: "2026-08-12T00:00:00.000Z",
+              updated_at: "2026-08-12T00:00:00.000Z",
+            },
+          }),
+        },
+      },
+      authorityResolver: {
+        resolveCurrent: async () => ({ status: "resolved", authority }),
+      },
+      preparedCommandOwner: {
+        prepare: async () => ({
+          status: "unavailable",
+          reason_code: "not_used",
+        }),
+        verifyConfirmed: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-1",
+          frozen_request: frozenRequest,
+          authority,
+        }),
+        deriveDirectContext: async () => ({
+          status: "unavailable",
+          reason_code: "not_used",
+        }),
+      },
+      workflowRunSettlementOwner: {
+        register: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        readStatus: async () => ({
+          status: "committed",
+          settlement_ref: {
+            schema_version: 1,
+            namespace: "nurture",
+            object_type: "workflow_run_settlement",
+            object_id: "settlement-1",
+            version: 2,
+          },
+          run_ref: hostReservation().run_ref,
+          outcome: "committed",
+          proof: {
+            proof_version: 1,
+            outcome: "committed",
+            writer_fence_receipt_ref: "receipt-1",
+            receipt_sha256: "c".repeat(64),
+          },
+        }),
+        confirmNoEffect: async () => ({ status: "unavailable", reason_code: "not_used" }),
+      } as never,
+    });
+    const execute = verifiedInvocation("execute");
+    execute.invocation.operation.input = {
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: hostReservation(),
+    };
+
+    await expect(
+      handlers[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute]?.(execute),
+    ).resolves.toMatchObject({
+      status: "ok",
+      workflow_run_settlement: {
+        status: "committed",
+        run_ref: hostReservation().run_ref,
+        proof: {
+          outcome: "committed",
+          writer_fence_receipt_ref: "receipt-1",
+        },
+      },
+    });
+    expect(trustedContexts).toEqual([expect.objectContaining({
+      command_request_id: "command-request-1",
+      host_workflow_run_reservation: hostReservation(),
+    })]);
+  });
+
+  it("requires reservation evidence for inquiry and forbids it on other commands", async () => {
+    const handlerFor = (frozenRequest: unknown) =>
+      createNurtureEnrollmentJourneyFormalInvocationHandlers({
+        surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+        authorityResolver: {
+          resolveCurrent: async () => ({
+            status: "unavailable",
+            reason_code: "must_not_reach_authority",
+          }),
+        },
+        preparedCommandOwner: {
+          prepare: async () => ({ status: "unavailable", reason_code: "not_used" }),
+          verifyConfirmed: async () => ({
+            status: "resolved",
+            command_request_id: "command-request-1",
+            frozen_request: frozenRequest,
+            authority: {
+              workspace_id: "workspace-1",
+              participant_ref: "participant-1",
+              institution_ref: "institution-1",
+              role_assignment_ref: "role-1",
+              active_role: "institution_admin",
+              surface_key: "institution_workbench",
+              authority_version: "1",
+              evaluated_at: "2026-08-12T00:00:00.000Z",
+            },
+          } as never),
+          deriveDirectContext: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        },
+        workflowRunSettlementOwner: {} as never,
+      });
+    const withoutEvidence = verifiedInvocation("execute");
+    withoutEvidence.invocation.operation.input = {
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+    };
+    await expect(handlerFor({
+      ...intent("start_enrollment_inquiry", {}),
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+    })[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute]?.(withoutEvidence))
+      .resolves.toEqual({
+        status: "invalid",
+        reason_code: "invalid_enrollment_journey_formal_input",
+      });
+
+    const forbiddenEvidence = verifiedInvocation("execute");
+    forbiddenEvidence.invocation.operation.input = {
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: hostReservation(),
+    };
+    await expect(handlerFor({
+      ...intent("close_inquiry", { reasonKey: "family_declined" }),
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+    })[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute]?.(forbiddenEvidence))
+      .resolves.toEqual({
+        status: "invalid",
+        reason_code: "invalid_enrollment_journey_formal_input",
+      });
+  });
 });
 
 function queryRequest(capabilityKey: string) {
@@ -238,5 +471,19 @@ function canonical(namespace: "my_chat", objectType: string, objectId: string) {
     namespace,
     object_type: objectType,
     object_id: objectId,
+  };
+}
+
+function hostReservation() {
+  return {
+    evidence_version: 1 as const,
+    logical_operation_id: "logical-operation-1",
+    reservation_ref: {
+      ...canonical("my_chat", "workflow_run_reservation", "reservation-1"),
+      version: 1,
+    },
+    run_ref: canonical("my_chat", "workflow_run", "run-1"),
+    binding_fingerprint_sha256: "b".repeat(64),
+    reservation_evidence_sha256: "e".repeat(64),
   };
 }

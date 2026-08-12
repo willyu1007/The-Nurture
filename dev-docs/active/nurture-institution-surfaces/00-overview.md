@@ -550,3 +550,23 @@ binding, the Host proof verifier is not composed, and production remains
 fail-closed. Verdict: `DUAL_LEDGER_CANDIDATES_IMPLEMENTED /
 TRANSPORT_AND_ATOMIC_COMMAND_ADOPTION_PENDING / NO_DB_APPLY /
 I4_NOT_QUALIFIED`.
+
+## 2026-08-12 sixth-round signed settlement adoption
+
+The Nurture side now carries an exact Host reservation through the verified,
+signed execute operation. Enrollment Journey execute rotated to input schema
+v2; v1 execute, malformed evidence, missing inquiry evidence and evidence on a
+non-inquiry command fail closed. The reservation is registered before any
+prospective-contact read or protected-content sealing.
+
+`start_enrollment_inquiry` now attaches the settlement finalizer after
+`NurtureCommandExecution` creation. The business effect, immutable command
+receipt and committed settlement proof share one serializable Nurture
+transaction. A successful formal execute returns the body-free committed proof
+needed by the future Host verifier.
+
+This is a default-off local implementation, not I4 qualification. Historical
+status transport after response loss, the My-Chat proof verifier, two-database
+race/replay qualification and migration apply remain open. Verdict:
+`SIGNED_TRANSPORT_AND_ATOMIC_SETTLEMENT_IMPLEMENTED / HOST_VERIFIER_AND_STATUS_TRANSPORT_PENDING /
+NO_DB_APPLY / I4_NOT_QUALIFIED`.

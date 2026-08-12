@@ -1570,3 +1570,30 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
   shape shared with the Host lifecycle.
 - Migration artifacts remain repository SSOT only. No target was selected and
   no database write was attempted during cleanup.
+
+## 2026-08-12 sixth-round signed transport and atomic adoption
+
+- Rotated only the private Enrollment Journey execute declaration to input
+  schema v2 and handler v2. Query and prepare remain v1. The signed Base
+  envelope is unchanged; its strict `operation.input` now admits one exact
+  `hostWorkflowRunReservation` object.
+- The parser copies only logical operation id, canonical reservation/Run refs,
+  binding fingerprint and reservation evidence hash. Extra Host fields,
+  versioned Run refs, wrong namespaces and old v1 execute inputs are rejected.
+- Evidence is copied into trusted server context, never into the public
+  Enrollment business request. It is required only when the frozen prepared
+  capability is `start_enrollment_inquiry` and forbidden for every other
+  command.
+- The Prisma binding owner registers the exact settlement before calling the
+  prospective-contact owner or sealing birth-month content. Registration
+  failure leaves those downstream calls untouched.
+- The command transaction now exposes the existing settlement adapter.
+  `withNurtureWorkflowRunSettlementFinalizer` preserves any prior finalizer and
+  then marks the settlement committed using the newly created immutable
+  command execution id. Missing transaction wiring is a deterministic rollback.
+- After an `ok` inquiry result, formal execute rereads the historical
+  settlement and returns only a validated committed proof. If the proof cannot
+  be reread, the response is `outcome_unknown`; it does not misreport success.
+- No route, capability activation, persistent migration apply, deployment or
+  traffic was added. A separate historical status operation and My-Chat proof
+  verifier are still required before Host confirmation is admitted.

@@ -37,6 +37,7 @@ import { PrismaInstitutionKnowledgeRepository } from "./institution-knowledge.re
 import { PrismaInstitutionKnowledgeConflictCandidateRepository } from "./institution-knowledge-conflict-candidate.repository.js";
 import { isPrismaSerializationAbort } from "./prisma-error.js";
 import { nurtureCommandAdvisoryKey } from "./nurture-command-advisory-key.js";
+import { PrismaNurtureWorkflowRunSettlementTransaction } from "./workflow-run-settlement.repository.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -137,6 +138,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly enrollmentFormalization: PrismaEnrollmentFormalizationRepository;
   /** G4-D I3: the enrollment prepared-command ledger, consumed in this tx. */
   readonly enrollmentPreparedCommands: PrismaNurtureEnrollmentJourneyPreparedCommandLedger;
+  /** T-007 I4: Host Run settlement receipt, committed with the command. */
+  readonly workflowRunSettlement: PrismaNurtureWorkflowRunSettlementTransaction;
   /** G4-E private Institution Knowledge lifecycle/provenance writes. */
   readonly institutionKnowledge: PrismaInstitutionKnowledgeRepository;
   readonly institutionKnowledgeConflicts: PrismaInstitutionKnowledgeConflictCandidateRepository;
@@ -200,6 +203,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     );
     this.enrollmentPreparedCommands =
       new PrismaNurtureEnrollmentJourneyPreparedCommandLedger(transaction);
+    this.workflowRunSettlement =
+      new PrismaNurtureWorkflowRunSettlementTransaction(transaction, now);
     this.institutionKnowledge = new PrismaInstitutionKnowledgeRepository(transaction, now);
     this.institutionKnowledgeConflicts =
       new PrismaInstitutionKnowledgeConflictCandidateRepository(transaction);

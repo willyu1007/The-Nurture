@@ -26,6 +26,7 @@ import type {
   NurtureEnrollmentJourneyFormalAuthorityResolverV1,
   NurtureEnrollmentJourneyPreparedCommandOwnerV1,
 } from "./enrollment-journey-formal-ingress-contract.js";
+import type { NurtureWorkflowRunSettlementOwnerV1 } from "./domain/institution/workflow-run-settlement.js";
 import { defaultNurtureInstitutionKnowledgeSurfaceDeps } from "./institution-knowledge-surfaces.js";
 import {
   admitNurtureInstitutionKnowledgeOwnerIntegration,
@@ -105,6 +106,7 @@ export type NurtureEnrollmentJourneyFormalOwnerBindingV1 = Readonly<{
   surfaceDeps: NurtureEnrollmentJourneySurfaceDeps;
   authorityResolver: NurtureEnrollmentJourneyFormalAuthorityResolverV1;
   preparedCommandOwner: NurtureEnrollmentJourneyPreparedCommandOwnerV1;
+  workflowRunSettlementOwner: NurtureWorkflowRunSettlementOwnerV1;
 }>;
 
 /**
@@ -146,6 +148,8 @@ export const createNurtureScenarioModule = (
         authorityResolver: deps.enrollmentJourneyFormalOwnerBinding?.authorityResolver,
         preparedCommandOwner:
           deps.enrollmentJourneyFormalOwnerBinding?.preparedCommandOwner,
+        workflowRunSettlementOwner:
+          deps.enrollmentJourneyFormalOwnerBinding?.workflowRunSettlementOwner,
       }),
     },
     internal_api_handlers: {

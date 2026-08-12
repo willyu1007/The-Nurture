@@ -115,3 +115,17 @@ signed Nurture execution plus historical writer-fenced settlement, then Host
 confirm or abandon. The transport, atomic command attachment and Host verifier
 remain open, so production still fails closed and no positive I4 claim is
 made.
+
+## Signed-adoption follow-up
+
+The Nurture transport and atomic attachment are now implemented. Formal
+execute v2 admits the exact signed reservation evidence, registers it before
+prospective-contact/protected work, persists the Host Run ref without deriving
+it, and marks the settlement committed after command-execution creation in the
+same transaction. The success response includes the committed proof.
+
+This does not restore a positive joint vehicle yet. A dedicated historical
+status operation, the My-Chat verifier and an approved two-database execution
+environment remain missing. The record verdict advances only to
+`NURTURE_SIGNED_ATOMIC_ADOPTION_IMPLEMENTED / HOST_CONFIRMATION_NOT_ADMITTED /
+I4_NOT_QUALIFIED`.

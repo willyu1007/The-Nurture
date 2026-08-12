@@ -10,6 +10,9 @@ import {
   NurtureEnrollmentJourneyPreparedCommandCrypto,
   NurtureEnrollmentJourneyPreparedCommandOwner,
   NurtureEnrollmentJourneyTargetOptionCodec,
+  createNurtureWorkflowRunSettlementOwner,
+  withNurtureWorkflowRunSettlementFinalizer,
+  workflowRunSettlementBinding,
   type InstitutionBusinessCommunicationReadPort,
   type NurtureCommandRepository,
   type NurtureCommandResult,
@@ -26,6 +29,8 @@ import {
   type NurtureEnrollmentJourneySurfaceDeps,
   type NurtureEnrollmentJourneyTargetSelectionV1,
   type NurtureEnrollmentJourneyTrustedContextV1,
+  type NurtureWorkflowRunSettlementBindingV1,
+  type NurtureWorkflowRunSettlementOwnerV1,
   type ProtectedContentWritePort,
 } from "@the-nurture/scenario";
 import {
@@ -48,6 +53,7 @@ import { PrismaEnrollmentJourneyRepository } from "./repositories/enrollment-jou
 import { PrismaEnrollmentPairOwnerRepository } from "./repositories/enrollment-pair-owner.repository.js";
 import { PrismaEnrollmentWaitlistRepository } from "./repositories/enrollment-waitlist.repository.js";
 import { PrismaNurtureCommandRepository } from "./repositories/institution-core.repositories.js";
+import { PrismaNurtureWorkflowRunSettlementRepository } from "./repositories/workflow-run-settlement.repository.js";
 
 const LEDGERED = new Set<string>(NURTURE_ENROLLMENT_JOURNEY_LEDGERED_COMMAND_KEYS);
 const DIRECT = new Set<string>(NURTURE_ENROLLMENT_JOURNEY_DIRECT_COMMAND_KEYS);
@@ -60,6 +66,7 @@ type BindingDeps = {
   nativeSourceProvider: NurtureEnrollmentNativeSourceProviderV1;
   currentOwnerProvider: NurtureEnrollmentJourneyCurrentOwnerProviderV1;
   protectedContent: ProtectedContentWritePort;
+  workflowRunSettlementOwner: NurtureWorkflowRunSettlementOwnerV1;
   now: () => Date;
 };
 
@@ -227,13 +234,55 @@ implements NurtureEnrollmentJourneyBindingPort {
       if (selection.target_kind !== "prospective_contact") {
         return { status: "denied", reason_code: "enrollment_target_option_invalid" };
       }
-      // The current issue/read candidate has no cross-database commit
-      // protocol. Fail before reading the contact owner, sealing protected
-      // data, or issuing any Host effect.
-      return {
-        status: "unavailable",
-        reason_code: "workflow_run_cross_db_commit_protocol_unavailable",
-      };
+      const hostReservation = trusted.host_workflow_run_reservation;
+      if (!hostReservation) {
+        return {
+          status: "unavailable",
+          reason_code: "workflow_run_reservation_evidence_required",
+        };
+      }
+      // Registration is the first cross-owner action. No prospective-contact
+      // fact is read and no protected value is sealed until the exact signed
+      // Host reservation has a durable, replayable Nurture settlement row.
+      const settlement = await this.deps.workflowRunSettlementOwner.register({
+        workspace_id: trusted.workspace_id,
+        command_request_id: trusted.command_request_id,
+        host_reservation: hostReservation,
+      });
+      if (settlement.status === "denied" || settlement.status === "unavailable") {
+        return settlement;
+      }
+      if (settlement.status === "confirmed_no_effect") {
+        return {
+          status: "denied",
+          reason_code: "workflow_run_settlement_already_no_effect",
+        };
+      }
+      const contact = await this.deps.contactProvider.resolveContact({
+        workspace_id: trusted.workspace_id,
+        institution_ref: binding.institution_ref,
+        contact_object_id: selection.target_ref,
+        contact_version: selection.contact_version,
+      });
+      if (contact.status !== "resolved") return contact;
+      binding.contact_owner_snapshot = contact.snapshot;
+      binding.workflow_run_ref = hostReservation.run_ref;
+      if (typeof operationInput.birthYearMonth === "string") {
+        binding.protected_birth_year_month =
+          this.deps.protectedContent.seal(operationInput.birthYearMonth);
+      }
+      if (typeof operationInput.targetCareGroupOptionRef === "string") {
+        const groupRef = await this.resolveCareGroupOption(
+          trusted,
+          operationInput.targetCareGroupOptionRef,
+          binding.institution_ref,
+        );
+        if (!groupRef) {
+          return { status: "denied", reason_code: "enrollment_care_group_option_invalid" };
+        }
+        binding.refs.target_care_group = groupRef.care_group_ref;
+      }
+      return { status: "resolved", binding };
     }
 
     if (key === "record_external_touchpoint") {
@@ -458,6 +507,17 @@ implements NurtureEnrollmentJourneyCommandExecutor {
     const repository = ledgered
       ? this.consumingRepository(input.trusted, input.confirmation_ref)
       : this.commands;
+    const settlementBinding = this.settlementBinding(input);
+    if (input.capability_key === "start_enrollment_inquiry" && !settlementBinding) {
+      return {
+        status: "not_committed",
+        decision: "invalid",
+        reason_code: "workflow_run_settlement_binding_invalid",
+      };
+    }
+    const spec = settlementBinding
+      ? withNurtureWorkflowRunSettlementFinalizer(input.spec, settlementBinding)
+      : input.spec;
     const runner = new NurtureCommandRunner(repository);
     let result: NurtureCommandResult;
     try {
@@ -467,7 +527,7 @@ implements NurtureEnrollmentJourneyCommandExecutor {
         command_request_id: input.trusted.command_request_id,
         business_actor_ref: input.trusted.actor_participant_ref,
         payload: input.payload,
-        spec: input.spec,
+        spec,
       });
     } catch {
       return { status: "outcome_unknown", reason_code: "enrollment_command_runner_failed" };
@@ -511,6 +571,21 @@ implements NurtureEnrollmentJourneyCommandExecutor {
       disposition: result.disposition,
       workflow: read.workflow,
     };
+  }
+
+  private settlementBinding(input: {
+    capability_key: NurtureEnrollmentJourneyCommandKey;
+    trusted: NurtureEnrollmentJourneyTrustedContextV1;
+  }): NurtureWorkflowRunSettlementBindingV1 | null {
+    if (input.capability_key !== "start_enrollment_inquiry") return null;
+    const hostReservation = input.trusted.host_workflow_run_reservation;
+    return hostReservation
+      ? workflowRunSettlementBinding({
+          workspace_id: input.trusted.workspace_id,
+          command_request_id: input.trusted.command_request_id,
+          host_reservation: hostReservation,
+        })
+      : null;
   }
 
   private consumingRepository(
@@ -588,6 +663,7 @@ export type PrismaNurtureEnrollmentJourneyFormalOwners = Readonly<{
   enrollmentJourneyPreparedCommandOwner: NurtureEnrollmentJourneyPreparedCommandOwnerV1;
   enrollmentJourneyOptionIssuer: NurtureEnrollmentJourneyTargetOptionCodec;
   enrollmentJourneySurfaceDeps: NurtureEnrollmentJourneySurfaceDeps;
+  workflowRunSettlementOwner: NurtureWorkflowRunSettlementOwnerV1;
 }>;
 
 /**
@@ -639,6 +715,12 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
         ? {}
         : { ttlMs: input.preparedCommandTtlMs }),
     });
+  const workflowRunSettlementOwner = createNurtureWorkflowRunSettlementOwner({
+    repository: new PrismaNurtureWorkflowRunSettlementRepository(
+      input.prisma,
+      now,
+    ),
+  });
   const bindings = new PrismaNurtureEnrollmentJourneyBindingPort({
     prisma: input.prisma,
     codec,
@@ -656,6 +738,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
       pairOwner: new PrismaEnrollmentPairOwnerRepository(input.prisma, now),
     }),
     protectedContent: input.protectedContent,
+    workflowRunSettlementOwner,
     now,
   });
   const commands = new PrismaNurtureEnrollmentJourneyCommandExecutor(
@@ -677,6 +760,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
     enrollmentJourneyPreparedCommandOwner,
     enrollmentJourneyOptionIssuer: codec,
     enrollmentJourneySurfaceDeps,
+    workflowRunSettlementOwner,
   });
 }
 
@@ -685,6 +769,7 @@ export type PrismaNurtureEnrollmentJourneyFormalModuleBinding = Readonly<{
     surfaceDeps: NurtureEnrollmentJourneySurfaceDeps;
     authorityResolver: NurtureEnrollmentJourneyFormalAuthorityResolverV1;
     preparedCommandOwner: NurtureEnrollmentJourneyPreparedCommandOwnerV1;
+    workflowRunSettlementOwner: NurtureWorkflowRunSettlementOwnerV1;
   }>;
 }>;
 
@@ -707,6 +792,7 @@ export function bindPrismaNurtureEnrollmentJourneyFormalOwners(input: {
       surfaceDeps: input.formalOwners.enrollmentJourneySurfaceDeps,
       authorityResolver: input.formalOwners.enrollmentJourneyAuthorityResolver,
       preparedCommandOwner: input.formalOwners.enrollmentJourneyPreparedCommandOwner,
+      workflowRunSettlementOwner: input.formalOwners.workflowRunSettlementOwner,
     }),
   });
 }

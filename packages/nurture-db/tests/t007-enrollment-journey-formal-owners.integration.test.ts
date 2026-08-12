@@ -233,7 +233,7 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
     }
   });
 
-  it("fails before prospective-contact read while the cross-DB protocol is absent", async () => {
+  it("fails before prospective-contact read when signed reservation evidence is absent", async () => {
     const scope = await seedAdminScope("contact");
     const clock = { now: new Date("2026-08-12T12:00:00.000Z") };
     const world = composed(clock);
@@ -279,12 +279,61 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
       });
       expect(resolved).toEqual({
         status: "unavailable",
-        reason_code: "workflow_run_cross_db_commit_protocol_unavailable",
+        reason_code: "workflow_run_reservation_evidence_required",
       });
       expect(world.contactOwnerCalls.count).toBe(0);
       expect(() => bindPrismaNurtureEnrollmentJourneyFormalOwners({
         formalOwners: world.owners,
       })).not.toThrow();
+    } finally {
+      await cleanupScope(scope.workspaceId);
+    }
+  });
+
+  it("registers exact Host reservation before reading the prospective contact", async () => {
+    const scope = await seedAdminScope("settlement-register");
+    const clock = { now: new Date("2026-08-12T12:30:00.000Z") };
+    const world = composed(clock);
+    try {
+      const option = world.owners.enrollmentJourneyOptionIssuer.issueProspectiveContact({
+        workspace_id: scope.workspaceId,
+        participant_ref: scope.participantId,
+        contact_object_id: `contact-${scope.suffix}`,
+        contact_version: 4,
+        institution_ref: scope.institutionId,
+      });
+      if (!option) throw new Error("contact option issue failed");
+      const reservation = hostReservation(scope.suffix);
+      const commandRequestId = `command-${scope.suffix}`;
+      const resolved = await world.owners.enrollmentJourneySurfaceDeps.bindings.resolve({
+        request: {
+          capabilityKey: "start_enrollment_inquiry",
+          capabilityVersion: "1.0.0",
+          targetOptionRef: option,
+          operationInput: startInquiryInput(clock),
+          confirmationRef: `ejc1.${"a".repeat(43)}`,
+        } as never,
+        trusted: {
+          workspace_id: scope.workspaceId,
+          actor_participant_ref: scope.participantId,
+          invocation_request_id: `invocation-${scope.suffix}`,
+          host_correlation_id: `correlation-${scope.suffix}`,
+          command_request_id: commandRequestId,
+          client_surface: "web_run_workbench",
+          host_workflow_run_reservation: reservation,
+        },
+      });
+      expect(resolved).toMatchObject({
+        status: "resolved",
+        binding: { workflow_run_ref: reservation.run_ref },
+      });
+      expect(world.contactOwnerCalls.count).toBe(1);
+      await expect(prisma.nurtureWorkflowRunSettlement.findMany({
+        where: { workspaceId: scope.workspaceId },
+      })).resolves.toMatchObject([{
+        state: "prepared",
+        runObjectId: reservation.run_ref.object_id,
+      }]);
     } finally {
       await cleanupScope(scope.workspaceId);
     }
@@ -448,11 +497,26 @@ async function seedAdminScope(label: string): Promise<SeededScope> {
 }
 
 async function cleanupScope(workspaceId: string) {
+  await prisma.nurtureWorkflowRunSettlement.deleteMany({ where: { workspaceId } });
   await prisma.nurtureEnrollmentJourneyPreparedCommand.deleteMany({ where: { workspaceId } });
   await prisma.nurtureCareRoleAssignment.deleteMany({ where: { workspaceId } });
   await prisma.nurtureCareInstitution.deleteMany({ where: { workspaceId } });
   await prisma.nurtureParticipantPrincipalBinding.deleteMany({ where: { workspaceId } });
   await prisma.nurtureParticipant.deleteMany({ where: { workspaceId } });
+}
+
+function hostReservation(suffix: string) {
+  return {
+    evidence_version: 1 as const,
+    logical_operation_id: `logical-${suffix}`,
+    reservation_ref: {
+      ...canonical("my_chat", "workflow_run_reservation", `reservation-${suffix}`),
+      version: 1,
+    },
+    run_ref: canonical("my_chat", "workflow_run", `run-${suffix}`),
+    binding_fingerprint_sha256: "b".repeat(64),
+    reservation_evidence_sha256: "e".repeat(64),
+  };
 }
 
 function canonical(

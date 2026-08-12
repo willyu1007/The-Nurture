@@ -1153,3 +1153,23 @@ PRODUCTION_FAIL_CLOSED / I4_NOT_QUALIFIED`.
 Current verdict: `CLEAN_SINGLE_PROTOCOL_BASELINE /
 SIGNED_TRANSPORT_AND_ATOMIC_ADOPTION_NEXT / NO_DB_APPLY /
 I4_NOT_QUALIFIED`.
+
+## 2026-08-12 sixth-round signed-adoption verification
+
+| Check | Result |
+| --- | --- |
+| focused transport/surface/settlement contracts | PASS - 4 files / 37 tests; final formal-ingress + settlement subset 2 files / 15 tests |
+| full unit lane | PASS - 97 files / 1037 tests; population gate PASS |
+| scenario-service lane | PASS - 14 files / 95 tests |
+| scenario and DB TypeScript | PASS - package checks and repository-root `pnpm typecheck` |
+| generated manifest | PASS - execute schema/handler v2 is current |
+| routing and structural gates | PASS - 178 files: 97 unit / 50 production DB / 11 dev host / 17 scenario service / 3 x5; persistence, formal ingress and port topology PASS |
+| settlement repository structural lane | PASS - 5/5 |
+| strict T-007 docs and governance | PASS - 157/157 docs; governance and diff check PASS |
+| direct ESLint invocation | NOT A REPOSITORY GATE - ESLint v9 has no repository config and cannot start; no temporary config was introduced |
+| authored Prisma registration/atomic command integration | NOT RUN - no approved `DATABASE_URL`; TypeScript coverage only |
+| database apply and x5 | NOT RUN - no approved database pair and no target mutation |
+
+Current verdict: `SIGNED_TRANSPORT_AND_ATOMIC_SETTLEMENT_IMPLEMENTED /
+LOCAL_CONTRACTS_GREEN / HISTORICAL_STATUS_AND_HOST_VERIFIER_PENDING /
+NO_DB_APPLY / I4_NOT_QUALIFIED`.

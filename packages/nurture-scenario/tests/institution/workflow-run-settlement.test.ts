@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createNurtureWorkflowRunSettlementOwner,
+  withNurtureWorkflowRunSettlementFinalizer,
   workflowRunSettlementBinding,
   type NurtureWorkflowRunReservationEvidenceV1,
   type NurtureWorkflowRunSettlementBindingV1,
@@ -149,6 +150,68 @@ describe("Nurture Workflow Run settlement owner", () => {
     });
     expect(binding?.logical_operation_id_hash).toMatch(/^[0-9a-f]{64}$/u);
     expect(binding?.command_request_id_hash).toMatch(/^[0-9a-f]{64}$/u);
+  });
+
+  it("chains the existing command finalizer before the atomic settlement commit", async () => {
+    const binding = workflowRunSettlementBinding(request);
+    if (!binding) throw new Error("binding missing");
+    const order: string[] = [];
+    const spec = withNurtureWorkflowRunSettlementFinalizer({
+      command_key: "nurture.start_enrollment_inquiry",
+      command_scope: "institution_enrollment_journey",
+      contract_version: 1,
+      canonicalize: () => ({}),
+      checkPreconditions: async () => ({ status: "ready" }),
+      apply: async () => ({ output_refs: [] }),
+      afterExecutionCreated: async () => { order.push("command-finalizer"); },
+    }, binding);
+
+    await spec.afterExecutionCreated?.({
+      workflowRunSettlement: {
+        markCommitted: async (input: NurtureWorkflowRunSettlementBindingV1 & {
+          command_execution_id: string;
+        }) => {
+          order.push(`settlement:${input.command_execution_id}`);
+          return {} as never;
+        },
+      },
+    } as never, {}, {
+      workspace_id: request.workspace_id,
+      business_actor_ref: "participant-1",
+      command_request_id: request.command_request_id,
+    }, {
+      output_refs: [],
+      business_outcome: "applied",
+      execution: { id: "execution-1" } as never,
+    });
+
+    expect(order).toEqual(["command-finalizer", "settlement:execution-1"]);
+  });
+
+  it("fails with a deterministic rollback when the command transaction lacks settlement", async () => {
+    const binding = workflowRunSettlementBinding(request);
+    if (!binding) throw new Error("binding missing");
+    const spec = withNurtureWorkflowRunSettlementFinalizer({
+      command_key: "nurture.start_enrollment_inquiry",
+      command_scope: "institution_enrollment_journey",
+      contract_version: 1,
+      canonicalize: () => ({}),
+      checkPreconditions: async () => ({ status: "ready" }),
+      apply: async () => ({ output_refs: [] }),
+    }, binding);
+
+    await expect(spec.afterExecutionCreated?.({} as never, {}, {
+      workspace_id: request.workspace_id,
+      business_actor_ref: "participant-1",
+      command_request_id: request.command_request_id,
+    }, {
+      output_refs: [],
+      business_outcome: "applied",
+      execution: { id: "execution-1" } as never,
+    })).rejects.toMatchObject({
+      reason_code: "workflow_run_settlement_transaction_unavailable",
+      decision: "technical_error",
+    });
   });
 });
 

@@ -4,13 +4,14 @@ import type {
 } from "@my-chat/workflow-contracts";
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
-  parseNurtureEnrollmentJourneyFormalExecuteInputV1,
+  parseNurtureEnrollmentJourneyFormalExecuteInputV2,
   parseNurtureEnrollmentJourneyFormalPrepareInputV1,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
   type NurtureEnrollmentJourneyFormalAuthorityResolverV1,
   type NurtureEnrollmentJourneyLocalAuthorityV1,
   type NurtureEnrollmentJourneyPreparedCommandOwnerV1,
 } from "./enrollment-journey-formal-ingress-contract.js";
+import type { NurtureWorkflowRunSettlementOwnerV1 } from "./domain/institution/workflow-run-settlement.js";
 import {
   NurtureEnrollmentJourneySurfaceHandler,
   type NurtureEnrollmentJourneyAdapterRequest,
@@ -29,6 +30,7 @@ export type NurtureEnrollmentJourneyFormalIngressDeps = {
   surfaceDeps: NurtureEnrollmentJourneySurfaceDeps;
   authorityResolver?: NurtureEnrollmentJourneyFormalAuthorityResolverV1;
   preparedCommandOwner?: NurtureEnrollmentJourneyPreparedCommandOwnerV1;
+  workflowRunSettlementOwner?: NurtureWorkflowRunSettlementOwnerV1;
 };
 
 export function createNurtureEnrollmentJourneyFormalInvocationHandlers(
@@ -100,7 +102,7 @@ async function execute(
   deps: NurtureEnrollmentJourneyFormalIngressDeps,
 ): Promise<unknown> {
   if (!matchesOperation(verified, "execute")) return declarationDrift();
-  const input = parseNurtureEnrollmentJourneyFormalExecuteInputV1(
+  const input = parseNurtureEnrollmentJourneyFormalExecuteInputV2(
     verified.invocation.operation.input,
   );
   if (!input) return invalid();
@@ -126,6 +128,13 @@ async function execute(
         verifiedCommand.command_request_id !== input.commandRequestId ||
         verifiedCommand.frozen_request.confirmationRef !== input.confirmationRef
       ) return { status: "conflict", reason_code: "prepared_command_binding_drift" };
+      const startsInquiry =
+        verifiedCommand.frozen_request.capabilityKey === "start_enrollment_inquiry";
+      if (
+        startsInquiry !== (input.hostWorkflowRunReservation !== undefined)
+      ) return invalid();
+      if (startsInquiry && !deps.workflowRunSettlementOwner) return unavailable();
+      const hostReservation = input.hostWorkflowRunReservation;
       const current = await resolveCurrentAuthority(
         verified,
         deps,
@@ -135,13 +144,33 @@ async function execute(
       if (!sameAuthority(verifiedCommand.authority, current.authority)) {
         return { status: "denied", reason_code: "enrollment_authority_snapshot_drift" };
       }
-      return await invokeSurface(
+      const surfaceResult = await invokeSurface(
         verified,
         deps,
         current.authority,
         verifiedCommand.frozen_request,
         verifiedCommand.command_request_id,
+        hostReservation,
       );
+      if (!startsInquiry || !isRecord(surfaceResult) || surfaceResult.status !== "ok") {
+        return surfaceResult;
+      }
+      if (!hostReservation) return invalid();
+      const settlement = await deps.workflowRunSettlementOwner?.readStatus({
+        workspace_id: current.authority.workspace_id,
+        command_request_id: verifiedCommand.command_request_id,
+        host_reservation: hostReservation,
+      });
+      if (settlement?.status !== "committed") {
+        return {
+          status: "outcome_unknown",
+          reason_code: "workflow_run_settlement_receipt_unavailable",
+        };
+      }
+      return {
+        ...surfaceResult,
+        workflow_run_settlement: settlement,
+      };
     }
     // Direct lane: the three direct_commit capabilities bypass the ledger
     // with an owner-derived deterministic command id (I1 idempotency dedups
@@ -184,6 +213,7 @@ async function invokeSurface(
   authority: NurtureEnrollmentJourneyLocalAuthorityV1,
   request: NurtureEnrollmentJourneyAdapterRequest,
   commandRequestId: string,
+  hostWorkflowRunReservation?: NurtureEnrollmentJourneyTrustedContextV1["host_workflow_run_reservation"],
 ): Promise<unknown> {
   const workspaceId = verified.invocation.principal.workspace_ref.object_id;
   if (authority.workspace_id !== workspaceId) {
@@ -199,6 +229,9 @@ async function invokeSurface(
       : { host_trace_id: verified.invocation.request.trace_id }),
     command_request_id: commandRequestId,
     client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
+    ...(hostWorkflowRunReservation === undefined
+      ? {}
+      : { host_workflow_run_reservation: hostWorkflowRunReservation }),
   };
   const handler = new NurtureEnrollmentJourneySurfaceHandler({
     ...deps.surfaceDeps,

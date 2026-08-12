@@ -286,7 +286,7 @@ describe("G4-D I2-A enrollment journey wire contract", () => {
     ).toEqual([
       "nurture.enrollment_journey.query.formal.v1",
       "nurture.enrollment_journey.command.prepare.formal.v1",
-      "nurture.enrollment_journey.command.execute.formal.v1",
+      "nurture.enrollment_journey.command.execute.formal.v2",
     ]);
     expect([
       ...NURTURE_ENROLLMENT_JOURNEY_QUERY_KEYS,

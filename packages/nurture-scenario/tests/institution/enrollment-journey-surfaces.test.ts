@@ -699,9 +699,11 @@ describe("G4-D I2-B Enrollment Journey public adapters", () => {
       .filter((key) => key.includes("enrollment_journey"));
     expect(internalKeys).toEqual([]);
     const trusted = nurtureScenarioModule.trusted_invocation_handlers ?? {};
-    for (const lane of ["query", "command.prepare", "command.execute"]) {
+    for (const lane of ["query", "command.prepare"]) {
       expect(typeof trusted[`nurture.enrollment_journey.${lane}.formal.v1`])
         .toBe("function");
     }
+    expect(typeof trusted["nurture.enrollment_journey.command.execute.formal.v2"])
+      .toBe("function");
   });
 });

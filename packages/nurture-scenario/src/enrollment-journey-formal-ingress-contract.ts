@@ -7,6 +7,10 @@ import {
   type NurtureEnrollmentJourneyQueryKey,
 } from "./enrollment-journey-surfaces.js";
 import type { NurtureEnrollmentJourneyCommandKey } from "./domain/institution/enrollment-journey-command.js";
+import {
+  parseNurtureWorkflowRunReservationEvidenceV1,
+  type NurtureWorkflowRunReservationEvidenceV1,
+} from "./domain/institution/workflow-run-settlement.js";
 
 /**
  * G4-D I3 formal trusted ingress (record 86, G4-E shape). The reviewable and
@@ -90,8 +94,8 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1 = Object.freeze({
     method: "POST",
     operation_key: "execute_prepared_enrollment_journey_command",
     input_schema_key: "nurture.enrollment_journey.command.execute.input",
-    input_schema_version: 1,
-    handler_key: "nurture.enrollment_journey.command.execute.formal.v1",
+    input_schema_version: 2,
+    handler_key: "nurture.enrollment_journey.command.execute.formal.v2",
     ingress_key: "nurture.enrollment_journey.command.execute",
   }),
   idempotency: "owner_command_request_id_replayed_with_exact_confirmation",
@@ -115,10 +119,15 @@ export type NurtureEnrollmentJourneyFormalPrepareInputV1 = {
  * full intent for exactly the three direct_commit capabilities and no
  * confirmation (the owner derives the deterministic command id).
  */
-export type NurtureEnrollmentJourneyFormalExecuteInputV1 =
-  | { contractVersion: 1; commandRequestId: string; confirmationRef: string }
+export type NurtureEnrollmentJourneyFormalExecuteInputV2 =
   | {
-      contractVersion: 1;
+      contractVersion: 2;
+      commandRequestId: string;
+      confirmationRef: string;
+      hostWorkflowRunReservation?: NurtureWorkflowRunReservationEvidenceV1;
+    }
+  | {
+      contractVersion: 2;
       clientCommandId: string;
       request: NurtureEnrollmentJourneyCommandIntentV1<NurtureEnrollmentJourneyDirectCommandKey>;
     };
@@ -243,23 +252,41 @@ export function parseNurtureEnrollmentJourneyFormalPrepareInputV1(
     : null;
 }
 
-export function parseNurtureEnrollmentJourneyFormalExecuteInputV1(
+export function parseNurtureEnrollmentJourneyFormalExecuteInputV2(
   value: unknown,
-): NurtureEnrollmentJourneyFormalExecuteInputV1 | null {
-  if (exactRecord(value, ["commandRequestId", "confirmationRef", "contractVersion"])) {
-    return value.contractVersion === 1 &&
-      opaqueId(value.commandRequestId) &&
-      opaqueRef(value.confirmationRef)
-      ? {
-          contractVersion: 1,
-          commandRequestId: value.commandRequestId,
-          confirmationRef: value.confirmationRef,
-        }
-      : null;
+): NurtureEnrollmentJourneyFormalExecuteInputV2 | null {
+  if (
+    exactRecord(value, ["commandRequestId", "confirmationRef", "contractVersion"]) ||
+    exactRecord(value, [
+      "commandRequestId",
+      "confirmationRef",
+      "contractVersion",
+      "hostWorkflowRunReservation",
+    ])
+  ) {
+    const hostReservation = "hostWorkflowRunReservation" in value
+      ? parseNurtureWorkflowRunReservationEvidenceV1(
+          value.hostWorkflowRunReservation,
+        )
+      : undefined;
+    if (
+      value.contractVersion !== 2 ||
+      !opaqueId(value.commandRequestId) ||
+      !opaqueRef(value.confirmationRef) ||
+      hostReservation === null
+    ) return null;
+    return {
+      contractVersion: 2,
+      commandRequestId: value.commandRequestId,
+      confirmationRef: value.confirmationRef,
+      ...(hostReservation === undefined
+        ? {}
+        : { hostWorkflowRunReservation: hostReservation }),
+    };
   }
   if (
     !exactRecord(value, ["clientCommandId", "contractVersion", "request"]) ||
-    value.contractVersion !== 1 ||
+    value.contractVersion !== 2 ||
     !opaqueId(value.clientCommandId)
   ) return null;
   const request = parseNurtureEnrollmentJourneyCommandIntent(value.request);
@@ -267,10 +294,10 @@ export function parseNurtureEnrollmentJourneyFormalExecuteInputV1(
     (NURTURE_ENROLLMENT_JOURNEY_DIRECT_COMMAND_KEYS as readonly string[])
       .includes(request.capabilityKey)
     ? {
-        contractVersion: 1,
+        contractVersion: 2,
         clientCommandId: value.clientCommandId,
         request: request as Extract<
-          NurtureEnrollmentJourneyFormalExecuteInputV1,
+          NurtureEnrollmentJourneyFormalExecuteInputV2,
           { clientCommandId: string }
         >["request"],
       }

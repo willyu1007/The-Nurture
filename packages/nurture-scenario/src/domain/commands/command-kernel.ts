@@ -18,6 +18,7 @@ import type { NurtureEnrollmentJourneyTransaction } from "../institution/enrollm
 import type { NurtureEnrollmentWaitlistTransaction } from "../institution/enrollment-waitlist.js";
 import type { NurtureEnrollmentTrialLifecycleTransaction } from "../institution/enrollment-trial-lifecycle.js";
 import type { NurtureEnrollmentFormalizationTransaction } from "../institution/enrollment-formalization.js";
+import type { NurtureWorkflowRunSettlementTransactionV1 } from "../institution/workflow-run-settlement.js";
 import type { NurtureInstitutionKnowledgeTransaction } from "../institution/institution-knowledge-commands.js";
 import type { NurtureInstitutionKnowledgeConflictCandidateTransaction } from "../institution/institution-knowledge-conflict-candidate.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
@@ -105,6 +106,8 @@ export type NurtureCommandTransaction = {
   interactionContexts?: NurtureInteractionContextTransactionPort;
   /** Present when the G4-D I3 enrollment prepared-command ledger is wired. */
   enrollmentPreparedCommands?: NurtureEnrollmentJourneyPreparedCommandLedgerV1;
+  /** Present when Host Run settlement must commit with the Nurture command. */
+  workflowRunSettlement?: NurtureWorkflowRunSettlementTransactionV1;
   findCommitted(input: {
     workspace_id: string;
     command_request_id_hash: string;

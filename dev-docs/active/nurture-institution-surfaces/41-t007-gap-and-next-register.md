@@ -455,3 +455,26 @@ atomic adoption:
 
 Until all six pass, production remains `workflow_run_cross_db_commit_protocol_unavailable`
 and positive I4/x5 admission remains closed.
+
+## Sixth-round status refinement
+
+Steps 1 through 3 are now implemented on the Nurture side, and successful
+formal inquiry execute returns the committed settlement proof from the same
+command transaction. The private execute declaration is v2 and strictly
+requires Host reservation evidence for inquiry only. Registration precedes
+contact/protected work; the command finalizer supplies the execution FK and
+receipt atomically.
+
+The remaining dependency order is now:
+
+1. expose historical `prepared | committed | confirmed_no_effect` through a
+   dedicated signed private status operation that does not recheck prepared
+   TTL or current authority;
+2. implement the exact My-Chat proof verifier and allow confirm/abandon only
+   from its result;
+3. add response-loss, expiry/revoke-after-commit and writer-race x5 vehicles;
+4. execute those vehicles on an approved disposable database pair;
+5. continue the remainder of I4 only after the protocol record passes.
+
+The authored Prisma integration case for registration is not database-qualified
+in this environment. No apply or positive I4 claim is made.

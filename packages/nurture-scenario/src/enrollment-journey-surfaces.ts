@@ -72,6 +72,10 @@ import type {
   NurtureInstitutionWorkflowProjectionV1,
 } from "./domain/institution/enrollment-journey-workflow.js";
 import type { ProtectedContentEnvelopeV1 } from "./harness/protected-content.js";
+import {
+  parseNurtureWorkflowRunReservationEvidenceV1,
+  type NurtureWorkflowRunReservationEvidenceV1,
+} from "./domain/institution/workflow-run-settlement.js";
 
 export const NURTURE_ENROLLMENT_JOURNEY_QUERY_KEYS = [
   "query_institution_enrollment_journey",
@@ -221,6 +225,8 @@ export type NurtureEnrollmentJourneyTrustedContextV1 = {
   host_trace_id?: string;
   command_request_id: string;
   client_surface: WorkflowCommandMeta["client_surface"];
+  /** Signed Host reservation evidence; admitted only for inquiry creation. */
+  host_workflow_run_reservation?: NurtureWorkflowRunReservationEvidenceV1;
 };
 
 type PreparedHeads = {
@@ -540,6 +546,10 @@ const validTrustedContext = (
   trustedIdentity(trusted.host_correlation_id) &&
   (trusted.host_trace_id === undefined || trustedIdentity(trusted.host_trace_id)) &&
   trustedIdentity(trusted.command_request_id) &&
+  (trusted.host_workflow_run_reservation === undefined ||
+    parseNurtureWorkflowRunReservationEvidenceV1(
+      trusted.host_workflow_run_reservation,
+    ) !== null) &&
   ["chat_workflow_control", "web_run_workbench", "mobile_dashboard"].includes(
     trusted.client_surface,
   );
