@@ -2,16 +2,20 @@
 
 ## Status
 
-- State: in-progress
-- Updated: 2026-08-12
-- Next step: prepare the exact default-off handoff and project-governance
-  closure. I4-C4 passed on the explicitly approved synthetic-only disposable
-  target: 39/39 migrations, 12/12 production-shape tests and zero business-row
-  residue. The My-Chat/Nurture two-database authorization suite passes 5/5 for
-  grant, stale authority, provider outage, response-loss reconciliation,
-  withdrawal and replay-safe cleanup; the complete x5 lane passes 35/35.
-  Production composition remains deliberately unavailable. Durable apply,
-  deployment, activation and traffic require separate decisions.
+- State: done
+- Updated: 2026-08-13
+- Next step: none — closed. Exit
+  `I4_C4_EXIT_PASS_DEFAULT_OFF / EXACT_OWNER_CONSUMER_AND_CLEANUP_QUALIFIED /
+  DURABLE_APPLY_ACTIVATION_TRAFFIC_CLOSED` (04-verification, 2026-08-12).
+  I4-C4 passed on the explicitly approved synthetic-only disposable target:
+  39/39 migrations, 12/12 production-shape tests and zero business-row residue.
+  The My-Chat/Nurture two-database authorization suite passes 5/5 for grant,
+  stale authority, provider outage, response-loss reconciliation, withdrawal
+  and replay-safe cleanup; the complete x5 lane passes 35/35. The default-off
+  handoff is recorded in the project changelog and dashboard. Production
+  composition remains deliberately unavailable. Durable apply, deployment,
+  activation and traffic remain separate decisions; none is authorized by this
+  closure.
 
 ## Goal
 

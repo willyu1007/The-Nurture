@@ -111,3 +111,12 @@ Project: `main`
 - 2026-08-12 task_id=T-010 event=increment id=I4-C1 result=drafted-review-pending tables=2 enums=4 partial_uniques=2 apply=none activation=unchanged
 - 2026-08-12 task_id=T-010 event=quality-review id=I4-C1-CODEX result=6-findings-addressed composite_fks=8 target_uniques=4 verifier=verify:family-sharing-invariants apply=none activation=unchanged
 - 2026-08-12 task_id=T-007 event=checkpoint id=G4-D-I3 result=G4_D_I3_QUALIFIED_DEFAULT_OFF record=87 migrations=39/39 targeted=3/3 full_db=403/403 unit=1027/1027 drift=0 destroy=0 defects_repaired=DR-I3-01 activation=unchanged
+- 2026-08-13 task_id=T-007 event=checkpoint id=G4-D-I4 result=G4_D_I4_EXIT_PASS_DEFAULT_OFF record=95 my_chat_pin=2d415ce migrations=41 db_tests=444/444 unit=1050/1050 x5=37/37x3 activation=unchanged
+- 2026-08-13 task_id=T-007 event=gate-exit id=G4-F result=G4_F_EXIT_PASS_DEFAULT_OFF record=96 handoff=T007_BETA_PROFILE_HANDOFF_ISSUED activation=unchanged
+- 2026-08-13 task_id=T-007 slug=nurture-institution-surfaces event=status from=done to=archived
+- 2026-08-12 task_id=T-010 event=increment id=I4-C2 result=reader-implemented-contract-qualified focused_db=16/16 unit=1027/1027 routing_census=173 apply=none activation=unchanged
+- 2026-08-12 task_id=T-010 event=increment id=I4-C3 result=transport-and-cleanup-implemented-contract-qualified controller_e2e=11/11 exact_pair=6/6 routing_census=175 apply=none activation=unchanged
+- 2026-08-12 task_id=T-010 event=checkpoint id=I4-C4 result=I4_C4_EXIT_PASS_DEFAULT_OFF target=approved-disposable migrations=39/39 production_shape=12/12 residual=0 joint=5/5 x5=35/35 routing_census=180 activation=unchanged
+- 2026-08-13 task_id=T-010 event=gate-exit id=I4-C result=I4_C4_EXIT_PASS_DEFAULT_OFF level=EXACT_OWNER_CONSUMER_AND_CLEANUP_QUALIFIED durable_apply=closed deployment=closed traffic=closed next=governance-closure activation=unchanged
+- 2026-08-13 task_id=T-008 event=authorization id=G5-0 result=separately-authorized scope=readiness-inventory-and-beta-profile sequence=after-T-011-W1-W2 c31=deferred-until-after-g5-a activation=unchanged
+- 2026-08-13 task_id=T-010 slug=nurture-family-sharing-eligibility event=status from=in-progress to=archived

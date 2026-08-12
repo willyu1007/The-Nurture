@@ -2,8 +2,8 @@ version: 1
 task_id: T-010
 project: main
 slug: nurture-family-sharing-eligibility
-status: in-progress
-updated: "2026-08-12"
+status: archived
+updated: "2026-08-13"
 keywords:
   - family-sharing-eligibility
   - cross-owner-authorization
