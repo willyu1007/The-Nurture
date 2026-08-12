@@ -12,7 +12,8 @@
 | carrier absent from prepared persistence | PASS |
 | Prisma format / validate | PASS |
 | DB context checksum | PASS — `7851031aa63a51887de6f937682d97a1998a25a80417e01edbb1115d8a33be3f` |
+| disposable container census | PASS — exact names absent; ports 55453/55454 free |
 | durable environment effect | NONE |
 
-Final container/port destruction is recorded during G4-F handoff cleanup; it
-is required before the task-level Exit is issued.
+The exact disposable targets were destroyed before the task-level Exit. No
+database rollback was required because no durable target was contacted.

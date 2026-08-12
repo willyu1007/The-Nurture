@@ -24,7 +24,7 @@ const frozenInputInterface = {
 const freezePath =
   "dev-docs/archive/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md";
 const t007FreezePath =
-  "dev-docs/active/nurture-institution-surfaces/08-g4-0b-publication-policy-freeze.md";
+  "dev-docs/archive/nurture-institution-surfaces/08-g4-0b-publication-policy-freeze.md";
 
 const artifactPin = readJson(
   "packages/nurture-scenario/contracts/surfaces/v1/generated/surface-contract.artifact-pin.json",

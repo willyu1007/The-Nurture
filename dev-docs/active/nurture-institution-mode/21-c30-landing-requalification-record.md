@@ -128,7 +128,7 @@ whoever owns the cultivation wave.
 
 This record is the current-pin evidence T-002's owner path has lacked since the
 T-009 rotations. It is what allows the G4-0A ledger row in
-`dev-docs/active/nurture-institution-surfaces/07-g4-0a-inventory-record.md`
+`dev-docs/archive/nurture-institution-surfaces/07-g4-0a-inventory-record.md`
 ("Pin Rebind") to move from `DEFINED_UNQUALIFIED` back to `PRESENT_PINNED`,
 which is why option C was chosen over the two T-007 0C paths on 2026-08-08.
 

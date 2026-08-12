@@ -180,15 +180,16 @@ Project: `main`
   inputs; it is not Owner Readiness, Joint Conformance, Beta Handoff or activation.
   G4-0A exact dependency/fact/schema/census inventory is PASS. G4-0B's
   `nurture.institution-publication-policy@1.0.0` bounded provider/consumer path is
-  qualified through the T-006 handoff and remains default-off. 0C～0E are now frozen
-  and exited; the G4-D branch has private I1 plus default-off I2. 0F has accepted its
+  qualified through the T-006 handoff and remains default-off. 0C～0E are frozen
+  and exited; G4-D is qualified through default-off I4. 0F has accepted its
   exact generic owner source pin, three-unit scope, lifecycle/provenance contract and
   retrieval/owner bridge plus cited-answer/safety contract. Its 0G audit passes;
   `G4_0F_EXIT_PASS` is issued; G4-E E1 lifecycle/provenance, E2 retrieval/
   currentness and E3 answer safety/conflict candidate pass statically. E4
   closes the private I1 audit with all 35 migrations and 391/391 DB tests on a
-  destroyed disposable target; E5–E8 remain open. None of these
-  checkpoints completes T-007.
+  destroyed disposable target; E5–E8 and the G4-E Exit are complete. G4-F then
+  joins all branches and issues the default-off T-007 Beta Profile Handoff in
+  record 96.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
   has its own DoD; overall acceptance covers contract/ownership, required product
@@ -390,31 +391,23 @@ Project: `main`
   artifact and disabled Workbench adapters. The adopted My-Chat T-040 sequence
   through `942bd00` closes Q2 ingestion/currentness and implements Q3 replay
   plus its provider-neutral safety boundary; Q4 sibling authority is closed.
-- Next Checkpoint: G4-D I4 joint conformance (J3) over the qualified I3
-  paths — I3 closed 2026-08-12 (`G4_D_I3_QUALIFIED_DEFAULT_OFF`, record 87:
-  ledger + three-provider composition + transactional executor + formal
-  trusted ingress in one coherent change; internal bridge removed; disposable
-  qualification 39/39, 3/3, 403/403, drift zero, `DR-I3-01` repaired). I4
-  binds the wave4 current-owner evidence transport and the joint
-  negative/replay matrix; then G4-F. G4-E is closed: record 83 (E7
-  disposable-database qualification), record 84 (E8 joint conformance, 12/12
-  matrix + x5 24/24 through the real Base dispatcher) and record 85
-  (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`) close the chain, and the 2026-08-12
-  post-review hardening re-qualified after nine independent-review fixes.
-  Q3 remains `ADAPTER_QUALIFIED` against
+- Exit: `G4_F_EXIT_PASS_DEFAULT_OFF /
+  T007_BETA_PROFILE_HANDOFF_ISSUED` (records 95/96). G4-D I4 qualifies the
+  production native-source owner, exact Admin Web/mobile-query and Guardian
+  chat/mobile/formalization surfaces, response-loss replay and current-owner
+  negative matrix. Final evidence passes 41 migrations, 444 production-DB
+  tests, 1050 unit tests and three consecutive 37/37 x5 runs at My-Chat
+  `2d415ce` and C30 owner aggregate `856cd6c6…`. G4-E remains closed by records
+  83–85; Q3 remains `ADAPTER_QUALIFIED` against
   the sole `/v2`
   `nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
   `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`:
   answer-safety and owner contract `2.0.0`, all 13 service/contract pins and 15
   fixtures × 2 attempts = 30 unique invocation ids. Pre-V2 evidence
   is invalid/non-current. `live_qualified=false` remains the activation gate;
-  recorded/synthetic transport is never live evidence. G-09 is closed;
-  G4-D I3 may now
-  implement the authenticated prospective-contact/native-source/current-owner
-  and formal-ingress binding.
-  I4 joint conformance follows only after each I3 path qualifies.
-  T-008 remains planned until the complete T-007 G4 Exit; Candidate Freeze,
-  deployment, activation and external traffic remain closed.
+  recorded/synthetic transport is never live evidence. G-09 is closed. T-008
+  remains planned and requires separate authorization; Candidate Freeze,
+  durable apply, deployment, activation and external traffic remain closed.
 
 ### F-004 Family growth material provider
 
@@ -531,7 +524,7 @@ Project: `main`
 | T-004 nurture-surface-contract-foundation | archived | dev-docs/archive/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | archived | dev-docs/archive/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | archived | dev-docs/archive/nurture-child-care-boards |
-| T-007 nurture-institution-surfaces | in-progress | dev-docs/active/nurture-institution-surfaces |
+| T-007 nurture-institution-surfaces | archived | dev-docs/archive/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |
 
 ### F-004 Family growth material provider

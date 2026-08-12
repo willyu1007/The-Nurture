@@ -216,7 +216,7 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
     const postG3Keys = new Map([
       [
         "query_institution_communication_review",
-        "dev-docs/active/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
+        "dev-docs/archive/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
       ] as const,
       ...manifest.capabilities
         .filter((entry) =>
@@ -226,7 +226,7 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
         )
         .map((entry) => [
           entry.capabilityKey,
-          "dev-docs/active/nurture-institution-surfaces/63-g4-d-i2-b-surface-adapter-record.md",
+          "dev-docs/archive/nurture-institution-surfaces/63-g4-d-i2-b-surface-adapter-record.md",
         ] as const),
       ...manifest.capabilities
         .filter((entry) =>
@@ -236,7 +236,7 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
         )
         .map((entry) => [
           entry.capabilityKey,
-          "dev-docs/active/nurture-institution-surfaces/74-g4-e-i2-a-contract-artifact-record.md",
+          "dev-docs/archive/nurture-institution-surfaces/74-g4-e-i2-a-contract-artifact-record.md",
         ] as const),
     ]);
     for (const entry of manifest.capabilities) {

@@ -13,6 +13,6 @@ The approved synthetic-only disposable targets were used as follows:
    registry. Schema checksum:
    `7851031aa63a51887de6f937682d97a1998a25a80417e01edbb1115d8a33be3f`.
 
-No shared, staging or production database was contacted. The named containers
-are retained only until the final cleanup census recorded in
-[`04-verification.md`](./04-verification.md).
+No shared, staging or production database was contacted. Both named containers
+were stopped and removed after qualification. Docker returned no matching
+container and ports 55453/55454 had no listener.

@@ -2,12 +2,12 @@
 
 ## Status
 
-- State: in-progress
+- State: done
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-12
-- Next step: **reseal the exact cross-repository adoption pin, then execute the
-  G4-F integration/handoff census**. G4-D I4 now passes as
+- Updated: 2026-08-13
+- Closure: **G4-F Exit and the T-007 Beta Profile Handoff are issued default-
+  off** by [`96`](./96-g4-f-exit-and-beta-handoff.md). G4-D I4 passes as
   `G4_D_I4_EXIT_PASS_DEFAULT_OFF` ([`95`](./95-g4-d-i4-exit-record.md)) at
   My-Chat `2d415cecea6c40cb41daf10bca0638bfaa0c504e`: the production native-source
   owner, Admin Web/mobile-query and Guardian chat/mobile lanes, query v2 /
@@ -18,9 +18,9 @@
   444/444, and the five-file x5 lane passed 37/37 in three consecutive runs.
   Prepared Guardian rows carry neither a fabricated Admin role nor owner
   evidence. Every capability remains default-off; no route, DI, durable apply,
-  activation, deployment or traffic exists. G4-F is now open but is not yet
-  issued until T-002 reseals the exact source pin and the final false/empty,
-  privacy, governance and cleanup censuses pass. E7
+  activation, deployment or traffic exists. T-002 resealed the exact source
+  pin, and the final false/empty, privacy, governance and cleanup censuses pass.
+  T-008 remains a separately authorized next task. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,
   record 84) are closed and the G4-E Exit is issued
@@ -399,131 +399,131 @@ T-006 依赖；0C 是 G4 自身公共基础，0D/0E/0F 按域并行，0G 滚动�
 
 ## Acceptance Criteria
 
-- [ ] publication-policy contract 可独立于 T-007 全任务发布 exact version/head；
+- [x] publication-policy contract 可独立于 T-007 全任务发布 exact version/head；
   T-006 解析后的 `scheduledAt/notAfter/timezone/policyHead` 对既有 process 保持稳定，
   后续配置变更只影响新解析。
-- [ ] T-006 对 `InstitutionWorkflowProjection` 的 optional board module 在无适用
+- [x] T-006 对 `InstitutionWorkflowProjection` 的 optional board module 在无适用
   Workflow 或 projection unavailable 时返回合法空态，不形成整任务依赖。
-- [ ] 每个 mobile/Web Surface 都绑定一个显式角色上下文；多角色用户不会获得合并
+- [x] 每个 mobile/Web Surface 都绑定一个显式角色上下文；多角色用户不会获得合并
   权限，Lead 不产生额外 capability。
-- [ ] `institution_admin` mobile board 为 read-only，且只显示 policy-approved
+- [x] `institution_admin` mobile board 为 read-only，且只显示 policy-approved
   class/detail projections、aggregate 与支持信号。
-- [ ] Admin mobile 首页以班级为顶层入口；每个班级使用自己的有效日程，不把全园
+- [x] Admin mobile 首页以班级为顶层入口；每个班级使用自己的有效日程，不把全园
   班级强行落到一条统一活动时间线。
-- [ ] 班级活动只展示 actor-safe 的照片/文字/记录证据；无记录不等于活动未开展，
+- [x] 班级活动只展示 actor-safe 的照片/文字/记录证据；无记录不等于活动未开展，
   自动归位不确定时留在本班待归位。
-- [ ] 班级卡使用“最新照片”而非主观“代表照片”：可选显式封面优先，否则按当前
+- [x] 班级卡使用“最新照片”而非主观“代表照片”：可选显式封面优先，否则按当前
   活动、当日最近活动的稳定规则选择；待复核、归属不明、已撤回/删除/失权内容排除。
-- [ ] 班级卡不展示沟通正文或 AI 出勤推测，只展示正式出勤提交状态、活动摘要、
+- [x] 班级卡不展示沟通正文或 AI 出勤推测，只展示正式出勤提交状态、活动摘要、
   source timestamp 和待处理数量；完整内容在班级详情/Web 读取。
-- [ ] Admin 可只读查看明确属于该 Institution 的园区业务沟通正文、附件与更正状态，
+- [x] Admin 可只读查看明确属于该 Institution 的园区业务沟通正文、附件与更正状态，
   无需老师升级；家庭私密 AI、草稿、私人聊天和其他 Institution 仍不可见。
-- [ ] 后置 AI attention 只在同一 owner-read 范围内产生带 source refs 的候选；
+- [x] 后置 AI attention 只在同一 owner-read 范围内产生带 source refs 的候选；
   redaction/correction/revoke 会同步失效候选，且 AI 不自动回复、建 Workflow 或评分。
-- [ ] Support Signal 只分“需要处理 / 建议关注”；确定性信号来自 canonical
+- [x] Support Signal 只分“需要处理 / 建议关注”；确定性信号来自 canonical
   deadline/blocker，负荷信号只使用园区配置的绝对阈值，不做跨班/跨老师比较。
-- [ ] 未配置负荷阈值时该类信号保持 disabled；来源解决、撤回、纠正、撤权或失效后
+- [x] 未配置负荷阈值时该类信号保持 disabled；来源解决、撤回、纠正、撤权或失效后
   派生信号自动消失，不形成长期绩效历史。
-- [ ] Admin mobile 最多突出三个跨班级信号并只读下钻；阈值配置、source action 与
+- [x] Admin mobile 最多突出三个跨班级信号并只读下钻；阈值配置、source action 与
   显式创建 WorkItem/当前已注册且 eligible 的 Workflow 位于 Admin Web；普通 signal
   不能启动 `EnrollmentJourneyWorkflowV1`，信号本身不自动产生业务动作。
-- [ ] 首个实现只包含 `EnrollmentJourneyWorkflowV1`；Grant change、出勤修订、知识
+- [x] 首个实现只包含 `EnrollmentJourneyWorkflowV1`；Grant change、出勤修订、知识
   编辑、CareInteraction、PublishProcess 和 support signal 不伪装成第二个 Workflow。
-- [ ] 顶层阶段覆盖意向 → 沟通/可选到访 → 满班候补（可选）→ My-Chat/binding 与
+- [x] 顶层阶段覆盖意向 → 沟通/可选到访 → 满班候补（可选）→ My-Chat/binding 与
   trial relationship preparation/start → 试入园适应 → 复盘 → 正式确认/formal phase
   → 完成。
-- [ ] `capacity_waitlist` 只由目标班级容量不足进入；其他等待保持为 waiting state，
+- [x] `capacity_waitlist` 只由目标班级容量不足进入；其他等待保持为 waiting state，
   并显示当前等待方和下一次复核/预计时间。
-- [ ] 意向/候补期可以只保留最少本地 provisional record；实际试入园前必须由
+- [x] 意向/候补期可以只保留最少本地 provisional record；实际试入园前必须由
   Guardian 创建/选择并授权 My-Chat Child/Family，完成 current binding、Nurture
   association、pending Enrollment/Grant 和 exact CareGroup assignment，再通过
   trial-start commit 进入真实照护。
-- [ ] 试入园本身就是适应期；如需继续观察必须在正式激活前显式延长 trial。确认
+- [x] 试入园本身就是适应期；如需继续观察必须在正式激活前显式延长 trial。确认
   Nurture 激活成功后 Workflow 幂等完成，不要求额外老师/家庭反馈、Admin 确认或
   post-activation settling gate。
-- [ ] D-07A 默认只收集称呼 + 出生月份/年龄段等最少 provisional 信息；法定姓名、
+- [x] D-07A 默认只收集称呼 + 出生月份/年龄段等最少 provisional 信息；法定姓名、
   完整出生日期和更深敏感事实仅在后续明确 purpose/consent 下采集。
-- [ ] 成人联系信息由 Host owner 持有；Nurture 只保存 opaque contact ref 与安全
+- [x] 成人联系信息由 Host owner 持有；Nurture 只保存 opaque contact ref 与安全
   label，无法取得受支持 owner contract 时不降级复制 raw contact。
-- [ ] native 园区业务沟通使用 canonical Message/source refs；外部电话/微信只保存
+- [x] native 园区业务沟通使用 canonical Message/source refs；外部电话/微信只保存
   structured manual summary、channel、occurredAt、confirmed needs、next action/dueAt
   和责任角色，修订 append-only。
-- [ ] AI 摘要必须基于当前授权、可引用的 native source，并由 Admin 确认后成为
+- [x] AI 摘要必须基于当前授权、可引用的 native source，并由 Admin 确认后成为
   touchpoint note；AI 不生成 intent/fit/conversion score，也不自动推进阶段。
-- [ ] D-07B 只有家庭明确接受候补、目标班级和最少信息已确认时才产生
+- [x] D-07B 只有家庭明确接受候补、目标班级和最少信息已确认时才产生
   `waitlistQualifiedAt`；首次咨询/到访时间不预占候补顺序。
-- [ ] 候补使用 versioned priority categories + category 内 FIFO；未配置优先类别时
+- [x] 候补使用 versioned priority categories + category 内 FIFO；未配置优先类别时
   为单一 FIFO，Admin 手工调整必须记录 reason 和前后顺序，AI 不参与。
-- [ ] 候补记录包含目标班级、期望日期/窗口、qualifiedAt、capacity/policy revision、
+- [x] 候补记录包含目标班级、期望日期/窗口、qualifiedAt、capacity/policy revision、
   priority basis、nextReviewAt、continued-interest 状态、最近确认和 waiting party。
-- [ ] 家庭端不显示精确名次，只显示候补中、目标班级、最近复核和下次预计联系；
+- [x] 家庭端不显示精确名次，只显示候补中、目标班级、最近复核和下次预计联系；
   Admin Web 才能查看完整顺序及依据。
-- [ ] 名额释放只产生 Admin 待处理事项；Admin 发出限时 offer，Guardian 接受后才进入
+- [x] 名额释放只产生 Admin 待处理事项；Admin 发出限时 offer，Guardian 接受后才进入
   `trial_preparation`。拒绝/超时后再处理下一位，不自动激活 Enrollment。
-- [ ] `nextReviewAt` 必填；复核未回复先进入 `waiting_on_guardian`，只在园区配置的
+- [x] `nextReviewAt` 必填；复核未回复先进入 `waiting_on_guardian`，只在园区配置的
   reminder/deadline 完成后过期，不因一次未回复自动删除。
-- [ ] D-07C 不创建独立 TrialChild、trial media/attendance/retention 或 caregiver
+- [x] D-07C 不创建独立 TrialChild、trial media/attendance/retention 或 caregiver
   Surface；老师使用普通 role-bound mobile，记录进入既有 care facts、照片关联、
   attendance、board 和 PublishProcess。
-- [ ] `NurtureEnrollmentStatus` 不新增 `trial`：preparation 使用 `pending`，真实
+- [x] `NurtureEnrollmentStatus` 不新增 `trial`：preparation 使用 `pending`，真实
   trial/formal relationship 都使用 `active`，并由 canonical
   `participationPhase=trial|formal` 区分；phase 不是 authority。
-- [ ] 试入园孩子当天计入照护安全人数和真实出勤，但不计入 formal Enrollment
+- [x] 试入园孩子当天计入照护安全人数和真实出勤，但不计入 formal Enrollment
   统计；转正式只更新同一关系的 lifecycle，不复制孩子、照片或照护记录。
-- [ ] D-07D trial offer 接受后关闭原 waitlist entry，并创建绑定 exact class 与
+- [x] D-07D trial offer 接受后关闭原 waitlist entry，并创建绑定 exact class 与
   `trialStartsAt`/`trialEndsAt`/`reviewAt` 的 capacity reservation；同一名额不能
   并行承诺。
-- [ ] trial-start 前撤回使用 `cancel_trial_preparation` 原子关闭 preparation shell
+- [x] trial-start 前撤回使用 `cancel_trial_preparation` 原子关闭 preparation shell
   并释放 reservation，不要求 Enrollment/Grant/CareGroup 已存在；trial 已开始后改走
   end-trial。
-- [ ] `reviewAt` 到期只产生 Admin 待办/支持信号；未完成显式延长、正式激活或结束
+- [x] `reviewAt` 到期只产生 Admin 待办/支持信号；未完成显式延长、正式激活或结束
   时不自动转换。超过 `trialEndsAt` 后不得继续安排试入园照护。
-- [ ] 复盘使用既有 attendance/care facts/观察/家园沟通；caregiver 无专用报告。
+- [x] 复盘使用既有 attendance/care facts/观察/家园沟通；caregiver 无专用报告。
   AI draft 必须引用来源且不能评分、推荐录取或判断孩子适配度。
-- [ ] Admin 复盘结果只允许 `extend trial | propose formal enrollment | end trial`：
+- [x] Admin 复盘结果只允许 `extend trial | propose formal enrollment | end trial`：
   延长更新期限并保留名额，正式方案等待 Guardian 明确接受且期间继续占位，结束
   释放名额。
-- [ ] 结束后需要继续等待时重新满足 D-07B qualification 并产生新的
+- [x] 结束后需要继续等待时重新满足 D-07B qualification 并产生新的
   `waitlistQualifiedAt`；旧名次不自动恢复，例外只允许带原因的 append-only override。
-- [ ] D-07E formal activation 必须先取得 Guardian acceptance，并在 Nurture commit
+- [x] D-07E formal activation 必须先取得 Guardian acceptance，并在 Nurture commit
   前重验 current My-Chat Child/Family membership、scenario binding 和 signed owner
   evidence；cached/stale/unavailable evidence 均不能激活。
-- [ ] Nurture formalization 在一个本地事务中保持 `status=active`、完成
+- [x] Nurture formalization 在一个本地事务中保持 `status=active`、完成
   `participationPhase: trial → formal`、保留同一 occupied reservation 并更新
   Grant；失败或重试期间保持 `active trial + occupied seat`。
-- [ ] `trial_start_pending | formalization_pending | exit_pending | waiting_on_system`
+- [x] `trial_start_pending | formalization_pending | exit_pending | waiting_on_system`
   只属于 Workflow，不增加 Enrollment 主状态；mobile/Web 只在 canonical local commit
   后显示 trial/formal/ended。
-- [ ] end trial 是可在 My-Chat owner outage 下执行的 Nurture 本地降权事务：同时
+- [x] end trial 是可在 My-Chat owner outage 下执行的 Nurture 本地降权事务：同时
   `status: active → ended`（历史 phase=`trial`）、结束 CareGroup、关闭 trial-purpose
   Grant、释放 reservation，
   之后只创建下一候补 Admin task，不自动 offer。
-- [ ] end trial 不删除 My-Chat Child/Family/membership/scenario binding 或 Nurture
+- [x] end trial 不删除 My-Chat Child/Family/membership/scenario binding 或 Nurture
   association/care history；只停止未来 caregiver access 和新 publication，历史沿用
   T-006 retention/redaction/revoke。
-- [ ] Workflow 完成后的 formal Enrollment 离园属于普通
+- [x] Workflow 完成后的 formal Enrollment 离园属于普通
   `status: active → ended` lifecycle maintenance，不重新打开 Enrollment Journey，
   也不默认创建第二个 Workflow。
-- [ ] Admin mobile board 可查看当前 actor-safe Workflow 关键内容、阶段、里程碑、阻塞和
+- [x] Admin mobile board 可查看当前 actor-safe Workflow 关键内容、阶段、里程碑、阻塞和
   下一步，但不暴露 raw Run/Step 或提供隐藏写操作。
-- [ ] 当前只有 `institution_admin` 可以进入 `InstitutionAdminWorkbench`；非 Admin
+- [x] 当前只有 `institution_admin` 可以进入 `InstitutionAdminWorkbench`；非 Admin
   角色不能进入或借用其 capability。
-- [ ] Admin Web 的 roster/invite/confirmation/grant、日常运营、家长触达、数字资源和
+- [x] Admin Web 的 roster/invite/confirmation/grant、日常运营、家长触达、数字资源和
   知识操作均有明确 authority、状态和审计。
-- [ ] Admin Web 可记录/查看完整照片和文字，并可设置封面、调整活动落位与 downscope
+- [x] Admin Web 可记录/查看完整照片和文字，并可设置封面、调整活动落位与 downscope
   visibility；这些修改追加 revision；child attribution 由 Admin 提议、exact
   CareGroup caregiver 确认，老师原始内容/作者/时间与自动匹配 provenance 不被覆盖。
-- [ ] AI 只在每日提交时生成带证据的出勤推理；当前班级老师明确提交后才产生正式
+- [x] AI 只在每日提交时生成带证据的出勤推理；当前班级老师明确提交后才产生正式
   出勤，同日修订和跨日 reopen 均保留审计，Admin 不能代确认。
-- [ ] 出勤事实、记录覆盖率和 AI 推理候选在 contract 与 UI 中保持不同语义。
-- [ ] 园区 Admin 可编辑/发布包括医疗类在内的知识；RAG 回答逐项标明园区或权威
+- [x] 出勤事实、记录覆盖率和 AI 推理候选在 contract 与 UI 中保持不同语义。
+- [x] 园区 Admin 可编辑/发布包括医疗类在内的知识；RAG 回答逐项标明园区或权威
   来源、版本和引用片段，来源冲突时不静默拼接。
-- [ ] Web 与 mobile 消费同一 `InstitutionWorkflow` 事实与 versioned projection；
+- [x] Web 与 mobile 消费同一 `InstitutionWorkflow` 事实与 versioned projection；
   Admin Web 是主要 Workflow 操作面，Admin mobile 不复制或拥有 Workflow。
-- [ ] aggregate 无法反推出家庭私密正文或未授权 child-level facts。
-- [ ] 产品中不存在教师/孩子/家庭的排名、评分或诊断性结论。
-- [ ] institution presenter 可被 My-Chat 消费且不暴露内部 persistence。
-- [ ] 顶层产品问题已收口；所有实现前 contract/schema 项均在 freeze register 中
+- [x] aggregate 无法反推出家庭私密正文或未授权 child-level facts。
+- [x] 产品中不存在教师/孩子/家庭的排名、评分或诊断性结论。
+- [x] institution presenter 可被 My-Chat 消费且不暴露内部 persistence。
+- [x] 顶层产品问题已收口；所有实现前 contract/schema 项均在 freeze register 中
   标明 owner、启用门和默认安全行为。
 
 

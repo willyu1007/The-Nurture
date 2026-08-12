@@ -70,10 +70,10 @@
   [`85`](./85-g4-e-exit-record.md). A real gateway smoke produces
   `live_qualified` and remains required only before feature-flag/traffic
   activation.
-- Current T-007 node: G4-D I4 is also closed default-off by
-  [`95`](./95-g4-d-i4-exit-record.md). Reseal the T-002 exact source pin and
-  execute G4-F's final integration/privacy/default-off/cleanup census; no
-  additional branch implementation is planned for T-007.
+- T-007 closure: G4-D I4 is closed default-off by
+  [`95`](./95-g4-d-i4-exit-record.md); the exact T-002 source pin is resealed;
+  [`96`](./96-g4-f-exit-and-beta-handoff.md) issues the G4-F Exit and Beta
+  Profile Handoff. No additional implementation is planned for T-007.
 - Qualification never starts from a hand-written fixture answer, raw generic
   moderation mapping or moving model alias. Mock transport must never be
   called live.
@@ -90,7 +90,7 @@
 - Conflict precedence: latest user-confirmed > 0F freeze/Exit records > existing
   task plan/architecture > model inference
 - Repository SSOT output:
-  `dev-docs/active/nurture-institution-surfaces/roadmap.md`
+  `dev-docs/archive/nurture-institution-surfaces/roadmap.md`
 - Mode fallback used: non-Plan default applied: yes
 
 ## Input sources and usage
@@ -441,7 +441,7 @@ expected project-structure impact.
 The existing detailed bundle remains:
 
 ```text
-dev-docs/active/nurture-institution-surfaces/
+dev-docs/archive/nurture-institution-surfaces/
   roadmap.md
   00-overview.md
   01-plan.md

@@ -1780,3 +1780,25 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
   `G4_D_I4_EXIT_PASS_DEFAULT_OFF`. G4-F is now open only for the exact pin
   reseal and task-level join; no durable apply, activation or traffic is
   implied.
+
+## 2026-08-13 — G4-F Exit and task closure
+
+- Consumed the T-002 exact reseal at My-Chat `2d415ce`, Nurture adoption source
+  `de4897f` and owner aggregate `856cd6c6…`. Workflow contract parity, x5,
+  wave4 and Nurture scenario self-pins are exact.
+- Joined the already-qualified G4-A/B/C branches with G4-D record 95 and G4-E
+  records 83–85. Legitimate unavailable/empty arms remain explicit; no
+  placeholder owner fact or compatibility capability was invented for G4-F.
+- Re-ran Nurture root TypeScript, the 97-file/1050-test unit lane and every
+  workflow/source/owner/default-off/G2/G3/formal/persistence/port/routing/
+  manifest gate after the pin reseal.
+- The first post-clean unit attempt correctly failed to collect because the
+  ignored pinned My-Chat package output had been removed. Running the declared
+  `pnpm typecheck` preparation first restored it; the complete rerun passed.
+  The generated output was removed again after verification.
+- Destroyed both exact disposable database containers, confirmed ports
+  55453/55454 free, and removed ignored task journals, test reports, compiled
+  `dist` directories and frontend TypeScript build metadata from both repos.
+- Issued [`96`](./96-g4-f-exit-and-beta-handoff.md). T-007 is complete and
+  default-off; T-008 still needs separate authorization and its own Candidate
+  Freeze/activation evidence.

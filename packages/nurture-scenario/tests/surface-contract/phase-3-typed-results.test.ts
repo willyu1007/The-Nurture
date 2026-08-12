@@ -708,7 +708,7 @@ const PRE_G3_KEYS = new Set([
 const POST_G3_FREEZE_ONLY_KEYS = new Map([
   [
     "query_institution_communication_review",
-    "dev-docs/active/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
+    "dev-docs/archive/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
   ],
 ]);
 

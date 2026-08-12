@@ -1371,3 +1371,23 @@ REMAINING_I4_MATRIX_PENDING / G4_F_CLOSED` (record
 Verdict: `G4_D_I4_EXIT_PASS_DEFAULT_OFF / G4_F_PIN_RESEAL_AND_JOIN_NEXT`.
 Evidence: [`95`](./95-g4-d-i4-exit-record.md) and
 [`artifacts/db/t007-g4d-i4-exit/`](./artifacts/db/t007-g4d-i4-exit/).
+
+## 2026-08-13 G4-F final join and cleanup
+
+| Check | Result |
+| --- | --- |
+| first unit attempt after deep cleanup | EXPECTED PREREQUISITE FAILURE — 49 suites could not resolve the intentionally removed pinned package output; no test assertion ran in those suites |
+| repository-declared pinned preparation | PASS — `pnpm typecheck` rebuilt the exact My-Chat workflow package and all Nurture types passed |
+| full unit rerun | PASS — 97 files / 1050 tests |
+| exact workflow/source pin | PASS — Base `536638a`, My-Chat `2d415ce`, parity `85cf56e2…`, x5 `f49459af…`, Nurture self `e4b26610…` |
+| C30 upstream / owner lock / default-off | PASS — owner aggregate `856cd6c6…`; enabled capabilities/routes/registrations/activation models all zero |
+| G2 / G3 / formal ingress | PASS |
+| persistence / port topology / test routing | PASS — 180 files: 97 unit, 50 production DB, 11 dev-host, 17 scenario-service, 5 x5 |
+| generated manifest | PASS — current |
+| disposable targets | PASS — exact containers absent; ports 55453/55454 free |
+| ignored build/test artifacts | PASS — identified task journals, test JSON, three Nurture dist trees, frontend tsbuildinfo and My-Chat pinned dist removed |
+| governance/docs | PASS — strict task docs and project sync/lint completed before archive |
+
+Final verdict: `G4_F_EXIT_PASS_DEFAULT_OFF /
+T007_BETA_PROFILE_HANDOFF_ISSUED / NO_DURABLE_APPLY_OR_ACTIVATION`.
+Normative record: [`96`](./96-g4-f-exit-and-beta-handoff.md).

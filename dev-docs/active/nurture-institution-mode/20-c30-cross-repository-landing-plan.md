@@ -295,7 +295,7 @@ Then the full scope, following the T-009 closing-requalification discipline:
 The 2026-08-12 Step 5 record restores the current-pin evidence that T-002's
 owner path lacked after the T-009 rotations. It restores the G4-0A ledger row
 from `DEFINED_UNQUALIFIED` to `PRESENT_PINNED`
-(`dev-docs/active/nurture-institution-surfaces/07-g4-0a-inventory-record.md`,
+(`dev-docs/archive/nurture-institution-surfaces/07-g4-0a-inventory-record.md`,
 "Pin Rebind"), which is why option C was chosen over the two T-007 0C paths on
 2026-08-08.
 

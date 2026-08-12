@@ -2,9 +2,9 @@
 
 ## Status
 
-- Date: 2026-08-12
+- Date: 2026-08-13
 - Task: T-007
-- Purpose: the **live** list of what is not built and what comes next.
+- Purpose: final task-level gap disposition and post-Exit boundaries.
 
 This register is the single place that answers "where is T-007 now". The
 other numbered records are history: each says what was true when it was
@@ -397,18 +397,20 @@ off slice.
    Done 2026-08-12 as `G4_D_I4_EXIT_PASS_DEFAULT_OFF`; record
    [`95`](./95-g4-d-i4-exit-record.md). The full unit, 41-migration fresh DB,
    444-test production DB and three consecutive 37/37 x5 lanes pass.
-7. **G4-F** — reseal the T-002 exact My-Chat/Nurture adoption lock, then run
+7. ~~**G4-F** — reseal the T-002 exact My-Chat/Nurture adoption lock, then run
    final integration/privacy/default-off/false-empty/governance and destroyed-
-   target censuses. Issue the Beta Profile Handoff only if all remain green.
+   target censuses.~~ Done 2026-08-13 as `G4_F_EXIT_PASS_DEFAULT_OFF /
+   T007_BETA_PROFILE_HANDOFF_ISSUED`; record
+   [`96`](./96-g4-f-exit-and-beta-handoff.md).
 
 G-03's remaining authority/source fact is an external owner gate, not an
 actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09 and G4-D I1–I4 are closed. G4-F waits only on the exact T-002 pin reseal
-and the final task-level join/census; it does not wait on additional Enrollment
-Journey implementation, a route, activation or a durable database target.
+G-09, G4-D I1–I4 and G4-F are closed. No T-007 implementation step remains.
+The separate activation, durable apply, live-provider, Candidate Freeze,
+deployment and traffic gates belong to later explicitly authorized work.
 
 ## Second-round status refinement
 
@@ -511,6 +513,6 @@ Host and Nurture owners inside the effect transaction; exact consumed replay
 admits only the expected target-head advance. Fresh migration, production DB,
 x5, type/static and default-off gates pass.
 
-The only next implementation-independent action is T-002's exact source-pin
-reseal followed by G4-F's final join and cleanup census. Durable apply,
+T-002's exact source pin is resealed and G4-F's final join/cleanup census passes
+at record [`96`](./96-g4-f-exit-and-beta-handoff.md). Durable apply,
 activation, deployment, live qualification and traffic remain outside T-007.

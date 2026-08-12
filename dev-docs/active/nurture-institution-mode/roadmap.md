@@ -551,7 +551,7 @@ dev-docs/active/nurture-institution-mode/
     composition.
   - `packages/nurture-db/` and `prisma/` — reviewed additive owner facts,
     cleanup and disposable qualification only.
-  - `dev-docs/active/nurture-institution-surfaces/`,
+  - `dev-docs/archive/nurture-institution-surfaces/`,
     `nurture-family-sharing-eligibility/` and
     `nurture-store-beta-readiness/` — execution evidence and handoffs.
 - My-Chat:

@@ -113,11 +113,11 @@ tasks:
     updated: 2026-08-11
   - id: T-007
     slug: nurture-institution-surfaces
-    status: in-progress
+    status: archived
     milestone_id: M-002
     feature_id: F-003
-    dev_docs_path: dev-docs/active/nurture-institution-surfaces
-    updated: 2026-08-11
+    dev_docs_path: dev-docs/archive/nurture-institution-surfaces
+    updated: 2026-08-13
   - id: T-008
     slug: nurture-store-beta-readiness
     status: planned

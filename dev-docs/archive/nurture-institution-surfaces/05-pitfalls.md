@@ -891,3 +891,20 @@
 - **Prevention:** idempotent replay contracts must list which facts are
   expected to change because of the original effect and keep every other
   current-owner component exact.
+
+## 2026-08-13 - A clean ignored tree can remove a local package prerequisite
+
+- **Symptom:** after deep cleanup, the full unit command collected 48 files but
+  failed 49 suites before tests because `@my-chat/workflow-contracts` had no
+  compiled package entry.
+- **Root cause:** Nurture's unit script does not prepare the pinned sibling;
+  the repository's root `typecheck` does. Cleanup intentionally removed the
+  ignored sibling `dist` between qualification and the final rerun.
+- **What was tried:** the failing unit run was not retried unchanged and no
+  generated output was committed.
+- **Fix/workaround:** run the repository-declared `pnpm typecheck` pinned-source
+  preparation, then rerun units. All 97 files / 1050 tests passed; remove the
+  generated output again only after the last code-dependent verification.
+- **Prevention:** final clean-room order is prepare -> typecheck/tests/gates ->
+  cleanup -> read-only docs/governance checks. Do not treat ignored build
+  output as durable source or leave it behind for convenience.
