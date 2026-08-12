@@ -32,16 +32,20 @@ Project: `main`
   record 63) and the formal trusted ingress landed as one coherent change;
   the internal bridge is removed with no alias, and the disposable
   qualification passed (39/39 deploy, targeted 3/3, full DB 403/403, drift
-  zero, `DR-I3-01` repaired pre-apply). Next: I4 joint conformance (J3) —
-  binds the wave4 current-owner evidence transport and the joint
-  negative/replay matrix — then G4-F. Durable apply remains approval-gated;
+  zero, `DR-I3-01` repaired pre-apply). The subsequent I4-A protocol gap is
+  now locally repaired at Nurture `5d489ac` and My-Chat `9ac8f16`: Host reserve
+  creates no Run/event, signed Nurture execution records historical settlement,
+  writer-fenced no-effect and Host confirm/abandon are exact and default-off.
+  Next: execute the serialized two-database negative/replay/race matrix, then
+  G4-F. Durable environment apply remains approval-gated;
   `live_qualified=false` stays a separate activation gate.
   Note: the pin rotation leaves the C30-I3 adoption lock host head at
   `ae563988` — refreshed by the T-002 C30 Step-5 track, not by G4-D I3.
-- T-010: I4-C1 drafted and independently reviewed (2026-08-12, review-only —
-  no apply): authority/policy schema with composite-FK scope pinning and
-  at-most-one active-slot partial uniques. Next is I4-C2 (current-authority
-  reader); apply stays behind the C4 approved-disposable gate.
+- T-010: I4-C1 is reviewed; I4-C2 current-authority SQL and I4-C3 private
+  transport/cleanup owner are contract-qualified. The C4 production-shape
+  runner is ready and refuses generic/non-empty/unapproved targets. Next is
+  execution on one approved disposable database plus exact My-Chat joint
+  grant/withdrawal/replay/response-loss/cleanup conformance.
 - T-002: execute C30 three-repository requalification Step 5 so recorded
   acceptances become current-pin evidence; afterwards only a separately
   authorized C30-I4 scope review is eligible. C31–C35, D, Pilot remain closed.
@@ -57,14 +61,13 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Continue G4-D I3** (started 2026-08-12, design record 86; My-Chat
-   contact owner landed): implement the Nurture owner composition, the
-   enrollment prepared-command ledger and the formal ingress, qualify on a
-   disposable DB, then run I4 joint conformance.
-2. **Begin T-010 I4-C1**: additive Prisma diff, review-only, no apply.
+1. **Execute T-007/T-041 I4-A qualification** on one approved disposable
+   My-Chat/Nurture database pair; preserve default-off and unknown quarantine.
+2. **Execute T-010 I4-C4** on its separate approved empty disposable target,
+   then run the exact My-Chat joint cleanup matrix.
 3. **Execute C30 requalification Step 5** for T-002.
-4. `NurtureInstitutionPolicyService` and the G4-D commands still have no
-   production caller; I1 evidence is not activation evidence.
+4. If all three gates pass, freeze T-007 G4-F inputs and execute its final
+   integration/privacy/false-empty census. No result authorizes activation.
 
 ## Notes (manual)
 

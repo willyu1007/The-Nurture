@@ -1234,3 +1234,19 @@ TWO_DATABASE_QUALIFICATION_PENDING / I4_NOT_QUALIFIED`.
 Current verdict: `CONFIRMATION_BOUND_WRITER_FENCE_AND_EXACT_HOST_COORDINATOR /
 CLEAN_PINNED_LOCAL_BASELINE / NO_DB_APPLY /
 TWO_DATABASE_QUALIFICATION_PENDING / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 I4-A two-database settlement qualification
+
+| Check | Result |
+| --- | --- |
+| Nurture empty-database migration replay | PASS — 39/39 migrations |
+| My-Chat empty-database migration replay | PASS — 43/43 migrations after the receipt-CHECK repair |
+| focused settlement x5 vehicle | PASS — 1 file / 6 tests |
+| complete serialized x5 lane | PASS — 5 files / 35 tests |
+| routing census | PASS at this checkpoint — 179 files: 97 unit / 50 production DB / 11 dev host / 17 scenario service / 4 x5 |
+| Nurture repository-root TypeScript | PASS |
+| My-Chat DB/API/scenario-integration TypeScript | PASS |
+| activation effects | NONE — no route, DI binding, durable apply, deployment or traffic |
+
+Verdict: `G4_D_I4_A_WORKFLOW_RUN_SETTLEMENT_DB_QUALIFIED_DEFAULT_OFF /
+I4_REMAINDER_PENDING / G4_F_CLOSED`.

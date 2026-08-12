@@ -369,10 +369,11 @@ off slice.
    scenario-service ingress.~~ Qualified 2026-08-12
    (`G4_D_I3_QUALIFIED_DEFAULT_OFF`, record 87): heads and default-off gates
    retained, disposable qualification passed, internal bridge removed.
-5. **G4-D I4-A Host Run seam** — land an exact My-Chat-owned Run
-   issue/reserve/read contract and carry its opaque ref through the trusted
-   boundary; Nurture must not derive the object id. Then restore record 88's
-   prospective-contact joint vehicle and run it on fresh disposable databases.
+5. ~~**G4-D I4-A Host Run seam** — qualify the exact My-Chat-owned
+   reserve/confirm/abandon lifecycle with Nurture's committed/no-effect
+   settlement owner on a fresh disposable pair.~~ Done 2026-08-12: 6/6 focused
+   protocol cases and 35/35 complete x5 cases; record
+   [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md).
 6. **G4-D I4 remainder** — add native-source/current-owner transport, remaining
    command families, Guardian/mobile and the complete negative/replay/head
    matrix over the qualified I3 paths (record 87 boundaries).
@@ -384,9 +385,9 @@ actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09 and G4-D I3 are closed. I4 now waits first on the Host Run issuance seam,
-then on disposable execution and the still-unimplemented remainder; it does
-not wait on a stale external revision pin.
+G-09, G4-D I3 and the I4-A Host Run settlement protocol qualification are
+closed. I4 now waits on the still-unimplemented owner/command/head remainder;
+it does not wait on the reservation protocol or a disposable database pair.
 
 ## Second-round status refinement
 

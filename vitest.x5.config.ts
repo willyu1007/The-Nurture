@@ -11,6 +11,7 @@ export default defineConfig({
       "packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts",
       "packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts",
       "packages/nurture-db/tests/t007-institution-knowledge-e8-joint.integration.test.ts",
+      "packages/nurture-db/tests/t007-workflow-run-settlement-joint.integration.test.ts",
     ],
     exclude: ["**/node_modules/**", "**/dist/**"],
     // The joint files share the two disposable databases and use serializable

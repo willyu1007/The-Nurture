@@ -6,8 +6,12 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **run the serialized two-database race and response-loss suite on
-  an explicitly approved disposable pair**. The writer-fenced signed
+- Next step: **complete the remaining G4-D I4 owner/command/head matrix** over
+  the now-qualified reservation/settlement protocol. The serialized
+  two-database race and response-loss suite passed 6/6 on an approved
+  synthetic-only disposable pair
+  ([`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md)).
+  The writer-fenced signed
   `confirmed_no_effect` operation and the default-off My-Chat reserve ->
   execute -> fence/status -> settle coordinator are implemented locally;
   status bypasses prepared TTL and current authority while remaining bound to
@@ -17,9 +21,10 @@
   neither migration is applied. The superseded immediate queued-Run issuer,
   its Nurture adapter and the negative protocol-gap x5 vehicle are removed.
   The product path remains default-off because the Host coordinator has no
-  route, DI or activation binding. Positive two-database qualification still requires an
-  approved disposable pair, and
-  I4/G4-F remain open. E7
+  route, DI or activation binding. The protocol subset is DB-qualified and
+  default-off; native-source, current-owner, remaining command families,
+  Guardian/mobile/head negatives and the full I4 exit matrix remain open.
+  G4-F therefore remains closed. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,
   record 84) are closed and the G4-E Exit is issued

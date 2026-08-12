@@ -19,13 +19,14 @@ async function collect(directory) {
 
 const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await collect(path.join(repoRoot, 'apps')))];
 const routes = { unit: [], productionDb: [], devHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
-const expectedCounts = { unit: 97, productionDb: 50, devHost: 11, scenarioService: 17, x5Joint: 3 };
+const expectedCounts = { unit: 97, productionDb: 50, devHost: 11, scenarioService: 17, x5Joint: 4 };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
   else if (
     file === 'packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts' ||
     file === 'packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts' ||
-    file === 'packages/nurture-db/tests/t007-institution-knowledge-e8-joint.integration.test.ts'
+    file === 'packages/nurture-db/tests/t007-institution-knowledge-e8-joint.integration.test.ts' ||
+    file === 'packages/nurture-db/tests/t007-workflow-run-settlement-joint.integration.test.ts'
   ) routes.x5Joint.push(file);
   else if (file.startsWith('packages/nurture-db/')) routes.productionDb.push(file);
   else if (file.startsWith('apps/backend/') && file.endsWith('.e2e.test.ts')) routes.devHost.push(file);

@@ -1669,3 +1669,19 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
 - No Prisma field/table/migration was added. The existing prepared-command
   record already retains the minimal hash/fingerprint/capability evidence.
   No route, DI, activation, apply, deployment or traffic changed.
+
+## 2026-08-12 - I4-A two-database settlement qualification
+
+- Added one serialized x5 vehicle that composes the real My-Chat reservation
+  lifecycle repository with the real Nurture settlement repository, command
+  runner and settlement finalizer. No test-local Run issuer or cross-database
+  write shortcut exists.
+- Six cases cover committed response loss, confirmed-no-effect response loss,
+  exact replay, unresolved prepared quarantine and both shared-writer-fence
+  winners. Only verified committed proof materializes one Host Run and one
+  body-free creation event; no-effect and unknown materialize neither.
+- The qualification passed after clean migration replay on the approved
+  synthetic-only database pair. The complete x5 lane passes 35/35. Production
+  composition remains default-off and G4-D I4 still requires the
+  native-source/current-owner, command-family, Guardian/mobile and head-drift
+  matrix recorded in the live gap register.
