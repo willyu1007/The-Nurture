@@ -123,5 +123,8 @@ export {
 export * from "./repositories/enrollment-journey-prepared-command.repository.js";
 export * from "./repositories/enrollment-pair-owner.repository.js";
 export * from "./repositories/enrollment-journey-current-authority.repository.js";
+export * from "./repositories/family-sharing-current-authority.repository.js";
+export * from "./repositories/family-sharing-exact-local-pair.repository.js";
+export * from "./repositories/family-sharing-cleanup-ledger.repository.js";
 export * from "./enrollment-journey-owner-providers.js";
 export * from "./enrollment-journey-owners.composition.js";

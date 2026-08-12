@@ -1,4 +1,5 @@
 import type {
+  NurtureFamilySharingAuthorityCategoryFactsV1,
   NurtureFamilySharingCategory,
   NurtureFamilySharingDirection,
 } from "../../harness/family-sharing-eligibility.js";
@@ -80,4 +81,90 @@ export type NurtureFamilySharingAuthorityRecordReadPort = Readonly<{
       receiving: NurtureFamilySharingPolicyRecordV1 | null;
     }>
   >;
+}>;
+
+export const NURTURE_FAMILY_SHARING_AUTHORITY_READ_AUDIENCE =
+  "nurture.family-sharing-eligibility" as const;
+
+export const NURTURE_FAMILY_SHARING_AUTHORITY_READ_OPERATION =
+  "read_current_authority" as const;
+
+/**
+ * C2 receives this object only after the private transport has authenticated
+ * the calling service. The repository still checks every literal and version
+ * so a structurally malformed or accidentally unverified context cannot reach
+ * the database read.
+ */
+export type NurtureFamilySharingVerifiedServicePrincipalV1 = Readonly<{
+  verification: "verified_service_principal";
+  service_ref: string;
+  trust_source_ref: string;
+  trust_source_version: number;
+  audience: typeof NURTURE_FAMILY_SHARING_AUTHORITY_READ_AUDIENCE;
+  operation: typeof NURTURE_FAMILY_SHARING_AUTHORITY_READ_OPERATION;
+}>;
+
+/**
+ * Signed My-Chat evidence is reduced to the minimum verified pair head needed
+ * by Nurture. The local repository never receives raw platform Child, Family
+ * or membership identifiers and never treats the evidence as local authority.
+ */
+export type NurtureFamilySharingVerifiedCurrentPairEvidenceV1 = Readonly<{
+  verification: "verified_current_pair_evidence";
+  evidence_ref: string;
+  evidence_version: number;
+  verified_at: string;
+  expires_at: string;
+  child_anchor_ref: string;
+  child_owner_version: number;
+  family_anchor_ref: string;
+  family_owner_version: number;
+  my_chat_family_lifecycle: "active" | "inactive";
+}>;
+
+/** Exact local objects resolved from the typed Nurture binding anchors. */
+export type NurtureFamilySharingResolvedLocalPairV1 = Readonly<{
+  workspace_id: string;
+  child_ref: string;
+  child_care_process_ref: string;
+  family_ref: string;
+  child_association_ref: string;
+  family_association_ref: string;
+}>;
+
+/** The signed target selector must name one exact local enrollment head. */
+export type NurtureFamilySharingExactTargetSelectorV1 = Readonly<{
+  verification: "verified_exact_target_selector";
+  pair_evidence_ref: string;
+  pair_evidence_version: number;
+  target_kind: "enrollment";
+  enrollment_ref: string;
+  enrollment_revision: number;
+}>;
+
+export type NurtureFamilySharingCurrentAuthorityReadInputV1 = Readonly<{
+  principal: NurtureFamilySharingVerifiedServicePrincipalV1;
+  pair_evidence: NurtureFamilySharingVerifiedCurrentPairEvidenceV1;
+  local_pair: NurtureFamilySharingResolvedLocalPairV1;
+  target: NurtureFamilySharingExactTargetSelectorV1;
+  purpose: "family_nurture_sharing_authorization";
+  evaluated_at: string;
+}>;
+
+export type NurtureFamilySharingCurrentAuthorityReadResultV1 =
+  | Readonly<{
+      status: "resolved";
+      authority_version: string;
+      categories: readonly NurtureFamilySharingAuthorityCategoryFactsV1[];
+    }>
+  | Readonly<{ status: "unavailable" }>;
+
+/**
+ * Coherent C2 owner read. Implementations issue one current PostgreSQL
+ * statement and return no diagnostic reason across this privacy boundary.
+ */
+export type NurtureFamilySharingCurrentAuthorityReadPortV1 = Readonly<{
+  loadCurrent(
+    input: NurtureFamilySharingCurrentAuthorityReadInputV1,
+  ): Promise<NurtureFamilySharingCurrentAuthorityReadResultV1>;
 }>;

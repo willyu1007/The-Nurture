@@ -25,6 +25,11 @@ const allowedErrors = new Set([
   "unknown_capability",
   "institution_business_communication_read_disabled",
   "teacher_release_owner_disabled",
+  "family_sharing_private_disabled",
+  "family_sharing_private_auth_failed",
+  "family_sharing_private_replay",
+  "family_sharing_private_unavailable",
+  "invalid_family_sharing_private_request",
   "invalid_teacher_release_owner_request",
   "teacher_release_owner_contract_mismatch",
   // family_growth_transport@1.0.0 §5 — the frozen rendition-exchange taxonomy.

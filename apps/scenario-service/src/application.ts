@@ -31,6 +31,10 @@ import {
 } from "./family-growth-runtime.js";
 import type { TeacherReleaseOwnerComposition } from "./teacher-release-owner-composition.js";
 import { createTeacherReleaseOwnerComposition } from "./teacher-release-owner-runtime.js";
+import {
+  createDisabledFamilySharingPrivateRuntime,
+  type FamilySharingPrivateRuntime,
+} from "./family-sharing-private-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -48,6 +52,7 @@ export async function createScenarioServiceApplication(input?: {
   harnessRuntime?: HarnessRuntime;
   familyGrowthRendition?: FamilyGrowthRenditionRuntime;
   teacherReleaseOwnerComposition?: TeacherReleaseOwnerComposition;
+  familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
@@ -90,6 +95,12 @@ export async function createScenarioServiceApplication(input?: {
       familyGrowthRendition,
       teacherReleaseOwner: {
         composition: teacherReleaseOwnerComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      familySharingPrivate: {
+        runtime:
+          input?.familySharingPrivateRuntime ??
+          createDisabledFamilySharingPrivateRuntime(),
         serviceAuth: bindingOwnerServiceAuth,
       },
     }),

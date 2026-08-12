@@ -26,6 +26,12 @@ import {
   type TeacherReleaseOwnerConfig,
   TeacherReleaseOwnerServiceAuthGuard,
 } from "./teacher-release-owner.controller.js";
+import {
+  FAMILY_SHARING_PRIVATE_CONFIG,
+  FamilySharingPrivateController,
+  FamilySharingPrivateServiceAuthGuard,
+  type FamilySharingPrivateConfig,
+} from "./family-sharing-private.controller.js";
 
 @Module({
   controllers: [
@@ -34,6 +40,7 @@ import {
     HarnessController,
     FamilyGrowthRenditionController,
     TeacherReleaseOwnerController,
+    FamilySharingPrivateController,
   ],
 })
 export class AppModule {
@@ -42,6 +49,7 @@ export class AppModule {
     harness: HarnessGuardConfig;
     familyGrowthRendition: FamilyGrowthRenditionRuntime;
     teacherReleaseOwner: TeacherReleaseOwnerConfig;
+    familySharingPrivate: FamilySharingPrivateConfig;
   }): DynamicModule {
     return {
       module: AppModule,
@@ -74,6 +82,11 @@ export class AppModule {
           useValue: Object.freeze({ ...input.teacherReleaseOwner }),
         },
         TeacherReleaseOwnerServiceAuthGuard,
+        {
+          provide: FAMILY_SHARING_PRIVATE_CONFIG,
+          useValue: Object.freeze({ ...input.familySharingPrivate }),
+        },
+        FamilySharingPrivateServiceAuthGuard,
       ],
     };
   }

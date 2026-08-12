@@ -4,13 +4,17 @@
 
 - State: in-progress
 - Updated: 2026-08-12
-- Next step: I4-C1 is drafted, independently reviewed and reworked
-  (2026-08-12): additive schema/migration with composite-FK scope pinning and
-  at-most-one active-slot semantics (review-only, not applied), domain record
-  types, the fail-closed read port and the pinned-invariant verifier; see
-  `artifacts/db/t010-family-sharing-authority/`. Next: I4-C2
-  current-authority reader over these records (no apply; the first apply
-  target is the approved C4 disposable).
+- Next step: the environment-free I4-C4 production-shape qualification vehicle
+  is ready (2026-08-12). It requires an explicit approved, empty PostgreSQL
+  database named for T-010; it never falls back to `DATABASE_URL`. The vehicle
+  applies the complete migration history, executes the real exact-pair/C2 SQL,
+  DB nonce and cleanup-ledger paths, injects duplicate cardinality inside a
+  rolled-back PostgreSQL transaction, verifies response-loss replay,
+  same-key/different-fingerprint serialization, partial failure and no
+  over-delete, then proves synthetic data cleanup. Six environment-free safety
+  tests pass. No disposable target was available or approved, so migration and
+  production-shape execution remain pending; no database was contacted,
+  applied or activated.
 
 ## Goal
 
@@ -53,14 +57,14 @@ and T-007 continue independently in their existing worktrees.
   policy, receiving policy and live source/destination lifecycle.
 - [x] Current `NurtureGrantDataClass` values are excluded from the new positive
   media/focus path; no compatibility alias or backfill exists.
-- [ ] A reviewed additive Prisma migration persists exact category authority
+- [x] A reviewed additive Prisma migration persists exact category authority
   and separate release/receiving policy facts.
-- [ ] One PostgreSQL repository resolves an exact verified pair and fails
+- [x] One PostgreSQL repository resolves an exact verified pair and fails
   closed for missing, stale, revoked, duplicate or ambiguous authority.
-- [ ] A dedicated private route reuses detached Ed25519 verification, service
+- [x] A dedicated private route reuses detached Ed25519 verification, service
   trust, short expiry and database nonce replay protection, and returns
   `private, no-store` responses without protected identifiers.
-- [ ] Nurture explicitly owns withdrawal cleanup for its derived media/focus
+- [x] Nurture explicitly owns withdrawal cleanup for its derived media/focus
   stores and returns an idempotent cleanup receipt.
 - [ ] Fresh-database migration, owner-negative coverage and joint My-Chat
   grant/withdrawal/outage/stale/replay/response-loss/cleanup conformance pass.

@@ -88,15 +88,29 @@ outage and cleanup-partial-failure tests all fail closed.
 
 ### I4-C4 — qualification and joint conformance
 
-1. Obtain explicit approval for a dedicated Nurture database target.
-2. Apply all migrations from empty, verify status and run the targeted
-   PostgreSQL integration suite.
+1. Build and statically qualify a deterministic production-shape vehicle that:
+   - accepts only `NURTURE_T010_C4_DATABASE_URL` with an exact disposable-name
+     pattern and separate explicit approval token;
+   - refuses generic `DATABASE_URL`, non-PostgreSQL, non-public-schema and
+     non-empty targets;
+   - applies the full migration history from empty and verifies the C1
+     constraints/indexes before behavior tests;
+   - exercises the real C2/exact-pair SQL, durable nonce and cleanup ledger,
+     response loss, partial failure, no over-delete and transient duplicate
+     cardinality;
+   - removes synthetic business data and proves no residue.
+2. Obtain explicit approval for a dedicated Nurture database target, then run
+   the vehicle. An unavailable target is `EXECUTION_PENDING`, never permission
+   to reuse another database.
 3. Run joint My-Chat fixtures for grant, withdrawal, provider outage, stale
    authority, exact replay, response loss, cleanup and unknown outcome.
 4. Re-prove that production composition and activation remain off.
 
 I4-C4 exit: exact-pin conformance and cleanup pass with no residual test data;
 activation still requires a separate rollout decision.
+
+Environment-free checkpoint: step 1 is `VEHICLE_READY`; steps 2-4 remain
+`EXECUTION_PENDING`. This checkpoint is not the I4-C4 exit.
 
 ## Risks and mitigations
 

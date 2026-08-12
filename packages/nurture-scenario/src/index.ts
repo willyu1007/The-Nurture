@@ -56,6 +56,7 @@ export * from "./harness/publication-safety.js";
 export * from "./harness/institution-business-communication.js";
 export * from "./harness/family-sharing-eligibility.js";
 export * from "./domain/family-sharing/authority-records.js";
+export * from "./domain/family-sharing/private-transport.js";
 export * from "./domain/identity/scenario-binding-owner.js";
 export * from "./domain/identity/derived-age-stage.js";
 export * from "./domain/family-growth/envelope.js";
