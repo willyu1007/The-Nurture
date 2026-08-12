@@ -1114,3 +1114,26 @@ identity/capability metadata and never restores the expired body. It does not
 resolve current Participant or authority and cannot execute the command. Only
 after this identity check may the settlement owner acquire the shared command
 writer fence and return `committed|confirmed_no_effect`.
+
+## Enrollment Journey current-owner derivation boundary
+
+The verified Host invocation may carry only ordered Child/Family owner refs,
+versions, evidence hashes and the exact family-action snapshot where that
+capability requires one. It cannot carry a Nurture pair, Guardian role or
+Grant policy snapshot. The carrier is removed before prepared-command
+persistence and must be supplied again for execution.
+
+Nurture derives the business snapshot from one production Prisma owner. The
+workflow's held reservation fixes the accepted My-Chat actor; the actor must
+resolve to exactly one active local participant binding and one active
+Guardian role for the current Family/CareProcess. Both owner refs must resolve
+to the current active association pair and exactly one unexpired Scenario
+binding authorization. Ambiguity is unavailable/denied, never latest-row-wins.
+
+Trial Grant terms come from one immutable, unsuperseded, effective
+exact-Institution policy row. The pending Grant stores the policy snapshot but
+bounds its own `expiresAt` to the trial end. Therefore start compares policy
+identity, revision, expiry and ordered allowed sets while allowing that legal
+trial-bound shortening. Prepare and start repeat the policy check inside the
+serializable command transaction; the outer binding check is not treated as a
+transactional authority substitute.

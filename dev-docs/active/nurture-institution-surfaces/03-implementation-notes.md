@@ -1702,3 +1702,25 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
 - Left the production Prisma derivation adapter, Host carrier producer and
   positive/revoke/expiry/head matrix for the next bounded unit. No route,
   durable apply, activation or traffic was added.
+
+## 2026-08-12 — G4-D I4-B Prisma current owners and Admin matrix
+
+- Removed the production derivation injection point. One Prisma repository now
+  derives the active trial Workflow/reservation, exact Child/Family
+  association and authorization pair, accepted actor, current participant and
+  Guardian role, plus the exact Institution Grant policy.
+- Added `NurtureEnrollmentTrialGrantPolicy` as an additive immutable policy
+  owner. Only a first `superseded_at` transition is mutable; delete or in-place
+  term changes are rejected by PostgreSQL.
+- Changed current authorization and principal reads from latest-row selection
+  to bounded exact-one admission. Duplicate active facts fail closed.
+- Rechecked Grant policy currentness inside prepare/start's serializable
+  command transaction. Start binds the pending Grant's stored policy identity
+  and allowed sets while preserving the designed trial-end expiry bound.
+- Exercised `qualify_capacity_waitlist`, `prepare_trial_relationship` and
+  `start_trial` through production option, authority, prepared-command,
+  binding and executor owners. Added revoke, expiry, ambiguity, policy drift
+  and immutable-row negatives.
+- Regenerated the DB context contract and qualified all 40 migrations only on
+  a local disposable PostgreSQL 16 target. No route, persistent apply,
+  activation, deployment or traffic was added.

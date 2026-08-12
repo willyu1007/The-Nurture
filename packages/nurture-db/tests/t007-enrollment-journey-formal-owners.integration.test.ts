@@ -5,10 +5,19 @@ import type {
 } from "@my-chat/workflow-contracts";
 import type { NurtureEnrollmentContactOwnerV1 } from "@my-chat/scenario-integrations";
 import {
+  NurtureCommandRunner,
+  NurtureEnrollmentJourneySurfaceHandler,
   NurtureEnrollmentJourneyPreparedCommandCrypto,
+  acceptTrialOfferSpec,
+  confirmIntentConversationSpec,
+  issueTrialOfferSpec,
+  recordExternalTouchpointSpec,
+  startEnrollmentInquirySpec,
   type InstitutionBusinessCommunicationReadPort,
+  type NurtureCommandSpec,
   type NurtureEnrollmentGuardianActionOwnerSnapshotV1,
   type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+  type NurtureEnrollmentJourneyPreparedCommandDraftV1,
   type NurtureTrialGrantTermsSnapshotV1,
   type NurtureTrialPairOwnerSnapshotV1,
 } from "@the-nurture/scenario";
@@ -23,6 +32,7 @@ import {
   createNurtureEnrollmentJourneyCurrentOwnerProvider,
   type NurtureEnrollmentLocalOwnerDerivationV1,
 } from "../src/enrollment-journey-owner-providers.js";
+import { PrismaEnrollmentPairOwnerRepository } from "../src/repositories/enrollment-pair-owner.repository.js";
 import { PrismaNurtureCommandRepository } from "../src/repositories/institution-core.repositories.js";
 
 const prisma = createPrismaClient();
@@ -137,6 +147,249 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
       grant_terms: facts.grantTerms,
     });
     expect(pairOwner.isTrialSnapshotCurrent).toHaveBeenCalledOnce();
+  });
+
+  it("derives pair, Guardian role and Grant policy only from current Prisma owners", async () => {
+    const scope = await seedAdminScope("derive-current-owner");
+    const clock = { now: new Date("2026-08-12T10:00:00.000Z") };
+    const seeded = await seedTrialOwnerScope(scope, clock.now);
+      const owner = new PrismaEnrollmentPairOwnerRepository(prisma, () => clock.now);
+      const request = {
+        workspace_id: scope.workspaceId,
+        institution_ref: scope.institutionId,
+        workflow_ref: seeded.workflowId,
+        current_owner_evidence: seeded.carrier.currentOwnerEvidence,
+      };
+
+      const current = await owner.deriveTrialPair(request);
+      expect(current).toMatchObject({
+        pair: {
+          actor_ref: seeded.guardianActorRef,
+          guardian_participant_ref: seeded.guardianParticipantId,
+          guardian_role_assignment_ref: seeded.guardianRoleId,
+          child_owner_ref: seeded.childOwnerRef,
+          family_owner_ref: seeded.familyOwnerRef,
+        },
+        grant_terms: {
+          policy_ref: "trial-care-policy",
+          policy_revision: 1,
+          directions: ["family_to_org", "org_to_family"],
+          data_classes: ["daily_care_log", "care_day_note"],
+          purposes: ["trial_care"],
+        },
+      });
+      if (!current) throw new Error("current owner derivation failed");
+      await expect(owner.isTrialSnapshotCurrent(scope.workspaceId, current.pair))
+        .resolves.toBe(true);
+
+      await prisma.nurtureCareRoleAssignment.update({
+        where: { id: seeded.guardianRoleId },
+        data: { status: "revoked" },
+      });
+      await expect(owner.deriveTrialPair(request)).resolves.toBeNull();
+      await prisma.nurtureCareRoleAssignment.update({
+        where: { id: seeded.guardianRoleId },
+        data: { status: "active" },
+      });
+
+      await prisma.nurtureScenarioBindingAuthorization.update({
+        where: { id: seeded.childAuthorizationId },
+        data: { expiresAt: clock.now },
+      });
+      await expect(owner.deriveTrialPair(request)).resolves.toBeNull();
+      await prisma.nurtureScenarioBindingAuthorization.update({
+        where: { id: seeded.childAuthorizationId },
+        data: { expiresAt: seeded.ownerExpiresAt },
+      });
+
+      const duplicateAuthorization = await prisma.nurtureScenarioBindingAuthorization.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          subjectType: "child",
+          childAnchorId: seeded.childAnchorId,
+          ownerRef: seeded.childOwnerRef,
+          ownerVersion: 1,
+          idempotencyKeyHash: fixtureHash(),
+          requestFingerprint: fixtureHash(),
+          subjectEvidenceHash: fixtureHash(),
+          userEvidenceHash: fixtureHash(),
+          actorEvidenceHash: fixtureHash(),
+          purpose: "scenario_binding_write",
+          authorizationSourceRef: "my_chat_child_identity",
+          authorizationSourceVersion: 1,
+          status: "active",
+          verifiedAt: new Date(clock.now.getTime() - 30_000),
+          expiresAt: seeded.ownerExpiresAt,
+        },
+      });
+      await expect(owner.deriveTrialPair(request)).resolves.toBeNull();
+      await prisma.nurtureScenarioBindingAuthorization.update({
+        where: { id: duplicateAuthorization.id },
+        data: { status: "revoked", revokedAt: clock.now },
+      });
+
+      await prisma.nurtureEnrollmentTrialGrantPolicy.update({
+        where: { id: seeded.policyId },
+        data: { supersededAt: clock.now },
+      });
+      const currentPolicy = await prisma.nurtureEnrollmentTrialGrantPolicy.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          institutionId: scope.institutionId,
+          contractVersion: "1.0.0",
+          policyRef: "trial-care-policy",
+          policyRevision: 2,
+          directions: ["family_to_org", "org_to_family"],
+          dataClasses: ["daily_care_log"],
+          purposes: ["trial_care"],
+          effectiveFrom: clock.now,
+          expiresAt: seeded.policyExpiresAt,
+        },
+      });
+      await expect(owner.deriveTrialPair(request)).resolves.toMatchObject({
+        grant_terms: { policy_revision: 2, data_classes: ["daily_care_log"] },
+      });
+      await expect(prisma.nurtureEnrollmentTrialGrantPolicy.update({
+        where: { id: currentPolicy.id },
+        data: { dataClasses: ["care_day_note"] },
+      })).rejects.toThrow();
+      await expect(prisma.nurtureEnrollmentTrialGrantPolicy.delete({
+        where: { id: currentPolicy.id },
+      })).rejects.toThrow();
+  });
+
+  it("admits qualify, trial preparation and trial start through production owners", async () => {
+    const scope = await seedAdminScope("current-owner-command-matrix");
+    const clock = { now: new Date("2026-08-12T10:00:00.000Z") };
+    const seeded = await seedTrialOwnerScope(scope, clock.now);
+    expect(seeded.qualifyResult).toMatchObject({
+      status: "ok",
+      result: { effect: "qualify_capacity_waitlist", workflowHead: 4 },
+    });
+
+    const world = composed(clock);
+    const journeyOption = () => world.owners.enrollmentJourneyOptionIssuer.issue({
+      workspace_id: scope.workspaceId,
+      actor_participant_ref: scope.participantId,
+      kind: "journey",
+      target_ref: seeded.workflowId,
+      waitlist_entry_ref: seeded.entryId,
+      waitlist_entry_head: 3,
+    });
+    const prepareOption = journeyOption();
+    if (!prepareOption) throw new Error("prepare journey option issue failed");
+    const prepared = await executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "prepare_trial_relationship",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: prepareOption,
+        operationInput: {},
+      },
+      currentOwnerCarrier: seeded.carrier,
+    });
+    expect(prepared).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      result: { effect: "prepare_trial_relationship", workflowHead: 7 },
+    });
+    await expect(prisma.nurtureEnrollment.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, childCareProcessId: seeded.processId },
+    })).resolves.toMatchObject({ status: "pending", participationPhase: null });
+
+    clock.now = new Date(clock.now.getTime() + 4 * 60 * 60_000);
+    const startOption = journeyOption();
+    if (!startOption) throw new Error("start journey option issue failed");
+    const started = await executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "start_trial",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: startOption,
+        operationInput: {},
+      },
+      currentOwnerCarrier: seeded.carrier,
+    });
+    if (started.status !== "ok") {
+      throw new Error(`trial start failed:${JSON.stringify(started)}`);
+    }
+    expect(started).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      result: { effect: "start_trial", workflowHead: 8, currentStage: "trial_in_progress" },
+    });
+    await expect(prisma.nurtureEnrollment.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, childCareProcessId: seeded.processId },
+    })).resolves.toMatchObject({ status: "active", participationPhase: "trial" });
+  });
+
+  it("denies trial start when the current Grant policy drifts after preparation", async () => {
+    const scope = await seedAdminScope("current-owner-policy-drift");
+    const clock = { now: new Date("2026-08-12T10:00:00.000Z") };
+    const seeded = await seedTrialOwnerScope(scope, clock.now);
+    const world = composed(clock);
+    const option = () => world.owners.enrollmentJourneyOptionIssuer.issue({
+      workspace_id: scope.workspaceId,
+      actor_participant_ref: scope.participantId,
+      kind: "journey",
+      target_ref: seeded.workflowId,
+      waitlist_entry_ref: seeded.entryId,
+      waitlist_entry_head: 3,
+    });
+    const prepareOption = option();
+    if (!prepareOption) throw new Error("prepare journey option issue failed");
+    await expect(executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "prepare_trial_relationship",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: prepareOption,
+        operationInput: {},
+      },
+      currentOwnerCarrier: seeded.carrier,
+    })).resolves.toMatchObject({ status: "ok" });
+
+    clock.now = new Date(clock.now.getTime() + 4 * 60 * 60_000);
+    await prisma.nurtureEnrollmentTrialGrantPolicy.update({
+      where: { id: seeded.policyId },
+      data: { supersededAt: clock.now },
+    });
+    await prisma.nurtureEnrollmentTrialGrantPolicy.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institutionId,
+        contractVersion: "1.0.0",
+        policyRef: "trial-care-policy",
+        policyRevision: 2,
+        directions: ["family_to_org", "org_to_family"],
+        dataClasses: ["daily_care_log"],
+        purposes: ["trial_care"],
+        effectiveFrom: clock.now,
+        expiresAt: seeded.policyExpiresAt,
+      },
+    });
+    const startOption = option();
+    if (!startOption) throw new Error("start journey option issue failed");
+    await expect(executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "start_trial",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: startOption,
+        operationInput: {},
+      },
+      currentOwnerCarrier: seeded.carrier,
+    })).resolves.toEqual({
+      status: "denied",
+      reason_code: "current_owner_grant_policy_drift",
+    });
+    await expect(prisma.nurtureEnrollment.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, childCareProcessId: seeded.processId },
+    })).resolves.toMatchObject({ status: "pending", aggregateVersion: 0 });
   });
 
   it("prepares, verifies and consumes inside the command transaction", async () => {
@@ -502,12 +755,6 @@ function composed(
     messageRefIntegrityKey: MESSAGE_REF_KEY,
     contactOwner,
     businessCommunicationReads: reads,
-    currentOwnerDerivation: {
-      deriveTrialPair: async () => ({
-        status: "unavailable",
-        reason_code: "current_owner_derivation_unavailable",
-      }),
-    },
     protectedContent: createAesGcmProtectedContentPort({
       keyRef: "t007-enrollment-protected-content-key",
       keyMaterial: "t007-enrollment-protected-content-key-material-0001",
@@ -527,6 +774,56 @@ function composed(
     confirmationHash: (confirmationRef: string) =>
       protection.tag({ purpose: "confirmation-ref", values: [confirmationRef] }),
   };
+}
+
+async function executePreparedAdminCommand(input: {
+  world: ReturnType<typeof composed>;
+  scope: SeededScope;
+  request: NurtureEnrollmentJourneyPreparedCommandDraftV1["request"];
+  currentOwnerCarrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
+}) {
+  const invocationRequestId = `invocation-${randomUUID()}`;
+  const authority = await input.world.owners.enrollmentJourneyAuthorityResolver.resolveCurrent({
+    principal: input.scope.principal,
+    invocation_request_id: invocationRequestId,
+    declared_operation_key: "prepare_enrollment_journey_command",
+    capability_key: input.request.capabilityKey,
+    target_option_ref: input.request.targetOptionRef,
+  });
+  if (authority.status !== "resolved") {
+    throw new Error(`authority:${authority.status}:${authority.reason_code}`);
+  }
+  const prepared = await input.world.owners.enrollmentJourneyPreparedCommandOwner.prepare({
+    principal: input.scope.principal,
+    invocation_request_id: invocationRequestId,
+    client_surface: "web_run_workbench",
+    authority: authority.authority,
+    command: {
+      contractVersion: 1,
+      clientCommandId: `client-${randomUUID()}`,
+      request: input.request,
+    },
+  });
+  if (prepared.status !== "ready_to_confirm") {
+    throw new Error(`prepare:${prepared.status}:${prepared.reason_code}`);
+  }
+  return new NurtureEnrollmentJourneySurfaceHandler(
+    input.world.owners.enrollmentJourneySurfaceDeps,
+  ).handle(
+    { ...input.request, confirmationRef: prepared.confirmation_ref },
+    {
+      workspace_id: input.scope.workspaceId,
+      actor_participant_ref: input.scope.participantId,
+      invocation_request_id: `invocation-execute-${randomUUID()}`,
+      host_correlation_id: `correlation-${randomUUID()}`,
+      host_trace_id: `trace-${randomUUID()}`,
+      command_request_id: prepared.command_request_id,
+      client_surface: "web_run_workbench",
+      ...(input.currentOwnerCarrier
+        ? { current_owner_carrier: input.currentOwnerCarrier }
+        : {}),
+    },
+  );
 }
 
 function startInquiryInput(clock: { now: Date }) {
@@ -635,6 +932,422 @@ function currentOwnerFacts(
       expires_at: new Date(now.getTime() + 30_000).toISOString(),
     },
   };
+}
+
+async function seedTrialOwnerScope(scope: SeededScope, now: Date) {
+  const careGroupId = `care-group-${scope.suffix}`;
+  const guardianParticipantId = `guardian-${scope.suffix}`;
+  const guardianActorRef = canonical(
+    "my_chat",
+    "actor",
+    `guardian-actor-${scope.suffix}`,
+  );
+  const trialStartsAt = new Date(now.getTime() + 3 * 60 * 60_000);
+  const trialEndsAt = new Date(now.getTime() + 3 * 24 * 60 * 60_000);
+  const policyExpiresAt = new Date(now.getTime() + 10 * 24 * 60 * 60_000);
+  const ownerExpiresAt = new Date(now.getTime() + 8 * 24 * 60 * 60_000);
+
+  await prisma.nurtureCareGroup.create({
+    data: {
+      id: careGroupId,
+      workspaceId: scope.workspaceId,
+      institutionId: scope.institutionId,
+      name: "Trial class",
+      capacity: 1,
+      status: "active",
+      aggregateVersion: 4,
+    },
+  });
+  const occupyingChild = await prisma.nurtureChild.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      displayName: "Occupying child",
+      status: "active",
+    },
+  });
+  const occupyingProcess = await prisma.nurtureChildCareProcess.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childId: occupyingChild.id,
+      status: "active",
+    },
+  });
+  const occupyingEnrollment = await prisma.nurtureEnrollment.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: occupyingProcess.id,
+      institutionId: scope.institutionId,
+      careGroupId,
+      status: "active",
+      participationPhase: "formal",
+    },
+  });
+  const contactRef = canonical(
+    "my_chat",
+    "nurture_prospective_contact",
+    `contact-${scope.suffix}`,
+  );
+  const runner = new NurtureCommandRunner(
+    new PrismaNurtureCommandRepository(prisma, () => now),
+  );
+  const run = <Payload>(input: {
+    actor_ref: string;
+    payload: Payload;
+    spec: NurtureCommandSpec<Payload>;
+  }) => runner.execute({
+    workspace_id: scope.workspaceId,
+    invocation_request_id: `invocation-${randomUUID()}`,
+    command_request_id: `command-${randomUUID()}`,
+    business_actor_ref: input.actor_ref,
+    payload: input.payload,
+    spec: input.spec,
+  }).then((result) => {
+    if (result.status !== "ok") {
+      throw new Error(`${input.spec.command_key}:${result.status}:${result.reason_code}`);
+    }
+    return result;
+  });
+  await run({
+    actor_ref: scope.participantId,
+    payload: {
+      workspace_id: scope.workspaceId,
+      institution_ref: scope.institutionId,
+      role_assignment_ref: scope.roleAssignmentId,
+      expected_workflow_head: 0,
+      workflow_run_ref: canonical(
+        "my_chat",
+        "workflow_run",
+        `run-${scope.suffix}`,
+      ),
+      contact_owner_snapshot: {
+        contract_version: "1.0.0",
+        contact_ref: contactRef,
+        safe_label: "Trial family",
+        verified_at: new Date(now.getTime() - 60_000).toISOString(),
+      },
+      preferred_label: "Trial family",
+      age_band_key: "age_2_3",
+      expected_entry_start_date: "2026-09-01",
+      expected_entry_end_date: "2026-10-01",
+      target_class_type_key: "toddler",
+      target_age_band_key: "age_2_3",
+      target_care_group_ref: careGroupId,
+      care_schedule_need_keys: ["full_day"],
+      source_channel: "walk_in",
+      safety_label_keys: [],
+      initial_contact_at: new Date(now.getTime() - 3 * 60 * 60_000).toISOString(),
+      next_touchpoint_at: trialStartsAt.toISOString(),
+    },
+    spec: startEnrollmentInquirySpec,
+  });
+  const workflow = await prisma.nurtureInstitutionWorkflow.findFirstOrThrow({
+    where: { workspaceId: scope.workspaceId },
+  });
+  const adminBase = (expectedWorkflowHead: number) => ({
+    workspace_id: scope.workspaceId,
+    institution_ref: scope.institutionId,
+    workflow_ref: workflow.id,
+    expected_workflow_head: expectedWorkflowHead,
+    role_assignment_ref: scope.roleAssignmentId,
+  });
+  await run({
+    actor_ref: scope.participantId,
+    payload: {
+      ...adminBase(1),
+      source_channel: "phone",
+      confirmed_need_keys: ["weekday_care"],
+      safety_label_keys: [],
+      next_action_key: "confirm_intent",
+      responsible_role: "institution_admin",
+      occurred_at: new Date(now.getTime() - 2 * 60 * 60_000).toISOString(),
+      due_at: new Date(now.getTime() + 60 * 60_000).toISOString(),
+      next_touchpoint_at: new Date(now.getTime() + 60 * 60_000).toISOString(),
+      external_summary_body_envelope: {
+        algVersion: 1,
+        keyRef: "trial-owner-fixture-key",
+        ciphertext: "c3VtbWFyeQ",
+        integrityTag: "dGFn",
+      },
+    },
+    spec: recordExternalTouchpointSpec,
+  });
+  await run({
+    actor_ref: scope.participantId,
+    payload: adminBase(2),
+    spec: confirmIntentConversationSpec,
+  });
+  const guardianAction = {
+    contract_version: "1.0.0" as const,
+    actor_ref: guardianActorRef,
+    contact_ref: contactRef,
+    action_ref: canonical(
+      "my_chat",
+      "enrollment_action",
+      `qualify-action-${scope.suffix}`,
+    ),
+    occurred_at: new Date(now.getTime() - 1_000).toISOString(),
+    verified_at: now.toISOString(),
+  };
+  const formalClock = { now };
+  const formalWorld = composed(formalClock);
+  const journeyOption = formalWorld.owners.enrollmentJourneyOptionIssuer.issue({
+    workspace_id: scope.workspaceId,
+    actor_participant_ref: scope.participantId,
+    kind: "journey",
+    target_ref: workflow.id,
+    waitlist_entry_ref: `pre-waitlist-${scope.suffix}`,
+    waitlist_entry_head: 0,
+  });
+  const careGroupOption = formalWorld.owners.enrollmentJourneyOptionIssuer.issue({
+    workspace_id: scope.workspaceId,
+    actor_participant_ref: scope.participantId,
+    kind: "care_group",
+    target_ref: careGroupId,
+  });
+  if (!journeyOption || !careGroupOption) {
+    throw new Error("qualification option issue failed");
+  }
+  const qualifyResult = await executePreparedAdminCommand({
+    world: formalWorld,
+    scope,
+    request: {
+      capabilityKey: "qualify_capacity_waitlist",
+      capabilityVersion: "1.0.0",
+      targetOptionRef: journeyOption,
+      operationInput: {
+        targetCareGroupOptionRef: careGroupOption,
+        categoryKey: "standard",
+        categoryBasisKey: "family_confirmed",
+        nextReviewAt: new Date(now.getTime() + 7 * 24 * 60 * 60_000).toISOString(),
+      },
+    },
+    currentOwnerCarrier: {
+      ...currentOwnerFacts(now).familyCarrier,
+      guardianAction,
+    },
+  });
+  if (qualifyResult.status !== "ok") {
+    throw new Error(`formal qualification failed:${JSON.stringify(qualifyResult)}`);
+  }
+  const entry = await prisma.nurtureEnrollmentWaitlistEntry.findFirstOrThrow({
+    where: { workspaceId: scope.workspaceId, workflowId: workflow.id },
+  });
+  await prisma.nurtureEnrollment.update({
+    where: { id: occupyingEnrollment.id },
+    data: { status: "ended", leftAt: now },
+  });
+  await run({
+    actor_ref: scope.participantId,
+    payload: {
+      ...adminBase(4),
+      entry_ref: entry.id,
+      expected_entry_head: 1,
+      expires_at: new Date(now.getTime() + 2 * 60 * 60_000).toISOString(),
+      trial_starts_at: trialStartsAt.toISOString(),
+      trial_ends_at: trialEndsAt.toISOString(),
+      review_at: new Date(trialEndsAt.getTime() - 24 * 60 * 60_000).toISOString(),
+      reason_key: "admin_issued_trial_offer",
+    },
+    spec: issueTrialOfferSpec,
+  });
+  const offer = await prisma.nurtureEnrollmentTrialOffer.findFirstOrThrow({
+    where: { workspaceId: scope.workspaceId, workflowId: workflow.id },
+  });
+  await run({
+    actor_ref: guardianActorRef.object_id,
+    payload: {
+      workspace_id: scope.workspaceId,
+      institution_ref: scope.institutionId,
+      workflow_ref: workflow.id,
+      expected_workflow_head: 5,
+      entry_ref: entry.id,
+      expected_entry_head: 2,
+      offer_ref: offer.id,
+      expected_offer_head: 1,
+      guardian_action_owner_snapshot: {
+        ...guardianAction,
+        action_ref: canonical(
+          "my_chat",
+          "enrollment_action",
+          `accept-action-${scope.suffix}`,
+        ),
+        occurred_at: now.toISOString(),
+      },
+    },
+    spec: acceptTrialOfferSpec,
+  });
+  const reservation = await prisma.nurtureEnrollmentTrialReservation.findFirstOrThrow({
+    where: { workspaceId: scope.workspaceId, workflowId: workflow.id },
+  });
+  const workflowId = workflow.id;
+  const entryId = entry.id;
+  const reservationId = reservation.id;
+
+  await prisma.nurtureParticipant.create({
+    data: {
+      id: guardianParticipantId,
+      workspaceId: scope.workspaceId,
+      myChatUserId: `guardian-user-${scope.suffix}`,
+      status: "active",
+    },
+  });
+  await prisma.nurtureParticipantPrincipalBinding.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      participantId: guardianParticipantId,
+      accountObjectId: `guardian-account-${scope.suffix}`,
+      actorObjectId: guardianActorRef.object_id,
+      status: "active",
+    },
+  });
+  const child = await prisma.nurtureChild.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      displayName: "Trial child",
+      status: "active",
+    },
+  });
+  const process = await prisma.nurtureChildCareProcess.create({
+    data: { workspaceId: scope.workspaceId, childId: child.id, status: "active" },
+  });
+  const family = await prisma.nurtureFamily.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: process.id,
+      displayName: "Trial family",
+      status: "active",
+    },
+  });
+  const guardianRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      participantId: guardianParticipantId,
+      role: "guardian",
+      scopeType: "child_care_process",
+      scopeId: process.id,
+      status: "active",
+      endsAt: ownerExpiresAt,
+    },
+  });
+  const childAnchor = await prisma.nurtureChildBindingAnchor.create({
+    data: { reservationKeyHash: fixtureHash(), status: "associated" },
+  });
+  const familyAnchor = await prisma.nurtureFamilyBindingAnchor.create({
+    data: { reservationKeyHash: fixtureHash(), status: "associated" },
+  });
+  const childAssociation = await prisma.nurtureChildAnchorAssociation.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childAnchorId: childAnchor.id,
+      childId: child.id,
+    },
+  });
+  await prisma.nurtureFamilyAnchorAssociation.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      familyAnchorId: familyAnchor.id,
+      childAnchorId: childAnchor.id,
+      childAssociationId: childAssociation.id,
+      currentChildAssociationId: childAssociation.id,
+      childId: child.id,
+      childCareProcessId: process.id,
+      familyId: family.id,
+    },
+  });
+  const childOwnerRef = `nurture_child_binding_anchor_v1:${childAnchor.id}`;
+  const familyOwnerRef = `nurture_family_binding_anchor_v1:${familyAnchor.id}`;
+  const authorizations = [];
+  for (const [subjectType, anchorId, ownerRef] of [
+    ["child", childAnchor.id, childOwnerRef],
+    ["family", familyAnchor.id, familyOwnerRef],
+  ] as const) {
+    authorizations.push(await prisma.nurtureScenarioBindingAuthorization.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        subjectType,
+        ...(subjectType === "child"
+          ? { childAnchorId: anchorId }
+          : { familyAnchorId: anchorId }),
+        ownerRef,
+        ownerVersion: 1,
+        idempotencyKeyHash: fixtureHash(),
+        requestFingerprint: fixtureHash(),
+        subjectEvidenceHash: fixtureHash(),
+        userEvidenceHash: fixtureHash(),
+        actorEvidenceHash: fixtureHash(),
+        purpose: "scenario_binding_write",
+        authorizationSourceRef: "my_chat_child_identity",
+        authorizationSourceVersion: 1,
+        status: "active",
+        verifiedAt: new Date(now.getTime() - 60_000),
+        expiresAt: ownerExpiresAt,
+      },
+    }));
+  }
+  const policy = await prisma.nurtureEnrollmentTrialGrantPolicy.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      institutionId: scope.institutionId,
+      contractVersion: "1.0.0",
+      policyRef: "trial-care-policy",
+      policyRevision: 1,
+      directions: ["family_to_org", "org_to_family"],
+      dataClasses: ["daily_care_log", "care_day_note"],
+      purposes: ["trial_care"],
+      effectiveFrom: new Date(now.getTime() - 60_000),
+      expiresAt: policyExpiresAt,
+    },
+  });
+  const carrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1 = {
+    carrierVersion: 1,
+    currentOwnerEvidence: {
+      binding_evidence_version: 1,
+      purpose_key: "enrollment_trial_pair",
+      owner_bindings: [
+        {
+          owner_binding_ref_version: 1,
+          binding_slot: "child",
+          owner_ref: {
+            ...canonical("scenario-owner", "child_binding_owner", childOwnerRef),
+            version: 1,
+          },
+        },
+        {
+          owner_binding_ref_version: 1,
+          binding_slot: "family",
+          owner_ref: {
+            ...canonical("scenario-owner", "family_binding_owner", familyOwnerRef),
+            version: 1,
+          },
+        },
+      ],
+      pair_relation_evidence_hash: fixtureHash(),
+      current_owner_evidence_hash: fixtureHash(),
+    },
+  };
+  return {
+    workflowId,
+    entryId,
+    reservationId,
+    careGroupId,
+    carrier,
+    guardianActorRef,
+    guardianParticipantId,
+    guardianRoleId: guardianRole.id,
+    childAuthorizationId: authorizations[0]!.id,
+    childAnchorId: childAnchor.id,
+    childOwnerRef,
+    familyOwnerRef,
+    ownerExpiresAt,
+    policyId: policy.id,
+    policyExpiresAt,
+    processId: process.id,
+    qualifyResult,
+  };
+}
+
+function fixtureHash(): string {
+  return randomUUID().replaceAll("-", "").repeat(2);
 }
 
 async function seedAdminScope(label: string): Promise<SeededScope> {

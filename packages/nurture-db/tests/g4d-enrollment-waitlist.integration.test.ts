@@ -454,6 +454,7 @@ const seedCurrentPair = async (
   const childOwnerRef = formatNurtureBindingOwnerRef("child", childAnchor.id);
   const familyOwnerRef = formatNurtureBindingOwnerRef("family", familyAnchor.id);
   const ownerExpiresAt = iso(world.now(), 10 * 24 * 60 * 60_000);
+  const policyExpiresAt = iso(world.now(), 10 * 24 * 60 * 60_000);
   for (const [subjectType, anchorId, ownerRef] of [
     ["child", childAnchor.id, childOwnerRef],
     ["family", familyAnchor.id, familyOwnerRef],
@@ -481,6 +482,20 @@ const seedCurrentPair = async (
       },
     });
   }
+  await prisma.nurtureEnrollmentTrialGrantPolicy.create({
+    data: {
+      workspaceId: world.workspaceId,
+      institutionId: world.institution.id,
+      contractVersion: "1.0.0",
+      policyRef: "trial-care-policy",
+      policyRevision: 1,
+      directions: ["family_to_org", "org_to_family"],
+      dataClasses: ["daily_care_log", "care_day_note"],
+      purposes: ["trial_care"],
+      effectiveFrom: world.now(),
+      expiresAt: new Date(policyExpiresAt),
+    },
+  });
   return {
     snapshot: {
       contract_version: "1.0.0",
@@ -513,7 +528,7 @@ const seedCurrentPair = async (
       data_classes: ["daily_care_log", "care_day_note"],
       purposes: ["trial_care"],
       verified_at: world.now().toISOString(),
-      expires_at: iso(world.now(), 10 * 24 * 60 * 60_000),
+      expires_at: policyExpiresAt,
     },
   };
 };

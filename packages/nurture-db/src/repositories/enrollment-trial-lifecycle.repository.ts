@@ -267,6 +267,12 @@ export class PrismaEnrollmentTrialLifecycleRepository
         new Date(mutation.grant_terms_snapshot.verified_at) > now ||
         new Date(mutation.grant_terms_snapshot.expires_at) <= now ||
         new Date(mutation.grant_terms_snapshot.expires_at) < reservation.trialEndsAt ||
+        !(await this.pairOwner.isTrialGrantTermsCurrent({
+          workspace_id: mutation.workspace_id,
+          institution_ref: mutation.institution_ref,
+          snapshot: mutation.grant_terms_snapshot,
+          required_until: reservation.trialEndsAt,
+        })) ||
         !(await this.pairOwner.isTrialSnapshotCurrent(
           mutation.workspace_id,
           mutation.pair_owner_snapshot,
@@ -294,6 +300,7 @@ export class PrismaEnrollmentTrialLifecycleRepository
 
     if (!enrollment || !grant) return denied();
     if (mutation.kind === "start_trial") {
+      const storedTerms = grant.policySnapshotPayload;
       if (
         workflow.currentStage !== "trial_preparation" ||
         workflow.waitingState !== "waiting_on_system" ||
@@ -307,6 +314,13 @@ export class PrismaEnrollmentTrialLifecycleRepository
         grant.grantedByParticipantId !==
           mutation.pair_owner_snapshot.guardian_participant_ref ||
         !this.grantMatchesStoredTerms(grant, reservation) ||
+        !validateTrialGrantTermsSnapshotV1(storedTerms) ||
+        !(await this.pairOwner.isTrialGrantTermsCurrent({
+          workspace_id: mutation.workspace_id,
+          institution_ref: mutation.institution_ref,
+          snapshot: storedTerms,
+          required_until: reservation.trialEndsAt,
+        })) ||
         mutation.pair_owner_snapshot.child_care_process_ref !== enrollment.childCareProcessId ||
         !(await this.pairOwner.isTrialSnapshotCurrent(
           mutation.workspace_id,

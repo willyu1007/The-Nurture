@@ -11,6 +11,7 @@ import {
   NurtureEnrollmentJourneyPreparedCommandOwner,
   NurtureEnrollmentJourneyTargetOptionCodec,
   createNurtureWorkflowRunSettlementOwner,
+  validateTrialGrantTermsSnapshotV1,
   withNurtureWorkflowRunSettlementFinalizer,
   workflowRunSettlementBinding,
   type InstitutionBusinessCommunicationReadPort,
@@ -29,6 +30,7 @@ import {
   type NurtureEnrollmentJourneySurfaceDeps,
   type NurtureEnrollmentJourneyTargetSelectionV1,
   type NurtureEnrollmentJourneyTrustedContextV1,
+  type NurtureTrialGrantTermsSnapshotV1,
   type NurtureWorkflowRunSettlementBindingV1,
   type NurtureWorkflowRunSettlementOwnerV1,
   type ProtectedContentWritePort,
@@ -37,7 +39,6 @@ import {
   createNurtureEnrollmentJourneyCurrentOwnerProvider,
   createNurtureEnrollmentNativeSourceProvider,
   createNurtureEnrollmentProspectiveContactProvider,
-  type NurtureEnrollmentLocalOwnerDerivationV1,
   type NurtureEnrollmentJourneyCurrentOwnerProviderV1,
   type NurtureEnrollmentNativeSourceProviderV1,
   type NurtureEnrollmentProspectiveContactProviderV1,
@@ -439,11 +440,28 @@ implements NurtureEnrollmentJourneyBindingPort {
               enrollmentId: enrollment.id,
               deletedAt: null,
             },
-            select: { id: true, aggregateVersion: true },
+            select: {
+              id: true,
+              aggregateVersion: true,
+              directions: true,
+              dataClasses: true,
+              purposes: true,
+              expiresAt: true,
+              policySnapshotPayload: true,
+            },
             take: 2,
           });
           const grant = grants[0];
           if (grants.length === 1 && grant) {
+            if (
+              key === "start_trial" &&
+              !grantMatchesCurrentPolicy(grant, binding.grant_terms_snapshot)
+            ) {
+              return {
+                status: "denied",
+                reason_code: "current_owner_grant_policy_drift",
+              };
+            }
             binding.refs.enrollment = enrollment.id;
             binding.heads.enrollment = enrollment.aggregateVersion;
             binding.refs.grant = grant.id;
@@ -678,8 +696,9 @@ export type PrismaNurtureEnrollmentJourneyFormalOwners = Readonly<{
  * Composes the Nurture-owned pieces of the formal Enrollment Journey ingress
  * (record 86). Supplying this bundle does not register a route, enable a
  * feature or create external traffic. The My-Chat prospective-contact owner
- * and the Nurture-local current-owner derivation port arrive as inputs; Host
- * current-owner evidence is admitted only from each verified invocation.
+ * arrives as an input. Pair, Guardian-role and Grant-policy facts are derived
+ * only from this Prisma owner; Host evidence is admitted from each verified
+ * invocation and cannot inject Nurture business snapshots.
  */
 export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
   prisma: PrismaClient;
@@ -689,7 +708,6 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
   messageRefIntegrityKey: string;
   contactOwner: NurtureEnrollmentContactOwnerV1;
   businessCommunicationReads: InstitutionBusinessCommunicationReadPort;
-  currentOwnerDerivation: NurtureEnrollmentLocalOwnerDerivationV1;
   protectedContent: ProtectedContentWritePort;
   now?: () => Date;
   preparedCommandTtlMs?: number;
@@ -729,6 +747,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
       now,
     ),
   });
+  const pairOwner = new PrismaEnrollmentPairOwnerRepository(input.prisma, now);
   const bindings = new PrismaNurtureEnrollmentJourneyBindingPort({
     prisma: input.prisma,
     codec,
@@ -742,8 +761,15 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
       now,
     }),
     currentOwnerProvider: createNurtureEnrollmentJourneyCurrentOwnerProvider({
-      localOwnerDerivation: input.currentOwnerDerivation,
-      pairOwner: new PrismaEnrollmentPairOwnerRepository(input.prisma, now),
+      localOwnerDerivation: {
+        async deriveTrialPair(request) {
+          const facts = await pairOwner.deriveTrialPair(request);
+          return facts
+            ? { status: "resolved", ...facts }
+            : { status: "denied", reason_code: "current_owner_pair_not_current" };
+        },
+      },
+      pairOwner,
       now,
     }),
     protectedContent: input.protectedContent,
@@ -835,4 +861,37 @@ function readWorkflowRef(committedResult: unknown, payload: unknown): string | n
       ? (payload as Record<string, unknown>).workflow_ref
       : undefined;
   return typeof fromPayload === "string" ? fromPayload : null;
+}
+
+function grantMatchesCurrentPolicy(
+  grant: {
+    directions: readonly string[];
+    dataClasses: readonly string[];
+    purposes: readonly string[];
+    expiresAt: Date | null;
+    policySnapshotPayload: unknown;
+  },
+  current: NurtureTrialGrantTermsSnapshotV1 | undefined,
+): boolean {
+  const stored = grant.policySnapshotPayload;
+  return Boolean(
+    current &&
+    validateTrialGrantTermsSnapshotV1(stored) &&
+    stored.policy_ref === current.policy_ref &&
+    stored.policy_revision === current.policy_revision &&
+    stored.expires_at === current.expires_at &&
+    sameValues(stored.directions, current.directions) &&
+    sameValues(stored.data_classes, current.data_classes) &&
+    sameValues(stored.purposes, current.purposes) &&
+    sameValues(grant.directions, current.directions) &&
+    sameValues(grant.dataClasses, current.data_classes) &&
+    sameValues(grant.purposes, current.purposes) &&
+    grant.expiresAt !== null &&
+    grant.expiresAt <= new Date(current.expires_at),
+  );
+}
+
+function sameValues(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length &&
+    left.every((value, index) => value === right[index]);
 }

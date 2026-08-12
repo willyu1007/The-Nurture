@@ -189,6 +189,24 @@
   closes the implementation prerequisite only; it does not qualify I4-A, I4,
   G4-F or Exit.
 
+## Execution checkpoint — 2026-08-12 G4-D I4-B Prisma current owners
+
+- Record [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md) closes
+  the injected-derivation gap. Production composition derives the exact
+  Child/Family pair, current associations/authorizations, accepted Guardian
+  principal/role and one current Institution trial Grant policy from Prisma.
+- Policy terms are immutable versioned canonical rows. Prepare and start
+  recheck them inside the serializable command transaction; stale policy,
+  ambiguous authorization, revoke and expiry fail closed.
+- The positive production matrix now executes
+  `qualify_capacity_waitlist`, `prepare_trial_relationship` and `start_trial`
+  through owner-held prepare, surface binding and the real command executor.
+  All 40 migrations and the 442-test DB lane pass on a disposable target.
+- Next, implement the real My-Chat carrier producer and restore a signed
+  two-database positive vehicle. Then extend native-source, remaining command,
+  Guardian/mobile and full negative/replay/head coverage before I4 Exit.
+  Nothing here enables a route, durable apply, activation or traffic.
+
 ## Stage G4 Delivery Structure — Accepted
 
 ### Overall goal

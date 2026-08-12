@@ -6,9 +6,9 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **implement the Nurture Prisma current-owner derivation adapter
-  and its positive signed command matrix** over
-  the now-qualified reservation/settlement protocol. The serialized
+- Next step: **implement the real My-Chat current-owner carrier producer and
+  extend the signed joint matrix beyond the three Admin commands now proven
+  locally** over the qualified reservation/settlement protocol. The serialized
   two-database race and response-loss suite passed 6/6 on an approved
   synthetic-only disposable pair
   ([`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md)).
@@ -33,8 +33,14 @@
   before prepared persistence and handed only to a Nurture-local derivation
   port; the former mixed remote evidence/source shape is removed
   ([`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)). The production
-  Prisma derivation adapter, positive command/revoke/expiry/head matrix,
-  native-source remainder, Guardian/mobile and full I4 exit remain open.
+  Prisma derivation now rereads the exact active pair, Guardian role,
+  association/authorization set and immutable exact-Institution Grant policy;
+  `qualify_capacity_waitlist`, `prepare_trial_relationship` and `start_trial`
+  pass through the real prepared-command/surface/transaction composition, and
+  role revoke, authorization expiry/ambiguity and policy drift fail closed
+  ([`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)). The real
+  Host carrier producer/signed positive vehicle, native-source remainder,
+  other command families, Guardian/mobile and full I4 exit remain open.
   G4-F therefore remains closed. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,

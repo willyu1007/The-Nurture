@@ -2336,6 +2336,7 @@ model NurtureCareInstitution {
   supportSignalPolicies                  NurtureInstitutionSupportSignalPolicy[]
   institutionWorkflows                   NurtureInstitutionWorkflow[]
   enrollmentWaitlistPolicies             NurtureEnrollmentWaitlistPolicy[]
+  enrollmentTrialGrantPolicies           NurtureEnrollmentTrialGrantPolicy[]
   enrollmentWaitlistEntries              NurtureEnrollmentWaitlistEntry[]
   enrollmentWaitlistOverrides            NurtureEnrollmentWaitlistOverride[]
   enrollmentTrialOffers                  NurtureEnrollmentTrialOffer[]
@@ -3503,6 +3504,31 @@ model NurtureEnrollmentWaitlistPolicy {
   @@unique([workspaceId, institutionId, policyRevision], map: "uq_nurture_waitlist_policy_revision")
   @@index([workspaceId, institutionId, effectiveFrom, effectiveTo], map: "ix_nurture_waitlist_policy_effective")
   @@map("nurture_enrollment_waitlist_policy")
+}
+
+// G4-D I4-B: immutable, exact-Institution policy owner for the pending Grant
+// created by trial relationship preparation. No row means unavailable; terms
+// are never inferred from the route, a Host carrier or an existing Grant.
+model NurtureEnrollmentTrialGrantPolicy {
+  id              String                  @id @default(uuid())
+  workspaceId     String                  @map("workspace_id")
+  institutionId   String                  @map("institution_id")
+  contractVersion String                  @map("contract_version")
+  policyRef       String                  @map("policy_ref")
+  policyRevision  Int                     @map("policy_revision")
+  directions      NurtureGrantDirection[]
+  dataClasses     NurtureGrantDataClass[] @map("data_classes")
+  purposes        String[]
+  effectiveFrom   DateTime                @map("effective_from")
+  expiresAt       DateTime                @map("expires_at")
+  supersededAt    DateTime?               @map("superseded_at")
+  createdAt       DateTime                @default(now()) @map("created_at")
+
+  institution NurtureCareInstitution @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_trial_grant_policy_institution_id_fkey")
+
+  @@unique([workspaceId, institutionId, policyRef, policyRevision], map: "uq_nurture_trial_grant_policy_revision")
+  @@index([workspaceId, institutionId, effectiveFrom, expiresAt, supersededAt], map: "ix_nurture_trial_grant_policy_effective")
+  @@map("nurture_enrollment_trial_grant_policy")
 }
 
 model NurtureEnrollmentWaitlistEntry {

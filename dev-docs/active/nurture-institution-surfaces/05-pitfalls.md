@@ -786,3 +786,33 @@
   through a Nurture-local port before exact cross-binding and currency reread.
 - **Prevention:** transport adapters never manufacture or cache Scenario
   business snapshots; each owner supplies its own facts at request time.
+
+## 2026-08-12 - A bounded Grant may expire before its policy
+
+- **Symptom:** the first start-time policy drift guard rejected the valid
+  positive path even though the policy revision and allowed terms were still
+  current.
+- **Root cause:** pending Grant `expiresAt` is intentionally bounded to the
+  trial end, while its stored policy snapshot retains the longer policy
+  expiry. Comparing those two timestamps for equality conflated permission
+  ceiling with relationship lifetime.
+- **Fix/workaround:** compare the stored snapshot's policy expiry to the
+  current policy and require the Grant expiry to be no later than that policy;
+  keep the existing lifecycle invariant that Grant expiry equals trial end.
+- **Prevention:** distinguish policy maximums from per-relationship narrowing
+  in every drift check. Equality is required for policy identity, not for a
+  legal downscoped effective lifetime.
+
+## 2026-08-12 - Current-owner reads must reject ambiguity
+
+- **Symptom:** an authorization query ordered active rows and selected the
+  first, so two simultaneously active current facts could still authorize a
+  pair.
+- **Root cause:** ordering was used as if it were an ownership rule, although
+  no canonical contract declared “latest active wins.”
+- **Fix/workaround:** read at most two and admit exactly one for Child/Family
+  authorizations, actor bindings, roles, reservations and policies. Add a
+  duplicate-active negative fixture.
+- **Prevention:** every current-owner repository must encode exact-one,
+  explicit priority or a database uniqueness invariant. `findFirst` alone is
+  never an ambiguity policy.

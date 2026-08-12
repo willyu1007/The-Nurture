@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-12T08:12:40.899Z",
+  "updatedAt": "2026-08-12T13:44:51.040Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -5926,6 +5926,15 @@
         {
           "field": "enrollments",
           "to": "NurtureEnrollment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentTrialGrantPolicies",
+          "to": "NurtureEnrollmentTrialGrantPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -12875,6 +12884,196 @@
           ],
           "name": null,
           "map": "ix_nurture_enrollment_touchpoint_workflow"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentTrialGrantPolicy",
+      "dbName": "nurture_enrollment_trial_grant_policy",
+      "schema": null,
+      "columns": [
+        {
+          "name": "contractVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "contract_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dataClasses",
+          "type": "NurtureGrantDataClass",
+          "nullable": false,
+          "list": true,
+          "dbName": "data_classes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "directions",
+          "type": "NurtureGrantDirection",
+          "nullable": false,
+          "list": true,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purposes",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersededAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "superseded_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "effectiveFrom",
+            "expiresAt",
+            "supersededAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_trial_grant_policy_effective"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "policyRef",
+            "policyRevision"
+          ],
+          "name": null,
+          "map": "uq_nurture_trial_grant_policy_revision"
         }
       ]
     },

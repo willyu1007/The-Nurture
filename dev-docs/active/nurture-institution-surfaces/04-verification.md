@@ -1302,3 +1302,26 @@ CARRIER_AND_POSITIVE_COMMAND_MATRIX_PENDING / DEFAULT_OFF` (record
 Verdict: `G4_D_I4_B_REQUEST_SCOPED_CARRIER_AND_LOCAL_DERIVATION_PORT_IMPLEMENTED_DEFAULT_OFF /
 PRISMA_DERIVATION_AND_POSITIVE_MATRIX_PENDING / G4_F_CLOSED` (record
 [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)).
+
+## 2026-08-12 I4-B Prisma current-owner and Admin-command matrix
+
+| Check | Result |
+| --- | --- |
+| Prisma format / validate / generate | PASS |
+| fresh migration replay | PASS — 40/40 on local disposable PostgreSQL 16 |
+| migration status / datasource-to-SSOT drift | PASS — current / empty migration |
+| policy immutability and rotation | PASS — supersede admitted; in-place term mutation and delete rejected |
+| exact association/authorization/Guardian derivation | PASS — revoke, expiry and duplicate-current negatives |
+| production Admin command matrix | PASS — qualify → prepare relationship → start trial |
+| stale policy between prepare and start | PASS — denied before effect; pending relationship preserved |
+| focused current-owner + lifecycle DB set | PASS — 2 files / 18 tests |
+| full production PostgreSQL lane | PASS — 50 files / 442 tests |
+| full unit lane | PASS — 97 files / 1049 tests |
+| complete serialized x5 lane | PASS — three consecutive runs, each 5 files / 36 tests |
+| repository-root TypeScript | PASS |
+| DB context regeneration | PASS — `docs/context/db/schema.json` refreshed |
+| runtime effects | NONE — no durable apply, route, DI binding, activation or traffic |
+
+Current verdict: `G4_D_I4_B_PRISMA_CURRENT_OWNER_AND_ADMIN_COMMAND_MATRIX_QUALIFIED_DEFAULT_OFF /
+HOST_CARRIER_PRODUCER_AND_REMAINING_I4_MATRIX_PENDING / G4_F_CLOSED` (record
+[`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)).
