@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import {
   Prisma,
   type NurtureCommandExecution as PrismaCommandExecution,
@@ -37,6 +36,7 @@ import { PrismaEnrollmentFormalizationRepository } from "./enrollment-formalizat
 import { PrismaInstitutionKnowledgeRepository } from "./institution-knowledge.repository.js";
 import { PrismaInstitutionKnowledgeConflictCandidateRepository } from "./institution-knowledge-conflict-candidate.repository.js";
 import { isPrismaSerializationAbort } from "./prisma-error.js";
+import { nurtureCommandAdvisoryKey } from "./nurture-command-advisory-key.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -319,13 +319,6 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   }
 }
 
-const advisoryKey = (workspaceId: string, commandHash: string): bigint => {
-  const digest = createHash("sha256")
-    .update(`nurture.command-lock.v1\0${workspaceId}\0${commandHash}`, "utf8")
-    .digest();
-  return BigInt.asIntN(64, digest.readBigUInt64BE(0));
-};
-
 export class PrismaNurtureCommandRepository implements NurtureCommandRepository {
   constructor(
     private readonly prisma: PrismaClient,
@@ -385,7 +378,7 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
     return this.prisma.$transaction(
       async (transaction) => {
         const rows = await transaction.$queryRaw<Array<{ acquired: boolean }>>(
-          Prisma.sql`SELECT pg_try_advisory_xact_lock(${advisoryKey(
+          Prisma.sql`SELECT pg_try_advisory_xact_lock(${nurtureCommandAdvisoryKey(
             input.workspace_id,
             input.command_request_id_hash,
           )}) AS acquired`,

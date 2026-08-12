@@ -71,6 +71,7 @@ export * from "./domain/resolution/candidate-kernel.js";
 export * from "./domain/institution/institution-context.js";
 export * from "./domain/institution/institution-policy.js";
 export * from "./domain/institution/institution-authority-chain.js";
+export * from "./domain/institution/workflow-run-settlement.js";
 export * from "./domain/institution/institution-aggregate.js";
 export * from "./domain/institution/attendance-closeout.js";
 export * from "./domain/institution/zoned-time.js";

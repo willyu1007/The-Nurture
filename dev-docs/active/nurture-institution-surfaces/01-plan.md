@@ -158,6 +158,37 @@
   revision, closing G-09. G4-D I3 and G4-E E7/E8 remain separate implementation
   work and are not implied by this adoption.
 
+## Execution checkpoint — 2026-08-12 G4-D I3 qualified; I4-A ownership gap
+
+- Record [`87`](./87-g4-d-i3-qualification-record.md) supersedes the former
+  I3-next status: the formal owners, prepared-command ledger, transactional
+  consumption and three trusted Enrollment Journey operations are qualified
+  default-off.
+- Record [`88`](./88-g4-d-i4-a-prospective-contact-joint-record.md) rejects the
+  first proposed joint vehicle: Nurture cannot derive a stable
+  `my_chat/workflow_run` id from its own command id. The opaque Run ref must be
+  issued/reserved by a pinned My-Chat runtime owner before Nurture persists it.
+- After that seam lands, restore the prospective-contact/Base-dispatcher/
+  Nurture-owner matrix and qualify it on two fresh disposable databases. This
+  checkpoint closes neither I4, mobile/Guardian/current-owner coverage, G4-F
+  nor Exit.
+
+## Execution checkpoint — 2026-08-12 second-round Host Run candidate
+
+- My-Chat T-041 now contains a contract-qualified, default-off generic
+  Workflow Run owner candidate. PostgreSQL/Prisma creates the Run identity and
+  one transaction records the queued Run plus a body-free
+  `workflow.run.created` outbox reservation. Exact replay keeps the Run id even
+  after the Run version advances; changed actor or exact registry pins
+  conflict.
+- The candidate has no route, DI activation or traffic and remains uncommitted,
+  so it is not an adopted source revision. Nurture still must consume the exact
+  owner pin through its trusted dispatcher and restore record 88's removed
+  joint vehicle.
+- The serialized two-database execution remains unavailable. This checkpoint
+  closes the implementation prerequisite only; it does not qualify I4-A, I4,
+  G4-F or Exit.
+
 ## Stage G4 Delivery Structure — Accepted
 
 ### Overall goal
@@ -736,3 +767,47 @@ My-Chat companion。
 T-006 可在 T-007 整体 Exit 前消费并资格化 publication-policy 精确子合同；这份
 subdeliverable 不等于 T-007 task completion。T-006 可选 Workflow projection 的
 absence/empty 也不得被解释为 T-007 或 T-006 核心路径失败。
+## 2026-08-12 G4-D I4-A protocol correction
+
+- Keep the exact-pin Workflow Run adapter as a candidate only. It consumes
+  verified Host invocation metadata, never the Nurture participant/command,
+  and retains versionless Run identity after validating Host version evidence.
+- Keep production `start_enrollment_inquiry` fail-closed with
+  `workflow_run_cross_db_commit_protocol_unavailable`; do not issue a Host Run
+  before the separate Nurture command transaction.
+- Next implement a Host-owned reserve-to-confirm/abandon lifecycle or equivalent
+  orphan reconciliation, plus a contractually stable logical Host request id
+  across response-loss retry. Only then admit a happy-path x5 vehicle.
+- I4-A, I4 and G4-F remain open. No route, activation, traffic or DB apply.
+
+## 2026-08-12 G4-D I4-A fourth-round sequence
+
+1. Keep the My-Chat pure lifecycle candidate default-off and versionless at the
+   Nurture boundary; it freezes semantics but is not persistence evidence.
+2. Design a dedicated, uniquely constrained My-Chat logical-operation and Run
+   reservation ledger through the DB SSOT workflow. Reserve must create no
+   Step and publish no `workflow.run.created`; confirm publishes it once.
+3. Add a Nurture private historical status owner bound to the same logical
+   operation, reservation and command. It must return exact `committed`,
+   writer-fenced `confirmed_no_effect`, or `unknown` without requiring current
+   authority merely to discover a historical commit.
+4. Add the Host receipt verifier and only then replace the production
+   fail-closed boundary with reserve -> execute/status -> settle composition.
+5. Run response-loss, expiry, revoke, unknown, opposite-settlement and orphan
+   reconciliation against approved disposable My-Chat and Nurture databases.
+
+Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
+
+### Fifth-round progress against this order
+
+- Step 2 is implemented as a My-Chat Prisma SSOT/migration preview and local
+  repository/service tests; PostgreSQL apply and race qualification remain.
+- Step 3 is implemented as a Nurture Prisma SSOT/migration preview, historical
+  status owner, shared writer-fence key and transaction adapter; production
+  command/transport adoption and PostgreSQL qualification remain.
+- Step 4 is now the active implementation target: carry the exact reservation
+  evidence through signed `operation.input`, register before protected owner
+  reads, mark committed inside the command transaction, and verify the returned
+  receipt before Host confirm.
+- Step 5 remains blocked on approved disposable databases and completion of
+  step 4. Unknown outcomes remain reserved/quarantined.

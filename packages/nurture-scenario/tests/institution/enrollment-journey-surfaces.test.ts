@@ -218,6 +218,8 @@ const trusted = (
   workspace_id: "workspace-01",
   actor_participant_ref: "participant-01",
   invocation_request_id: "invocation-01",
+  host_correlation_id: "correlation-01",
+  host_trace_id: "trace-01",
   command_request_id: "command-01",
   client_surface: clientSurface,
 });

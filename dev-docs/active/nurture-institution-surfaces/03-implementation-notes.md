@@ -1450,3 +1450,123 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   knowledge/enrollment lanes.
 - `DR-I3-01` repaired before any durable apply: minted workflow_run_ref must
   be the Host `my_chat`/`workflow_run` canonical form.
+
+## 2026-08-12 — G4-D I4-A Host Run ownership preflight
+
+- The planned prospective-contact joint vehicle exposed a replay defect: the
+  I3 binding generates a new `my_chat/workflow_run` object id while resolving
+  the same prepared command.
+- A Nurture-local deterministic hash was implemented experimentally and then
+  rejected during combined ownership review. It would remove the replay drift
+  while still minting a My-Chat canonical identity with no Host Run row,
+  lifecycle or owner receipt.
+- The experimental production change and x5 vehicle were removed. Record 88
+  freezes the required repair: a pinned My-Chat issue/reserve/read seam must
+  supply the opaque Run ref through a trusted boundary; Nurture only validates
+  and persists it.
+- Current-owner transport, native-source, the Host Run seam, the joint matrix,
+  Guardian/mobile, full I4, G4-F and Exit stay open. No database, route,
+  capability or traffic changed.
+
+## 2026-08-12 — second-round Host Run owner candidate
+
+- My-Chat T-041 now implements the missing generic owner seam without a schema
+  change: Prisma creates the canonical Run id and the same transaction writes
+  the queued Run plus a body-free `workflow.run.created` outbox reservation.
+- The Host idempotency reservation is independent of Nurture command identity.
+  Exact replay returns the same Run id and its current aggregate version;
+  changed actor or exact scenario/contract/capability/entrypoint/version pins
+  conflict. Service and repository layers both recheck the exact binding.
+- The candidate passes 10 focused tests plus workflow-runtime, DB non-integration
+  and adjacent Run regressions. It remains default-off, uncommitted and has no
+  route, DI activation or traffic.
+- Nurture has not adopted that candidate. The next slice must pin a referencable
+  My-Chat revision, carry the owner-issued opaque ref through the trusted
+  dispatcher and restore the removed two-database record-88 vehicle. I4-A, I4,
+  G4-F and Exit remain open.
+## 2026-08-12 — third-round adapter and protocol-gap finding
+
+- Added an exact injected Nurture adapter for the uncommitted generic My-Chat
+  Workflow Run owner. It forwards workspace plus verified Host request/
+  correlation/trace metadata only; local participant, command and contact facts
+  cannot cross, and `actor_id` is omitted.
+- Positive Host aggregate-version evidence is validated then stripped. The
+  durable Nurture association is versionless identity, so Host v1→v3 is not
+  local authority drift. Correlation/trace changes replay the same reservation.
+- The formal ingress carries verified Host request/correlation/trace metadata.
+- Production composition deliberately does not invoke the adapter. Current
+  `issueRun` commits queued Run/outbox before Nurture's separate transaction;
+  local abort/crash can orphan it, and a retry with a fresh Host request id can
+  create another. No confirm/abandon, reconciler or cited stable-logical-id
+  contract exists.
+- Restored a negative serialized x5 proof, not a happy-path admission. It was
+  not run because Docker and both x5 URLs are unavailable. Root integration
+  merged the census and rotated only the settled Nurture self-pin to
+  `5a59039b...`; no schema, route, activation, traffic or external pin changed.
+
+Verdict: `ADAPTER_IMPLEMENTED / CROSS_DB_COMMIT_PROTOCOL_GAP /
+JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 Fourth-round cross-database protocol freeze
+
+- Independent Base/My-Chat/Nurture review proved that signed
+  `operation.input` can carry an exact reservation receipt without changing
+  the Base envelope, but Base request id and nonce are transport-attempt
+  identities and cannot be the durable logical operation.
+- My-Chat now has a pure, default-off lifecycle candidate with stable Host
+  `logical_operation_id`, versionless Run identity, non-executable/no-Step/
+  no-created-event reservation, proof-gated confirmation and writer-fenced
+  no-effect abandonment. `unknown` remains reserved.
+- The candidate intentionally has no persistent ledger. Reusing
+  `waiting_approval` would overload approval semantics; using the outbox as the
+  reservation ledger would publish or silently consume lifecycle evidence.
+  A dedicated uniquely constrained Host ledger remains the next My-Chat DB
+  design step.
+- Nurture's ordinary formal execute replay is not a commit-status API: current
+  participant, prepared expiry and current authority checks occur before the
+  command kernel can return a committed replay. A separate historical status
+  owner must return exact `committed`, writer-fenced `confirmed_no_effect`, or
+  `unknown` bound to the logical operation/reservation/command.
+- Until both persistent owners and the receipt verifier exist, production
+  `start_enrollment_inquiry` continues to fail before contact-owner read,
+  protected-data sealing or any Host effect. No positive x5 path is admitted.
+
+## 2026-08-12 fifth-round dual-ledger implementation
+
+- My-Chat uses a dedicated `WorkflowRunReservation`; it does not overload
+  `waiting_approval`, a queued Run or the outbox. Exact reserve replay is keyed
+  by `(workspace_id, logical_operation_id)` and semantic binding drift is a
+  conflict. Confirm creates Run + existing body-free created event + settlement
+  transition atomically; abandon creates neither.
+- Nurture uses `NurtureWorkflowRunSettlement`, keyed by hashed logical
+  operation, reservation evidence and command request. It stores the
+  versionless Run id plus binding/evidence hashes, never contact or enrollment
+  payload facts.
+- `nurtureCommandAdvisoryKey` is now the single writer-fence derivation used by
+  ordinary command execution and settlement reconciliation. A no-effect
+  decision acquires that exact transaction lock, checks for the command
+  execution, and reconciles committed if it exists.
+- `PrismaNurtureWorkflowRunSettlementTransaction.markCommitted` is designed to
+  run after `NurtureCommandExecution` creation inside the existing serializable
+  command transaction. An opposite no-effect terminal throws so the surrounding
+  business transaction rolls back.
+- The settlement read is historical and exact; it does not call participant,
+  authority or prepared-command owners and therefore survives response loss,
+  prepared expiry and later authority revoke.
+- Production is intentionally not wired yet. The signed transport input,
+  registration placement, command-spec binding and My-Chat proof verifier must
+  land together before removing the current fail-closed guard.
+
+## 2026-08-12 baseline quality audit and cleanup
+
+- Removed the superseded immediate queued-Run Nurture adapter, its unit suite,
+  and the negative protocol-gap x5 vehicle. The failure remains documented as
+  a pitfall; executable source now has one reservation/settlement direction.
+- Restored the x5 census to the three maintained joint suites. Tests that lock
+  the current positive protocol will be added only with the signed transport;
+  an obsolete negative vehicle is not retained as permanent product code.
+- Removed an unused settlement-receipt alias. The active proof vocabulary is
+  the exact `proof_version/outcome/writer_fence_receipt_ref/receipt_sha256`
+  shape shared with the Host lifecycle.
+- Migration artifacts remain repository SSOT only. No target was selected and
+  no database write was attempted during cleanup.

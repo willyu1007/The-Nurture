@@ -5,6 +5,8 @@ export * from "./institution-knowledge-formal-owners.composition.js";
 export { Prisma } from "@prisma/client";
 export * from "./repositories/port-repositories.js";
 export * from "./repositories/institution-core.repositories.js";
+export * from "./repositories/nurture-command-advisory-key.js";
+export * from "./repositories/workflow-run-settlement.repository.js";
 export * from "./repositories/institution-context.repository.js";
 export * from "./repositories/attendance-closeout.repository.js";
 export * from "./repositories/attendance-preview.repository.js";

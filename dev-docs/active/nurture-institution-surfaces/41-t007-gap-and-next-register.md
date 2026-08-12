@@ -2,7 +2,7 @@
 
 ## Status
 
-- Date: 2026-08-11
+- Date: 2026-08-12
 - Task: T-007
 - Purpose: the **live** list of what is not built and what comes next.
 
@@ -194,7 +194,7 @@ observations in [`40`](./40-g4-b-increment-7-record.md),
 [`42`](./42-g4-b-increment-8-record.md) and
 [`44`](./44-g4-b-increment-10-record.md) remain historical evidence.
 
-### G-10 — Enrollment Journey I2-A/I2-B are complete; I3–I4 remain
+### G-10 — Enrollment Journey I1–I3 are complete; I4 is active
 
 G4-D increments 2–5 now supply DB-qualified private inquiry and capacity
 waitlist/preparation owners. The latter provides standard-only FIFO by default,
@@ -214,15 +214,14 @@ acceptance, exact-head trial-to-formal transaction and completed workflow
 outcome without releasing/reacquiring the seat or persisting owner evidence.
 
 I2-A now publishes three queries and the complete 21-command inventory through
-the exact `nurture.surface-contract@1.19.0` /
-`sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e`
+the exact current `nurture.surface-contract@1.20.0`
 artifact. Institution mobile remains query-only; Institution actions appear
 only in Workbench; Guardian surfaces receive a rank-free family waitlist result
 and only Guardian/mixed waitlist, offer, preparation and formalization actions.
 Public inputs carry no trusted Workspace/role, owner snapshot/evidence, private
 Workflow ref, expected local head or derived lifecycle field. All 24 descriptors
-depend on the unqualified `t007_enrollment_journey_runtime` owner-integration
-gate.
+remain behind `t007_enrollment_journey_runtime` and disabled composition; I3
+qualification does not activate the gate.
 
 I2-B now validates the exact public DTOs before trusted resolution, binds every
 action to its existing I1 command spec, reuses the three I1 query paths and
@@ -232,27 +231,28 @@ the family no-rank/no-category boundary. Query and command internal keys reject
 cross-lane payloads; canonical Workflow Run or local scope drift fails
 unavailable.
 
-I3 is designed and started ([`86`](./86-g4-d-i3-design-freeze.md)): the lane is
-the trusted verified-invocation ingress (G4-E shape), the providers decompose
-into one binding, and confirmation runs through an E7-isomorphic enrollment
-prepared-command ledger. The first landed piece is the authenticated My-Chat
-prospective-contact owner
-(`my-chat.nurture-enrollment-prospective-contact-owner@1.0.0`, My-Chat
-`83c4647`, disposable-qualified) plus the pin rotation that adopts it. Still
-open as Nurture-side I3 work: the native business-message source adapter (over
-the existing communication owner-read port), the current-owner/formalization
-evidence adapter, the prepared-command ledger + repository, the formal
-scenario-service ingress and its censuses. G-09 is closed; the module's two
-adapter keys fail closed by default and the manifest marks their
-chat/mobile/Web composition disabled. No Host bridge is yet wired into the
-Nurture composition, no database operation, activation or traffic exists;
-`workflowRunRef` accepts only the exact My-Chat-owned canonical ref, and the
-private workflow ref is never projected.
+I3 is qualified default-off ([`86`](./86-g4-d-i3-design-freeze.md),
+[`87`](./87-g4-d-i3-qualification-record.md)): the three upstream providers,
+prepared-command ledger, transactional consume, formal query/prepare/execute
+ingress and censuses are present. No route, activation, durable apply or
+traffic exists; `workflowRunRef` accepts only the exact My-Chat-owned canonical
+shape and the private workflow ref is never projected.
+
+I4-A ownership preflight is recorded by
+[`88`](./88-g4-d-i4-a-prospective-contact-joint-record.md). The proposed
+prospective-contact joint vehicle exposed a prior I3 replay defect: Nurture
+creates a new Host `my_chat/workflow_run` ref while resolving the same command.
+A deterministic Nurture-local replacement was rejected because stable replay
+does not grant authority to mint a My-Chat Run. Before the joint vehicle lands,
+My-Chat must issue/reserve/read that ref through a pinned trusted seam and
+Nurture must only validate/persist it. Disposable database availability is a
+second gate. Native-source/current-owner transport, other command families,
+Guardian/mobile and the full negative/head matrix also remain open.
 
 The revision-bearing local C30 adoption lock remains historical G4-D evidence.
 The current cross-repository Workflow/source population is adopted separately
-by [`79`](./79-teacher-release-owner-v3-migration.md); neither pin substitutes
-for the missing G4-D I3 owner implementations.
+by [`79`](./79-teacher-release-owner-v3-migration.md); it does not substitute
+for the remaining I4 matrix.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
@@ -369,14 +369,89 @@ off slice.
    scenario-service ingress.~~ Qualified 2026-08-12
    (`G4_D_I3_QUALIFIED_DEFAULT_OFF`, record 87): heads and default-off gates
    retained, disposable qualification passed, internal bridge removed.
-5. **G4-D I4** — run joint negative/replay/mobile-Web head conformance over
-   the qualified I3 paths; the wave4 current-owner evidence transport and the
-   end-to-end journey command lanes bind here (record 87 boundaries).
+5. **G4-D I4-A Host Run seam** — land an exact My-Chat-owned Run
+   issue/reserve/read contract and carry its opaque ref through the trusted
+   boundary; Nurture must not derive the object id. Then restore record 88's
+   prospective-contact joint vehicle and run it on fresh disposable databases.
+6. **G4-D I4 remainder** — add native-source/current-owner transport, remaining
+   command families, Guardian/mobile and the complete negative/replay/head
+   matrix over the qualified I3 paths (record 87 boundaries).
+7. **G4-F** — begin only after the complete I4 matrix passes; do not infer it
+   from the ownership preflight or a future single-suite pass.
 
 G-03's remaining authority/source fact is an external owner gate, not an
 actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09 is closed. G4-D I3/I4 now wait on their concrete owner-adapter and formal-
-ingress implementation, not on a stale external revision pin.
+G-09 and G4-D I3 are closed. I4 now waits first on the Host Run issuance seam,
+then on disposable execution and the still-unimplemented remainder; it does
+not wait on a stale external revision pin.
+
+## Second-round status refinement
+
+The Host Run implementation prerequisite now has a locally qualified My-Chat
+T-041 candidate. It is not yet a landed or adopted source: the working tree is
+uncommitted, no new My-Chat revision can be pinned, and Nurture has not carried
+the owner-issued ref through its trusted dispatcher. The actionable order is
+therefore: create a referencable source revision, adopt the exact owner pin,
+restore record 88's joint vehicle, execute it on two disposable databases, and
+then continue the I4 remainder. Nurture must never replace those steps with a
+locally derived Run id.
+
+## Third-round status refinement
+
+Nurture now has a passing exact-pin adapter candidate and carries verified Host
+request/correlation/trace metadata. Its durable association is versionless Run
+identity; correlation/trace changes replay the same reservation. Production
+composition stays fail-closed: current `issueRun` commits queued Run/outbox
+before the local transaction, so abort/crash can orphan Host state and a new
+retry request id can create another Run. No confirm/abandon/reconciler or
+stable-logical-id contract closes that gap. The next step is that Host-owned
+protocol, not direct adoption of issue/read. Record 88 restores only a negative
+x5 proof, not an admitted happy path.
+
+Verdict: `ADAPTER_IMPLEMENTED / CROSS_DB_COMMIT_PROTOCOL_GAP /
+JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
+
+## Fourth-round protocol refinement
+
+The Host lifecycle shape is now frozen as a pure candidate, not a persistence
+claim: stable Host logical operation; versionless Run identity; reservation
+with zero Steps, no execution and no `workflow.run.created`; confirm only from
+an exact verified committed receipt; abandon only from writer-fenced
+`confirmed_no_effect`; `unknown` remains quarantined.
+
+Two owners are still required before adoption:
+
+1. a dedicated uniquely constrained My-Chat logical-operation/reservation
+   ledger with CAS settlement and created-event publication only on confirm;
+2. a Nurture historical status owner that can discover a committed receipt
+   after prepared expiry or authority change, or atomically prove no effect
+   under the command writer fence.
+
+Do not use Base request id/nonce, a Nurture command id, `waiting_approval`, a
+queued Run, a reservation-stage created event, prepared expiry, authority
+revoke or an absent read as substitutes for those contracts. Positive I4/x5
+admission remains closed.
+
+## Fifth-round status refinement
+
+Both dedicated persistence candidates are now implemented in the shared
+worktrees, with migration previews only. My-Chat owns reserve/confirm/abandon;
+Nurture owns historical committed/no-effect settlement under the exact command
+writer fence. Focused contracts and package typechecks pass.
+
+The next dependency is no longer ledger design. It is exact transport and
+atomic adoption:
+
+1. carry the Host reservation receipt in the signed strict operation input;
+2. register it before contact-owner/protected-content work;
+3. pass its frozen binding to `start_enrollment_inquiry` and call the Nurture
+   settlement transaction adapter after execution creation;
+4. expose the historical status receipt through the private trusted handler;
+5. verify that receipt in My-Chat before confirm/abandon;
+6. run response-loss and writer-race qualification on approved disposable DBs.
+
+Until all six pass, production remains `workflow_run_cross_db_commit_protocol_unavailable`
+and positive I4/x5 admission remains closed.

@@ -1047,3 +1047,109 @@ Current verdict: `DR_E8_02_CLOSED_PRODUCTION_PORT_OWNED / G4_D_I3_NURTURE_OWNER_
 | Runtime effects | NONE / DEFAULT-OFF | no route, flag, credential, durable apply or traffic |
 
 Current verdict: `G4_D_I3_QUALIFIED_DEFAULT_OFF / G4_D_I4_JOINT_NEXT`.
+
+## 2026-08-12 G4-D I4-A ownership preflight verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Host canonical ownership review | BLOCKED | The binding creates `my_chat/workflow_run` inside Nurture; the 0E freeze and repository boundaries assign Run/Step/ledger ownership to My-Chat. |
+| Deterministic local replacement | REJECTED AND REMOVED | Stable hashing would fix replay drift but still invent a Host identity without a My-Chat Run or pinned owner receipt. |
+| Joint vehicle | NOT ADMITTED | The experimental x5 file and routing entry were removed; x5 remains 3 files. Restore only after an exact Host Run issuance seam lands. |
+| Repository-root typecheck | PASS | `pnpm install --offline --frozen-lockfile` restored already-locked local My-Chat package links; final `pnpm typecheck` has zero diagnostics. |
+| Full unit lane | PASS | `pnpm test:unit`: 96 files / 1027 tests. |
+| Structural gates | PASS | `verify:test-routing` reports 173 files: unit 96, production DB 47, dev host 11, scenario service 16 and x5 joint 3. Formal-ingress, persistence and port gates pass. |
+| Exact repository pins | PASS after combined source settlement | My-Chat `ec9f298` and Base `536638a` remain exact. The final Nurture self-pin is recorded by the combined T-007/T-010 checkpoint. |
+| Secondary execution gate | BLOCKED | Docker API and an approved two-PostgreSQL disposable target are unavailable; no database was written. |
+| Runtime effects | NONE / DEFAULT-OFF | No route, activation, credential, durable apply, deployment or traffic. |
+
+Current verdict: `G4_D_I4_A_HOST_RUN_ISSUANCE_GAP /
+IMPLEMENTATION_NOT_ADMITTED / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 second-round Host Run candidate verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Host Run owner implementation | PASS, local candidate | My-Chat workflow-runtime owner port/service and Prisma repository create a DB-issued queued Run plus body-free creation outbox in one transaction. |
+| Exact replay after lifecycle advance | PASS | Creation evidence stays at version 1 while replay returns the same Run id at current version 3. Changed actor or exact binding pins conflict. |
+| Owner-bound output and privacy | PASS | Service rereads workspace and all exact pins; Nurture command/contact/Institution fields do not cross the repository or response boundary. |
+| Focused and adjacent tests | PASS | Owner service/repository 10/10; workflow runtime 237/237; DB non-integration 139/139; adjacent Run paths 31/31. |
+| Adoption/source pin | OPEN | Candidate is uncommitted and therefore has no new referencable My-Chat revision. Nurture trusted-dispatcher composition is not implemented. |
+| PostgreSQL/joint execution | BLOCKED | No approved My-Chat/Nurture disposable database pair and Docker is unavailable. |
+| Runtime effects | NONE / DEFAULT-OFF | No route, DI activation, deployment, traffic or database apply. |
+
+Current verdict: `G4_D_I4_A_HOST_RUN_OWNER_CANDIDATE_QUALIFIED /
+ADOPTION_AND_JOINT_EXECUTION_PENDING / I4_NOT_QUALIFIED`.
+## 2026-08-12 third-round adapter and protocol-gap verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Adapter semantics | PASS | 5 isolated tests: exact pin/output, Host-only metadata, versionless v1→v3 identity, correlation replay, conflict/outage/malformed fail-closed. |
+| Trusted ingress | PASS | Verified Host request/correlation/trace reaches binding; participant stays Nurture-local. |
+| Focused unit | PASS | 3 files / 25 tests. |
+| Full unit lane | PASS | 97 files / 1033 tests. |
+| Root typecheck | PASS | `pnpm typecheck`, zero diagnostics, including unexecuted x5 source. |
+| Production composition | FAIL-CLOSED | `workflow_run_cross_db_commit_protocol_unavailable`; no issue-before-local-commit. |
+| Cross-DB protocol | OPEN | No confirm/abandon/orphan reconciliation; logical Host request-id stability on response loss is not cited. |
+| x5 vehicle | STRUCTURAL / NOT RUN | Negative protocol-gap proof requires `X5_NURTURE_DATABASE_URL` and `X5_MY_CHAT_DATABASE_URL`; Docker and URLs unavailable. |
+| Effects | LOCAL METADATA ONLY | Root integration rotated the settled Nurture self-pin and merged the routing census; no DB apply, route, activation, deployment, traffic or external pin. |
+
+The root integration pass merged the combined census as 178 files: unit 97,
+production DB 49, dev host 11, scenario service 17 and x5 joint 4. The full
+unit lane passes 97 files / 1033 tests, and the settled Nurture exact-runtime
+self-pin is `5a59039b...` over 298 files. The complete cross-repository pin
+verifier remains intentionally red only on uncommitted My-Chat
+`x5_joint_api` source drift; no false My-Chat revision was recorded.
+
+Verdict: `ADAPTER_IMPLEMENTED / CROSS_DB_COMMIT_PROTOCOL_GAP /
+JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 fourth-round lifecycle-contract evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Base carrier review | PASS, contract-only | Signed `operation.input` can carry an operation-specific strict reservation receipt; no Base envelope change is required. |
+| Stable replay identity review | GAP CONFIRMED | Request id, nonce, correlation and trace are transport metadata, not durable logical-operation identity. |
+| My-Chat pure lifecycle candidate | PASS, local only | 6 lifecycle tests; focused lifecycle + prior owner/repository total 3 files / 16 tests; runtime package typecheck and targeted ESLint pass. |
+| Nurture commit reconciliation | GAP CONFIRMED | Existing execute replay is gated by prepared expiry/current participant/current authority before committed replay; no writer-fenced status receipt exists. |
+| Production composition | FAIL-CLOSED | `workflow_run_cross_db_commit_protocol_unavailable` remains before contact/protected/effect boundaries. |
+| Nurture regression | PASS | Root typecheck; unit 97 files / 1033 tests; routing 178 exact (97 unit / 49 production DB / 11 dev host / 17 scenario service / 4 x5). |
+| Persistent DB / x5 | NOT RUN | No lifecycle ledger/schema was added and no approved database pair is available. |
+
+Verdict: `LOCAL_LIFECYCLE_CONTRACT_PASS /
+HOST_PERSISTENCE_LEDGER_PENDING / NURTURE_COMMIT_STATUS_RECEIPT_PENDING /
+PRODUCTION_FAIL_CLOSED / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 fifth-round dual-ledger verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| My-Chat schema/repository candidate | PASS, local | Dedicated reservation enum/table/migration preview; focused lifecycle + Prisma repository tests pass; reserve has no Run/outbox, confirm is atomic, opposite settlement conflicts. |
+| Nurture schema/repository candidate | PASS, local | Dedicated settlement enum/table/migration preview; strict terminal CHECK; exact execution FK; no business-fact columns. |
+| Nurture owner contract | PASS, local | 5 focused tests cover opaque hashing, exact replay, historical committed read, writer-fenced no-effect proof, drift/malformed/outage fail-closed. |
+| Nurture repository contract | PASS, local | 5 focused tests cover migration structure, shared advisory fence, committed reconciliation, no-effect terminal replay and transaction-atomic commit adapter. |
+| Prisma SSOT | PASS | format/validate/generate and DB context sync pass using a non-connecting schema-only URL. |
+| Package/root typecheck | PASS | `@the-nurture/scenario`, `@the-nurture/db` and repository-root typechecks pass after generated-client refresh. |
+| Full unit lane | PASS | 98 files / 1038 tests. |
+| Structural gates | PASS | routing 180 exact (98 unit / 50 production DB / 11 dev host / 17 scenario service / 4 x5); persistence, formal-ingress and port-topology gates pass. |
+| Cross-repository source pin | EXPECTED RED | Nurture self/Base pins are not reported as drift; My-Chat `x5_joint_api` expected `48c0f597...`, current uncommitted worktree `ceb027d5...`. No false revision/hash was recorded. |
+| Database apply | NOT RUN | Migration is preview-only; no target was contacted or changed. |
+| Production composition | FAIL-CLOSED | Reservation transport, command transaction adoption and Host proof verifier are not composed; contact/protected/effect calls remain unreachable. |
+
+Verdict: `DUAL_LEDGER_CANDIDATES_IMPLEMENTED /
+TRANSPORT_AND_ATOMIC_COMMAND_ADOPTION_PENDING / NO_DB_APPLY /
+PRODUCTION_FAIL_CLOSED / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 baseline quality-audit rerun
+
+| Check | Result |
+| --- | --- |
+| superseded owner/adapter reference scan | PASS — no executable reference remains |
+| routing census | PASS — 178 files: 97 unit / 50 production DB / 11 dev host / 17 scenario service / 3 x5 |
+| settlement focused unit + DB | PASS — 5 + 5 tests |
+| scenario/DB package typechecks | PASS |
+| family-sharing private controller | PASS — 12 tests, including corrupt-ledger receipt substitution denial |
+| C4 qualification runner `--check-only` | PASS — explicit disposable target and approval still mandatory |
+
+Current verdict: `CLEAN_SINGLE_PROTOCOL_BASELINE /
+SIGNED_TRANSPORT_AND_ATOMIC_ADOPTION_NEXT / NO_DB_APPLY /
+I4_NOT_QUALIFIED`.

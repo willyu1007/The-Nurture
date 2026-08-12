@@ -842,6 +842,15 @@ enum NurtureCommandBusinessOutcome {
   already_satisfied
 }
 
+// T-007 I4 cross-owner settlement. `prepared` is not evidence that the
+// Nurture command committed; only `committed` or `confirmed_no_effect` may
+// settle the corresponding Host reservation.
+enum NurtureWorkflowRunSettlementState {
+  prepared
+  committed
+  confirmed_no_effect
+}
+
 // G4-D EnrollmentJourneyWorkflowV1. These values are the private durable
 // carrier vocabulary; My-Chat continues to own the shared workflow runtime.
 enum NurtureInstitutionWorkflowStage {
@@ -3136,12 +3145,48 @@ model NurtureCommandExecution {
   enrollmentWaitlistOverride            NurtureEnrollmentWaitlistOverride?
   institutionKnowledgeEvents            NurtureInstitutionKnowledgeRevisionEvent[]
   institutionKnowledgeConflictCandidate NurtureInstitutionKnowledgeConflictReviewCandidate?
+  workflowRunSettlement                 NurtureWorkflowRunSettlement?
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
   @@index([workspaceId, childCareProcessId, committedAt], map: "ix_nurture_command_execution_process")
   @@index([workspaceId, actorPrincipalBindingId, committedAt], map: "ix_nurture_command_execution_actor_binding")
   @@map("nurture_command_execution")
+}
+
+// T-007 I4 durable binding between a Host logical-operation reservation and
+// the Nurture command writer. It contains only opaque identifiers and hashes;
+// prospective-contact, child, family, authority and command payload facts are
+// deliberately excluded. The command writer and no-effect reconciler use the
+// same advisory-lock identity derived from commandRequestIdHash.
+model NurtureWorkflowRunSettlement {
+  id                       String                            @id @default(uuid())
+  workspaceId              String                            @map("workspace_id") @db.VarChar(200)
+  logicalOperationIdHash   String                            @map("logical_operation_id_hash") @db.Char(64)
+  reservationRefHash       String                            @map("reservation_ref_hash") @db.Char(64)
+  reservationEvidenceHash  String                            @map("reservation_evidence_hash") @db.Char(64)
+  runObjectId              String                            @map("run_object_id") @db.VarChar(200)
+  bindingFingerprintSha256 String                            @map("binding_fingerprint_sha256") @db.Char(64)
+  commandRequestIdHash     String                            @map("command_request_id_hash") @db.Char(64)
+  commandKey               String                            @map("command_key") @db.VarChar(100)
+  state                    NurtureWorkflowRunSettlementState
+  commandExecutionId       String?                           @unique(map: "uq_nurture_run_settlement_execution") @map("command_execution_id")
+  settlementReceiptRef     String?                           @map("settlement_receipt_ref") @db.VarChar(200)
+  settlementEvidenceHash   String?                           @map("settlement_evidence_hash") @db.Char(64)
+  aggregateVersion         Int                               @default(1) @map("aggregate_version")
+  preparedAt               DateTime                          @map("prepared_at")
+  committedAt              DateTime?                         @map("committed_at")
+  confirmedNoEffectAt      DateTime?                         @map("confirmed_no_effect_at")
+  createdAt                DateTime                          @default(now()) @map("created_at")
+  updatedAt                DateTime                          @updatedAt @map("updated_at")
+
+  commandExecution NurtureCommandExecution? @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict, map: "nurture_run_settlement_execution_id_fkey")
+
+  @@unique([workspaceId, logicalOperationIdHash], map: "uq_nurture_run_settlement_logical_operation")
+  @@unique([workspaceId, reservationEvidenceHash], map: "uq_nurture_run_settlement_reservation_evidence")
+  @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_run_settlement_command")
+  @@index([workspaceId, state, updatedAt], map: "ix_nurture_run_settlement_reconciliation")
+  @@map("nurture_workflow_run_settlement")
 }
 
 // G4-E increment 1: private Institution Knowledge lifecycle/provenance owner.

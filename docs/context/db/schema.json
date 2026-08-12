@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-12T00:32:22.287Z",
+  "updatedAt": "2026-08-12T08:12:40.899Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -1225,6 +1225,14 @@
         "resolved",
         "expired",
         "suppressed"
+      ]
+    },
+    {
+      "name": "NurtureWorkflowRunSettlementState",
+      "values": [
+        "prepared",
+        "committed",
+        "confirmed_no_effect"
       ]
     }
   ],
@@ -9523,6 +9531,15 @@
           "to": "NurturePublicationVisibilityEvent",
           "optional": false,
           "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "workflowRunSettlement",
+          "to": "NurtureWorkflowRunSettlement",
+          "optional": true,
+          "list": false,
           "relationName": null,
           "fields": [],
           "references": []
@@ -29376,6 +29393,276 @@
           ],
           "name": null,
           "map": "ix_42"
+        }
+      ]
+    },
+    {
+      "name": "NurtureWorkflowRunSettlement",
+      "dbName": "nurture_workflow_run_settlement",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bindingFingerprintSha256",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "binding_fingerprint_sha256",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_key",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confirmedNoEffectAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "confirmed_no_effect_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "logicalOperationIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "logical_operation_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "preparedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "prepared_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reservationEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reservation_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reservationRefHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reservation_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "runObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "run_object_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "settlementEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "settlement_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "settlementReceiptRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "settlement_receipt_ref",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureWorkflowRunSettlementState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "state",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_run_settlement_reconciliation"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "commandRequestIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_run_settlement_command"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "logicalOperationIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_run_settlement_logical_operation"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "reservationEvidenceHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_run_settlement_reservation_evidence"
         }
       ]
     }

@@ -124,6 +124,54 @@ describe("Enrollment Journey formal ingress", () => {
       reason_code: "enrollment_journey_formal_ingress_unavailable",
     });
   });
+
+  it("carries verified Host invocation metadata into trusted binding context", async () => {
+    const trustedContexts: unknown[] = [];
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: {
+        ...defaultNurtureEnrollmentJourneySurfaceDeps,
+        bindings: {
+          resolve: async ({ trusted }) => {
+            trustedContexts.push(trusted);
+            return { status: "denied", reason_code: "test_stop_after_binding" };
+          },
+        },
+      },
+      authorityResolver: {
+        resolveCurrent: async () => ({
+          status: "resolved",
+          authority: {
+            workspace_id: "workspace-1",
+            participant_ref: "nurture-local-participant-1",
+            institution_ref: "institution-1",
+            role_assignment_ref: "role-1",
+            active_role: "institution_admin",
+            surface_key: "institution_workbench",
+            authority_version: "1",
+            evaluated_at: "2026-08-12T00:00:00.000Z",
+          },
+        }),
+      },
+    });
+    const query = verifiedInvocation("query");
+    query.invocation.operation.input = {
+      contractVersion: 1,
+      request: queryRequest("query_institution_enrollment_journey"),
+    };
+
+    await expect(
+      handlers[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.query]?.(query),
+    ).resolves.toEqual({ status: "denied", reason_code: "test_stop_after_binding" });
+    expect(trustedContexts).toEqual([{
+      workspace_id: "workspace-1",
+      actor_participant_ref: "nurture-local-participant-1",
+      invocation_request_id: "host-invocation-request-1",
+      host_correlation_id: "host-correlation-1",
+      host_trace_id: "host-trace-1",
+      command_request_id: "host-invocation-request-1",
+      client_surface: "web_run_workbench",
+    }]);
+  });
 });
 
 function queryRequest(capabilityKey: string) {
@@ -175,7 +223,11 @@ function verifiedInvocation(
         input: {},
       },
       principal,
-      request: { request_id: "request-1" },
+      request: {
+        request_id: "host-invocation-request-1",
+        correlation_id: "host-correlation-1",
+        trace_id: "host-trace-1",
+      },
     },
   } as unknown as WorkflowVerifiedScenarioInvocationV1;
 }

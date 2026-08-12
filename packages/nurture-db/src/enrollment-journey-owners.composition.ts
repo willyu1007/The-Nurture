@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 import type { NurtureEnrollmentContactOwnerV1 } from "@my-chat/scenario-integrations";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
@@ -228,38 +227,13 @@ implements NurtureEnrollmentJourneyBindingPort {
       if (selection.target_kind !== "prospective_contact") {
         return { status: "denied", reason_code: "enrollment_target_option_invalid" };
       }
-      const contact = await this.deps.contactProvider.resolveContact({
-        workspace_id: trusted.workspace_id,
-        institution_ref: binding.institution_ref,
-        contact_object_id: selection.target_ref,
-        contact_version: selection.contact_version,
-      });
-      if (contact.status !== "resolved") return contact;
-      binding.contact_owner_snapshot = contact.snapshot;
-      // Workflow runs are My-Chat canonical objects (the shared runtime owns
-      // run/step records); the workflow-identity CHECK enforces the namespace.
-      binding.workflow_run_ref = {
-        schema_version: 1,
-        namespace: "my_chat",
-        object_type: "workflow_run",
-        object_id: randomUUID(),
+      // The current issue/read candidate has no cross-database commit
+      // protocol. Fail before reading the contact owner, sealing protected
+      // data, or issuing any Host effect.
+      return {
+        status: "unavailable",
+        reason_code: "workflow_run_cross_db_commit_protocol_unavailable",
       };
-      if (typeof operationInput.birthYearMonth === "string") {
-        binding.protected_birth_year_month =
-          this.deps.protectedContent.seal(operationInput.birthYearMonth);
-      }
-      if (typeof operationInput.targetCareGroupOptionRef === "string") {
-        const groupRef = await this.resolveCareGroupOption(
-          trusted,
-          operationInput.targetCareGroupOptionRef,
-          binding.institution_ref,
-        );
-        if (!groupRef) {
-          return { status: "denied", reason_code: "enrollment_care_group_option_invalid" };
-        }
-        binding.refs.target_care_group = groupRef.care_group_ref;
-      }
-      return { status: "resolved", binding };
     }
 
     if (key === "record_external_touchpoint") {

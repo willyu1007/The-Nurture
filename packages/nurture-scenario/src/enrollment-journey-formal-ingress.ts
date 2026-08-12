@@ -193,6 +193,10 @@ async function invokeSurface(
     workspace_id: workspaceId,
     actor_participant_ref: authority.participant_ref,
     invocation_request_id: verified.invocation.request.request_id,
+    host_correlation_id: verified.invocation.request.correlation_id,
+    ...(verified.invocation.request.trace_id === undefined
+      ? {}
+      : { host_trace_id: verified.invocation.request.trace_id }),
     command_request_id: commandRequestId,
     client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
   };

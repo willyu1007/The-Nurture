@@ -5,10 +5,20 @@
 - State: in-progress
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-11
-- Next step: **implement and qualify G4-D I3 (authenticated My-Chat
-  prospective-contact/native-source/current-owner adapters plus formal
-  ingress), then I4 joint conformance, then G4-F**. E7 disposable
+- Updated: 2026-08-12
+- Next step: **carry the committed My-Chat reservation evidence through the
+  signed private operation input, register it before protected owner reads,
+  mark the Nurture settlement committed inside the command transaction, and
+  compose the Host proof verifier before admitting G4-D I4-A**. I3 is
+  qualified by record [`87`](./87-g4-d-i3-qualification-record.md). Both
+  dedicated ledgers and their additive migrations are implemented locally;
+  neither migration is applied. The superseded immediate queued-Run issuer,
+  its Nurture adapter and the negative protocol-gap x5 vehicle are removed.
+  Production start inquiry remains fail-closed before contact/protected/effect
+  work until the signed transport and atomic adoption land. Positive
+  two-database qualification still requires an approved disposable pair, and
+  I4/G4-F remain open. E7
+  disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,
   record 84) are closed and the G4-E Exit is issued
   (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`, record 85); `live_qualified=false`
@@ -519,3 +529,24 @@ T-006 依赖；0C 是 G4 自身公共基础，0D/0E/0F 按域并行，0G 滚动�
 See [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md)
 "Next steps, in dependency order". It is kept there rather than here so there is
 one list to update instead of two that disagree.
+
+## 2026-08-12 fifth-round mainline increment
+
+The two durable owner candidates now exist in the shared worktrees. My-Chat has
+a dedicated logical-operation reservation ledger: reserve creates no Run,
+Step or outbox event; confirm atomically creates the queued Run and the existing
+body-free `workflow.run.created` event; no-effect abandons without either.
+
+Nurture now has a separate settlement ledger and owner boundary. It freezes
+only hashes/opaque ids, reuses the exact command advisory-lock identity, reads
+historical committed status without current authority or prepared TTL, and can
+issue `confirmed_no_effect` only while holding that writer fence. The command
+transaction adapter can attach the exact `NurtureCommandExecution` and receipt
+in the same database transaction.
+
+These are schema and local owner candidates only. Neither migration was
+applied, the Nurture command spec/transport is not yet carrying the reservation
+binding, the Host proof verifier is not composed, and production remains
+fail-closed. Verdict: `DUAL_LEDGER_CANDIDATES_IMPLEMENTED /
+TRANSPORT_AND_ATOMIC_COMMAND_ADOPTION_PENDING / NO_DB_APPLY /
+I4_NOT_QUALIFIED`.

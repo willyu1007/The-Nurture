@@ -233,7 +233,7 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
     }
   });
 
-  it("binds the prospective-contact owner through the binding port", async () => {
+  it("fails before prospective-contact read while the cross-DB protocol is absent", async () => {
     const scope = await seedAdminScope("contact");
     const clock = { now: new Date("2026-08-12T12:00:00.000Z") };
     const world = composed(clock);
@@ -271,51 +271,17 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
           workspace_id: scope.workspaceId,
           actor_participant_ref: scope.participantId,
           invocation_request_id: `invocation-${scope.suffix}`,
+          host_correlation_id: `correlation-${scope.suffix}`,
+          host_trace_id: `trace-${scope.suffix}`,
           command_request_id: `command-${scope.suffix}`,
           client_surface: "web_run_workbench",
         },
       });
-      expect(resolved.status).toBe("resolved");
-      if (resolved.status !== "resolved") throw new Error("binding failed");
-      expect(resolved.binding.contact_owner_snapshot).toMatchObject({
-        contract_version: "1.0.0",
-        safe_label: "尾号 6789（微信）",
+      expect(resolved).toEqual({
+        status: "unavailable",
+        reason_code: "workflow_run_cross_db_commit_protocol_unavailable",
       });
-      expect(resolved.binding.contact_owner_snapshot?.contact_ref.object_id)
-        .toBe(`contact-${scope.suffix}`);
-      expect(resolved.binding.workflow_run_ref?.object_type).toBe("workflow_run");
-      expect(resolved.binding.protected_birth_year_month).toBeDefined();
-      expect(resolved.binding.role_assignment_ref).toBe(scope.roleAssignmentId);
-
-      // Version drift at the Host owner fails closed.
-      const drifted = world.owners.enrollmentJourneyOptionIssuer.issueProspectiveContact({
-        workspace_id: scope.workspaceId,
-        participant_ref: scope.participantId,
-        contact_object_id: `contact-${scope.suffix}`,
-        contact_version: 5,
-        institution_ref: scope.institutionId,
-      });
-      if (!drifted) throw new Error("contact option issue failed");
-      await expect(world.owners.enrollmentJourneySurfaceDeps.bindings.resolve({
-        request: {
-          capabilityKey: "start_enrollment_inquiry",
-          capabilityVersion: "1.0.0",
-          targetOptionRef: drifted,
-          operationInput: {},
-          confirmationRef: `ejc1.${"a".repeat(43)}`,
-        } as never,
-        trusted: {
-          workspace_id: scope.workspaceId,
-          actor_participant_ref: scope.participantId,
-          invocation_request_id: `invocation-2-${scope.suffix}`,
-          command_request_id: `command-2-${scope.suffix}`,
-          client_surface: "web_run_workbench",
-        },
-      })).resolves.toEqual({
-        status: "denied",
-        reason_code: "prospective_contact_not_current",
-      });
-
+      expect(world.contactOwnerCalls.count).toBe(0);
       expect(() => bindPrismaNurtureEnrollmentJourneyFormalOwners({
         formalOwners: world.owners,
       })).not.toThrow();
@@ -340,6 +306,7 @@ function composed(
   clock: { now: Date },
   overrides: { preparedCommandTtlMs?: number } = {},
 ) {
+  const contactOwnerCalls = { count: 0 };
   const contactOwner: NurtureEnrollmentContactOwnerV1 = {
     owner_pin: {
       key: "my-chat.nurture-enrollment-prospective-contact-owner",
@@ -347,8 +314,9 @@ function composed(
       purpose: "enrollment_inquiry_contact",
       snapshot_contract_version: "1.0.0",
     },
-    resolveCurrentContact: async (request) =>
-      request.contact_ref.version === 4
+    resolveCurrentContact: async (request) => {
+      contactOwnerCalls.count += 1;
+      return request.contact_ref.version === 4
         ? {
             status: "resolved",
             snapshot: {
@@ -358,7 +326,8 @@ function composed(
               verified_at: clock.now.toISOString(),
             },
           }
-        : { status: "denied", reason_code: "prospective_contact_not_current" },
+        : { status: "denied", reason_code: "prospective_contact_not_current" };
+    },
   } as NurtureEnrollmentContactOwnerV1;
   const reads: InstitutionBusinessCommunicationReadPort = {
     loadInstitutionBusinessCommunication: async () => ({ authorized: false }),
@@ -392,6 +361,7 @@ function composed(
   );
   return {
     owners,
+    contactOwnerCalls,
     confirmationHash: (confirmationRef: string) =>
       protection.tag({ purpose: "confirmation-ref", values: [confirmationRef] }),
   };

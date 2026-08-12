@@ -718,3 +718,28 @@
   contract, fail-closed handler, full conformance/default-off verification, and
   metadata-only lock. A port-only owner is reported as pending and never as an
   activated transport.
+
+## 2026-08-12 — A historical replay is not a writer-fenced status receipt
+
+- **Symptom:** an already committed command could not be rediscovered after
+  prepared expiry or current participant/authority change, while an absent
+  execution read could be mistaken for proof that no effect happened.
+- **Root cause:** normal formal execute verifies current owners before reaching
+  command-kernel replay, and an unlocked absence check races the command writer.
+- **Fix/workaround:** add a separate opaque settlement ledger. Historical reads
+  use its exact frozen binding; `confirmed_no_effect` acquires the same advisory
+  transaction lock as the command writer and checks the execution under that
+  fence. If execution exists, reconcile to committed instead.
+- **Prevention:** never use prepared expiry, authority revoke, timeout, 404 or
+  an unlocked missing row as no-effect evidence. Unknown remains quarantined.
+
+## 2026-08-12 — Prisma schema validation may require a URL without using a DB
+
+- **Symptom:** `prisma validate` failed before schema validation because
+  `DATABASE_URL` was unset.
+- **Root cause:** Prisma resolves datasource environment variables during
+  configuration parsing even when the operation does not connect.
+- **Fix/workaround:** use a one-command invalid local placeholder URL for
+  format/validate/generate only; do not invoke migrate/apply.
+- **Prevention:** qualification records distinguish schema parsing from database
+  execution and explicitly record whether any target was contacted.

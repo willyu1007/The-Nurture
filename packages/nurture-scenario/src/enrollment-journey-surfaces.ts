@@ -215,7 +215,10 @@ export type NurtureEnrollmentJourneyAdapterRequest<
 export type NurtureEnrollmentJourneyTrustedContextV1 = {
   workspace_id: string;
   actor_participant_ref: string;
+  /** Verified Host invocation identity; never a Nurture command id. */
   invocation_request_id: string;
+  host_correlation_id: string;
+  host_trace_id?: string;
   command_request_id: string;
   client_surface: WorkflowCommandMeta["client_surface"];
 };
@@ -534,6 +537,8 @@ const validTrustedContext = (
   trustedIdentity(trusted.workspace_id) &&
   trustedIdentity(trusted.actor_participant_ref) &&
   trustedIdentity(trusted.invocation_request_id) &&
+  trustedIdentity(trusted.host_correlation_id) &&
+  (trusted.host_trace_id === undefined || trustedIdentity(trusted.host_trace_id)) &&
   trustedIdentity(trusted.command_request_id) &&
   ["chat_workflow_control", "web_run_workbench", "mobile_dashboard"].includes(
     trusted.client_surface,
