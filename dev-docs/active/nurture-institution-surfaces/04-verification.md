@@ -1345,3 +1345,29 @@ HOST_CARRIER_PRODUCER_AND_REMAINING_I4_MATRIX_PENDING / G4_F_CLOSED` (record
 Current verdict: `G4_D_I4_B_HOST_CARRIER_SIGNED_POSITIVE_QUALIFIED_DEFAULT_OFF /
 REMAINING_I4_MATRIX_PENDING / G4_F_CLOSED` (record
 [`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md)).
+
+## 2026-08-12 G4-D I4 Exit qualification
+
+| Check | Result |
+| --- | --- |
+| formal query/prepare/execute declaration | PASS — v2/v3/v4; obsolete declarations absent |
+| exact surface mapping | PASS — Admin Web/mobile-query and Guardian chat/mobile; all disabled |
+| focused formal-owner PostgreSQL set | PASS — 1 file / 11 tests |
+| production native-source owner | PASS — body-free; current Admin role revoke denies |
+| Guardian mobile formalization | PASS — current Host action/pair plus local association/role/Grant/policy/heads |
+| exact consumed replay | PASS — existing execution returned; only committed target-head advance tolerated |
+| fresh Nurture migration replay | PASS — 41/41 |
+| Prisma migration status / datasource diff | PASS — current / empty |
+| full production PostgreSQL lane | PASS — 50 files / 444 tests |
+| full unit lane | PASS — 97 files / 1050 tests |
+| complete serialized x5 lane | PASS — three consecutive runs, each 5 files / 37 tests |
+| repository-root TypeScript | PASS |
+| persistence boundaries / port topology / test routing | PASS |
+| formal ingress / G3-0 / C30 default-off / manifest | PASS |
+| Prisma format / validate | PASS |
+| DB context refresh | PASS — checksum `7851031aa63a51887de6f937682d97a1998a25a80417e01edbb1115d8a33be3f` |
+| runtime effects | NONE — disposable databases only; no route, DI, durable apply, activation or traffic |
+
+Verdict: `G4_D_I4_EXIT_PASS_DEFAULT_OFF / G4_F_PIN_RESEAL_AND_JOIN_NEXT`.
+Evidence: [`95`](./95-g4-d-i4-exit-record.md) and
+[`artifacts/db/t007-g4d-i4-exit/`](./artifacts/db/t007-g4d-i4-exit/).

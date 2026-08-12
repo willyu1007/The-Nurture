@@ -77,6 +77,10 @@ import {
   type NurtureWorkflowRunReservationEvidenceV1,
 } from "./domain/institution/workflow-run-settlement.js";
 import type { NurtureEnrollmentJourneyCurrentOwnerCarrierV1 } from "./enrollment-journey-current-owner-carrier.js";
+import {
+  parseNurtureEnrollmentJourneyGuardianOwnerCarrierV1,
+  type NurtureEnrollmentJourneyGuardianOwnerCarrierV1,
+} from "./enrollment-journey-guardian-owner-carrier.js";
 
 export const NURTURE_ENROLLMENT_JOURNEY_QUERY_KEYS = [
   "query_institution_enrollment_journey",
@@ -230,6 +234,11 @@ export type NurtureEnrollmentJourneyTrustedContextV1 = {
   host_workflow_run_reservation?: NurtureWorkflowRunReservationEvidenceV1;
   /** Request-scoped Host owner evidence; never persisted in prepared state. */
   current_owner_carrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
+  /** Fresh Host Guardian action/pair evidence for chat/mobile execution. */
+  guardian_owner_carrier?: NurtureEnrollmentJourneyGuardianOwnerCarrierV1;
+  /** Derived only from the enclosing signed invocation at formalization time. */
+  guardian_invocation_nonce_hash?: string;
+  guardian_evidence_expires_at?: string;
 };
 
 type PreparedHeads = {
@@ -310,6 +319,8 @@ export type NurtureEnrollmentJourneyCommandExecutor = {
     capability_key: NurtureEnrollmentJourneyCommandKey;
     /** I3 must verify and consume this binding inside the command transaction. */
     confirmation_ref: string;
+    institution_ref: string;
+    role_assignment_ref?: string;
     trusted: NurtureEnrollmentJourneyTrustedContextV1;
     spec: NurtureCommandSpec<Input>;
     payload: Input;
@@ -553,6 +564,18 @@ const validTrustedContext = (
     parseNurtureWorkflowRunReservationEvidenceV1(
       trusted.host_workflow_run_reservation,
     ) !== null) &&
+  (trusted.guardian_invocation_nonce_hash === undefined ||
+    /^[0-9a-f]{64}$/u.test(trusted.guardian_invocation_nonce_hash)) &&
+  (trusted.guardian_evidence_expires_at === undefined ||
+    instant(trusted.guardian_evidence_expires_at)) &&
+  (trusted.guardian_owner_carrier === undefined
+    ? trusted.guardian_invocation_nonce_hash === undefined
+      && trusted.guardian_evidence_expires_at === undefined
+    : parseNurtureEnrollmentJourneyGuardianOwnerCarrierV1(
+        trusted.guardian_owner_carrier,
+      ) !== null
+      && trusted.guardian_invocation_nonce_hash !== undefined
+      && trusted.guardian_evidence_expires_at !== undefined) &&
   ["chat_workflow_control", "web_run_workbench", "mobile_dashboard"].includes(
     trusted.client_surface,
   );
@@ -877,6 +900,10 @@ export class NurtureEnrollmentJourneySurfaceHandler {
       this.deps.commands.execute({
         capability_key: key,
         confirmation_ref: request.confirmationRef,
+        institution_ref: binding.institution_ref,
+        ...(binding.role_assignment_ref
+          ? { role_assignment_ref: binding.role_assignment_ref }
+          : {}),
         trusted,
         spec,
         payload,

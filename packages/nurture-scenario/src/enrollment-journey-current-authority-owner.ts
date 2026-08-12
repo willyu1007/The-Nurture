@@ -1,5 +1,9 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import {
+  assertCanonicalRef,
+  type CanonicalRef,
+} from "@my-chat/workflow-contracts";
+import {
   NurtureParticipantResolutionError,
   resolveAuthorizedNurtureParticipant,
   type NurtureParticipantAuthorityReader,
@@ -48,6 +52,7 @@ export type NurtureEnrollmentJourneyCurrentTargetV1 = {
   institution_ref: string;
   institution_revision: number;
   target_revision: number;
+  host_contact_ref?: CanonicalRef;
 };
 
 export type NurtureEnrollmentJourneyCurrentTargetReaderV1 = {
@@ -141,8 +146,8 @@ const TARGET_KIND_BY_CAPABILITY: Readonly<
 >);
 
 /**
- * Resolves a verified My-Chat principal to one exact, current Institution
- * Admin assignment for the Enrollment Journey workbench ingress.
+ * Resolves a verified My-Chat principal to one exact current Admin assignment
+ * or one current Host Guardian action bound to the selected journey.
  */
 export class NurtureEnrollmentJourneyCurrentAuthorityOwner
 implements NurtureEnrollmentJourneyFormalAuthorityResolverV1 {
@@ -207,6 +212,55 @@ implements NurtureEnrollmentJourneyFormalAuthorityResolverV1 {
       return unavailable("enrollment_journey_target_owner_invalid");
     }
 
+    if (input.guardian_owner_carrier) {
+      const action = input.guardian_owner_carrier.guardianAction;
+      const contact = currentTarget.target.host_contact_ref;
+      if (
+        input.client_surface === "web_run_workbench"
+        || selection.target_kind !== "journey"
+        || input.principal.actor_ref.namespace !== "my_chat"
+        || input.principal.actor_ref.object_type !== "actor"
+        || action.actor_ref.namespace !== "my_chat"
+        || action.actor_ref.object_type !== "actor"
+        || action.actor_ref.object_id !== input.principal.actor_ref.object_id
+        || !contact
+        || action.contact_ref.namespace !== "my_chat"
+        || action.contact_ref.object_type !== "nurture_prospective_contact"
+        || contact.namespace !== "my_chat"
+        || contact.object_type !== "nurture_prospective_contact"
+        || action.contact_ref.object_id !== contact.object_id
+        || (action.contact_ref.version ?? 0) < (contact.version ?? 0)
+      ) return denied("enrollment_journey_guardian_action_not_current");
+      return {
+        status: "resolved",
+        authority: {
+          workspace_id: workspaceId,
+          participant_ref: participantId,
+          institution_ref: currentTarget.target.institution_ref,
+          active_role: "guardian",
+          surface_key: input.client_surface === "chat_workflow_control"
+            ? "guardian_nurture_chat"
+            : "guardian_family_board",
+          authority_version: [
+            "nurture.ej-guardian-authority.v1",
+            `b${participant.binding_revision}`,
+            `p${participant.authority_revision}`,
+            `i${currentTarget.target.institution_revision}`,
+            `t${currentTarget.target.target_revision}`,
+            `c${action.contact_ref.version ?? 0}`,
+            `a${action.action_ref.version ?? 0}`,
+          ].join("."),
+          evaluated_at: evaluatedAt,
+        },
+      };
+    }
+
+    if (
+      input.client_surface === "chat_workflow_control"
+      || (input.client_surface === "mobile_dashboard"
+        && !input.capability_key.startsWith("query_institution_"))
+    ) return denied("enrollment_journey_invocation_not_authorized");
+
     let roles;
     try {
       roles = await this.deps.roles.readCurrent({
@@ -233,7 +287,9 @@ implements NurtureEnrollmentJourneyFormalAuthorityResolverV1 {
         institution_ref: role.institution_ref,
         role_assignment_ref: role.role_assignment_ref,
         active_role: "institution_admin",
-        surface_key: "institution_workbench",
+        surface_key: input.client_surface === "mobile_dashboard"
+          ? "institution_board"
+          : "institution_workbench",
         authority_version: [
           "nurture.ej-authority.v1",
           `b${participant.binding_revision}`,
@@ -450,7 +506,19 @@ function exactMemberCount(value: Record<string, unknown>, expected: number): boo
 function validCurrentTarget(target: NurtureEnrollmentJourneyCurrentTargetV1): boolean {
   return opaqueId(target.institution_ref)
     && nonNegativeVersion(target.institution_revision)
-    && nonNegativeVersion(target.target_revision);
+    && nonNegativeVersion(target.target_revision)
+    && (target.host_contact_ref === undefined
+      || validHostContactRef(target.host_contact_ref));
+}
+
+function validHostContactRef(value: unknown): value is CanonicalRef {
+  try {
+    assertCanonicalRef(value);
+  } catch {
+    return false;
+  }
+  return value.namespace === "my_chat"
+    && value.object_type === "nurture_prospective_contact";
 }
 
 function validRole(

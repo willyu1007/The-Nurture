@@ -877,12 +877,13 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
   runtime gates disabled and requalify the complete x5 lane.
 - [x] Implement the production Prisma derivation adapter and qualify one real
   Host-producer signed prepare/fresh-execute positive relationship command.
-- [ ] Complete exact replay/response-loss plus revoke/expiry/head-drift across
+- [x] Complete exact replay/response-loss plus revoke/expiry/head-drift across
   the admitted command matrix.
-- [ ] Add the separate Guardian/mobile/formalization carrier only with its
+- [x] Add the separate Guardian/mobile/formalization carrier only with its
   authenticated Host producer and exact local owner predicates.
 
 Records [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md) through
 [`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md) close the request
-boundary, Prisma derivation and first real signed positive path, not I4 or
-G4-F.
+boundary, Prisma derivation and first real signed positive path. Record
+[`95`](./95-g4-d-i4-exit-record.md) closes I4; G4-F remains the exact pin
+reseal and task-level integration/handoff join.

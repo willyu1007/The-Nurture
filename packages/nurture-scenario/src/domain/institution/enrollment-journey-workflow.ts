@@ -313,6 +313,66 @@ const snapshotVocabularyIsKnown = (
     isMember(NURTURE_ENROLLMENT_JOURNEY_MILESTONES, milestone),
   );
 
+type SnapshotValidationReason =
+  | "contract_mismatch"
+  | "unsupported_workflow_type"
+  | "invalid_snapshot"
+  | "invalid_pending_transition"
+  | "invalid_lifecycle";
+
+const snapshotValidationReason = (
+  snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1,
+): SnapshotValidationReason | null => {
+  if (
+    snapshot.contract_version !==
+    NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION
+  ) return "contract_mismatch";
+  if (findNurtureInstitutionWorkflowDefinitionV1(snapshot.workflow_type) === null) {
+    return "unsupported_workflow_type";
+  }
+  if (
+    typeof snapshot.workflow_ref !== "string" ||
+    snapshot.workflow_ref.length === 0 ||
+    snapshot.workflow_ref.length > 256 ||
+    snapshot.workflow_ref.trim() !== snapshot.workflow_ref ||
+    typeof snapshot.workspace_id !== "string" ||
+    snapshot.workspace_id.length === 0 ||
+    typeof snapshot.institution_ref !== "string" ||
+    snapshot.institution_ref.length === 0 ||
+    !isWorkflowRunRef(snapshot.workflow_run_ref) ||
+    !snapshotVocabularyIsKnown(snapshot) ||
+    !Number.isSafeInteger(snapshot.workflow_head) ||
+    snapshot.workflow_head < 1 ||
+    typeof snapshot.started_at !== "string" ||
+    !validInstant(snapshot.started_at) ||
+    typeof snapshot.updated_at !== "string" ||
+    !validInstant(snapshot.updated_at) ||
+    new Date(snapshot.started_at) > new Date(snapshot.updated_at) ||
+    (snapshot.due_at !== undefined &&
+      (typeof snapshot.due_at !== "string" || !validInstant(snapshot.due_at))) ||
+    !milestonesAreCanonical(snapshot.completed_milestones)
+  ) return "invalid_snapshot";
+  if (!pendingTransitionMatchesStage(
+    snapshot.pending_transition,
+    snapshot.current_stage,
+    snapshot.waiting_state,
+  )) return "invalid_pending_transition";
+  return !milestoneDependenciesAreValid(snapshot) ||
+      !lifecycleIsValid(snapshot) ||
+      !stageHasRequiredMilestones(snapshot)
+    ? "invalid_lifecycle"
+    : null;
+};
+
+/** Pure shape/lifecycle validation; it grants no projection authority. */
+export const validateNurtureEnrollmentJourneyWorkflowSnapshotV1 = (
+  value: unknown,
+): value is NurtureEnrollmentJourneyWorkflowSnapshotV1 =>
+  isExactSnapshotObject(value) &&
+  snapshotValidationReason(
+    value as NurtureEnrollmentJourneyWorkflowSnapshotV1,
+  ) === null;
+
 const milestoneOrder = new Map<NurtureEnrollmentJourneyMilestone, number>(
   NURTURE_ENROLLMENT_JOURNEY_MILESTONES.map((milestone, index) => [
     milestone,
@@ -755,59 +815,9 @@ export const projectNurtureEnrollmentJourneyWorkflowV1 = (input: {
   ) {
     return { status: "unavailable", reason_code: "scope_mismatch" };
   }
-  if (
-    snapshot.contract_version !==
-    NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION
-  ) {
-    return { status: "unavailable", reason_code: "contract_mismatch" };
-  }
-  if (
-    findNurtureInstitutionWorkflowDefinitionV1(snapshot.workflow_type) === null
-  ) {
-    return { status: "unavailable", reason_code: "unsupported_workflow_type" };
-  }
-  if (
-    typeof snapshot.workflow_ref !== "string" ||
-    snapshot.workflow_ref.length === 0 ||
-    snapshot.workflow_ref.length > 256 ||
-    snapshot.workflow_ref.trim() !== snapshot.workflow_ref ||
-    typeof snapshot.workspace_id !== "string" ||
-    snapshot.workspace_id.length === 0 ||
-    typeof snapshot.institution_ref !== "string" ||
-    snapshot.institution_ref.length === 0 ||
-    !isWorkflowRunRef(snapshot.workflow_run_ref) ||
-    !snapshotVocabularyIsKnown(snapshot) ||
-    !Number.isSafeInteger(snapshot.workflow_head) ||
-    snapshot.workflow_head < 1 ||
-    typeof snapshot.started_at !== "string" ||
-    !validInstant(snapshot.started_at) ||
-    typeof snapshot.updated_at !== "string" ||
-    !validInstant(snapshot.updated_at) ||
-    new Date(snapshot.started_at) > new Date(snapshot.updated_at) ||
-    (snapshot.due_at !== undefined &&
-      (typeof snapshot.due_at !== "string" || !validInstant(snapshot.due_at))) ||
-    !milestonesAreCanonical(snapshot.completed_milestones)
-  ) {
-    return { status: "unavailable", reason_code: "invalid_snapshot" };
-  }
-  if (
-    !pendingTransitionMatchesStage(
-      snapshot.pending_transition,
-      snapshot.current_stage,
-      snapshot.waiting_state,
-    )
-  ) {
-    return {
-      status: "unavailable",
-      reason_code: "invalid_pending_transition",
-    };
-  }
-  if (
-    !milestoneDependenciesAreValid(snapshot) ||
-    !lifecycleIsValid(snapshot) ||
-    !stageHasRequiredMilestones(snapshot)
-  ) {
-    return { status: "unavailable", reason_code: "invalid_lifecycle" };
+  const validationReason = snapshotValidationReason(snapshot);
+  if (validationReason) {
+    return { status: "unavailable", reason_code: validationReason };
   }
 
   const safeBlocker = blockerFor(snapshot.waiting_state);

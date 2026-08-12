@@ -11,6 +11,7 @@ import {
   NurtureEnrollmentJourneyPreparedCommandOwner,
   NurtureEnrollmentJourneyTargetOptionCodec,
   createNurtureWorkflowRunSettlementOwner,
+  hashCommandRequestId,
   validateTrialGrantTermsSnapshotV1,
   withNurtureWorkflowRunSettlementFinalizer,
   workflowRunSettlementBinding,
@@ -75,8 +76,9 @@ type BindingDeps = {
  * G4-D I3 production binding port: composes the three upstream owners
  * (prospective contact, native source, current owner) with the local Prisma
  * facts. Every owner fact enters through this port — the wire request supplies
- * routing input only. Guardian-only lanes stay absent here (the workbench
- * ingress can never satisfy them) and fail closed at the surface.
+ * routing input only. Guardian chat/mobile actions carry a fresh Host action;
+ * formalization also carries the current pair and is rechecked by the local
+ * formalization owner inside the business transaction.
  */
 class PrismaNurtureEnrollmentJourneyBindingPort
 implements NurtureEnrollmentJourneyBindingPort {
@@ -110,29 +112,45 @@ implements NurtureEnrollmentJourneyBindingPort {
     const anchored = await this.anchor(trusted.workspace_id, selection);
     if ("reason_code" in anchored) return anchored;
 
-    const roleRows = await this.deps.roles.readCurrent({
-      workspace_id: trusted.workspace_id,
-      participant_ref: trusted.actor_participant_ref,
-      institution_ref: anchored.institution_ref,
-      at: this.deps.now().toISOString(),
-      limit: 2,
-    });
-    if (roleRows.length === 0) {
-      return { status: "denied", reason_code: "institution_admin_role_not_current" };
+    const guardianCarrier = trusted.guardian_owner_carrier;
+    let binding: NurtureEnrollmentJourneyPreparedBindingV1;
+    if (guardianCarrier) {
+      binding = {
+        surface_key: trusted.client_surface === "chat_workflow_control"
+          ? "guardian_nurture_chat"
+          : "guardian_family_board",
+        active_role: "guardian",
+        institution_ref: anchored.institution_ref,
+        heads: {},
+        refs: {},
+        guardian_action_owner_snapshot: guardianCarrier.guardianAction,
+      };
+    } else {
+      const roleRows = await this.deps.roles.readCurrent({
+        workspace_id: trusted.workspace_id,
+        participant_ref: trusted.actor_participant_ref,
+        institution_ref: anchored.institution_ref,
+        at: this.deps.now().toISOString(),
+        limit: 2,
+      });
+      if (roleRows.length === 0) {
+        return { status: "denied", reason_code: "institution_admin_role_not_current" };
+      }
+      const role = roleRows[0];
+      if (roleRows.length !== 1 || !role) {
+        return { status: "unavailable", reason_code: "institution_admin_role_ambiguous" };
+      }
+      binding = {
+        surface_key: trusted.client_surface === "mobile_dashboard"
+          ? "institution_board"
+          : "institution_workbench",
+        active_role: "institution_admin",
+        institution_ref: anchored.institution_ref,
+        role_assignment_ref: role.role_assignment_ref,
+        heads: {},
+        refs: {},
+      };
     }
-    const role = roleRows[0];
-    if (roleRows.length !== 1 || !role) {
-      return { status: "unavailable", reason_code: "institution_admin_role_ambiguous" };
-    }
-
-    const binding: NurtureEnrollmentJourneyPreparedBindingV1 = {
-      surface_key: "institution_workbench",
-      active_role: "institution_admin",
-      institution_ref: anchored.institution_ref,
-      role_assignment_ref: role.role_assignment_ref,
-      heads: {},
-      refs: {},
-    };
     if (anchored.kind === "journey") {
       binding.refs.workflow = anchored.workflow.id;
       binding.heads.workflow = anchored.workflow.workflowHead;
@@ -415,7 +433,7 @@ implements NurtureEnrollmentJourneyBindingPort {
       binding.grant_terms_snapshot = pair.grant_terms;
     }
 
-    if (["start_trial", "mark_trial_review_reached", "extend_trial", "propose_formal_enrollment", "end_trial"].includes(key)) {
+    if (["start_trial", "mark_trial_review_reached", "extend_trial", "propose_formal_enrollment", "formalize_enrollment", "end_trial"].includes(key)) {
       const workflow = (anchored as {
         workflow?: { childCareProcessId: string | null };
       }).workflow;
@@ -470,6 +488,53 @@ implements NurtureEnrollmentJourneyBindingPort {
         }
       }
     }
+    if (key === "formalize_enrollment") {
+      const carrier = trusted.guardian_owner_carrier;
+      if (
+        !carrier
+        || !("currentOwnerEvidence" in carrier)
+        || carrier.currentOwnerEvidence.purpose_key !== "formalize_enrollment"
+        || !trusted.guardian_invocation_nonce_hash
+        || !trusted.guardian_evidence_expires_at
+      ) return { status: "denied", reason_code: "formalization_owner_evidence_required" };
+      const proposals = await this.deps.prisma.nurtureEnrollmentFormalProposal.findMany({
+        where: {
+          workspaceId: trusted.workspace_id,
+          institutionId: binding.institution_ref,
+          workflowId: requireRef(binding.refs.workflow),
+        },
+        select: {
+          id: true,
+          proposalHead: true,
+          enrollmentId: true,
+          grantId: true,
+          reservationId: true,
+        },
+        take: 2,
+      });
+      const proposal = proposals.length === 1 ? proposals[0] : undefined;
+      if (!proposal || proposal.proposalHead !== 1) {
+        return { status: "denied", reason_code: "formalization_proposal_not_current" };
+      }
+      if (
+        proposal.enrollmentId !== binding.refs.enrollment
+        || proposal.grantId !== binding.refs.grant
+        || proposal.reservationId !== binding.refs.reservation
+      ) return { status: "unavailable", reason_code: "formalization_proposal_scope_drift" };
+      binding.refs.formal_proposal = proposal.id;
+      binding.heads.formal_proposal = 1;
+      binding.acceptance_ref = carrier.guardianAction.action_ref;
+      binding.accepted_at = carrier.guardianAction.occurred_at;
+      binding.formalization_owner_evidence = {
+        contract_version: "1.0.0",
+        actor_ref: carrier.guardianAction.actor_ref,
+        audience: "nurture",
+        current_owner_evidence: carrier.currentOwnerEvidence,
+        request_nonce_hash: trusted.guardian_invocation_nonce_hash,
+        verified_at: carrier.guardianAction.verified_at,
+        expires_at: trusted.guardian_evidence_expires_at,
+      };
+    }
     return { status: "resolved", binding };
   }
 
@@ -518,6 +583,8 @@ implements NurtureEnrollmentJourneyCommandExecutor {
   async execute<Input>(input: {
     capability_key: NurtureEnrollmentJourneyCommandKey;
     confirmation_ref: string;
+    institution_ref: string;
+    role_assignment_ref?: string;
     trusted: NurtureEnrollmentJourneyTrustedContextV1;
     spec: NurtureCommandSpec<Input>;
     payload: Input;
@@ -547,14 +614,19 @@ implements NurtureEnrollmentJourneyCommandExecutor {
     const runner = new NurtureCommandRunner(repository);
     let result: NurtureCommandResult;
     try {
-      result = await runner.execute({
-        workspace_id: input.trusted.workspace_id,
-        invocation_request_id: input.trusted.invocation_request_id,
-        command_request_id: input.trusted.command_request_id,
-        business_actor_ref: input.trusted.actor_participant_ref,
-        payload: input.payload,
-        spec,
-      });
+      const replay = ledgered
+        ? await this.readConsumedReplay(input, spec.command_key)
+        : null;
+      result = replay ?? await runner.execute({
+          workspace_id: input.trusted.workspace_id,
+          invocation_request_id: input.trusted.invocation_request_id,
+          command_request_id: input.trusted.command_request_id,
+          business_actor_ref:
+            input.trusted.guardian_owner_carrier?.guardianAction.actor_ref.object_id
+            ?? input.trusted.actor_participant_ref,
+          payload: input.payload,
+          spec,
+        });
     } catch {
       return { status: "outcome_unknown", reason_code: "enrollment_command_runner_failed" };
     }
@@ -568,34 +640,99 @@ implements NurtureEnrollmentJourneyCommandExecutor {
     if (result.status === "outcome_unknown") return result;
 
     const workflowRef = readWorkflowRef(result.committed_result, input.payload);
-    const payloadScope = input.payload as {
-      institution_ref?: string;
-      role_assignment_ref?: string;
-    };
-    if (!workflowRef || typeof payloadScope.institution_ref !== "string") {
+    if (!workflowRef) {
       return { status: "outcome_unknown", reason_code: "committed_result_scope_unreadable" };
     }
     let read;
     try {
-      read = await new PrismaEnrollmentJourneyRepository(this.prisma).readWorkflow({
-        workspace_id: input.trusted.workspace_id,
-        institution_ref: payloadScope.institution_ref,
-        participant_ref: input.trusted.actor_participant_ref,
-        ...(typeof payloadScope.role_assignment_ref === "string"
-          ? { role_assignment_ref: payloadScope.role_assignment_ref }
-          : {}),
-        workflow_ref: workflowRef,
-      });
+      const repository = new PrismaEnrollmentJourneyRepository(this.prisma);
+      read = input.role_assignment_ref
+        ? await repository.readWorkflow({
+            workspace_id: input.trusted.workspace_id,
+            institution_ref: input.institution_ref,
+            participant_ref: input.trusted.actor_participant_ref,
+            role_assignment_ref: input.role_assignment_ref,
+            workflow_ref: workflowRef,
+          })
+        : await repository.readWorkflowAfterAuthorizedCommand({
+            workspace_id: input.trusted.workspace_id,
+            institution_ref: input.institution_ref,
+            workflow_ref: workflowRef,
+          });
     } catch {
       return { status: "outcome_unknown", reason_code: "committed_result_read_unavailable" };
     }
-    if (read.status !== "resolved") {
+    const workflow = input.role_assignment_ref
+      ? read && "status" in read && read.status === "resolved"
+        ? read.workflow
+        : null
+      : read && !("status" in read)
+        ? read
+        : null;
+    if (!workflow) {
       return { status: "outcome_unknown", reason_code: "committed_result_read_unavailable" };
     }
     return {
       status: "committed",
       disposition: result.disposition,
-      workflow: read.workflow,
+      workflow,
+    };
+  }
+
+  private async readConsumedReplay(
+    input: {
+      capability_key: NurtureEnrollmentJourneyCommandKey;
+      confirmation_ref: string;
+      trusted: NurtureEnrollmentJourneyTrustedContextV1;
+    },
+    commandKey: string,
+  ): Promise<NurtureCommandResult | null> {
+    const ledger = new PrismaNurtureEnrollmentJourneyPreparedCommandLedger(this.prisma);
+    const prepared = await ledger.readExact({
+      workspace_id: input.trusted.workspace_id,
+      participant_ref: input.trusted.actor_participant_ref,
+      command_request_id: input.trusted.command_request_id,
+    });
+    if (prepared.status !== "found" || prepared.record.status !== "consumed") return null;
+    if (
+      prepared.record.capability_key !== input.capability_key
+      || prepared.record.confirmation_ref_hash !== this.protection.tag({
+        purpose: "confirmation-ref",
+        values: [input.confirmation_ref],
+      })
+    ) {
+      return {
+        status: "not_committed",
+        decision: "idempotency_conflict",
+        reason_code: "prepared_command_reuse_conflict",
+      };
+    }
+    const existing = await this.commands.findCommitted({
+      workspace_id: input.trusted.workspace_id,
+      command_request_id_hash: hashCommandRequestId(
+        input.trusted.workspace_id,
+        input.trusted.command_request_id,
+      ),
+    });
+    if (!existing || existing.command_key !== commandKey) {
+      return { status: "outcome_unknown", reason_code: "prepared_replay_effect_unavailable" };
+    }
+    return {
+      status: "ok",
+      disposition: "replayed",
+      business_outcome: existing.business_outcome,
+      execution_ref: {
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "command_execution",
+        object_id: existing.id,
+        version: 1,
+      },
+      output_refs: existing.output_refs,
+      handoff_request_snapshots: existing.handoff_request_snapshots_payload,
+      ...(existing.committed_result_payload === undefined
+        ? {}
+        : { committed_result: existing.committed_result_payload }),
     };
   }
 
@@ -715,7 +852,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
   const now = input.now ?? (() => new Date());
   const participantBindings = new PrismaNurtureParticipantBindingReader(input.prisma);
   const participantAuthority =
-    new PrismaNurtureEnrollmentJourneyParticipantAuthorityReader(input.prisma, now);
+    new PrismaNurtureEnrollmentJourneyParticipantAuthorityReader(input.prisma);
   const codec = new NurtureEnrollmentJourneyTargetOptionCodec(input.targetOptionIntegrityKey);
   const enrollmentJourneyAuthorityResolver =
     new NurtureEnrollmentJourneyCurrentAuthorityOwner({

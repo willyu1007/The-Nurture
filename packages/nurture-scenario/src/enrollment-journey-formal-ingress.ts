@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type {
   WorkflowTrustedInvocationHandlerRegistry,
   WorkflowVerifiedScenarioInvocationV1,
@@ -5,12 +6,14 @@ import type {
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
   parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2,
-  parseNurtureEnrollmentJourneyFormalExecuteInputV3,
-  parseNurtureEnrollmentJourneyFormalPrepareInputV2,
-  parseNurtureEnrollmentJourneyFormalQueryInputV1,
+  parseNurtureEnrollmentJourneyFormalExecuteInputV4,
+  parseNurtureEnrollmentJourneyFormalPrepareInputV3,
+  parseNurtureEnrollmentJourneyFormalQueryInputV2,
   parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1,
   type NurtureEnrollmentJourneyFormalAuthorityResolverV1,
   type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+  type NurtureEnrollmentJourneyFormalClientSurface,
+  type NurtureEnrollmentJourneyGuardianOwnerCarrierV1,
   type NurtureEnrollmentJourneyLocalAuthorityV1,
   type NurtureEnrollmentJourneyPreparedCommandOwnerV1,
 } from "./enrollment-journey-formal-ingress-contract.js";
@@ -135,13 +138,25 @@ async function query(
   deps: NurtureEnrollmentJourneyFormalIngressDeps,
 ): Promise<unknown> {
   if (!matchesOperation(verified, "query")) return declarationDrift();
-  const input = parseNurtureEnrollmentJourneyFormalQueryInputV1(
+  const input = parseNurtureEnrollmentJourneyFormalQueryInputV2(
     verified.invocation.operation.input,
   );
   if (!input) return invalid();
   if (!deps.authorityResolver) return unavailable();
   try {
-    const resolution = await resolveCurrentAuthority(verified, deps, input.request);
+    if (!ownerCarriersMatchCapability(
+      input.request,
+      undefined,
+      input.guardianOwnerCarrier,
+      input.clientSurface,
+    )) return invalid();
+    const resolution = await resolveCurrentAuthority(
+      verified,
+      deps,
+      input.request,
+      input.clientSurface,
+      input.guardianOwnerCarrier,
+    );
     if (resolution.status !== "resolved") return resolution;
     return await invokeSurface(
       verified,
@@ -149,6 +164,10 @@ async function query(
       resolution.authority,
       input.request,
       verified.invocation.request.request_id,
+      input.clientSurface,
+      undefined,
+      undefined,
+      input.guardianOwnerCarrier,
     );
   } catch {
     return unavailable();
@@ -160,22 +179,30 @@ async function prepare(
   deps: NurtureEnrollmentJourneyFormalIngressDeps,
 ): Promise<unknown> {
   if (!matchesOperation(verified, "prepare")) return declarationDrift();
-  const input = parseNurtureEnrollmentJourneyFormalPrepareInputV2(
+  const input = parseNurtureEnrollmentJourneyFormalPrepareInputV3(
     verified.invocation.operation.input,
   );
   if (!input) return invalid();
   if (!deps.preparedCommandOwner || !deps.authorityResolver) return unavailable();
   try {
-    if (!carrierMatchesCapability(
-      input.request.capabilityKey,
+    if (!ownerCarriersMatchCapability(
+      input.request,
       input.currentOwnerCarrier,
+      input.guardianOwnerCarrier,
+      input.clientSurface,
     )) return invalid();
-    const resolution = await resolveCurrentAuthority(verified, deps, input.request);
+    const resolution = await resolveCurrentAuthority(
+      verified,
+      deps,
+      input.request,
+      input.clientSurface,
+      input.guardianOwnerCarrier,
+    );
     if (resolution.status !== "resolved") return resolution;
     const prepared = await deps.preparedCommandOwner.prepare({
       principal: verified.invocation.principal,
       invocation_request_id: verified.invocation.request.request_id,
-      client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
+      client_surface: input.clientSurface,
       authority: resolution.authority,
       command: {
         contractVersion: 1,
@@ -194,7 +221,7 @@ async function execute(
   deps: NurtureEnrollmentJourneyFormalIngressDeps,
 ): Promise<unknown> {
   if (!matchesOperation(verified, "execute")) return declarationDrift();
-  const input = parseNurtureEnrollmentJourneyFormalExecuteInputV3(
+  const input = parseNurtureEnrollmentJourneyFormalExecuteInputV4(
     verified.invocation.operation.input,
   );
   if (!input) return invalid();
@@ -208,7 +235,7 @@ async function execute(
         await deps.preparedCommandOwner.verifyConfirmed({
           principal: verified.invocation.principal,
           invocation_request_id: verified.invocation.request.request_id,
-          client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
+          client_surface: input.clientSurface,
           command: {
             commandRequestId: input.commandRequestId,
             confirmationRef: input.confirmationRef,
@@ -225,9 +252,11 @@ async function execute(
       if (
         startsInquiry !== (input.hostWorkflowRunReservation !== undefined)
       ) return invalid();
-      if (!carrierMatchesCapability(
-        verifiedCommand.frozen_request.capabilityKey,
+      if (!ownerCarriersMatchCapability(
+        verifiedCommand.frozen_request,
         input.currentOwnerCarrier,
+        input.guardianOwnerCarrier,
+        input.clientSurface,
       )) return invalid();
       if (startsInquiry && !deps.workflowRunSettlementOwner) return unavailable();
       const hostReservation = input.hostWorkflowRunReservation;
@@ -235,9 +264,13 @@ async function execute(
         verified,
         deps,
         verifiedCommand.frozen_request,
+        input.clientSurface,
+        input.guardianOwnerCarrier,
       );
       if (current.status !== "resolved") return current;
-      if (!sameAuthority(verifiedCommand.authority, current.authority)) {
+      if (!(verifiedCommand.ledger_status === "consumed"
+        ? sameReplayAuthority(verifiedCommand.authority, current.authority)
+        : sameAuthority(verifiedCommand.authority, current.authority))) {
         return { status: "denied", reason_code: "enrollment_authority_snapshot_drift" };
       }
       const surfaceResult = await invokeSurface(
@@ -246,8 +279,10 @@ async function execute(
         current.authority,
         verifiedCommand.frozen_request,
         verifiedCommand.command_request_id,
+        input.clientSurface,
         hostReservation,
         input.currentOwnerCarrier,
+        input.guardianOwnerCarrier,
       );
       if (!startsInquiry || !isRecord(surfaceResult) || surfaceResult.status !== "ok") {
         return surfaceResult;
@@ -272,12 +307,24 @@ async function execute(
     // Direct lane: the three direct_commit capabilities bypass the ledger
     // with an owner-derived deterministic command id (I1 idempotency dedups
     // replays); the surface still authorizes role and surface.
-    const resolution = await resolveCurrentAuthority(verified, deps, input.request);
+    if (!ownerCarriersMatchCapability(
+      input.request,
+      undefined,
+      input.guardianOwnerCarrier,
+      input.clientSurface,
+    )) return invalid();
+    const resolution = await resolveCurrentAuthority(
+      verified,
+      deps,
+      input.request,
+      input.clientSurface,
+      input.guardianOwnerCarrier,
+    );
     if (resolution.status !== "resolved") return resolution;
     const direct = await deps.preparedCommandOwner.deriveDirectContext({
       principal: verified.invocation.principal,
       invocation_request_id: verified.invocation.request.request_id,
-      client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
+      client_surface: input.clientSurface,
       command: { clientCommandId: input.clientCommandId, request: input.request },
     });
     if (direct.status !== "resolved") {
@@ -298,6 +345,10 @@ async function execute(
       resolution.authority,
       request,
       direct.command_request_id,
+      input.clientSurface,
+      undefined,
+      undefined,
+      input.guardianOwnerCarrier,
     );
   } catch {
     return unavailable();
@@ -310,8 +361,10 @@ async function invokeSurface(
   authority: NurtureEnrollmentJourneyLocalAuthorityV1,
   request: NurtureEnrollmentJourneyAdapterRequest,
   commandRequestId: string,
+  clientSurface: NurtureEnrollmentJourneyFormalClientSurface,
   hostWorkflowRunReservation?: NurtureEnrollmentJourneyTrustedContextV1["host_workflow_run_reservation"],
   currentOwnerCarrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+  guardianOwnerCarrier?: NurtureEnrollmentJourneyGuardianOwnerCarrierV1,
 ): Promise<unknown> {
   const workspaceId = verified.invocation.principal.workspace_ref.object_id;
   if (authority.workspace_id !== workspaceId) {
@@ -326,13 +379,22 @@ async function invokeSurface(
       ? {}
       : { host_trace_id: verified.invocation.request.trace_id }),
     command_request_id: commandRequestId,
-    client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
+    client_surface: clientSurface,
     ...(hostWorkflowRunReservation === undefined
       ? {}
       : { host_workflow_run_reservation: hostWorkflowRunReservation }),
     ...(currentOwnerCarrier === undefined
       ? {}
       : { current_owner_carrier: currentOwnerCarrier }),
+    ...(guardianOwnerCarrier === undefined
+      ? {}
+      : {
+          guardian_owner_carrier: guardianOwnerCarrier,
+          guardian_invocation_nonce_hash: createHash("sha256")
+            .update(verified.invocation.request.nonce, "utf8")
+            .digest("hex"),
+          guardian_evidence_expires_at: verified.invocation.request.expires_at,
+        }),
   };
   const handler = new NurtureEnrollmentJourneySurfaceHandler({
     ...deps.surfaceDeps,
@@ -341,18 +403,55 @@ async function invokeSurface(
   return handler.handle(request, trusted);
 }
 
-function carrierMatchesCapability(
-  capabilityKey: string,
-  carrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1 | undefined,
+function ownerCarriersMatchCapability(
+  request: Pick<NurtureEnrollmentJourneyAdapterRequest, "capabilityKey" | "operationInput">,
+  currentCarrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1 | undefined,
+  guardianCarrier: NurtureEnrollmentJourneyGuardianOwnerCarrierV1 | undefined,
+  clientSurface: NurtureEnrollmentJourneyFormalClientSurface,
 ): boolean {
+  const capabilityKey = request.capabilityKey;
   const requiredPurpose = capabilityKey === "qualify_capacity_waitlist"
     ? "enrollment_family_acceptance"
     : ["prepare_trial_relationship", "start_trial"].includes(capabilityKey)
       ? "enrollment_trial_pair"
       : undefined;
-  return requiredPurpose === undefined
-    ? carrier === undefined
-    : carrier?.currentOwnerEvidence.purpose_key === requiredPurpose;
+  const guardian = guardianCapability(request, clientSurface);
+  if (guardian) {
+    const formalization = capabilityKey === "formalize_enrollment";
+    return currentCarrier === undefined
+      && guardianCarrier !== undefined
+      && (formalization
+        ? "currentOwnerEvidence" in guardianCarrier
+          && guardianCarrier.currentOwnerEvidence.purpose_key === "formalize_enrollment"
+        : !("currentOwnerEvidence" in guardianCarrier));
+  }
+  if (guardianCarrier !== undefined) return false;
+  if (capabilityKey.startsWith("query_institution_")) {
+    return currentCarrier === undefined
+      && clientSurface !== "chat_workflow_control";
+  }
+  return clientSurface === "web_run_workbench"
+    && (requiredPurpose === undefined
+      ? currentCarrier === undefined
+      : currentCarrier?.currentOwnerEvidence.purpose_key === requiredPurpose);
+}
+
+function guardianCapability(
+  request: Pick<NurtureEnrollmentJourneyAdapterRequest, "capabilityKey" | "operationInput">,
+  clientSurface: NurtureEnrollmentJourneyFormalClientSurface,
+): boolean {
+  if (request.capabilityKey === "query_guardian_enrollment_waitlist") return true;
+  if (["accept_trial_offer", "withdraw_from_waitlist", "formalize_enrollment"].includes(
+    request.capabilityKey,
+  )) return true;
+  if (request.capabilityKey === "review_waitlist_interest") {
+    return (request.operationInput as { interestState?: unknown }).interestState === "confirmed";
+  }
+  if (request.capabilityKey === "decline_or_expire_trial_offer") {
+    return (request.operationInput as { disposition?: unknown }).disposition === "declined";
+  }
+  return request.capabilityKey === "cancel_trial_preparation"
+    && clientSurface !== "web_run_workbench";
 }
 
 function authorityBoundBindings(
@@ -365,7 +464,7 @@ function authorityBoundBindings(
       if (result.status !== "resolved") return result;
       const binding = result.binding;
       return binding.institution_ref === authority.institution_ref &&
-        binding.role_assignment_ref === authority.role_assignment_ref &&
+        binding.role_assignment_ref === authorityRoleRef(authority) &&
         binding.active_role === authority.active_role &&
         binding.surface_key === authority.surface_key
         ? result
@@ -383,6 +482,8 @@ async function resolveCurrentAuthority(
     >[0]["capability_key"];
     targetOptionRef: string;
   },
+  clientSurface: NurtureEnrollmentJourneyFormalClientSurface,
+  guardianOwnerCarrier?: NurtureEnrollmentJourneyGuardianOwnerCarrierV1,
 ) {
   if (!deps.authorityResolver) return unavailable();
   return normalizeAuthorityResolution(
@@ -390,8 +491,12 @@ async function resolveCurrentAuthority(
       principal: verified.invocation.principal,
       invocation_request_id: verified.invocation.request.request_id,
       declared_operation_key: verified.declaration.operation_key,
+      client_surface: clientSurface,
       capability_key: request.capabilityKey,
       target_option_ref: request.targetOptionRef,
+      ...(guardianOwnerCarrier === undefined
+        ? {}
+        : { guardian_owner_carrier: guardianOwnerCarrier }),
     }),
   );
 }
@@ -443,12 +548,17 @@ function normalizeVerifiedResult(
       ? { status: value.status, reason_code: value.reason_code }
       : unavailable("enrollment_journey_owner_response_invalid");
   }
-  if (!opaqueId(value.command_request_id) || !validAuthority(value.authority)) {
+  if (
+    !opaqueId(value.command_request_id)
+    || (value.ledger_status !== "prepared" && value.ledger_status !== "consumed")
+    || !validAuthority(value.authority)
+  ) {
     return unavailable("enrollment_journey_owner_response_invalid");
   }
   return {
     status: "resolved" as const,
     command_request_id: value.command_request_id,
+    ledger_status: value.ledger_status,
     frozen_request: value.frozen_request,
     authority: { ...value.authority },
   };
@@ -478,22 +588,39 @@ function normalizeHistoricalConfirmationResult(
 function validAuthority(
   value: unknown,
 ): value is NurtureEnrollmentJourneyLocalAuthorityV1 {
-  return isRecord(value) && exactKeys(value, [
-    "active_role",
-    "authority_version",
-    "evaluated_at",
-    "institution_ref",
-    "participant_ref",
-    "role_assignment_ref",
-    "surface_key",
-    "workspace_id",
-  ]) &&
+  if (!isRecord(value)) return false;
+  const admin = value.active_role === "institution_admin";
+  const keys = admin
+    ? [
+        "active_role",
+        "authority_version",
+        "evaluated_at",
+        "institution_ref",
+        "participant_ref",
+        "role_assignment_ref",
+        "surface_key",
+        "workspace_id",
+      ]
+    : [
+        "active_role",
+        "authority_version",
+        "evaluated_at",
+        "institution_ref",
+        "participant_ref",
+        "surface_key",
+        "workspace_id",
+      ];
+  return exactKeys(value, keys) &&
     opaqueId(value.workspace_id) &&
     opaqueId(value.participant_ref) &&
     opaqueId(value.institution_ref) &&
-    opaqueId(value.role_assignment_ref) &&
-    value.active_role === "institution_admin" &&
-    value.surface_key === "institution_workbench" &&
+    (admin
+      ? opaqueId(value.role_assignment_ref)
+        && (value.surface_key === "institution_workbench"
+          || value.surface_key === "institution_board")
+      : value.active_role === "guardian"
+        && (value.surface_key === "guardian_nurture_chat"
+          || value.surface_key === "guardian_family_board")) &&
     opaqueId(value.authority_version) &&
     canonicalInstant(value.evaluated_at);
 }
@@ -535,10 +662,36 @@ function sameAuthority(
   return prepared.workspace_id === current.workspace_id &&
     prepared.participant_ref === current.participant_ref &&
     prepared.institution_ref === current.institution_ref &&
-    prepared.role_assignment_ref === current.role_assignment_ref &&
+    authorityRoleRef(prepared) === authorityRoleRef(current) &&
     prepared.active_role === current.active_role &&
     prepared.surface_key === current.surface_key &&
     prepared.authority_version === current.authority_version;
+}
+
+function sameReplayAuthority(
+  prepared: NurtureEnrollmentJourneyLocalAuthorityV1,
+  current: NurtureEnrollmentJourneyLocalAuthorityV1,
+): boolean {
+  return prepared.workspace_id === current.workspace_id &&
+    prepared.participant_ref === current.participant_ref &&
+    prepared.institution_ref === current.institution_ref &&
+    authorityRoleRef(prepared) === authorityRoleRef(current) &&
+    prepared.active_role === current.active_role &&
+    prepared.surface_key === current.surface_key &&
+    authorityWithoutTargetHead(prepared.authority_version) ===
+      authorityWithoutTargetHead(current.authority_version);
+}
+
+function authorityWithoutTargetHead(value: string): string {
+  return value.replace(/\.t[0-9]+(?=\.|$)/u, ".t*");
+}
+
+function authorityRoleRef(
+  authority: NurtureEnrollmentJourneyLocalAuthorityV1,
+): string | undefined {
+  return authority.active_role === "institution_admin"
+    ? authority.role_assignment_ref
+    : undefined;
 }
 
 function matchesOperation(

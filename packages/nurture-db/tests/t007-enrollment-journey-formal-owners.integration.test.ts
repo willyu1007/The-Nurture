@@ -10,6 +10,7 @@ import {
   NurtureEnrollmentJourneyPreparedCommandCrypto,
   acceptTrialOfferSpec,
   confirmIntentConversationSpec,
+  issueFamilyCareMessageTargetRef,
   issueTrialOfferSpec,
   recordExternalTouchpointSpec,
   startEnrollmentInquirySpec,
@@ -17,6 +18,10 @@ import {
   type NurtureCommandSpec,
   type NurtureEnrollmentGuardianActionOwnerSnapshotV1,
   type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+  type NurtureEnrollmentJourneyCommandIntentV1,
+  type NurtureEnrollmentJourneyDirectCommandKey,
+  type NurtureEnrollmentJourneyGuardianOwnerCarrierV1,
+  type NurtureEnrollmentJourneyFormalClientSurface,
   type NurtureEnrollmentJourneyPreparedCommandDraftV1,
   type NurtureTrialGrantTermsSnapshotV1,
   type NurtureTrialPairOwnerSnapshotV1,
@@ -30,9 +35,11 @@ import {
 } from "../src/enrollment-journey-owners.composition.js";
 import {
   createNurtureEnrollmentJourneyCurrentOwnerProvider,
+  createNurtureEnrollmentNativeSourceProvider,
   type NurtureEnrollmentLocalOwnerDerivationV1,
 } from "../src/enrollment-journey-owner-providers.js";
 import { PrismaEnrollmentPairOwnerRepository } from "../src/repositories/enrollment-pair-owner.repository.js";
+import { PrismaInstitutionBusinessCommunicationReadPort } from "../src/repositories/institution-business-communication.read.js";
 import { PrismaNurtureCommandRepository } from "../src/repositories/institution-core.repositories.js";
 
 const prisma = createPrismaClient();
@@ -325,6 +332,209 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
     })).resolves.toMatchObject({ status: "active", participationPhase: "trial" });
   });
 
+  it("formalizes through current Guardian mobile authority and exact replay", async () => {
+    const scope = await seedAdminScope("guardian-formalization");
+    const clock = { now: new Date("2026-08-12T10:00:00.000Z") };
+    const seeded = await seedTrialOwnerScope(scope, clock.now);
+    const world = composed(clock);
+    const journeyOption = (participantRef: string) =>
+      world.owners.enrollmentJourneyOptionIssuer.issue({
+        workspace_id: scope.workspaceId,
+        actor_participant_ref: participantRef,
+        kind: "journey",
+        target_ref: seeded.workflowId,
+        waitlist_entry_ref: seeded.entryId,
+        waitlist_entry_head: 3,
+      });
+
+    const mobileQueryOption = journeyOption(scope.participantId);
+    if (!mobileQueryOption) throw new Error("Admin mobile query option issue failed");
+    await expect(world.owners.enrollmentJourneyAuthorityResolver.resolveCurrent({
+      principal: scope.principal,
+      invocation_request_id: `invocation-${randomUUID()}`,
+      declared_operation_key: "query_enrollment_journey",
+      client_surface: "mobile_dashboard",
+      capability_key: "query_institution_enrollment_journey",
+      target_option_ref: mobileQueryOption,
+    })).resolves.toMatchObject({
+      status: "resolved",
+      authority: {
+        active_role: "institution_admin",
+        surface_key: "institution_board",
+      },
+    });
+
+    const prepareOption = journeyOption(scope.participantId);
+    if (!prepareOption) throw new Error("trial preparation option issue failed");
+    await expect(executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "prepare_trial_relationship",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: prepareOption,
+        operationInput: {},
+      },
+      currentOwnerCarrier: seeded.carrier,
+    })).resolves.toMatchObject({ status: "ok", result: { workflowHead: 7 } });
+
+    clock.now = new Date(clock.now.getTime() + 4 * 60 * 60_000);
+    const startOption = journeyOption(scope.participantId);
+    if (!startOption) throw new Error("trial start option issue failed");
+    await expect(executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "start_trial",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: startOption,
+        operationInput: {},
+      },
+      currentOwnerCarrier: seeded.carrier,
+    })).resolves.toMatchObject({ status: "ok", result: { workflowHead: 8 } });
+
+    clock.now = new Date(seeded.reviewAt.getTime() + 1_000);
+    const reviewOption = journeyOption(scope.participantId);
+    if (!reviewOption) throw new Error("trial review option issue failed");
+    await expect(executeDirectAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "mark_trial_review_reached",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: reviewOption,
+        operationInput: {},
+      },
+    })).resolves.toMatchObject({ status: "ok", result: { workflowHead: 9 } });
+
+    const proposalOption = journeyOption(scope.participantId);
+    if (!proposalOption) throw new Error("formal proposal option issue failed");
+    await expect(executePreparedAdminCommand({
+      world,
+      scope,
+      request: {
+        capabilityKey: "propose_formal_enrollment",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: proposalOption,
+        operationInput: {
+          proposedFormalStartAt: clock.now.toISOString(),
+          proposedGrantPurposes: ["trial_care"],
+          proposedGrantExpiresAt: new Date(
+            clock.now.getTime() + 5 * 24 * 60 * 60_000,
+          ).toISOString(),
+          safeFamilySummary: "Guardian reviewed the formal care continuation.",
+          proposalExpiresAt: new Date(
+            clock.now.getTime() + 12 * 60 * 60_000,
+          ).toISOString(),
+          reasonKey: "admin_proposed_formal_continuation",
+        },
+      },
+    })).resolves.toMatchObject({ status: "ok", result: { workflowHead: 10 } });
+
+    const guardianCarrier: NurtureEnrollmentJourneyGuardianOwnerCarrierV1 = {
+      carrierVersion: 1,
+      guardianAction: {
+        contract_version: "1.0.0",
+        actor_ref: seeded.guardianActorRef,
+        contact_ref: seeded.contactRef,
+        action_ref: canonical(
+          "my_chat",
+          "enrollment_action",
+          `formal-acceptance-${scope.suffix}`,
+        ),
+        occurred_at: clock.now.toISOString(),
+        verified_at: clock.now.toISOString(),
+      },
+      currentOwnerEvidence: {
+        ...seeded.carrier.currentOwnerEvidence,
+        purpose_key: "formalize_enrollment",
+      },
+    };
+    const formalizeOption = journeyOption(seeded.guardianParticipantId);
+    if (!formalizeOption) throw new Error("Guardian formalization option issue failed");
+    const formalized = await executePreparedGuardianCommand({
+      world,
+      principal: seeded.guardianPrincipal,
+      participantRef: seeded.guardianParticipantId,
+      surface: "mobile_dashboard",
+      guardianOwnerCarrier: guardianCarrier,
+      request: {
+        capabilityKey: "formalize_enrollment",
+        capabilityVersion: "1.0.0",
+        targetOptionRef: formalizeOption,
+        operationInput: {},
+      },
+      evidenceExpiresAt: new Date(clock.now.getTime() + 60_000).toISOString(),
+    });
+    if (formalized.first.status !== "ok") {
+      throw new Error(`Guardian formalization failed:${JSON.stringify(formalized.first)}`);
+    }
+    expect(formalized.first).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      result: { workflowHead: 11, currentStage: "completed", lifecycle: "completed" },
+    });
+    if (formalized.replay.status !== "ok") {
+      throw new Error(`Guardian replay failed:${JSON.stringify(formalized.replay)}`);
+    }
+    expect(formalized.replay).toMatchObject({ status: "ok", disposition: "replayed" });
+    await expect(prisma.nurtureEnrollment.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, childCareProcessId: seeded.processId },
+    })).resolves.toMatchObject({ status: "active", participationPhase: "formal" });
+    await expect(prisma.nurtureEnrollmentJourneyPreparedCommand.findUniqueOrThrow({
+      where: { commandRequestId: formalized.commandRequestId },
+    })).resolves.toMatchObject({
+      participantId: seeded.guardianParticipantId,
+      roleAssignmentId: null,
+      clientSurface: "mobile_dashboard",
+      status: "consumed",
+    });
+  });
+
+  it("resolves a native touchpoint only through the current production message owner", async () => {
+    const scope = await seedAdminScope("native-source-owner");
+    const source = await seedNativeSource(scope);
+    const provider = createNurtureEnrollmentNativeSourceProvider({
+      reads: new PrismaInstitutionBusinessCommunicationReadPort(prisma),
+      messageRefIntegrityKey: MESSAGE_REF_KEY,
+      now: () => new Date("2026-08-12T10:00:00.000Z"),
+    });
+    const option = issueFamilyCareMessageTargetRef(MESSAGE_REF_KEY, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.participantId,
+      message_id: source.messageId,
+    });
+
+    const resolved = await provider.resolveNativeSource({
+      workspace_id: scope.workspaceId,
+      participant_id: scope.participantId,
+      source_message_option_ref: option,
+    });
+    expect(resolved).toMatchObject({
+      status: "resolved",
+      snapshot: {
+        contract_version: "1.0.0",
+        source_ref: {
+          namespace: "nurture",
+          object_type: "family_care_message",
+          object_id: source.messageId,
+        },
+      },
+    });
+    expect(JSON.stringify(resolved)).not.toContain("bodyProtectionPayload");
+    expect(JSON.stringify(resolved)).not.toContain("private-family-message");
+
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: scope.roleAssignmentId },
+      data: { status: "revoked" },
+    });
+    await expect(provider.resolveNativeSource({
+      workspace_id: scope.workspaceId,
+      participant_id: scope.participantId,
+      source_message_option_ref: option,
+    })).resolves.toEqual({ status: "denied", reason_code: "native_source_not_visible" });
+  });
+
   it("denies trial start when the current Grant policy drifts after preparation", async () => {
     const scope = await seedAdminScope("current-owner-policy-drift");
     const clock = { now: new Date("2026-08-12T10:00:00.000Z") };
@@ -410,11 +620,15 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
         principal: scope.principal,
         invocation_request_id: `invocation-${scope.suffix}`,
         declared_operation_key: "prepare_enrollment_journey_command",
+        client_surface: "web_run_workbench",
         capability_key: "start_enrollment_inquiry",
         target_option_ref: option,
       });
       expect(authority.status).toBe("resolved");
       if (authority.status !== "resolved") throw new Error("authority failed");
+      if (authority.authority.active_role !== "institution_admin") {
+        throw new Error("admin authority required");
+      }
       expect(authority.authority.institution_ref).toBe(scope.institutionId);
       expect(authority.authority.role_assignment_ref).toBe(scope.roleAssignmentId);
 
@@ -523,6 +737,7 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
         principal: scope.principal,
         invocation_request_id: `invocation-${scope.suffix}`,
         declared_operation_key: "prepare_enrollment_journey_command",
+        client_surface: "web_run_workbench",
         capability_key: "start_enrollment_inquiry",
         target_option_ref: option,
       });
@@ -787,6 +1002,7 @@ async function executePreparedAdminCommand(input: {
     principal: input.scope.principal,
     invocation_request_id: invocationRequestId,
     declared_operation_key: "prepare_enrollment_journey_command",
+    client_surface: "web_run_workbench",
     capability_key: input.request.capabilityKey,
     target_option_ref: input.request.targetOptionRef,
   });
@@ -824,6 +1040,116 @@ async function executePreparedAdminCommand(input: {
         : {}),
     },
   );
+}
+
+async function executeDirectAdminCommand(input: {
+  world: ReturnType<typeof composed>;
+  scope: SeededScope;
+  request: NurtureEnrollmentJourneyCommandIntentV1<
+    NurtureEnrollmentJourneyDirectCommandKey
+  >;
+}) {
+  const invocationRequestId = `invocation-${randomUUID()}`;
+  const authority = await input.world.owners.enrollmentJourneyAuthorityResolver.resolveCurrent({
+    principal: input.scope.principal,
+    invocation_request_id: invocationRequestId,
+    declared_operation_key: "execute_prepared_enrollment_journey_command",
+    client_surface: "web_run_workbench",
+    capability_key: input.request.capabilityKey,
+    target_option_ref: input.request.targetOptionRef,
+  });
+  if (authority.status !== "resolved") {
+    throw new Error(`direct authority:${authority.status}:${authority.reason_code}`);
+  }
+  const direct = await input.world.owners.enrollmentJourneyPreparedCommandOwner
+    .deriveDirectContext({
+      principal: input.scope.principal,
+      invocation_request_id: invocationRequestId,
+      client_surface: "web_run_workbench",
+      command: {
+        clientCommandId: `client-${randomUUID()}`,
+        request: input.request,
+      },
+    });
+  if (direct.status !== "resolved") {
+    throw new Error(`direct context:${direct.status}:${direct.reason_code}`);
+  }
+  return new NurtureEnrollmentJourneySurfaceHandler(
+    input.world.owners.enrollmentJourneySurfaceDeps,
+  ).handle(
+    { ...input.request, confirmationRef: direct.confirmation_ref },
+    {
+      workspace_id: input.scope.workspaceId,
+      actor_participant_ref: input.scope.participantId,
+      invocation_request_id: invocationRequestId,
+      host_correlation_id: `correlation-${randomUUID()}`,
+      host_trace_id: `trace-${randomUUID()}`,
+      command_request_id: direct.command_request_id,
+      client_surface: "web_run_workbench",
+    },
+  );
+}
+
+async function executePreparedGuardianCommand(input: {
+  world: ReturnType<typeof composed>;
+  principal: ScenarioHumanPrincipalV1;
+  participantRef: string;
+  surface: Exclude<NurtureEnrollmentJourneyFormalClientSurface, "web_run_workbench">;
+  guardianOwnerCarrier: NurtureEnrollmentJourneyGuardianOwnerCarrierV1;
+  request: NurtureEnrollmentJourneyPreparedCommandDraftV1["request"];
+  evidenceExpiresAt: string;
+}) {
+  const prepareInvocationId = `invocation-${randomUUID()}`;
+  const authority = await input.world.owners.enrollmentJourneyAuthorityResolver.resolveCurrent({
+    principal: input.principal,
+    invocation_request_id: prepareInvocationId,
+    declared_operation_key: "prepare_enrollment_journey_command",
+    client_surface: input.surface,
+    capability_key: input.request.capabilityKey,
+    target_option_ref: input.request.targetOptionRef,
+    guardian_owner_carrier: input.guardianOwnerCarrier,
+  });
+  if (authority.status !== "resolved") {
+    throw new Error(`Guardian authority:${authority.status}:${authority.reason_code}`);
+  }
+  const prepared = await input.world.owners.enrollmentJourneyPreparedCommandOwner.prepare({
+    principal: input.principal,
+    invocation_request_id: prepareInvocationId,
+    client_surface: input.surface,
+    authority: authority.authority,
+    command: {
+      contractVersion: 1,
+      clientCommandId: `client-${randomUUID()}`,
+      request: input.request,
+    },
+  });
+  if (prepared.status !== "ready_to_confirm") {
+    throw new Error(`Guardian prepare:${prepared.status}:${prepared.reason_code}`);
+  }
+  const trusted = {
+    workspace_id: input.principal.workspace_ref.object_id,
+    actor_participant_ref: input.participantRef,
+    invocation_request_id: `invocation-execute-${randomUUID()}`,
+    host_correlation_id: `correlation-${randomUUID()}`,
+    host_trace_id: `trace-${randomUUID()}`,
+    command_request_id: prepared.command_request_id,
+    client_surface: input.surface,
+    guardian_owner_carrier: input.guardianOwnerCarrier,
+    guardian_invocation_nonce_hash: fixtureHash(),
+    guardian_evidence_expires_at: input.evidenceExpiresAt,
+  } as const;
+  const request = { ...input.request, confirmationRef: prepared.confirmation_ref };
+  const handler = new NurtureEnrollmentJourneySurfaceHandler(
+    input.world.owners.enrollmentJourneySurfaceDeps,
+  );
+  return {
+    commandRequestId: prepared.command_request_id,
+    first: await handler.handle(request, trusted),
+    replay: await handler.handle(request, {
+      ...trusted,
+      invocation_request_id: `invocation-replay-${randomUUID()}`,
+    }),
+  };
 }
 
 function startInquiryInput(clock: { now: Date }) {
@@ -1332,6 +1658,18 @@ async function seedTrialOwnerScope(scope: SeededScope, now: Date) {
     careGroupId,
     carrier,
     guardianActorRef,
+    guardianPrincipal: {
+      principal_version: 1 as const,
+      principal_kind: "human_user" as const,
+      account_ref: canonical(
+        "my_chat",
+        "user",
+        `guardian-account-${scope.suffix}`,
+      ),
+      actor_ref: guardianActorRef,
+      workspace_ref: canonical("my_chat", "workspace", scope.workspaceId),
+      principal_origin: "interactive_session" as const,
+    },
     guardianParticipantId,
     guardianRoleId: guardianRole.id,
     childAuthorizationId: authorizations[0]!.id,
@@ -1342,8 +1680,147 @@ async function seedTrialOwnerScope(scope: SeededScope, now: Date) {
     policyId: policy.id,
     policyExpiresAt,
     processId: process.id,
+    contactRef,
+    reviewAt: new Date(trialEndsAt.getTime() - 24 * 60 * 60_000),
+    trialEndsAt,
     qualifyResult,
   };
+}
+
+async function seedNativeSource(scope: SeededScope) {
+  const guardian = await prisma.nurtureParticipant.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      myChatUserId: `native-guardian-${scope.suffix}`,
+      status: "active",
+    },
+  });
+  const child = await prisma.nurtureChild.create({
+    data: { workspaceId: scope.workspaceId, displayName: "Native child", status: "active" },
+  });
+  const process = await prisma.nurtureChildCareProcess.create({
+    data: { workspaceId: scope.workspaceId, childId: child.id, status: "active" },
+  });
+  const family = await prisma.nurtureFamily.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: process.id,
+      displayName: "Native family",
+      status: "active",
+    },
+  });
+  const careGroup = await prisma.nurtureCareGroup.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      institutionId: scope.institutionId,
+      name: "Native source class",
+      status: "active",
+    },
+  });
+  const enrollment = await prisma.nurtureEnrollment.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: process.id,
+      institutionId: scope.institutionId,
+      careGroupId: careGroup.id,
+      status: "active",
+      participationPhase: "formal",
+    },
+  });
+  const guardianRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      participantId: guardian.id,
+      role: "guardian",
+      scopeType: "child_care_process",
+      scopeId: process.id,
+      status: "active",
+    },
+  });
+  const grant = await prisma.nurtureChildLinkGrant.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: process.id,
+      enrollmentId: enrollment.id,
+      grantedByParticipantId: guardian.id,
+      grantedToScopeType: "care_group",
+      grantedToScopeId: careGroup.id,
+      directions: ["family_to_org"],
+      dataClasses: ["family_care_question"],
+      purposes: ["family_care_workflow"],
+      policySnapshotPayload: {
+        institution_admin_business_communication: {
+          schema_version: 1,
+          disclosed: true,
+          institution_id: scope.institutionId,
+          enrollment_id: enrollment.id,
+          care_group_id: careGroup.id,
+          directions: ["family_to_org"],
+          data_classes: ["family_care_question"],
+          purposes: ["family_care_workflow"],
+        },
+      },
+      status: "active",
+    },
+  });
+  const thread = await prisma.nurtureFamilyCareThread.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: process.id,
+      familyId: family.id,
+      enrollmentId: enrollment.id,
+      careGroupId: careGroup.id,
+      visibilityScope: "family_private",
+      status: "active",
+    },
+  });
+  const protection = createAesGcmProtectedContentPort({
+    keyRef: "t007-native-source-protected-key",
+    keyMaterial: "t007-native-source-protected-key-material-0001",
+  });
+  const message = await prisma.nurtureFamilyCareMessage.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      threadId: thread.id,
+      childCareProcessId: process.id,
+      senderParticipantId: guardian.id,
+      senderRoleAssignmentId: guardianRole.id,
+      messageKind: "family_message",
+      authorshipKind: "family_authored",
+      bodyFormat: "plain_text",
+      bodyStorageMode: "protected",
+      bodyProtectionPayload: protection.seal("private-family-message") as never,
+      sourceSurface: "mobile",
+      grantId: grant.id,
+      status: "sent",
+      writerContract: "harness_g2_v1",
+      enrollmentId: enrollment.id,
+      careGroupId: careGroup.id,
+      direction: "family_to_org",
+    },
+  });
+  await prisma.nurtureFamilyCareItem.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      sourceMessageId: message.id,
+      threadId: thread.id,
+      childCareProcessId: process.id,
+      familyId: family.id,
+      enrollmentId: enrollment.id,
+      careGroupId: careGroup.id,
+      dataClass: "family_care_question",
+      category: "question",
+      summary: "Private family message",
+      urgency: "normal",
+      requiresAck: true,
+      requiresReply: true,
+      status: "open",
+      classificationSource: "system",
+      grantId: grant.id,
+      writerContract: "harness_g2_v1",
+    },
+  });
+  return { messageId: message.id };
 }
 
 function fixtureHash(): string {

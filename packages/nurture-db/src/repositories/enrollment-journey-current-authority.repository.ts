@@ -1,4 +1,8 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
+import {
+  assertCanonicalRef,
+  type CanonicalRef,
+} from "@my-chat/workflow-contracts";
 import type {
   NurtureEnrollmentJourneyAdminRoleReaderV1,
   NurtureEnrollmentJourneyAdminRoleV1,
@@ -18,14 +22,7 @@ const ENROLLMENT_JOURNEY_FORMAL_OPERATIONS = new Set([
 
 export class PrismaNurtureEnrollmentJourneyParticipantAuthorityReader
 implements NurtureParticipantAuthorityReader {
-  private readonly now: () => Date;
-
-  constructor(
-    private readonly prisma: PrismaReader,
-    now: () => Date = () => new Date(),
-  ) {
-    this.now = now;
-  }
+  constructor(private readonly prisma: PrismaReader) {}
 
   async authorizeCurrent(
     input: Parameters<NurtureParticipantAuthorityReader["authorizeCurrent"]>[0],
@@ -41,7 +38,6 @@ implements NurtureParticipantAuthorityReader {
       return deniedParticipantAuthority("enrollment_journey_participant_operation_denied");
     }
 
-    const at = this.now();
     const rows = await this.prisma.$queryRaw<Array<{ authority_revision: number }>>(
       Prisma.sql`SELECT participant."aggregate_version" AS "authority_revision"
         FROM "nurture_participant" participant
@@ -49,25 +45,6 @@ implements NurtureParticipantAuthorityReader {
           AND participant."workspace_id" = ${input.workspace_ref.object_id}
           AND participant."status" = 'active'
           AND participant."deleted_at" IS NULL
-          AND EXISTS (
-            SELECT 1
-            FROM "nurture_care_role_assignment" role_assignment
-            INNER JOIN "nurture_care_institution" institution
-              ON institution."id" = role_assignment."scope_id"
-              AND institution."workspace_id" = role_assignment."workspace_id"
-              AND institution."status" = 'active'
-              AND institution."deleted_at" IS NULL
-            WHERE role_assignment."workspace_id" = participant."workspace_id"
-              AND role_assignment."participant_id" = participant."id"
-              AND role_assignment."role" = 'institution_admin'
-              AND role_assignment."scope_type" = 'institution'
-              AND role_assignment."status" = 'active'
-              AND role_assignment."deleted_at" IS NULL
-              AND (role_assignment."starts_at" IS NULL
-                OR role_assignment."starts_at" <= (${at}::timestamptz AT TIME ZONE 'UTC'))
-              AND (role_assignment."ends_at" IS NULL
-                OR role_assignment."ends_at" > (${at}::timestamptz AT TIME ZONE 'UTC'))
-          )
         LIMIT 1`,
     );
     const row = rows[0];
@@ -130,12 +107,15 @@ implements NurtureEnrollmentJourneyCurrentTargetReaderV1 {
           select: {
             workflowHead: true,
             institution: { select: { id: true, aggregateVersion: true } },
+            inquiry: { select: { hostContactRef: true } },
           },
         });
+        const hostContactRef = parseHostContactRef(row?.inquiry?.hostContactRef);
         return row ? {
           institution_ref: row.institution.id,
           institution_revision: row.institution.aggregateVersion,
           target_revision: row.workflowHead,
+          ...(hostContactRef ? { host_contact_ref: hostContactRef } : {}),
         } : null;
       }
       case "prospective_contact": {
@@ -159,6 +139,18 @@ implements NurtureEnrollmentJourneyCurrentTargetReaderV1 {
       }
     }
   }
+}
+
+function parseHostContactRef(value: unknown): CanonicalRef | null {
+  try {
+    assertCanonicalRef(value);
+  } catch {
+    return null;
+  }
+  return value.namespace === "my_chat"
+    && value.object_type === "nurture_prospective_contact"
+    ? value
+    : null;
 }
 
 export class PrismaNurtureEnrollmentJourneyAdminRoleReader

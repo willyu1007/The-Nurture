@@ -23,8 +23,8 @@ import type {
   WorkflowTrustedInvocationHandlerRegistry,
 } from "@my-chat/workflow-contracts";
 import {
-  NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V3,
-  NURTURE_ENROLLMENT_JOURNEY_PREPARE_OPERATION_V2,
+  NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V4,
+  NURTURE_ENROLLMENT_JOURNEY_PREPARE_OPERATION_V3,
   createNurtureEnrollmentContactOwner,
   createNurtureEnrollmentJourneyCurrentOwnerCarrierProducer,
   createSignedNurtureEnrollmentJourneyRunSettlementClient,
@@ -32,7 +32,7 @@ import {
   createNurtureEnrollmentJourneyRunCoordinator,
   type NurtureEnrollmentContactOwnerV1,
   type NurtureEnrollmentJourneyCurrentOwnerCarrierProducerV1,
-  type VerifiedNurtureEnrollmentJourneyRunSettlementClientV3,
+  type VerifiedNurtureEnrollmentJourneyRunSettlementClientV4,
 } from "@my-chat/scenario-integrations";
 import {
   InMemoryAtomicScenarioNonceStore,
@@ -99,13 +99,13 @@ type ProtocolMode =
   | "writer_wins"
   | "no_effect_wins";
 type ExecuteInput = Parameters<
-  VerifiedNurtureEnrollmentJourneyRunSettlementClientV3["execute"]
+  VerifiedNurtureEnrollmentJourneyRunSettlementClientV4["execute"]
 >[0];
 type StatusInput = Parameters<
-  VerifiedNurtureEnrollmentJourneyRunSettlementClientV3["readStatus"]
+  VerifiedNurtureEnrollmentJourneyRunSettlementClientV4["readStatus"]
 >[0];
 type NoEffectInput = Parameters<
-  VerifiedNurtureEnrollmentJourneyRunSettlementClientV3["confirmNoEffect"]
+  VerifiedNurtureEnrollmentJourneyRunSettlementClientV4["confirmNoEffect"]
 >[0];
 
 const workspaces = new Set<string>();
@@ -137,7 +137,7 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
     const responseKeys = generateKeyPairSync("ed25519");
     const now = new Date("2026-08-12T09:00:00.000Z");
     const formalExecute = NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.execute;
-    expect(NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V3).toEqual({
+    expect(NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V4).toEqual({
       scenario_key: "nurture",
       endpoint_key: formalExecute.endpoint_key,
       method: formalExecute.method,
@@ -245,7 +245,8 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
     });
 
     await expect(client.execute({
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: reservationEvidence("signed-route"),
@@ -357,7 +358,8 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
 
     const prepareCarrier = await resolvedTrialCarrier(producer, world);
     const prepared = asRecord(await client.prepare({
-      contractVersion: 2,
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: `client-${world.suffix}`,
       request: {
         capabilityKey: "prepare_trial_relationship",
@@ -378,7 +380,8 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
 
     const executeCarrier = await resolvedTrialCarrier(producer, world);
     const executed = await client.execute({
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: prepared.command_request_id,
       confirmationRef: prepared.confirmation_ref,
       currentOwnerCarrier: executeCarrier,
@@ -568,7 +571,7 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
 });
 
 class DatabaseProtocolClient
-implements VerifiedNurtureEnrollmentJourneyRunSettlementClientV3 {
+implements VerifiedNurtureEnrollmentJourneyRunSettlementClientV4 {
   readonly calls = { execute: 0, confirmNoEffect: 0, readStatus: 0 };
   readonly gate = executionGate();
   private readonly owner: NurtureWorkflowRunSettlementOwnerV1;
@@ -684,7 +687,7 @@ implements VerifiedNurtureEnrollmentJourneyRunSettlementClientV3 {
 }
 
 function createCoordinator(
-  client: VerifiedNurtureEnrollmentJourneyRunSettlementClientV3,
+  client: VerifiedNurtureEnrollmentJourneyRunSettlementClientV4,
 ) {
   return createNurtureEnrollmentJourneyRunCoordinator({
     repository: new PrismaWorkflowRunReservationLifecycleRepository(myChat),
@@ -1382,8 +1385,8 @@ function signedCurrentOwnerTransport(input: {
 }): ScenarioPrivateTransport {
   const nonceStore = new InMemoryAtomicScenarioNonceStore();
   const declarations = [
-    NURTURE_ENROLLMENT_JOURNEY_PREPARE_OPERATION_V2,
-    NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V3,
+    NURTURE_ENROLLMENT_JOURNEY_PREPARE_OPERATION_V3,
+    NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V4,
   ];
   return {
     async send(request) {
@@ -1417,7 +1420,7 @@ function signedCurrentOwnerTransport(input: {
         now: input.now,
       });
       const handlerKey = verified.declaration.operation_key ===
-          NURTURE_ENROLLMENT_JOURNEY_PREPARE_OPERATION_V2.operation_key
+          NURTURE_ENROLLMENT_JOURNEY_PREPARE_OPERATION_V3.operation_key
         ? NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.prepare
         : NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute;
       const handler = input.handlers[handlerKey];

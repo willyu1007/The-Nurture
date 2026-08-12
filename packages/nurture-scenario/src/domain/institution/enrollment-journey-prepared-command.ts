@@ -40,8 +40,8 @@ export type NurtureEnrollmentJourneyPreparedCommandRecordV1 = {
   workspace_id: string;
   participant_ref: string;
   institution_ref: string;
-  role_assignment_ref: string;
-  client_surface: "web_run_workbench";
+  role_assignment_ref?: string;
+  client_surface: "web_run_workbench" | "chat_workflow_control" | "mobile_dashboard";
   client_command_id_hash: string;
   prepare_fingerprint: string;
   origin_invocation_request_id_hash: string;
@@ -156,7 +156,7 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
       return { status: "unavailable", reason_code: participant.reason_code };
     }
     if (
-      input.client_surface !== "web_run_workbench"
+      !surfaceMatchesAuthority(input.client_surface, input.authority)
       || input.command.contractVersion !== 1
       || !opaqueId(input.invocation_request_id)
       || !opaqueId(input.command.clientCommandId)
@@ -197,7 +197,9 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
         workspace_id: input.authority.workspace_id,
         participant_ref: input.authority.participant_ref,
         institution_ref: input.authority.institution_ref,
-        role_assignment_ref: input.authority.role_assignment_ref,
+        ...(input.authority.active_role === "institution_admin"
+          ? { role_assignment_ref: input.authority.role_assignment_ref }
+          : {}),
         active_role: input.authority.active_role,
         surface_key: input.authority.surface_key,
         authority_version: input.authority.authority_version,
@@ -230,7 +232,9 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
       workspace_id: participant.workspace_id,
       participant_ref: participant.participant_ref,
       institution_ref: input.authority.institution_ref,
-      role_assignment_ref: input.authority.role_assignment_ref,
+      ...(input.authority.active_role === "institution_admin"
+        ? { role_assignment_ref: input.authority.role_assignment_ref }
+        : {}),
       client_surface: input.client_surface,
       client_command_id_hash: clientCommandIdHash,
       prepare_fingerprint: prepareFingerprint,
@@ -265,7 +269,9 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
       record.workspace_id !== participant.workspace_id
       || record.participant_ref !== participant.participant_ref
       || record.institution_ref !== input.authority.institution_ref
-      || record.role_assignment_ref !== input.authority.role_assignment_ref
+      || record.role_assignment_ref !== (input.authority.active_role === "institution_admin"
+        ? input.authority.role_assignment_ref
+        : undefined)
       || record.client_surface !== input.client_surface
       || record.capability_key !== command.capabilityKey
     ) {
@@ -306,7 +312,7 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
     );
     if (participant.status !== "resolved") return participant;
     if (
-      input.client_surface !== "web_run_workbench"
+      !formalClientSurface(input.client_surface)
       || !opaqueId(input.invocation_request_id)
       || !opaqueId(input.command.commandRequestId)
       || !opaqueConfirmation(input.command.confirmationRef)
@@ -331,13 +337,14 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
       || record.command_request_id !== input.command.commandRequestId
       || record.workspace_id !== participant.workspace_id
       || record.participant_ref !== participant.participant_ref
+      || record.client_surface !== input.client_surface
     ) return { status: "unavailable", reason_code: "prepared_command_ledger_drift" };
     if (record.confirmation_ref_hash !== confirmationRefHash) {
       return { status: "conflict", reason_code: "prepared_command_reuse_conflict" };
     }
     if (
       record.status === "expired"
-      || Date.parse(record.expires_at) <= this.now().getTime()
+      || (record.status !== "consumed" && Date.parse(record.expires_at) <= this.now().getTime())
     ) {
       return { status: "denied", reason_code: "prepared_command_expired" };
     }
@@ -353,12 +360,15 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
       || snapshot.authority.workspace_id !== record.workspace_id
       || snapshot.authority.participant_ref !== record.participant_ref
       || snapshot.authority.institution_ref !== record.institution_ref
-      || snapshot.authority.role_assignment_ref !== record.role_assignment_ref
+      || (snapshot.authority.active_role === "institution_admin"
+        ? snapshot.authority.role_assignment_ref
+        : undefined) !== record.role_assignment_ref
     ) return { status: "unavailable", reason_code: "prepared_command_snapshot_drift" };
 
     return {
       status: "resolved",
       command_request_id: record.command_request_id,
+      ledger_status: record.status,
       frozen_request: snapshot.frozen_request,
       authority: snapshot.authority,
     };
@@ -434,7 +444,7 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
     );
     if (participant.status !== "resolved") return participant;
     if (
-      input.client_surface !== "web_run_workbench"
+      !formalClientSurface(input.client_surface)
       || !opaqueId(input.invocation_request_id)
       || !opaqueId(input.command.clientCommandId)
     ) return { status: "denied", reason_code: "direct_command_context_invalid" };
@@ -620,8 +630,10 @@ function validRecord(value: NurtureEnrollmentJourneyPreparedCommandRecordV1): bo
     && opaqueId(value.workspace_id)
     && opaqueId(value.participant_ref)
     && opaqueId(value.institution_ref)
-    && opaqueId(value.role_assignment_ref)
-    && value.client_surface === "web_run_workbench"
+    && (value.role_assignment_ref === undefined || opaqueId(value.role_assignment_ref))
+    && ["web_run_workbench", "chat_workflow_control", "mobile_dashboard"].includes(
+      value.client_surface,
+    )
     && [
       value.client_command_id_hash,
       value.prepare_fingerprint,
@@ -652,9 +664,9 @@ function isLedgeredKey(value: unknown): value is NurtureEnrollmentJourneyLedgere
 
 function validAuthority(value: unknown): value is NurtureEnrollmentJourneyLocalAuthorityV1 {
   if (!record(value)) return false;
-  const keys = Object.keys(value);
-  return keys.length === 8
-    && [
+  const admin = value.active_role === "institution_admin";
+  const expectedKeys = admin
+    ? [
       "workspace_id",
       "participant_ref",
       "institution_ref",
@@ -663,15 +675,51 @@ function validAuthority(value: unknown): value is NurtureEnrollmentJourneyLocalA
       "surface_key",
       "authority_version",
       "evaluated_at",
-    ].every((key) => Object.prototype.hasOwnProperty.call(value, key))
+    ]
+    : [
+      "workspace_id",
+      "participant_ref",
+      "institution_ref",
+      "active_role",
+      "surface_key",
+      "authority_version",
+      "evaluated_at",
+    ];
+  return Object.keys(value).length === expectedKeys.length
+    && expectedKeys.every((key) => Object.prototype.hasOwnProperty.call(value, key))
     && opaqueId(value.workspace_id)
     && opaqueId(value.participant_ref)
     && opaqueId(value.institution_ref)
-    && opaqueId(value.role_assignment_ref)
-    && value.active_role === "institution_admin"
-    && value.surface_key === "institution_workbench"
+    && (admin
+      ? opaqueId(value.role_assignment_ref)
+        && (value.surface_key === "institution_workbench"
+          || value.surface_key === "institution_board")
+      : value.active_role === "guardian"
+        && (value.surface_key === "guardian_nurture_chat"
+          || value.surface_key === "guardian_family_board"))
     && opaqueId(value.authority_version)
     && instant(value.evaluated_at);
+}
+
+function formalClientSurface(
+  value: unknown,
+): value is NurtureEnrollmentJourneyPreparedCommandRecordV1["client_surface"] {
+  return value === "web_run_workbench"
+    || value === "chat_workflow_control"
+    || value === "mobile_dashboard";
+}
+
+function surfaceMatchesAuthority(
+  clientSurface: NurtureEnrollmentJourneyPreparedCommandRecordV1["client_surface"],
+  authority: NurtureEnrollmentJourneyLocalAuthorityV1,
+): boolean {
+  return authority.active_role === "institution_admin"
+    ? clientSurface === "web_run_workbench"
+      && authority.surface_key === "institution_workbench"
+    : (clientSurface === "chat_workflow_control"
+        && authority.surface_key === "guardian_nurture_chat")
+      || (clientSurface === "mobile_dashboard"
+        && authority.surface_key === "guardian_family_board");
 }
 
 function validSealedSnapshot(value: { codec_version: number; ciphertext: string }): boolean {

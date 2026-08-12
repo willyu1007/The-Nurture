@@ -61,12 +61,22 @@
   binding. Nurture now has an exact signed-role current-authority owner and a
   bounded encrypted prepared-command ledger; My-Chat provides principal-bound
   retrieval and final access recheck. The additive migration has not been run.
-- Current node: qualify that migration on an approved disposable PostgreSQL
-  target, then run E8 Joint Conformance. A real gateway
-  smoke produces
-  `live_qualified` and is required only before feature-flag/traffic activation.
-- I3/I4 cannot start from a hand-written fixture answer, raw generic moderation
-  mapping or moving model alias. Mock transport must never be called live.
+- E7 persistence qualification: `G4_E_E7_DB_QUALIFICATION_PASS`; see
+  [`83`](./83-g4-e-e7-db-qualification-record.md). The approved disposable
+  target was destroyed; no durable apply occurred.
+- E8 joint conformance and G4-E Exit:
+  `G4_E_EXIT_PASS_ADAPTER_QUALIFIED`; see
+  [`84`](./84-g4-e-e8-joint-conformance-record.md) and
+  [`85`](./85-g4-e-exit-record.md). A real gateway smoke produces
+  `live_qualified` and remains required only before feature-flag/traffic
+  activation.
+- Current T-007 node: G4-D I4 is also closed default-off by
+  [`95`](./95-g4-d-i4-exit-record.md). Reseal the T-002 exact source pin and
+  execute G4-F's final integration/privacy/default-off/cleanup census; no
+  additional branch implementation is planned for T-007.
+- Qualification never starts from a hand-written fixture answer, raw generic
+  moderation mapping or moving model alias. Mock transport must never be
+  called live.
 
 ## Planning-mode context and merge policy
 

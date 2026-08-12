@@ -19,8 +19,8 @@ const toRecord = (
   workspace_id: row.workspaceId,
   participant_ref: row.participantId,
   institution_ref: row.institutionId,
-  role_assignment_ref: row.roleAssignmentId,
-  client_surface: row.clientSurface as "web_run_workbench",
+  ...(row.roleAssignmentId ? { role_assignment_ref: row.roleAssignmentId } : {}),
+  client_surface: row.clientSurface as NurtureEnrollmentJourneyPreparedCommandRecordV1["client_surface"],
   client_command_id_hash: row.clientCommandIdHash,
   prepare_fingerprint: row.prepareFingerprint,
   origin_invocation_request_id_hash: row.originInvocationRequestIdHash,
@@ -52,8 +52,9 @@ implements NurtureEnrollmentJourneyPreparedCommandLedgerV1 {
     try {
       const created = await this.runInTransaction(async (transaction) => {
         const preparedAt = new Date(input.prepared_at);
-        const currentScope = await transaction.$queryRaw<Array<{ role_assignment_id: string }>>(
-          Prisma.sql`SELECT role_assignment."id" AS "role_assignment_id"
+        const currentScope = input.role_assignment_ref
+          ? await transaction.$queryRaw<Array<{ scope_ref: string }>>(
+          Prisma.sql`SELECT role_assignment."id" AS "scope_ref"
             FROM "nurture_care_role_assignment" role_assignment
             INNER JOIN "nurture_participant" participant
               ON participant."id" = role_assignment."participant_id"
@@ -71,6 +72,7 @@ implements NurtureEnrollmentJourneyPreparedCommandLedgerV1 {
               AND role_assignment."role" = 'institution_admin'
               AND role_assignment."scope_type" = 'institution'
               AND role_assignment."scope_id" = ${input.institution_ref}
+              AND ${input.client_surface} = 'web_run_workbench'
               AND role_assignment."status" = 'active'
               AND role_assignment."deleted_at" IS NULL
               AND (role_assignment."starts_at" IS NULL
@@ -78,6 +80,21 @@ implements NurtureEnrollmentJourneyPreparedCommandLedgerV1 {
               AND (role_assignment."ends_at" IS NULL
                 OR role_assignment."ends_at" > (${preparedAt}::timestamptz AT TIME ZONE 'UTC'))
             FOR SHARE OF role_assignment, participant, institution`,
+        )
+          : await transaction.$queryRaw<Array<{ scope_ref: string }>>(
+          Prisma.sql`SELECT participant."id" AS "scope_ref"
+            FROM "nurture_participant" participant
+            CROSS JOIN "nurture_care_institution" institution
+            WHERE participant."id" = ${input.participant_ref}
+              AND participant."workspace_id" = ${input.workspace_id}
+              AND participant."status" = 'active'
+              AND participant."deleted_at" IS NULL
+              AND institution."id" = ${input.institution_ref}
+              AND institution."workspace_id" = ${input.workspace_id}
+              AND institution."status" = 'active'
+              AND institution."deleted_at" IS NULL
+              AND ${input.client_surface} IN ('chat_workflow_control', 'mobile_dashboard')
+            FOR SHARE OF participant, institution`,
         );
         if (currentScope.length !== 1) {
           throw new PreparedCommandScopeError();
@@ -88,7 +105,9 @@ implements NurtureEnrollmentJourneyPreparedCommandLedgerV1 {
             workspaceId: input.workspace_id,
             participantId: input.participant_ref,
             institutionId: input.institution_ref,
-            roleAssignmentId: input.role_assignment_ref,
+            ...(input.role_assignment_ref
+              ? { roleAssignmentId: input.role_assignment_ref }
+              : {}),
             clientSurface: input.client_surface,
             clientCommandIdHash: input.client_command_id_hash,
             prepareFingerprint: input.prepare_fingerprint,

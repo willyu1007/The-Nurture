@@ -6,49 +6,21 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **extend the signed joint matrix from the now-qualified real Host
-  carrier path into native-source, remaining command-family and
-  Guardian/mobile coverage** over the qualified reservation/settlement
-  protocol. The serialized
-  two-database race and response-loss suite passed 6/6 on an approved
-  synthetic-only disposable pair
-  ([`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md)).
-  A post-qualification audit repaired a stale My-Chat signed execute
-  declaration and qualified the exact detached request/nonce/formal-handler/
-  detached-response round trip; the complete x5 lane is now 36/36
-  ([`90`](./90-g4-d-i4-a-signed-ingress-requalification-record.md)). The writer-fenced signed
-  `confirmed_no_effect` operation and the default-off My-Chat reserve ->
-  execute -> fence/status -> settle coordinator are implemented locally;
-  status bypasses prepared TTL and current authority while remaining bound to
-  the original command and reservation evidence. I3 is
-  qualified by record [`87`](./87-g4-d-i3-qualification-record.md). Both
-  dedicated ledgers and their additive migrations are implemented locally;
-  neither migration is applied. The superseded immediate queued-Run issuer,
-  its Nurture adapter and the negative protocol-gap x5 vehicle are removed.
-  The product path remains default-off because the Host coordinator has no
-  route, DI or activation binding. The protocol subset is DB-qualified and
-  default-off. Current-owner admission now rejects malformed Guardian actions,
-  cross-pair evidence substitution and stale grant terms before local use
-  ([`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)). The exact
-  request-scoped carrier is now admitted by prepare v2/execute v3, stripped
-  before prepared persistence and handed only to a Nurture-local derivation
-  port; the former mixed remote evidence/source shape is removed
-  ([`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)). The production
-  Prisma derivation now rereads the exact active pair, Guardian role,
-  association/authorization set and immutable exact-Institution Grant policy;
-  `qualify_capacity_waitlist`, `prepare_trial_relationship` and `start_trial`
-  pass through the real prepared-command/surface/transaction composition, and
-  role revoke, authorization expiry/ambiguity and policy drift fail closed
-  ([`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)). My-Chat
-  `ae33b313...` now issues real current pair/contact carriers; one signed
-  prepare-v2/fresh execute-v3 relationship command passes through the formal
-  handler and production transaction owners. The complete x5 lane is 37/37 in
-  three consecutive runs, with carrier-free prepared persistence and
-  raw-contact absence
-  ([`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md)). Native-source
-  remainder, other command families, Guardian/mobile and full I4 exit remain
-  open.
-  G4-F therefore remains closed. E7
+- Next step: **reseal the exact cross-repository adoption pin, then execute the
+  G4-F integration/handoff census**. G4-D I4 now passes as
+  `G4_D_I4_EXIT_PASS_DEFAULT_OFF` ([`95`](./95-g4-d-i4-exit-record.md)) at
+  My-Chat `2d415cecea6c40cb41daf10bca0638bfaa0c504e`: the production native-source
+  owner, Admin Web/mobile-query and Guardian chat/mobile lanes, query v2 /
+  prepare v3 / execute v4 contracts, formalization transaction, exact replay,
+  revoke/expiry/ambiguity/head-drift negatives and privacy boundaries are
+  qualified. The fresh Nurture database replay passed 41/41 migrations, the
+  focused owner matrix passed 11/11, the full production-DB lane passed
+  444/444, and the five-file x5 lane passed 37/37 in three consecutive runs.
+  Prepared Guardian rows carry neither a fabricated Admin role nor owner
+  evidence. Every capability remains default-off; no route, DI, durable apply,
+  activation, deployment or traffic exists. G4-F is now open but is not yet
+  issued until T-002 reseals the exact source pin and the final false/empty,
+  privacy, governance and cleanup censuses pass. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,
   record 84) are closed and the G4-E Exit is issued

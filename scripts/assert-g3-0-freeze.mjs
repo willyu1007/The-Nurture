@@ -339,6 +339,7 @@ const expectedTableCensus = [
   "NurtureEnrollmentInquiry",
   "NurtureEnrollmentJourneyPreparedCommand",
   "NurtureEnrollmentTouchpoint",
+  "NurtureEnrollmentTrialGrantPolicy",
   "NurtureEnrollmentTrialOffer",
   "NurtureEnrollmentTrialReservation",
   "NurtureEnrollmentWaitlistEntry",

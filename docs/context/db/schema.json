@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-12T13:44:51.040Z",
+  "updatedAt": "2026-08-12T15:37:03.287Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -12445,7 +12445,7 @@
         {
           "name": "roleAssignmentId",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "role_assignment_id",
           "dbType": null,
@@ -12528,7 +12528,7 @@
         {
           "field": "roleAssignment",
           "to": "NurtureCareRoleAssignment",
-          "optional": false,
+          "optional": true,
           "list": false,
           "relationName": null,
           "fields": [

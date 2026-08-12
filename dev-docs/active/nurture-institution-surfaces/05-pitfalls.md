@@ -845,3 +845,49 @@
   the Nurture participant only in local role/command facts.
 - **Prevention:** fixtures must name account, Actor, Participant, role and
   business actor separately even when one human connects them.
+
+## 2026-08-12 - A nullable authority field still needs a relational invariant
+
+- **Symptom:** dropping `role_assignment_id` NOT NULL enabled Guardian rows but
+  the original CHECK still admitted only the Web surface and did not prove the
+  intended role/surface pairing.
+- **Root cause:** the column migration and the existing table-level contract
+  were reviewed separately.
+- **What was tried:** relying on TypeScript unions would not protect direct SQL
+  writes or future repository drift.
+- **Fix/workaround:** replace the old CHECK in the same migration: Web requires
+  a role assignment; chat/mobile forbid one; only the three exact surfaces are
+  admitted.
+- **Prevention:** every nullability change must inventory all CHECK, unique,
+  index and foreign-key semantics that previously relied on non-nullness.
+
+## 2026-08-12 - Post-commit projection is not an authorization read
+
+- **Symptom:** a Guardian command committed correctly but response assembly
+  called the Admin-only projection read and returned outcome unknown.
+- **Root cause:** one repository method combined shape validation with Admin
+  projection authority, even though command authority had already been checked
+  and consumed inside the effect transaction.
+- **What was tried:** fabricating an Admin role for Guardian response assembly
+  would have crossed the owner boundary and was rejected.
+- **Fix/workaround:** extract a pure snapshot shape/lifecycle validator and add
+  an explicitly named after-authorized-command read. It cannot be used to make
+  a permission decision.
+- **Prevention:** distinguish current authorization reads from post-commit
+  result reconstruction in repository contracts and method names.
+
+## 2026-08-12 - Exact replay may legitimately advance one head
+
+- **Symptom:** retrying the same consumed formalization was denied because the
+  current workflow head had advanced after the first successful command,
+  causing both authority and payload hashes to differ.
+- **Root cause:** replay rebuilt a pre-effect payload and compared the complete
+  prepared authority string before checking the consumed ledger/execution.
+- **What was tried:** ignoring all authority drift would have admitted revoked
+  participants, roles, contacts or actions and was rejected.
+- **Fix/workaround:** detect the exact consumed ledger and existing committed
+  execution first; still resolve current authority and permit only the
+  structured target-head component to differ.
+- **Prevention:** idempotent replay contracts must list which facts are
+  expected to change because of the original effect and keep every other
+  current-owner component exact.

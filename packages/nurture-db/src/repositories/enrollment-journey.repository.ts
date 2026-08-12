@@ -9,6 +9,7 @@ import {
   NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_TYPE,
   NurtureInstitutionAuthorityChain,
   projectNurtureEnrollmentJourneyWorkflowV1,
+  validateNurtureEnrollmentJourneyWorkflowSnapshotV1,
   type NurtureAuthorityChainResult,
   type NurtureEnrollmentJourneyCommandFactsResult,
   type NurtureEnrollmentJourneyMutation,
@@ -66,9 +67,8 @@ const duplicateConflict = (
           : "enrollment_journey_write_conflict",
 });
 
-const toSnapshot = (
+const snapshotFromRow = (
   row: NurtureInstitutionWorkflow,
-  authority: ResolvedAuthority,
 ): NurtureEnrollmentJourneyWorkflowSnapshotV1 | null => {
   const snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1 = {
     contract_version: NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION,
@@ -89,6 +89,17 @@ const toSnapshot = (
     started_at: row.startedAt.toISOString(),
     updated_at: row.updatedAt.toISOString(),
   };
+  return validateNurtureEnrollmentJourneyWorkflowSnapshotV1(snapshot)
+    ? snapshot
+    : null;
+};
+
+const toSnapshot = (
+  row: NurtureInstitutionWorkflow,
+  authority: ResolvedAuthority,
+): NurtureEnrollmentJourneyWorkflowSnapshotV1 | null => {
+  const snapshot = snapshotFromRow(row);
+  if (!snapshot) return null;
   const validation = projectNurtureEnrollmentJourneyWorkflowV1({
     surface: "institution_admin_web",
     context: {
@@ -248,6 +259,24 @@ export class PrismaEnrollmentJourneyRepository
         status: "unavailable",
         reason_code: "enrollment_journey_owner_unavailable",
       };
+    }
+  }
+
+  /**
+   * Exact post-commit carrier read for a command whose authority and effect
+   * were already checked by the formal owner path. This validates shape and
+   * lifecycle only; callers must not use it as an authorization decision.
+   */
+  async readWorkflowAfterAuthorizedCommand(input: {
+    workspace_id: string;
+    institution_ref: string;
+    workflow_ref: string;
+  }): Promise<NurtureEnrollmentJourneyWorkflowSnapshotV1 | null> {
+    try {
+      const carrier = await this.loadCarrier(input);
+      return carrier?.inquiry ? snapshotFromRow(carrier) : null;
+    } catch {
+      return null;
     }
   }
 

@@ -693,17 +693,19 @@ describe("G4-D I2-B Enrollment Journey public adapters", () => {
       execute_endpoint_key: "nurture.enrollment_journey.command.execute",
       enablement_policy: "disabled",
     });
-    expect(mapping.chat_workflow_control?.enrollment_journey).toBeUndefined();
-    expect(mapping.mobile_dashboard?.enrollment_journey).toBeUndefined();
+    expect(mapping.chat_workflow_control?.enrollment_journey)
+      .toEqual(mapping.web_run_workbench?.enrollment_journey);
+    expect(mapping.mobile_dashboard?.enrollment_journey)
+      .toEqual(mapping.web_run_workbench?.enrollment_journey);
     const internalKeys = Object.keys(nurtureScenarioModule.internal_api_handlers ?? {})
       .filter((key) => key.includes("enrollment_journey"));
     expect(internalKeys).toEqual([]);
     const trusted = nurtureScenarioModule.trusted_invocation_handlers ?? {};
-    expect(typeof trusted["nurture.enrollment_journey.query.formal.v1"])
+    expect(typeof trusted["nurture.enrollment_journey.query.formal.v2"])
       .toBe("function");
-    expect(typeof trusted["nurture.enrollment_journey.command.prepare.formal.v2"])
+    expect(typeof trusted["nurture.enrollment_journey.command.prepare.formal.v3"])
       .toBe("function");
-    expect(typeof trusted["nurture.enrollment_journey.command.execute.formal.v3"])
+    expect(typeof trusted["nurture.enrollment_journey.command.execute.formal.v4"])
       .toBe("function");
   });
 });

@@ -1741,3 +1741,42 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
   the raw Host contact value is absent from Nurture inquiry persistence.
 - The complete serialized x5 lane passes 37/37 in three consecutive runs. No
   route, durable apply, DI binding, activation, deployment or traffic changed.
+
+## 2026-08-12 — G4-D I4 Guardian, native-source and replay closure
+
+- Rotated the one formal Enrollment Journey declaration to query v2, prepare
+  v3 and execute v4. The manifest now maps the exact disabled ingress on Admin
+  Web, Admin mobile query, Guardian chat and Guardian mobile surfaces; no
+  compatibility handler or alias remains.
+- Added the strict Guardian carrier parser. Ordinary actions carry only the
+  current Host Actor/contact/action tuple; formalization additionally requires
+  a current Child/Family pair for purpose `formalize_enrollment`.
+- Generalized the current authority owner without treating a platform identity
+  as Scenario permission. It validates the signed Host action against the
+  current inquiry contact, then Nurture derives and rereads its own participant,
+  Institution, association, Guardian role, Grant policy and entity heads.
+- Changed prepared persistence so Admin Web rows retain the exact current role
+  assignment while Guardian chat/mobile rows must have no role assignment.
+  The new migration replaces the old CHECK with that exact split rather than
+  weakening or duplicating the contract.
+- Added production native-source qualification through the existing
+  communication owner. The result is body-free and current Admin role revoke
+  denies the same source option.
+- Added current Guardian mobile formalization and exact replay through the
+  production owners. The transaction retains the same Enrollment/seat, rotates
+  the trial Grant and completes the Workflow only after current local owner
+  checks.
+- Fixed post-commit response reconstruction for Guardian commands with a pure
+  snapshot shape/lifecycle validator. This read is documented and typed as
+  after-authorized-command evidence, never as a new authorization path.
+- Fixed response-loss replay by resolving an exact consumed ledger/execution
+  before rebuilding the now-advanced payload. Replay still rechecks current
+  authority and tolerates only the target-head component advanced by the
+  committed command.
+- Refreshed the Prisma DB context to checksum
+  `7851031aa63a51887de6f937682d97a1998a25a80417e01edbb1115d8a33be3f`
+  and added the trial Grant policy to the G3-0 table census.
+- Issued [`95`](./95-g4-d-i4-exit-record.md) as
+  `G4_D_I4_EXIT_PASS_DEFAULT_OFF`. G4-F is now open only for the exact pin
+  reseal and task-level join; no durable apply, activation or traffic is
+  implied.

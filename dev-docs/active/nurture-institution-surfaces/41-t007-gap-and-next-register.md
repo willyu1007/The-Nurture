@@ -20,7 +20,7 @@ places drifts in one of them.
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
-| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A/I2-B; I3 default-off; I4-A settlement plus I4-B Prisma current-owner/Admin matrix and real Host-carrier signed positive qualified** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md), [`87`](./87-g4-d-i3-qualification-record.md), [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md), [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md), [`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md) |
+| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D I1–I4 qualified default-off; native source, Admin Web/mobile query, Guardian chat/mobile/formalization, replay and current-owner negatives complete** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md), [`87`](./87-g4-d-i3-qualification-record.md), [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md), [`95`](./95-g4-d-i4-exit-record.md) |
 | 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal ingress and complete owner source bound default-off; E7 DB qualification `PASS` at `223daa7`; E8 joint conformance `PASS` at `8d41be1`; **G4-E Exit issued (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`, record 85)**; `live_qualified=false` stays the activation gate** | [`64`](./64-g4-0f-scope-freeze.md)–[`85`](./85-g4-e-exit-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
@@ -34,8 +34,8 @@ prepare/confirmation persistence, and principal-bound My-Chat retrieval/final
 access. Its additive migration is disposable-qualified
 (`G4_E_E7_DB_QUALIFICATION_PASS` at `223daa7`, record
 [`83`](./83-g4-e-e7-db-qualification-record.md)); durable apply remains
-approval-gated. No I4 joint
-conformance, runtime capability activation or traffic exists. 0F now has a mechanically verified generic
+approval-gated. G4-D I4 joint conformance is complete and default-off; runtime
+capability activation and traffic remain absent. 0F now has a mechanically verified generic
 My-Chat Knowledge/PBR/RAG source pin, an accepted three-unit decomposition,
 the exact Nurture-owned lifecycle/provenance contract, retrieval/source/
 currentness bridge and cited-answer/safety/conflict-candidate contract. The 0G
@@ -200,7 +200,7 @@ observations in [`40`](./40-g4-b-increment-7-record.md),
 [`42`](./42-g4-b-increment-8-record.md) and
 [`44`](./44-g4-b-increment-10-record.md) remain historical evidence.
 
-### G-10 — Enrollment Journey I1–I3 are complete; I4 is active
+### G-10 — Closed: Enrollment Journey I1–I4 are qualified default-off
 
 G4-D increments 2–5 now supply DB-qualified private inquiry and capacity
 waitlist/preparation owners. The latter provides standard-only FIFO by default,
@@ -256,19 +256,22 @@ qualified by [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md):
 current association/authorization ambiguity, Guardian role revoke/expiry and
 Grant policy rotation all fail closed, including a policy reread inside the
 command transaction. Record
-[`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md) qualifies the real
-My-Chat producer and one signed prepare/fresh-execute relationship command
-through the formal handler. Native-source remainder, other command families,
-Guardian/mobile and the rest of the negative/replay/head matrix remain open.
+[`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md) qualifies the first real
+My-Chat producer path. Record [`95`](./95-g4-d-i4-exit-record.md) closes the
+remainder: production native source, exact Admin Web/mobile-query and Guardian
+chat/mobile surface mapping, formalization through current local association/
+role/Grant/policy/entity owners, consumed response-loss replay and the revoke/
+expiry/ambiguity/head matrix all pass on disposable PostgreSQL. Prepared
+Guardian rows store neither a fabricated Admin role nor carrier evidence.
 
 The revision-bearing local C30 adoption lock remains historical G4-D evidence.
 The current cross-repository Workflow/source population is adopted separately
-by [`79`](./79-teacher-release-owner-v3-migration.md); it does not substitute
-for the remaining I4 matrix.
+by [`79`](./79-teacher-release-owner-v3-migration.md); the final current-source
+reseal is owned by T-002 and is the sole prerequisite to the G4-F join.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
-### G-11 — G4-E I1/I2 are qualified; I3–I4 remain
+### G-11 — Closed: G4-E I1–I4 are qualified default-off
 
 [`70`](./70-g4-e-increment-1-record.md) implements the frozen 0F-1 private
 item, sealed immutable revision, atomic authority links, append-only events and
@@ -389,34 +392,23 @@ off slice.
    The post-audit signed declaration repair and exact request/response
    round trip raise the current complete lane to 36/36; record
    [`90`](./90-g4-d-i4-a-signed-ingress-requalification-record.md).
-6. **G4-D I4 remainder** — add native-source/current-owner transport, remaining
-   command families, Guardian/mobile and the complete negative/replay/head
-   matrix over the qualified I3 paths (record 87 boundaries). Current-owner
-   admission now rejects cross-pair, malformed action and stale grant-term
-   composition (record [`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)).
-   The request-scoped carrier and Nurture-local derivation port are now
-   implemented default-off (record
-   [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)). The production
-   Prisma owner plus local positive Admin matrix are now qualified (record
-   [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)); the real
-   Host carrier producer and first signed positive path are also qualified
-   (record [`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md)). The
-   remaining native-source, command-family, Guardian/mobile and complete
-   negative/replay/head matrix is next.
-7. **G4-F** — begin only after the complete I4 matrix passes; do not infer it
-   from the ownership preflight or a future single-suite pass.
+6. ~~**G4-D I4 remainder** — production native source, remaining command
+   families, Guardian/mobile and the complete negative/replay/head matrix.~~
+   Done 2026-08-12 as `G4_D_I4_EXIT_PASS_DEFAULT_OFF`; record
+   [`95`](./95-g4-d-i4-exit-record.md). The full unit, 41-migration fresh DB,
+   444-test production DB and three consecutive 37/37 x5 lanes pass.
+7. **G4-F** — reseal the T-002 exact My-Chat/Nurture adoption lock, then run
+   final integration/privacy/default-off/false-empty/governance and destroyed-
+   target censuses. Issue the Beta Profile Handoff only if all remain green.
 
 G-03's remaining authority/source fact is an external owner gate, not an
 actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09, G4-D I3, the I4-A Host Run settlement protocol, the local Prisma
-current-owner/Admin-command matrix and the first real Host-carrier signed
-positive path are closed. I4 now waits on the remaining native-source,
-command-family, Guardian/mobile and complete negative/replay/head matrix; it
-does not wait on the reservation protocol, Host producer or a disposable
-database pair.
+G-09 and G4-D I1–I4 are closed. G4-F waits only on the exact T-002 pin reseal
+and the final task-level join/census; it does not wait on additional Enrollment
+Journey implementation, a route, activation or a durable database target.
 
 ## Second-round status refinement
 
@@ -508,3 +500,17 @@ The remaining dependency order is now:
 
 The authored Prisma integration case for registration is not database-qualified
 in this environment. No apply or positive I4 claim is made.
+
+## Seventh-round status refinement
+
+The previous six rounds are historical. The current implementation closes the
+remaining I4 matrix at record [`95`](./95-g4-d-i4-exit-record.md): query v2,
+prepare v3 and execute v4 cover the exact three private surfaces; native-source
+reads are production-owner/body-free; Guardian formalization rereads current
+Host and Nurture owners inside the effect transaction; exact consumed replay
+admits only the expected target-head advance. Fresh migration, production DB,
+x5, type/static and default-off gates pass.
+
+The only next implementation-independent action is T-002's exact source-pin
+reseal followed by G4-F's final join and cleanup census. Durable apply,
+activation, deployment, live qualification and traffic remain outside T-007.

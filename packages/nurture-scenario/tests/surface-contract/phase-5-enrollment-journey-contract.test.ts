@@ -252,9 +252,8 @@ describe("G4-D I2-A enrollment journey wire contract", () => {
     expect([...types.$defs.actionEffect.enum].sort()).toEqual(actionKeys);
   });
 
-  it("registers only the single formal trusted track, not a legacy Workflow capability", () => {
-    expect(nurtureScenarioManifest.surface_mapping.web_run_workbench?.enrollment_journey)
-      .toEqual({
+  it("registers one disabled formal contract on every supported surface", () => {
+    const expectedMapping = {
         workflow_type: "EnrollmentJourneyWorkflowV1",
         contract_version: "1.0.0",
         ingress_category: "host_transition",
@@ -262,13 +261,15 @@ describe("G4-D I2-A enrollment journey wire contract", () => {
         prepare_endpoint_key: "nurture.enrollment_journey.command.prepare",
         execute_endpoint_key: "nurture.enrollment_journey.command.execute",
         enablement_policy: "disabled",
-      });
+      };
+    expect(nurtureScenarioManifest.surface_mapping.web_run_workbench?.enrollment_journey)
+      .toEqual(expectedMapping);
     expect(
       nurtureScenarioManifest.surface_mapping.chat_workflow_control?.enrollment_journey,
-    ).toBeUndefined();
+    ).toEqual(expectedMapping);
     expect(
       nurtureScenarioManifest.surface_mapping.mobile_dashboard?.enrollment_journey,
-    ).toBeUndefined();
+    ).toEqual(expectedMapping);
     expect(
       nurtureScenarioManifest.capabilities.some((capability) =>
         JSON.stringify(capability).includes("EnrollmentJourneyWorkflowV1"),
@@ -284,9 +285,9 @@ describe("G4-D I2-A enrollment journey wire contract", () => {
         .map((operation) => operation.handler_key)
         .filter((key) => key.includes("enrollment_journey")),
     ).toEqual([
-      "nurture.enrollment_journey.query.formal.v1",
-      "nurture.enrollment_journey.command.prepare.formal.v2",
-      "nurture.enrollment_journey.command.execute.formal.v3",
+      "nurture.enrollment_journey.query.formal.v2",
+      "nurture.enrollment_journey.command.prepare.formal.v3",
+      "nurture.enrollment_journey.command.execute.formal.v4",
       "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
       "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v2",
     ]);

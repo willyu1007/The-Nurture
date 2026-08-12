@@ -6,9 +6,9 @@ import { describe, expect, it } from "vitest";
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
   parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2,
-  parseNurtureEnrollmentJourneyFormalExecuteInputV3,
-  parseNurtureEnrollmentJourneyFormalPrepareInputV2,
-  parseNurtureEnrollmentJourneyFormalQueryInputV1,
+  parseNurtureEnrollmentJourneyFormalExecuteInputV4,
+  parseNurtureEnrollmentJourneyFormalPrepareInputV3,
+  parseNurtureEnrollmentJourneyFormalQueryInputV2,
   parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1,
 } from "../../src/enrollment-journey-formal-ingress-contract.js";
 import {
@@ -27,17 +27,21 @@ const principal: ScenarioHumanPrincipalV1 = {
 };
 
 describe("Enrollment Journey formal ingress", () => {
-  it("admits only the two admin queries on the query lane", () => {
-    expect(parseNurtureEnrollmentJourneyFormalQueryInputV1({
-      contractVersion: 1,
+  it("admits Admin and fresh-carrier Guardian queries on their exact surfaces", () => {
+    expect(parseNurtureEnrollmentJourneyFormalQueryInputV2({
+      contractVersion: 2,
+      clientSurface: "web_run_workbench",
       request: queryRequest("query_institution_enrollment_journey"),
     })).not.toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalQueryInputV1({
-      contractVersion: 1,
+    expect(parseNurtureEnrollmentJourneyFormalQueryInputV2({
+      contractVersion: 2,
+      clientSurface: "mobile_dashboard",
       request: queryRequest("query_guardian_enrollment_waitlist"),
-    })).toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalQueryInputV1({
-      contractVersion: 1,
+      guardianOwnerCarrier: guardianOwnerCarrier(),
+    })).not.toBeNull();
+    expect(parseNurtureEnrollmentJourneyFormalQueryInputV2({
+      contractVersion: 2,
+      clientSurface: "web_run_workbench",
       request: {
         capabilityKey: "close_inquiry",
         capabilityVersion: "1.0.0",
@@ -49,41 +53,48 @@ describe("Enrollment Journey formal ingress", () => {
   });
 
   it("admits only ledgered intents on the prepare lane", () => {
-    expect(parseNurtureEnrollmentJourneyFormalPrepareInputV2({
-      contractVersion: 2,
+    expect(parseNurtureEnrollmentJourneyFormalPrepareInputV3({
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-1",
       request: intent("close_inquiry", { reasonKey: "family_declined" }),
     })).not.toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalPrepareInputV2({
-      contractVersion: 2,
+    expect(parseNurtureEnrollmentJourneyFormalPrepareInputV3({
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-1",
       request: intent("record_or_skip_visit", { disposition: "recorded" }),
     })).toBeNull();
   });
 
   it("parses the execute union: ledgered confirmation or direct intent", () => {
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
-      contractVersion: 3,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: hostReservation(),
     })).not.toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
-      contractVersion: 3,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-1",
       request: intent("record_or_skip_visit", { disposition: "recorded" }),
     })).not.toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
-      contractVersion: 3,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-1",
       request: intent("close_inquiry", { reasonKey: "family_declined" }),
     })).toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
-      contractVersion: 3,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
     })).toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
-      contractVersion: 3,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: {
@@ -91,8 +102,9 @@ describe("Enrollment Journey formal ingress", () => {
         actor_id: "forbidden-host-field",
       },
     })).toBeNull();
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
       contractVersion: 2,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
     })).toBeNull();
@@ -113,8 +125,9 @@ describe("Enrollment Journey formal ingress", () => {
         ],
       },
     };
-    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV3({
-      contractVersion: 3,
+    expect(parseNurtureEnrollmentJourneyFormalExecuteInputV4({
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       currentOwnerCarrier: wrongOwnerPair,
@@ -153,7 +166,8 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const invocation = verifiedInvocation("prepare");
     invocation.invocation.operation.input = {
-      contractVersion: 2,
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-1",
       request: intent("prepare_trial_relationship", {}),
       currentOwnerCarrier: currentOwnerCarrier("enrollment_trial_pair"),
@@ -175,7 +189,8 @@ describe("Enrollment Journey formal ingress", () => {
     expect(JSON.stringify(prepared)).not.toContain("currentOwnerEvidence");
 
     invocation.invocation.operation.input = {
-      contractVersion: 2,
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-2",
       request: intent("prepare_trial_relationship", {}),
     };
@@ -187,7 +202,8 @@ describe("Enrollment Journey formal ingress", () => {
     });
 
     invocation.invocation.operation.input = {
-      contractVersion: 2,
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-3",
       request: intent("close_inquiry", { reasonKey: "family_declined" }),
       currentOwnerCarrier: currentOwnerCarrier("enrollment_trial_pair"),
@@ -231,6 +247,7 @@ describe("Enrollment Journey formal ingress", () => {
         verifyConfirmed: async () => ({
           status: "resolved",
           command_request_id: "command-request-1",
+          ledger_status: "prepared",
           frozen_request: {
             ...intent("prepare_trial_relationship", {}),
             confirmationRef: `ejc1.${"a".repeat(43)}`,
@@ -241,7 +258,8 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const invocation = verifiedInvocation("execute");
     invocation.invocation.operation.input = {
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       currentOwnerCarrier: carrier,
@@ -256,7 +274,8 @@ describe("Enrollment Journey formal ingress", () => {
     })]);
 
     invocation.invocation.operation.input = {
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
     };
@@ -267,6 +286,67 @@ describe("Enrollment Journey formal ingress", () => {
       reason_code: "invalid_enrollment_journey_formal_input",
     });
     expect(trustedContexts).toHaveLength(1);
+  });
+
+  it("allows only the consumed command's own target-head advance on replay", async () => {
+    const preparedAuthority = {
+      workspace_id: "workspace-1",
+      participant_ref: "participant-1",
+      institution_ref: "institution-1",
+      role_assignment_ref: "role-1",
+      active_role: "institution_admin" as const,
+      surface_key: "institution_workbench" as const,
+      authority_version: "nurture.ej-authority.v1.b1.p1.r1.i1.t10",
+      evaluated_at: "2026-08-12T00:00:00.000Z",
+    };
+    let currentAuthority = {
+      ...preparedAuthority,
+      authority_version: "nurture.ej-authority.v1.b1.p1.r1.i1.t11",
+    };
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: {
+        ...defaultNurtureEnrollmentJourneySurfaceDeps,
+        bindings: {
+          resolve: async () => ({ status: "denied", reason_code: "replay_reached_binding" }),
+        },
+      },
+      authorityResolver: {
+        resolveCurrent: async () => ({ status: "resolved", authority: currentAuthority }),
+      },
+      preparedCommandOwner: {
+        verifyConfirmed: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-1",
+          ledger_status: "consumed",
+          frozen_request: {
+            ...intent("close_inquiry", { reasonKey: "family_declined" }),
+            confirmationRef: `ejc1.${"a".repeat(43)}`,
+          },
+          authority: preparedAuthority,
+        }),
+      } as never,
+    });
+    const invocation = verifiedInvocation("execute");
+    invocation.invocation.operation.input = {
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+    };
+    await expect(
+      handlers[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute]?.(invocation),
+    ).resolves.toEqual({ status: "denied", reason_code: "replay_reached_binding" });
+
+    currentAuthority = {
+      ...currentAuthority,
+      authority_version: "nurture.ej-authority.v1.b1.p1.r2.i1.t11",
+    };
+    await expect(
+      handlers[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute]?.(invocation),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "enrollment_authority_snapshot_drift",
+    });
   });
 
   it("parses only exact historical settlement status input", () => {
@@ -344,7 +424,8 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const query = verifiedInvocation("query");
     query.invocation.operation.input = {
-      contractVersion: 1,
+      contractVersion: 2,
+      clientSurface: "web_run_workbench",
       request: queryRequest("query_institution_enrollment_journey"),
     };
     await expect(
@@ -356,7 +437,8 @@ describe("Enrollment Journey formal ingress", () => {
 
     const prepare = verifiedInvocation("prepare");
     prepare.invocation.operation.input = {
-      contractVersion: 2,
+      contractVersion: 3,
+      clientSurface: "web_run_workbench",
       clientCommandId: "client-1",
       request: intent("close_inquiry", { reasonKey: "family_declined" }),
     };
@@ -691,7 +773,8 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const query = verifiedInvocation("query");
     query.invocation.operation.input = {
-      contractVersion: 1,
+      contractVersion: 2,
+      clientSurface: "web_run_workbench",
       request: queryRequest("query_institution_enrollment_journey"),
     };
 
@@ -806,6 +889,7 @@ describe("Enrollment Journey formal ingress", () => {
         verifyConfirmed: async () => ({
           status: "resolved",
           command_request_id: "command-request-1",
+          ledger_status: "prepared",
           frozen_request: frozenRequest,
           authority,
         }),
@@ -843,7 +927,8 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const execute = verifiedInvocation("execute");
     execute.invocation.operation.input = {
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: hostReservation(),
@@ -883,6 +968,7 @@ describe("Enrollment Journey formal ingress", () => {
           verifyConfirmed: async () => ({
             status: "resolved",
             command_request_id: "command-request-1",
+            ledger_status: "prepared",
             frozen_request: frozenRequest,
             authority: {
               workspace_id: "workspace-1",
@@ -905,7 +991,8 @@ describe("Enrollment Journey formal ingress", () => {
       });
     const withoutEvidence = verifiedInvocation("execute");
     withoutEvidence.invocation.operation.input = {
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
     };
@@ -920,7 +1007,8 @@ describe("Enrollment Journey formal ingress", () => {
 
     const forbiddenEvidence = verifiedInvocation("execute");
     forbiddenEvidence.invocation.operation.input = {
-      contractVersion: 3,
+      contractVersion: 4,
+      clientSurface: "web_run_workbench",
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: hostReservation(),
@@ -994,6 +1082,9 @@ function verifiedInvocation(
         request_id: "host-invocation-request-1",
         correlation_id: "host-correlation-1",
         trace_id: "host-trace-1",
+        issued_at: "2026-08-12T00:00:00.000Z",
+        expires_at: "2026-08-12T00:01:00.000Z",
+        nonce: "n".repeat(32),
       },
     },
   } as unknown as WorkflowVerifiedScenarioInvocationV1;
@@ -1075,4 +1166,22 @@ function currentOwnerCarrier(
           verified_at: "2026-08-12T00:00:01.000Z",
         },
       };
+}
+
+function guardianOwnerCarrier() {
+  return {
+    carrierVersion: 1 as const,
+    guardianAction: {
+      contract_version: "1.0.0" as const,
+      actor_ref: canonical("my_chat", "actor", "actor-1"),
+      contact_ref: canonical(
+        "my_chat",
+        "nurture_prospective_contact",
+        "contact-1",
+      ),
+      action_ref: canonical("my_chat", "enrollment_action", "action-1"),
+      occurred_at: "2026-08-12T00:00:00.000Z",
+      verified_at: "2026-08-12T00:00:01.000Z",
+    },
+  };
 }

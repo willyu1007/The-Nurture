@@ -42,7 +42,7 @@ export function parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1(
   } catch {
     return null;
   }
-  if (!validNurtureOwnerPair(value.currentOwnerEvidence)) return null;
+  if (!isValidNurtureOwnerPairEvidence(value.currentOwnerEvidence)) return null;
   if (value.currentOwnerEvidence.purpose_key === "enrollment_trial_pair") {
     return exactRecord(value, ["carrierVersion", "currentOwnerEvidence"])
       ? {
@@ -69,7 +69,7 @@ export function parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1(
   };
 }
 
-function validNurtureOwnerPair(
+export function isValidNurtureOwnerPairEvidence(
   evidence: ScenarioCurrentOwnerBindingPairEvidenceV1,
 ): boolean {
   const [child, family] = evidence.owner_bindings;

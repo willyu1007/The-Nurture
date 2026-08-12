@@ -80,9 +80,9 @@ const expectedTrustedHandlerKeys = [
   "nurture.institution_knowledge.query.formal.v1",
   "nurture.institution_knowledge.command.prepare.formal.v1",
   "nurture.institution_knowledge.command.execute.formal.v1",
-  "nurture.enrollment_journey.query.formal.v1",
-  "nurture.enrollment_journey.command.prepare.formal.v2",
-  "nurture.enrollment_journey.command.execute.formal.v3",
+  "nurture.enrollment_journey.query.formal.v2",
+  "nurture.enrollment_journey.command.prepare.formal.v3",
+  "nurture.enrollment_journey.command.execute.formal.v4",
   "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
   "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v2",
 ];
@@ -102,6 +102,15 @@ assert(
       enablement_policy: "disabled",
     }),
   "Institution Knowledge must have one exact disabled formal Workbench mapping",
+);
+const enrollmentMapping = manifest.surface_mapping?.web_run_workbench?.enrollment_journey;
+assert(
+  JSON.stringify(manifest.surface_mapping?.chat_workflow_control?.enrollment_journey)
+      === JSON.stringify(enrollmentMapping)
+    && JSON.stringify(manifest.surface_mapping?.mobile_dashboard?.enrollment_journey)
+      === JSON.stringify(enrollmentMapping)
+    && enrollmentMapping?.enablement_policy === "disabled",
+  "Enrollment Journey formal mappings must be identical and disabled across Host surfaces",
 );
 
 const c30RouteTokens = new Set([

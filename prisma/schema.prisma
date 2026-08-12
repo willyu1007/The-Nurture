@@ -4410,7 +4410,7 @@ model NurtureEnrollmentJourneyPreparedCommand {
   workspaceId                   String                                        @map("workspace_id")
   participantId                 String                                        @map("participant_id")
   institutionId                 String                                        @map("institution_id")
-  roleAssignmentId              String                                        @map("role_assignment_id")
+  roleAssignmentId              String?                                       @map("role_assignment_id")
   clientSurface                 String                                        @map("client_surface")
   clientCommandIdHash           String                                        @map("client_command_id_hash") @db.Char(64)
   prepareFingerprint            String                                        @map("prepare_fingerprint") @db.Char(64)
@@ -4427,9 +4427,9 @@ model NurtureEnrollmentJourneyPreparedCommand {
   createdAt                     DateTime                                      @default(now()) @map("created_at")
   updatedAt                     DateTime                                      @updatedAt @map("updated_at")
 
-  participant    NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_participant_id_fkey")
-  institution    NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_institution_id_fkey")
-  roleAssignment NurtureCareRoleAssignment @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_role_assignment_id_fkey")
+  participant    NurtureParticipant         @relation(fields: [participantId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_participant_id_fkey")
+  institution    NurtureCareInstitution     @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_institution_id_fkey")
+  roleAssignment NurtureCareRoleAssignment? @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_role_assignment_id_fkey")
 
   @@unique([workspaceId, participantId, clientSurface, clientCommandIdHash], map: "uq_nurture_enrollment_prepared_client_command")
   @@index([workspaceId, participantId, status, expiresAt], map: "ix_nurture_enrollment_prepared_participant")
