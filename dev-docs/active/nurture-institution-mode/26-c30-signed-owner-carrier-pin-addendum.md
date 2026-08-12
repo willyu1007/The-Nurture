@@ -62,3 +62,18 @@ aggregate, scenario runtime, schema, migration, production route, Workspace
 activation, deployment, Pilot or traffic state. G4-D I4 is complete; the exact
 pin now permits T-007 to execute the G4-F integration/handoff census. C31-C35,
 T-008 and all activation gates remain separately closed.
+
+## 2026-08-13 revision-only reseal addendum
+
+- My-Chat pin head: `1db3f03c69dfa7c8cd77a2cd4b9aebd4a868acdb`. Drift since
+  `2d415ce` is confined to `ci/scenario-federation/qualification-lock.json`
+  and archived dev-docs; every content hash in the exact-current-inputs
+  table above is unchanged.
+- Nurture lock source: `a78e7ddb467e53fce97bb6ca7e8c89cc3872260f` (the
+  guard-head reseal commit).
+- Nurture owner aggregate:
+  `ec5198acb7fef7450414d56d62312f33deeeddb7878303e8d9ffb54cb2c85d44`. The
+  aggregate rotates only because the three guard scripts are part of the
+  `nurture_c30_manifest_foundation_v1` profile.
+- The 2026-08-12 requalification evidence above remains authoritative; no
+  content requalification was required for this reseal.

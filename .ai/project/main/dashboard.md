@@ -39,9 +39,10 @@ Project: `main`
   residue; the joint My-Chat/Nurture suite passes 5/5 and the full x5
   population 35/35. Durable apply, deployment, activation and traffic remain
   separate, unauthorized decisions.
-- T-002: `C30_CURRENT_PIN_REQUAL_PASS` at Base `536638a`, My-Chat `2d415ce`
-  and Nurture owner lock `856cd6c6…`; record 26 is authoritative. C31–C35, D
-  and Pilot remain closed.
+- T-002: `C30_CURRENT_PIN_REQUAL_PASS`; record 26 is authoritative, with its
+  2026-08-13 revision-only reseal addendum: Base `536638a`, My-Chat `1db3f03`
+  (ci/docs-only drift, content hashes unchanged) and Nurture owner lock
+  `ec5198ac…` sealed by `a78e7dd`. C31–C35, D and Pilot remain closed.
 - Cross-repo contract supply order (decided 2026-08-11): parent-context
   presenter first (unblocks the My-Chat parent institution tab), then IR-C01
   parent-communication gates, then the director presenter. This supply line and
