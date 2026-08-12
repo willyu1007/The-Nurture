@@ -1434,3 +1434,19 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Rotated the workflow-contract pin (`myChat.revision`, `x5_joint_api`,
   Nurture self-pin — the latter folding in `a869aaf`'s unrotated read-owner
   src drift).
+
+## 2026-08-12 G4-D I3 coherent change
+
+- Landed the record-86 change as one set: enrollment prepared-command ledger
+  (migration + domain owner + Prisma ledger), the three-provider composition
+  and production binding port, the transactional command executor (consume
+  inside the I1 effect transaction via the new optional
+  `enrollmentPreparedCommands` owner on the command transaction), the formal
+  trusted ingress with the internal bridge removed, and every census the
+  change touches. Details and boundaries in record 87.
+- Lane-scoped crypto: enrollment confirmations use the `ejc1` prefix and
+  enrollment-specific HMAC/AEAD domain strings; direct_commit contexts use
+  `ejd1.<deterministic-id>`; shared secrets can never validate across the
+  knowledge/enrollment lanes.
+- `DR-I3-01` repaired before any durable apply: minted workflow_run_ref must
+  be the Host `my_chat`/`workflow_run` canonical form.

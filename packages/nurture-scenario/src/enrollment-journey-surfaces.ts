@@ -466,6 +466,41 @@ const isQueryKey = (key: string): key is NurtureEnrollmentJourneyQueryKey =>
 const isCommandKey = (value: string): value is NurtureEnrollmentJourneyCommandKey =>
   (NURTURE_ENROLLMENT_JOURNEY_COMMAND_KEYS as readonly string[]).includes(value);
 
+/**
+ * Command intent = the adapter request without its confirmation. The prepare
+ * lane freezes exactly this shape; the confirmation is owner-issued, never
+ * caller-supplied (record 86 / G4-E shape).
+ */
+export type NurtureEnrollmentJourneyCommandIntentV1<
+  Key extends NurtureEnrollmentJourneyCommandKey = NurtureEnrollmentJourneyCommandKey,
+> = {
+  capabilityKey: Key;
+  capabilityVersion: "1.0.0";
+  targetOptionRef: string;
+  operationInput: OperationInputByCapability[Key];
+};
+
+export const parseNurtureEnrollmentJourneyCommandIntent = (
+  value: unknown,
+): NurtureEnrollmentJourneyCommandIntentV1 | null => {
+  if (!exact(value, [
+    "capabilityKey",
+    "capabilityVersion",
+    "targetOptionRef",
+    "operationInput",
+  ]) || typeof value.capabilityKey !== "string") {
+    return null;
+  }
+  const capability = value.capabilityKey;
+  if (!isCommandKey(capability) ||
+    value.capabilityVersion !== "1.0.0" || typeof value.targetOptionRef !== "string" ||
+    !OPAQUE_REF.test(value.targetOptionRef) ||
+    !validateOperationInput(capability, value.operationInput)) {
+    return null;
+  }
+  return value as NurtureEnrollmentJourneyCommandIntentV1;
+};
+
 export const parseNurtureEnrollmentJourneyAdapterRequest = (
   value: unknown,
 ): NurtureEnrollmentJourneyAdapterRequest | null => {
@@ -1076,35 +1111,3 @@ export class NurtureEnrollmentJourneySurfaceHandler {
     return execution;
   }
 }
-
-export const createNurtureEnrollmentJourneyInternalApiHandlers = (
-  deps: NurtureEnrollmentJourneySurfaceDeps,
-) => {
-  const handler = new NurtureEnrollmentJourneySurfaceHandler(deps);
-  const invoke = (
-    payload: unknown,
-    meta: WorkflowCommandMeta,
-    expectedLane: "query" | "command",
-  ) => {
-    const parsed = parseNurtureEnrollmentJourneyAdapterRequest(payload);
-    if (!parsed || isQueryKey(parsed.capabilityKey) !== (expectedLane === "query")) {
-      return Promise.resolve({
-        status: "invalid" as const,
-        reason_code: "invalid_enrollment_journey_request",
-      });
-    }
-    return handler.handle(parsed, {
-      workspace_id: meta.workspace_id,
-      actor_participant_ref: meta.actor_id ?? "",
-      invocation_request_id: meta.correlation_id,
-      command_request_id: meta.idempotency_key,
-      client_surface: meta.client_surface,
-    });
-  };
-  return {
-    "nurture.internal.query_enrollment_journey": (input: { payload: unknown; meta: WorkflowCommandMeta }) =>
-      invoke(input.payload, input.meta, "query"),
-    "nurture.internal.execute_enrollment_journey": (input: { payload: unknown; meta: WorkflowCommandMeta }) =>
-      invoke(input.payload, input.meta, "command"),
-  };
-};

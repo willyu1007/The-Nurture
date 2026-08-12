@@ -110,3 +110,4 @@ Project: `main`
 - 2026-08-12 task_id=T-007 event=debt-closure id=DR-E8-02 result=production-port-owned my_chat_pin=5ee3ffe x5=24/24 e8=12/12 unit=1014/1014 db=400/400 typecheck=repaired activation=unchanged
 - 2026-08-12 task_id=T-010 event=increment id=I4-C1 result=drafted-review-pending tables=2 enums=4 partial_uniques=2 apply=none activation=unchanged
 - 2026-08-12 task_id=T-010 event=quality-review id=I4-C1-CODEX result=6-findings-addressed composite_fks=8 target_uniques=4 verifier=verify:family-sharing-invariants apply=none activation=unchanged
+- 2026-08-12 task_id=T-007 event=checkpoint id=G4-D-I3 result=G4_D_I3_QUALIFIED_DEFAULT_OFF record=87 migrations=39/39 targeted=3/3 full_db=403/403 unit=1027/1027 drift=0 destroy=0 defects_repaired=DR-I3-01 activation=unchanged

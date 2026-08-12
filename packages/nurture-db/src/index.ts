@@ -120,3 +120,8 @@ export {
   NurturePackTriggerType,
   NurturePackStatus,
 } from "@prisma/client";
+export * from "./repositories/enrollment-journey-prepared-command.repository.js";
+export * from "./repositories/enrollment-pair-owner.repository.js";
+export * from "./repositories/enrollment-journey-current-authority.repository.js";
+export * from "./enrollment-journey-owner-providers.js";
+export * from "./enrollment-journey-owners.composition.js";

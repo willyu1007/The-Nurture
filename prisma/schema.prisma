@@ -830,6 +830,13 @@ enum NurtureInstitutionKnowledgePreparedCommandStatus {
   expired
 }
 
+// T-007 G4-D I3 enrollment prepared-command ledger status (E7-isomorphic).
+enum NurtureEnrollmentJourneyPreparedCommandStatus {
+  prepared
+  consumed
+  expired
+}
+
 enum NurtureCommandBusinessOutcome {
   applied
   already_satisfied
@@ -1891,6 +1898,7 @@ model NurtureParticipant {
   institutionKnowledgeRevisions        NurtureInstitutionKnowledgeRevision[]        @relation("NurtureKnowledgeRevisionAuthor")
   institutionKnowledgeEvents           NurtureInstitutionKnowledgeRevisionEvent[]   @relation("NurtureKnowledgeEventActor")
   institutionKnowledgePreparedCommands NurtureInstitutionKnowledgePreparedCommand[]
+  enrollmentJourneyPreparedCommands    NurtureEnrollmentJourneyPreparedCommand[]
 
   @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
   @@map("nurture_participant")
@@ -2330,6 +2338,7 @@ model NurtureCareInstitution {
   institutionKnowledgeEvents             NurtureInstitutionKnowledgeRevisionEvent[]
   institutionKnowledgeConflictCandidates NurtureInstitutionKnowledgeConflictReviewCandidate[]
   institutionKnowledgePreparedCommands   NurtureInstitutionKnowledgePreparedCommand[]
+  enrollmentJourneyPreparedCommands      NurtureEnrollmentJourneyPreparedCommand[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -2548,6 +2557,7 @@ model NurtureCareRoleAssignment {
   institutionKnowledgePreparedCommands NurtureInstitutionKnowledgePreparedCommand[]
   familySharingAuthorities             NurtureFamilySharingAuthority[]
   familySharingPolicies                NurtureFamilySharingPolicy[]
+  enrollmentJourneyPreparedCommands    NurtureEnrollmentJourneyPreparedCommand[]
 
   @@unique([workspaceId, role, id], map: "uq_nurture_care_role_assignment_workspace_role_id")
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
@@ -4317,4 +4327,41 @@ model NurtureFamilySharingPolicy {
   @@index([workspaceId, childCareProcessId, familyId, enrollmentId, category, axis, status], map: "ix_nurture_family_sharing_policy_scope")
   @@index([workspaceId, enrollmentId, status], map: "ix_nurture_family_sharing_policy_enrollment")
   @@map("nurture_family_sharing_policy")
+}
+
+// T-007 G4-D I3 formal Enrollment Journey prepare/confirm ledger, isomorphic
+// to the E7 Institution Knowledge ledger. The encrypted snapshot is
+// owner-held; command execution accepts only its opaque ids. reviewable and
+// strong confirmation classes go through this ledger; direct_commit
+// capabilities bypass it.
+model NurtureEnrollmentJourneyPreparedCommand {
+  commandRequestId              String                                        @id @map("command_request_id") @db.VarChar(200)
+  workspaceId                   String                                        @map("workspace_id")
+  participantId                 String                                        @map("participant_id")
+  institutionId                 String                                        @map("institution_id")
+  roleAssignmentId              String                                        @map("role_assignment_id")
+  clientSurface                 String                                        @map("client_surface")
+  clientCommandIdHash           String                                        @map("client_command_id_hash") @db.Char(64)
+  prepareFingerprint            String                                        @map("prepare_fingerprint") @db.Char(64)
+  originInvocationRequestIdHash String                                        @map("origin_invocation_request_id_hash") @db.Char(64)
+  confirmationRefHash           String                                        @map("confirmation_ref_hash") @db.Char(64)
+  capabilityKey                 String                                        @map("capability_key") @db.VarChar(100)
+  snapshotCodecVersion          Int                                           @map("snapshot_codec_version")
+  frozenSnapshotCiphertext      String                                        @map("frozen_snapshot_ciphertext") @db.Text
+  status                        NurtureEnrollmentJourneyPreparedCommandStatus
+  preparedAt                    DateTime                                      @map("prepared_at")
+  expiresAt                     DateTime                                      @map("expires_at")
+  consumedAt                    DateTime?                                     @map("consumed_at")
+  aggregateVersion              Int                                           @default(1) @map("aggregate_version")
+  createdAt                     DateTime                                      @default(now()) @map("created_at")
+  updatedAt                     DateTime                                      @updatedAt @map("updated_at")
+
+  participant    NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_participant_id_fkey")
+  institution    NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_institution_id_fkey")
+  roleAssignment NurtureCareRoleAssignment @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_enrollment_prepared_role_assignment_id_fkey")
+
+  @@unique([workspaceId, participantId, clientSurface, clientCommandIdHash], map: "uq_nurture_enrollment_prepared_client_command")
+  @@index([workspaceId, participantId, status, expiresAt], map: "ix_nurture_enrollment_prepared_participant")
+  @@index([workspaceId, institutionId, status, expiresAt], map: "ix_nurture_enrollment_prepared_institution")
+  @@map("nurture_enrollment_journey_prepared_command")
 }

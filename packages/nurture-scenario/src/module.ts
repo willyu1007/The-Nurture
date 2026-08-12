@@ -18,10 +18,14 @@ import {
 } from "./registry.js";
 import { createInstitutionInternalApiHandlers } from "./institution-surfaces.js";
 import {
-  createNurtureEnrollmentJourneyInternalApiHandlers,
   defaultNurtureEnrollmentJourneySurfaceDeps,
   type NurtureEnrollmentJourneySurfaceDeps,
 } from "./enrollment-journey-surfaces.js";
+import { createNurtureEnrollmentJourneyFormalInvocationHandlers } from "./enrollment-journey-formal-ingress.js";
+import type {
+  NurtureEnrollmentJourneyFormalAuthorityResolverV1,
+  NurtureEnrollmentJourneyPreparedCommandOwnerV1,
+} from "./enrollment-journey-formal-ingress-contract.js";
 import { defaultNurtureInstitutionKnowledgeSurfaceDeps } from "./institution-knowledge-surfaces.js";
 import {
   admitNurtureInstitutionKnowledgeOwnerIntegration,
@@ -56,13 +60,13 @@ export const nurtureScenarioModule: WorkflowScenarioModule = {
     ...createNurtureInstitutionKnowledgeFormalInvocationHandlers({
       surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
     }),
+    ...createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+    }),
   },
   internal_api_handlers: {
     ...nurtureInternalApiHandlers,
     ...createInstitutionInternalApiHandlers(defaultNurtureDeps),
-    ...createNurtureEnrollmentJourneyInternalApiHandlers(
-      defaultNurtureEnrollmentJourneySurfaceDeps,
-    ),
   },
 };
 
@@ -74,6 +78,8 @@ export type NurtureScenarioModuleDeps = {
   enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
   /** G4-E E7 admits the complete owner set only behind the exact Q2/Q3 pin tuple. */
   institutionKnowledgeFormalOwnerBinding?: NurtureInstitutionKnowledgeFormalOwnerBindingV1;
+  /** G4-D I3 formal Enrollment Journey owners; omitted stays fail-closed. */
+  enrollmentJourneyFormalOwnerBinding?: NurtureEnrollmentJourneyFormalOwnerBindingV1;
   /** Exact C30 owner; omitted production composition remains fail-closed. */
   c30SubjectPresentationOwner?: NurtureC30TrustedInvocationOwner;
 };
@@ -88,6 +94,17 @@ export type NurtureInstitutionKnowledgeFormalOwnerBindingV1 = Readonly<{
   authorityResolver: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
   preparedCommandOwner: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
   authorizedRetrievalOwnerFactory: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1;
+}>;
+
+/**
+ * Single production binding for the formal Enrollment Journey ingress
+ * (G4-D I3, record 86). One value keeps the surface dependencies, authority
+ * resolver and prepared-command owner from being mixed across tracks.
+ */
+export type NurtureEnrollmentJourneyFormalOwnerBindingV1 = Readonly<{
+  surfaceDeps: NurtureEnrollmentJourneySurfaceDeps;
+  authorityResolver: NurtureEnrollmentJourneyFormalAuthorityResolverV1;
+  preparedCommandOwner: NurtureEnrollmentJourneyPreparedCommandOwnerV1;
 }>;
 
 /**
@@ -121,13 +138,19 @@ export const createNurtureScenarioModule = (
         authorizedRetrievalOwnerFactory:
           admittedFormalOwnerBinding?.authorizedRetrievalOwnerFactory,
       }),
+      ...createNurtureEnrollmentJourneyFormalInvocationHandlers({
+        surfaceDeps:
+          deps.enrollmentJourneyFormalOwnerBinding?.surfaceDeps
+          ?? deps.enrollmentJourneySurfaceDeps
+          ?? defaultNurtureEnrollmentJourneySurfaceDeps,
+        authorityResolver: deps.enrollmentJourneyFormalOwnerBinding?.authorityResolver,
+        preparedCommandOwner:
+          deps.enrollmentJourneyFormalOwnerBinding?.preparedCommandOwner,
+      }),
     },
     internal_api_handlers: {
       ...nurtureInternalApiHandlers,
       ...createInstitutionInternalApiHandlers(deps.handlerDeps),
-      ...createNurtureEnrollmentJourneyInternalApiHandlers(
-        deps.enrollmentJourneySurfaceDeps ?? defaultNurtureEnrollmentJourneySurfaceDeps,
-      ),
     },
   };
 };

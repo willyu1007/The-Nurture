@@ -720,14 +720,7 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
   "surface_mapping": {
     "chat_workflow_control": {
       "adapter_key": "nurture.chat_workflow",
-      "recommendation_policy": "user_message_intent_and_context_refs",
-      "enrollment_journey": {
-        "workflow_type": "EnrollmentJourneyWorkflowV1",
-        "contract_version": "1.0.0",
-        "query_handler_key": "nurture.internal.query_enrollment_journey",
-        "command_handler_key": "nurture.internal.execute_enrollment_journey",
-        "enablement_policy": "disabled"
-      }
+      "recommendation_policy": "user_message_intent_and_context_refs"
     },
     "chat_dashboard_summary": {
       "presenter_key": "nurture.chat_dashboard_summary"
@@ -745,8 +738,10 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
       "enrollment_journey": {
         "workflow_type": "EnrollmentJourneyWorkflowV1",
         "contract_version": "1.0.0",
-        "query_handler_key": "nurture.internal.query_enrollment_journey",
-        "command_handler_key": "nurture.internal.execute_enrollment_journey",
+        "ingress_category": "host_transition",
+        "query_endpoint_key": "nurture.enrollment_journey.query",
+        "prepare_endpoint_key": "nurture.enrollment_journey.command.prepare",
+        "execute_endpoint_key": "nurture.enrollment_journey.command.execute",
         "enablement_policy": "disabled"
       },
       "institution_knowledge": {
@@ -759,14 +754,7 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
       }
     },
     "mobile_dashboard": {
-      "adapter_key": "nurture.mobile_dashboard",
-      "enrollment_journey": {
-        "workflow_type": "EnrollmentJourneyWorkflowV1",
-        "contract_version": "1.0.0",
-        "query_handler_key": "nurture.internal.query_enrollment_journey",
-        "command_handler_key": "nurture.internal.execute_enrollment_journey",
-        "enablement_policy": "disabled"
-      }
+      "adapter_key": "nurture.mobile_dashboard"
     },
     "forum_publication": {
       "handoff_type": "public_draft",
@@ -1114,6 +1102,57 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
             {
               "ingress_category": "host_transition",
               "ingress_key": "nurture.institution_knowledge.command.execute",
+              "principal_origins": [
+                "interactive_session"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint_key": "nurture.enrollment_journey.query",
+          "method": "POST",
+          "operation_key": "query_enrollment_journey",
+          "input_schema_key": "nurture.enrollment_journey.query.input",
+          "input_schema_version": 1,
+          "handler_key": "nurture.enrollment_journey.query.formal.v1",
+          "ingress": [
+            {
+              "ingress_category": "host_transition",
+              "ingress_key": "nurture.enrollment_journey.query",
+              "principal_origins": [
+                "interactive_session"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint_key": "nurture.enrollment_journey.command.prepare",
+          "method": "POST",
+          "operation_key": "prepare_enrollment_journey_command",
+          "input_schema_key": "nurture.enrollment_journey.command.prepare.input",
+          "input_schema_version": 1,
+          "handler_key": "nurture.enrollment_journey.command.prepare.formal.v1",
+          "ingress": [
+            {
+              "ingress_category": "host_transition",
+              "ingress_key": "nurture.enrollment_journey.command.prepare",
+              "principal_origins": [
+                "interactive_session"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint_key": "nurture.enrollment_journey.command.execute",
+          "method": "POST",
+          "operation_key": "execute_prepared_enrollment_journey_command",
+          "input_schema_key": "nurture.enrollment_journey.command.execute.input",
+          "input_schema_version": 1,
+          "handler_key": "nurture.enrollment_journey.command.execute.formal.v1",
+          "ingress": [
+            {
+              "ingress_category": "host_transition",
+              "ingress_key": "nurture.enrollment_journey.command.execute",
               "principal_origins": [
                 "interactive_session"
               ]

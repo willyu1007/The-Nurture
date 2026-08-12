@@ -21,6 +21,7 @@ import type {
   NurtureWorkflowProject,
 } from "@the-nurture/scenario/harness";
 import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js";
+import { PrismaNurtureEnrollmentJourneyPreparedCommandLedger } from "./enrollment-journey-prepared-command.repository.js";
 import { PrismaPublishProcessTransaction } from "./publish-process.transaction.js";
 import { PrismaMediaAttributionTransaction } from "./media-attribution.transaction.js";
 import { PrismaAttendanceTransaction } from "./attendance-closeout.repository.js";
@@ -134,6 +135,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly enrollmentWaitlist: PrismaEnrollmentWaitlistRepository;
   readonly enrollmentTrialLifecycle: PrismaEnrollmentTrialLifecycleRepository;
   readonly enrollmentFormalization: PrismaEnrollmentFormalizationRepository;
+  /** G4-D I3: the enrollment prepared-command ledger, consumed in this tx. */
+  readonly enrollmentPreparedCommands: PrismaNurtureEnrollmentJourneyPreparedCommandLedger;
   /** G4-E private Institution Knowledge lifecycle/provenance writes. */
   readonly institutionKnowledge: PrismaInstitutionKnowledgeRepository;
   readonly institutionKnowledgeConflicts: PrismaInstitutionKnowledgeConflictCandidateRepository;
@@ -195,6 +198,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
       transaction,
       now,
     );
+    this.enrollmentPreparedCommands =
+      new PrismaNurtureEnrollmentJourneyPreparedCommandLedger(transaction);
     this.institutionKnowledge = new PrismaInstitutionKnowledgeRepository(transaction, now);
     this.institutionKnowledgeConflicts =
       new PrismaInstitutionKnowledgeConflictCandidateRepository(transaction);

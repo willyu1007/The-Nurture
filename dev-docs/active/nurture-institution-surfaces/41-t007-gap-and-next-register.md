@@ -364,12 +364,14 @@ off slice.
 3. **Activation gate, later** — before enabling any Q3 flag or traffic, run a
    real secret-backed request through the same gateway and record
    `live_qualified`. Never label recorded/synthetic transport as live evidence.
-4. **G4-D I3** — bind the authenticated My-Chat
+4. ~~**G4-D I3** — bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
-   scenario-service ingress. Retain exact option/confirmation heads and the
-   default-off runtime gate while qualifying on an approved disposable DB.
-5. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
-   after the I3 owner and ingress paths qualify.
+   scenario-service ingress.~~ Qualified 2026-08-12
+   (`G4_D_I3_QUALIFIED_DEFAULT_OFF`, record 87): heads and default-off gates
+   retained, disposable qualification passed, internal bridge removed.
+5. **G4-D I4** — run joint negative/replay/mobile-Web head conformance over
+   the qualified I3 paths; the wave4 current-owner evidence transport and the
+   end-to-end journey command lanes bind here (record 87 boundaries).
 
 G-03's remaining authority/source fact is an external owner gate, not an
 actionable implementation step in the current schema. Resume it only when a

@@ -678,59 +678,28 @@ describe("G4-D I2-B Enrollment Journey public adapters", () => {
     expect(JSON.stringify(guardian)).not.toMatch(/rank|category|policy|entry|count/i);
   });
 
-  it("registers only fail-closed module handlers and disabled surface composition", async () => {
+  it("registers only the formal trusted track with a disabled surface mapping", () => {
     expect(Object.isFrozen(defaultNurtureEnrollmentJourneySurfaceDeps)).toBe(true);
     expect(Object.isFrozen(defaultNurtureEnrollmentJourneySurfaceDeps.bindings)).toBe(true);
     const mapping = nurtureScenarioManifest.surface_mapping;
-    for (const surface of ["chat_workflow_control", "web_run_workbench", "mobile_dashboard"]) {
-      expect(mapping[surface]?.enrollment_journey).toMatchObject({
-        workflow_type: "EnrollmentJourneyWorkflowV1",
-        contract_version: "1.0.0",
-        enablement_policy: "disabled",
-      });
+    expect(mapping.web_run_workbench?.enrollment_journey).toEqual({
+      workflow_type: "EnrollmentJourneyWorkflowV1",
+      contract_version: "1.0.0",
+      ingress_category: "host_transition",
+      query_endpoint_key: "nurture.enrollment_journey.query",
+      prepare_endpoint_key: "nurture.enrollment_journey.command.prepare",
+      execute_endpoint_key: "nurture.enrollment_journey.command.execute",
+      enablement_policy: "disabled",
+    });
+    expect(mapping.chat_workflow_control?.enrollment_journey).toBeUndefined();
+    expect(mapping.mobile_dashboard?.enrollment_journey).toBeUndefined();
+    const internalKeys = Object.keys(nurtureScenarioModule.internal_api_handlers ?? {})
+      .filter((key) => key.includes("enrollment_journey"));
+    expect(internalKeys).toEqual([]);
+    const trusted = nurtureScenarioModule.trusted_invocation_handlers ?? {};
+    for (const lane of ["query", "command.prepare", "command.execute"]) {
+      expect(typeof trusted[`nurture.enrollment_journey.${lane}.formal.v1`])
+        .toBe("function");
     }
-    const internal = nurtureScenarioModule.internal_api_handlers;
-    expect(internal).toHaveProperty("nurture.internal.query_enrollment_journey");
-    expect(internal).toHaveProperty("nurture.internal.execute_enrollment_journey");
-    const meta = {
-      workspace_id: "workspace-01",
-      actor_id: "participant-01",
-      idempotency_key: "request-01",
-      correlation_id: "correlation-01",
-      client_surface: "web_run_workbench" as const,
-    };
-    const queryPayload = {
-      capabilityKey: "query_institution_enrollment_journey",
-      capabilityVersion: "1.0.0",
-      targetOptionRef: "option-query",
-      operationInput: {},
-    };
-    await expect(internal["nurture.internal.query_enrollment_journey"]?.({
-      method: "POST",
-      path: "/synthetic",
-      payload: queryPayload,
-      meta,
-    })).resolves.toEqual({
-      status: "unavailable",
-      reason_code: "enrollment_journey_runtime_unavailable",
-    });
-    await expect(internal["nurture.internal.execute_enrollment_journey"]?.({
-      method: "POST",
-      path: "/synthetic",
-      payload: queryPayload,
-      meta,
-    })).resolves.toEqual({
-      status: "invalid",
-      reason_code: "invalid_enrollment_journey_request",
-    });
-    await expect(internal["nurture.internal.query_enrollment_journey"]?.({
-      method: "POST",
-      path: "/synthetic",
-      payload: request("confirm_intent_conversation"),
-      meta,
-    })).resolves.toEqual({
-      status: "invalid",
-      reason_code: "invalid_enrollment_journey_request",
-    });
   });
 });

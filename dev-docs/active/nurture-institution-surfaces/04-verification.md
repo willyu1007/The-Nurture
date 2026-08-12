@@ -1030,3 +1030,20 @@ aggregate、出勤推理或 RAG。
 | Runtime effects | NONE / DEFAULT-OFF | unchanged; `live_qualified=false` |
 
 Current verdict: `DR_E8_02_CLOSED_PRODUCTION_PORT_OWNED / G4_D_I3_NURTURE_OWNER_COMPOSITION_NEXT`.
+
+## 2026-08-12 G4-D I3 disposable qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Empty-target deploy | PASS | 39/39 migrations on `postgres:16-alpine` disposable; status up to date |
+| Targeted I3 suite | PASS | 3/3 final form — prepare/verify/transactional-consume + exact replay; dedup/reuse-conflict/expiry scrub; prospective-contact binding + Host version-drift denial |
+| Full production DB lane | PASS | 403/403 across 46 files on the disposable |
+| Drift | NONE | `migrate diff` from the disposable to the datamodel is empty |
+| Unit / typecheck | PASS | 1027/1027 across 96 files; 0 type errors |
+| Censuses | PASS | routing 172 exact; formal-ingress routes=7 unrouted=32; c30 default-off handlers=9 all-zero activation; G3-0 freeze [ok]; manifest current |
+| Pin | PASS | self-pin rotated to `6767f609…` (290 files); My-Chat `ec9f298` unchanged |
+| Pre-apply defects | 1 repaired | `DR-I3-01` workflow_run_ref namespace (composition fix; PostgreSQL-only signal) |
+| Disposable cleanup | PASS | destroyed, 0 survivors |
+| Runtime effects | NONE / DEFAULT-OFF | no route, flag, credential, durable apply or traffic |
+
+Current verdict: `G4_D_I3_QUALIFIED_DEFAULT_OFF / G4_D_I4_JOINT_NEXT`.

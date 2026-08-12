@@ -9,6 +9,7 @@ import type { NurturePublishProcessTransaction } from "../institution/publish-pr
 import type { NurtureMediaAttributionTransaction } from "../institution/media-attribution-transaction.js";
 import type { NurturePublicationSafetyTransaction } from "../institution/publication-safety-transaction.js";
 import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
+import type { NurtureEnrollmentJourneyPreparedCommandLedgerV1 } from "../institution/enrollment-journey-prepared-command.js";
 import type { NurtureCareCaptureTransaction } from "../institution/care-capture-transaction.js";
 import type { NurtureAttendanceCommandTransaction } from "../institution/attendance-closeout.js";
 import type { NurtureContentRevisionTransaction } from "../institution/content-revision.js";
@@ -102,6 +103,8 @@ export type NurtureCommandTransaction = {
   institutionKnowledgeConflicts?: NurtureInstitutionKnowledgeConflictCandidateTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
+  /** Present when the G4-D I3 enrollment prepared-command ledger is wired. */
+  enrollmentPreparedCommands?: NurtureEnrollmentJourneyPreparedCommandLedgerV1;
   findCommitted(input: {
     workspace_id: string;
     command_request_id_hash: string;

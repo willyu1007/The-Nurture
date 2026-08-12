@@ -25,15 +25,17 @@ Project: `main`
   (production DB 400/400, x5 24/24, E8 12/12); the read owner was rewritten for
   deterministic feed ordering, opaque cursors, watermark reconciliation and
   page batching (records 84 post-review, 04-verification 2026-08-12).
-  **G4-D I3 has started** (design record 86): the authenticated My-Chat
-  prospective-contact owner
-  (`my-chat.nurture-enrollment-prospective-contact-owner@1.0.0`, My-Chat
-  `83c4647`) is landed and disposable-qualified, and the pin is rotated to
-  adopt it. Next: the Nurture-side owner composition (contact/native-source/
-  current-owner), the enrollment prepared-command ledger + repository and the
-  formal scenario-service ingress, all landing together with their consumer;
-  then I3 qualification, I4 joint conformance and G4-F. Durable apply remains
-  approval-gated; `live_qualified=false` stays a separate activation gate.
+  **G4-D I3 is qualified** (`G4_D_I3_QUALIFIED_DEFAULT_OFF`, record 87,
+  2026-08-12): the enrollment prepared-command ledger, the three-provider
+  composition (prospective-contact / native-source / current-owner), the
+  transactional command executor (consume inside the I1 effect transaction,
+  record 63) and the formal trusted ingress landed as one coherent change;
+  the internal bridge is removed with no alias, and the disposable
+  qualification passed (39/39 deploy, targeted 3/3, full DB 403/403, drift
+  zero, `DR-I3-01` repaired pre-apply). Next: I4 joint conformance (J3) —
+  binds the wave4 current-owner evidence transport and the joint
+  negative/replay matrix — then G4-F. Durable apply remains approval-gated;
+  `live_qualified=false` stays a separate activation gate.
   Note: the pin rotation leaves the C30-I3 adoption lock host head at
   `ae563988` — refreshed by the T-002 C30 Step-5 track, not by G4-D I3.
 - T-010: I4-C1 drafted and independently reviewed (2026-08-12, review-only —

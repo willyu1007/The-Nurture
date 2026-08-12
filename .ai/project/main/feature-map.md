@@ -390,12 +390,13 @@ Project: `main`
   artifact and disabled Workbench adapters. The adopted My-Chat T-040 sequence
   through `942bd00` closes Q2 ingestion/currentness and implements Q3 replay
   plus its provider-neutral safety boundary; Q4 sibling authority is closed.
-- Next Checkpoint: G4-D I3 — one coherent change that lands the enrollment
-  prepared-command ledger with its consumer, composes the adopted My-Chat
-  prospective-contact owner with the Nurture native-source and current-owner
-  ports, binds the formal trusted ingress (three operations, internal bridge
-  removed, no compatibility alias) and qualifies on an approved disposable
-  target (design frozen in record 86). G4-E is closed: record 83 (E7
+- Next Checkpoint: G4-D I4 joint conformance (J3) over the qualified I3
+  paths — I3 closed 2026-08-12 (`G4_D_I3_QUALIFIED_DEFAULT_OFF`, record 87:
+  ledger + three-provider composition + transactional executor + formal
+  trusted ingress in one coherent change; internal bridge removed; disposable
+  qualification 39/39, 3/3, 403/403, drift zero, `DR-I3-01` repaired). I4
+  binds the wave4 current-owner evidence transport and the joint
+  negative/replay matrix; then G4-F. G4-E is closed: record 83 (E7
   disposable-database qualification), record 84 (E8 joint conformance, 12/12
   matrix + x5 24/24 through the real Base dispatcher) and record 85
   (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`) close the chain, and the 2026-08-12
