@@ -1281,3 +1281,24 @@ I4_REMAINDER_PENDING / G4_F_CLOSED` (record [`90`](./90-g4-d-i4-a-signed-ingress
 Verdict: `G4_D_I4_B_CURRENT_OWNER_ADMISSION_HARDENED /
 CARRIER_AND_POSITIVE_COMMAND_MATRIX_PENDING / DEFAULT_OFF` (record
 [`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)).
+
+## 2026-08-12 I4-B request-scoped owner carrier
+
+| Check | Result |
+| --- | --- |
+| exact prepare/execute wire | PASS — prepare v2, execute v3; exact optional carrier keys and purpose/capability admission |
+| prepared persistence boundary | PASS — wire carrier removed before the v1 encrypted owner draft; execute requires fresh evidence |
+| mixed owner source removal | PASS — Host evidence arrives only from verified invocation; Nurture pair/Grant facts come from a local derivation port |
+| focused carrier/formal/surface set | PASS — 4 files / 51 tests |
+| full unit lane | PASS — 97 files / 1049 tests |
+| focused current-owner PostgreSQL suite | PASS — 1 file / 6 tests |
+| full production PostgreSQL lane | PASS — 50 files / 439 tests |
+| empty migration replay | PASS — Nurture 39/39; My-Chat 43/43 |
+| complete serialized x5 lane | PASS — three consecutive runs, each 5 files / 36 tests |
+| type/static gates | PASS — root TypeScript; formal ingress, persistence, port topology, routing, manifest and C30 default-off |
+| exact workflow pin | PASS — My-Chat `42c94825`, x5 `d7cf510b...`, wave4 `65d6b0a0...`, Nurture self `6337639e...` |
+| runtime effects | NONE — no persistent apply, route, DI binding, activation or traffic |
+
+Verdict: `G4_D_I4_B_REQUEST_SCOPED_CARRIER_AND_LOCAL_DERIVATION_PORT_IMPLEMENTED_DEFAULT_OFF /
+PRISMA_DERIVATION_AND_POSITIVE_MATRIX_PENDING / G4_F_CLOSED` (record
+[`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)).

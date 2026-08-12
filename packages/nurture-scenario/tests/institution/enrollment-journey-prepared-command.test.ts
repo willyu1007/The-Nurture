@@ -1,7 +1,7 @@
 import type { CanonicalRef, ScenarioHumanPrincipalV1 } from "@my-chat/workflow-contracts";
 import { describe, expect, it } from "vitest";
 import type { NurtureParticipantPrincipalBindingV1 } from "../../src/c30/participant-binding.js";
-import type { NurtureEnrollmentJourneyFormalPrepareInputV1 } from "../../src/enrollment-journey-formal-ingress-contract.js";
+import type { NurtureEnrollmentJourneyPreparedCommandDraftV1 } from "../../src/enrollment-journey-formal-ingress-contract.js";
 import {
   NurtureEnrollmentJourneyPreparedCommandCrypto,
   NurtureEnrollmentJourneyPreparedCommandOwner,
@@ -307,7 +307,7 @@ function prepareInput(overrides: Partial<Parameters<
 function intentCommand(
   capabilityKey: string,
   operationInput: Record<string, unknown>,
-): NurtureEnrollmentJourneyFormalPrepareInputV1 {
+): NurtureEnrollmentJourneyPreparedCommandDraftV1 {
   return {
     contractVersion: 1 as const,
     clientCommandId: "client-command-1",
@@ -317,7 +317,7 @@ function intentCommand(
       targetOptionRef: "option-journey-1",
       operationInput,
     },
-  } as NurtureEnrollmentJourneyFormalPrepareInputV1;
+  } as NurtureEnrollmentJourneyPreparedCommandDraftV1;
 }
 
 function verifyInput(prepared: { command_request_id: string; confirmation_ref: string }) {

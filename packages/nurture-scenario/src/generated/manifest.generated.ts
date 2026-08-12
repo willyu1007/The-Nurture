@@ -1130,8 +1130,8 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
           "method": "POST",
           "operation_key": "prepare_enrollment_journey_command",
           "input_schema_key": "nurture.enrollment_journey.command.prepare.input",
-          "input_schema_version": 1,
-          "handler_key": "nurture.enrollment_journey.command.prepare.formal.v1",
+          "input_schema_version": 2,
+          "handler_key": "nurture.enrollment_journey.command.prepare.formal.v2",
           "ingress": [
             {
               "ingress_category": "host_transition",
@@ -1147,8 +1147,8 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
           "method": "POST",
           "operation_key": "execute_prepared_enrollment_journey_command",
           "input_schema_key": "nurture.enrollment_journey.command.execute.input",
-          "input_schema_version": 2,
-          "handler_key": "nurture.enrollment_journey.command.execute.formal.v2",
+          "input_schema_version": 3,
+          "handler_key": "nurture.enrollment_journey.command.execute.formal.v3",
           "ingress": [
             {
               "ingress_category": "host_transition",

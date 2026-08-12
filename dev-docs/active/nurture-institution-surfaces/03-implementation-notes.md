@@ -1685,3 +1685,20 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
   composition remains default-off and G4-D I4 still requires the
   native-source/current-owner, command-family, Guardian/mobile and head-drift
   matrix recorded in the live gap register.
+
+## 2026-08-12 — G4-D I4-B request-scoped current-owner carrier
+
+- Added the exact two-shape carrier and strict parser around
+  `ScenarioCurrentOwnerBindingPairEvidenceV1` plus the family-only Guardian
+  action.
+- Rotated formal prepare to v2 and execute to v3. Prepare removes carrier
+  material before the v1 encrypted ledger draft; execute admits fresh evidence
+  only for the exact capability/purpose tuple.
+- Replaced the mixed remote owner source with
+  `NurtureEnrollmentLocalOwnerDerivationV1`; the provider validates, cross-binds
+  and locally rereads pair/Grant facts before use.
+- Adopted My-Chat `42c94825` for the execute-v3 settlement declaration and
+  requalified unit, PostgreSQL, migration, x5 and default-off gates.
+- Left the production Prisma derivation adapter, Host carrier producer and
+  positive/revoke/expiry/head matrix for the next bounded unit. No route,
+  durable apply, activation or traffic was added.

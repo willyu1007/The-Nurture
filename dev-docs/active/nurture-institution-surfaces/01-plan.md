@@ -846,3 +846,21 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
 - [x] Run step 5 on an explicitly approved disposable database pair. I4-A is
   DB-qualified default-off by record [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md);
   the remaining owner/command/head matrix and G4-F stay open.
+
+## 2026-08-12 G4-D I4-B carrier checkpoint
+
+- [x] Replace the mixed current-owner evidence source with one exact
+  request-scoped carrier plus a Nurture-local derivation port.
+- [x] Rotate formal prepare to v2 and execute to v3; require the exact carrier
+  only on the three current Admin owner lanes and reject it everywhere else.
+- [x] Strip the carrier before prepared-command persistence and require fresh
+  evidence at execute.
+- [x] Cross-bind and reread locally derived trial pair/Grant facts, retain all
+  runtime gates disabled and requalify the complete x5 lane.
+- [ ] Implement the production Prisma derivation adapter and positive signed
+  prepare/execute/replay plus revoke/expiry/head-drift matrix.
+- [ ] Add the separate Guardian/mobile/formalization carrier only with its
+  authenticated Host producer and exact local owner predicates.
+
+Record [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md) closes the
+request boundary, not I4 or G4-F.

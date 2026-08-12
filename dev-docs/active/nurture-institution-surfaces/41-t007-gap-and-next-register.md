@@ -238,16 +238,16 @@ ingress and censuses are present. No route, activation, durable apply or
 traffic exists; `workflowRunRef` accepts only the exact My-Chat-owned canonical
 shape and the private workflow ref is never projected.
 
-I4-A ownership preflight is recorded by
-[`88`](./88-g4-d-i4-a-prospective-contact-joint-record.md). The proposed
-prospective-contact joint vehicle exposed a prior I3 replay defect: Nurture
-creates a new Host `my_chat/workflow_run` ref while resolving the same command.
-A deterministic Nurture-local replacement was rejected because stable replay
-does not grant authority to mint a My-Chat Run. Before the joint vehicle lands,
-My-Chat must issue/reserve/read that ref through a pinned trusted seam and
-Nurture must only validate/persist it. Disposable database availability is a
-second gate. Native-source/current-owner transport, other command families,
-Guardian/mobile and the full negative/head matrix also remain open.
+I4-A's ownership preflight and repaired settlement qualification are recorded
+by [`88`](./88-g4-d-i4-a-prospective-contact-joint-record.md) through
+[`90`](./90-g4-d-i4-a-signed-ingress-requalification-record.md). My-Chat now
+owns the reserve/confirm/abandon lifecycle and exact Run identity; Nurture owns
+the committed/no-effect settlement and never mints that Run. The request-scoped
+current-owner carrier and Nurture-local derivation port are implemented
+default-off by [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md).
+The production derivation adapter, positive current-owner command matrix,
+native-source remainder, other command families, Guardian/mobile and the full
+negative/head matrix remain open.
 
 The revision-bearing local C30 adoption lock remains historical G4-D evidence.
 The current cross-repository Workflow/source population is adopted separately
@@ -381,8 +381,12 @@ off slice.
    command families, Guardian/mobile and the complete negative/replay/head
    matrix over the qualified I3 paths (record 87 boundaries). Current-owner
    admission now rejects cross-pair, malformed action and stale grant-term
-   composition (record [`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md));
-   the request-scoped Host carrier and positive command matrix remain next.
+   composition (record [`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)).
+   The request-scoped carrier and Nurture-local derivation port are now
+   implemented default-off (record
+   [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)); the production
+   Prisma derivation adapter and positive signed command/revoke/expiry/head
+   matrix are next.
 7. **G4-F** — begin only after the complete I4 matrix passes; do not infer it
    from the ownership preflight or a future single-suite pass.
 
@@ -392,7 +396,8 @@ business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
 G-09, G4-D I3 and the I4-A Host Run settlement protocol qualification are
-closed. I4 now waits on the still-unimplemented owner/command/head remainder;
+closed. I4 now waits on the production owner adapter and still-unimplemented
+positive command/head remainder;
 it does not wait on the reservation protocol or a disposable database pair.
 
 ## Second-round status refinement

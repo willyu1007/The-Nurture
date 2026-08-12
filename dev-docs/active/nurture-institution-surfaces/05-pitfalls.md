@@ -771,3 +771,18 @@
   settlement or acquiring the command writer fence.
 - **Prevention:** destructive reconciliation inputs must preserve the complete
   semantic identity of the attempted operation across every owner boundary.
+
+## 2026-08-12 - Do not combine Host evidence with Scenario business snapshots
+
+- **Symptom:** the I3 source port could return valid Host current-owner evidence
+  together with a separately chosen Nurture pair and Grant snapshot.
+- **Root cause:** signed transport acquisition and Nurture business derivation
+  were represented by one mixed remote-source result.
+- **What was tried:** structural evidence validation and a final local pair
+  reread rejected malformed or stale facts, but they did not make the source
+  ownership boundary explicit and still allowed cross-pair substitution.
+- **Fix/workaround:** carry only exact Host evidence in the enclosing verified
+  invocation, strip it before prepare persistence, and derive pair/Grant facts
+  through a Nurture-local port before exact cross-binding and currency reread.
+- **Prevention:** transport adapters never manufacture or cache Scenario
+  business snapshots; each owner supplies its own facts at request time.

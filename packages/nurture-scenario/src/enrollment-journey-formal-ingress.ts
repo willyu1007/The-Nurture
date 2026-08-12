@@ -5,11 +5,12 @@ import type {
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
   parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2,
-  parseNurtureEnrollmentJourneyFormalExecuteInputV2,
-  parseNurtureEnrollmentJourneyFormalPrepareInputV1,
+  parseNurtureEnrollmentJourneyFormalExecuteInputV3,
+  parseNurtureEnrollmentJourneyFormalPrepareInputV2,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
   parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1,
   type NurtureEnrollmentJourneyFormalAuthorityResolverV1,
+  type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
   type NurtureEnrollmentJourneyLocalAuthorityV1,
   type NurtureEnrollmentJourneyPreparedCommandOwnerV1,
 } from "./enrollment-journey-formal-ingress-contract.js";
@@ -159,12 +160,16 @@ async function prepare(
   deps: NurtureEnrollmentJourneyFormalIngressDeps,
 ): Promise<unknown> {
   if (!matchesOperation(verified, "prepare")) return declarationDrift();
-  const input = parseNurtureEnrollmentJourneyFormalPrepareInputV1(
+  const input = parseNurtureEnrollmentJourneyFormalPrepareInputV2(
     verified.invocation.operation.input,
   );
   if (!input) return invalid();
   if (!deps.preparedCommandOwner || !deps.authorityResolver) return unavailable();
   try {
+    if (!carrierMatchesCapability(
+      input.request.capabilityKey,
+      input.currentOwnerCarrier,
+    )) return invalid();
     const resolution = await resolveCurrentAuthority(verified, deps, input.request);
     if (resolution.status !== "resolved") return resolution;
     const prepared = await deps.preparedCommandOwner.prepare({
@@ -172,7 +177,11 @@ async function prepare(
       invocation_request_id: verified.invocation.request.request_id,
       client_surface: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.client_surface,
       authority: resolution.authority,
-      command: input,
+      command: {
+        contractVersion: 1,
+        clientCommandId: input.clientCommandId,
+        request: input.request,
+      },
     });
     return normalizePreparedResult(prepared, input.request.capabilityKey);
   } catch {
@@ -185,7 +194,7 @@ async function execute(
   deps: NurtureEnrollmentJourneyFormalIngressDeps,
 ): Promise<unknown> {
   if (!matchesOperation(verified, "execute")) return declarationDrift();
-  const input = parseNurtureEnrollmentJourneyFormalExecuteInputV2(
+  const input = parseNurtureEnrollmentJourneyFormalExecuteInputV3(
     verified.invocation.operation.input,
   );
   if (!input) return invalid();
@@ -216,6 +225,10 @@ async function execute(
       if (
         startsInquiry !== (input.hostWorkflowRunReservation !== undefined)
       ) return invalid();
+      if (!carrierMatchesCapability(
+        verifiedCommand.frozen_request.capabilityKey,
+        input.currentOwnerCarrier,
+      )) return invalid();
       if (startsInquiry && !deps.workflowRunSettlementOwner) return unavailable();
       const hostReservation = input.hostWorkflowRunReservation;
       const current = await resolveCurrentAuthority(
@@ -234,6 +247,7 @@ async function execute(
         verifiedCommand.frozen_request,
         verifiedCommand.command_request_id,
         hostReservation,
+        input.currentOwnerCarrier,
       );
       if (!startsInquiry || !isRecord(surfaceResult) || surfaceResult.status !== "ok") {
         return surfaceResult;
@@ -297,6 +311,7 @@ async function invokeSurface(
   request: NurtureEnrollmentJourneyAdapterRequest,
   commandRequestId: string,
   hostWorkflowRunReservation?: NurtureEnrollmentJourneyTrustedContextV1["host_workflow_run_reservation"],
+  currentOwnerCarrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
 ): Promise<unknown> {
   const workspaceId = verified.invocation.principal.workspace_ref.object_id;
   if (authority.workspace_id !== workspaceId) {
@@ -315,12 +330,29 @@ async function invokeSurface(
     ...(hostWorkflowRunReservation === undefined
       ? {}
       : { host_workflow_run_reservation: hostWorkflowRunReservation }),
+    ...(currentOwnerCarrier === undefined
+      ? {}
+      : { current_owner_carrier: currentOwnerCarrier }),
   };
   const handler = new NurtureEnrollmentJourneySurfaceHandler({
     ...deps.surfaceDeps,
     bindings: authorityBoundBindings(deps.surfaceDeps.bindings, authority),
   });
   return handler.handle(request, trusted);
+}
+
+function carrierMatchesCapability(
+  capabilityKey: string,
+  carrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1 | undefined,
+): boolean {
+  const requiredPurpose = capabilityKey === "qualify_capacity_waitlist"
+    ? "enrollment_family_acceptance"
+    : ["prepare_trial_relationship", "start_trial"].includes(capabilityKey)
+      ? "enrollment_trial_pair"
+      : undefined;
+  return requiredPurpose === undefined
+    ? carrier === undefined
+    : carrier?.currentOwnerEvidence.purpose_key === requiredPurpose;
 }
 
 function authorityBoundBindings(

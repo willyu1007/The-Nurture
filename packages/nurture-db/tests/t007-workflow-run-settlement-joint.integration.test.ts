@@ -5,10 +5,10 @@ import {
   PrismaWorkflowRunReservationLifecycleRepository,
 } from "@my-chat/db";
 import {
-  NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V2,
+  NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V3,
   createSignedNurtureEnrollmentJourneyRunSettlementClient,
   createNurtureEnrollmentJourneyRunCoordinator,
-  type VerifiedNurtureEnrollmentJourneyRunSettlementClientV2,
+  type VerifiedNurtureEnrollmentJourneyRunSettlementClientV3,
 } from "@my-chat/scenario-integrations";
 import {
   InMemoryAtomicScenarioNonceStore,
@@ -64,13 +64,13 @@ type ProtocolMode =
   | "writer_wins"
   | "no_effect_wins";
 type ExecuteInput = Parameters<
-  VerifiedNurtureEnrollmentJourneyRunSettlementClientV2["execute"]
+  VerifiedNurtureEnrollmentJourneyRunSettlementClientV3["execute"]
 >[0];
 type StatusInput = Parameters<
-  VerifiedNurtureEnrollmentJourneyRunSettlementClientV2["readStatus"]
+  VerifiedNurtureEnrollmentJourneyRunSettlementClientV3["readStatus"]
 >[0];
 type NoEffectInput = Parameters<
-  VerifiedNurtureEnrollmentJourneyRunSettlementClientV2["confirmNoEffect"]
+  VerifiedNurtureEnrollmentJourneyRunSettlementClientV3["confirmNoEffect"]
 >[0];
 
 const workspaces = new Set<string>();
@@ -102,7 +102,7 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
     const responseKeys = generateKeyPairSync("ed25519");
     const now = new Date("2026-08-12T09:00:00.000Z");
     const formalExecute = NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.execute;
-    expect(NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V2).toEqual({
+    expect(NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V3).toEqual({
       scenario_key: "nurture",
       endpoint_key: formalExecute.endpoint_key,
       method: formalExecute.method,
@@ -210,7 +210,7 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
     });
 
     await expect(client.execute({
-      contractVersion: 2,
+      contractVersion: 3,
       commandRequestId: "command-request-1",
       confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: reservationEvidence("signed-route"),
@@ -364,7 +364,7 @@ describe("T-007/T-041 two-database Workflow Run settlement", () => {
 });
 
 class DatabaseProtocolClient
-implements VerifiedNurtureEnrollmentJourneyRunSettlementClientV2 {
+implements VerifiedNurtureEnrollmentJourneyRunSettlementClientV3 {
   readonly calls = { execute: 0, confirmNoEffect: 0, readStatus: 0 };
   readonly gate = executionGate();
   private readonly owner: NurtureWorkflowRunSettlementOwnerV1;
@@ -480,7 +480,7 @@ implements VerifiedNurtureEnrollmentJourneyRunSettlementClientV2 {
 }
 
 function createCoordinator(
-  client: VerifiedNurtureEnrollmentJourneyRunSettlementClientV2,
+  client: VerifiedNurtureEnrollmentJourneyRunSettlementClientV3,
 ) {
   return createNurtureEnrollmentJourneyRunCoordinator({
     repository: new PrismaWorkflowRunReservationLifecycleRepository(myChat),

@@ -37,7 +37,7 @@ import {
   createNurtureEnrollmentJourneyCurrentOwnerProvider,
   createNurtureEnrollmentNativeSourceProvider,
   createNurtureEnrollmentProspectiveContactProvider,
-  type NurtureEnrollmentCurrentOwnerEvidenceSourceV1,
+  type NurtureEnrollmentLocalOwnerDerivationV1,
   type NurtureEnrollmentJourneyCurrentOwnerProviderV1,
   type NurtureEnrollmentNativeSourceProviderV1,
   type NurtureEnrollmentProspectiveContactProviderV1,
@@ -324,10 +324,14 @@ implements NurtureEnrollmentJourneyBindingPort {
       }
       binding.refs.target_care_group = group.care_group_ref;
       binding.heads.capacity_revision = group.capacity_revision;
+      if (!trusted.current_owner_carrier) {
+        return { status: "denied", reason_code: "current_owner_carrier_required" };
+      }
       const acceptance = await this.deps.currentOwnerProvider.resolveFamilyAcceptance({
         workspace_id: trusted.workspace_id,
         institution_ref: binding.institution_ref,
         workflow_ref: requireRef(binding.refs.workflow),
+        current_owner_carrier: trusted.current_owner_carrier,
       });
       if (acceptance.status !== "resolved") return acceptance;
       binding.family_acceptance_owner_snapshot = acceptance.snapshot;
@@ -396,10 +400,14 @@ implements NurtureEnrollmentJourneyBindingPort {
     }
 
     if (["prepare_trial_relationship", "start_trial"].includes(key)) {
+      if (!trusted.current_owner_carrier) {
+        return { status: "denied", reason_code: "current_owner_carrier_required" };
+      }
       const pair = await this.deps.currentOwnerProvider.resolveTrialPair({
         workspace_id: trusted.workspace_id,
         institution_ref: binding.institution_ref,
         workflow_ref: requireRef(binding.refs.workflow),
+        current_owner_carrier: trusted.current_owner_carrier,
       });
       if (pair.status !== "resolved") return pair;
       binding.pair_owner_snapshot = pair.pair;
@@ -669,9 +677,9 @@ export type PrismaNurtureEnrollmentJourneyFormalOwners = Readonly<{
 /**
  * Composes the Nurture-owned pieces of the formal Enrollment Journey ingress
  * (record 86). Supplying this bundle does not register a route, enable a
- * feature or create external traffic; the My-Chat prospective-contact owner
- * and the wave4 current-owner evidence source arrive as inputs, never as a
- * reverse source pin.
+ * feature or create external traffic. The My-Chat prospective-contact owner
+ * and the Nurture-local current-owner derivation port arrive as inputs; Host
+ * current-owner evidence is admitted only from each verified invocation.
  */
 export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
   prisma: PrismaClient;
@@ -681,7 +689,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
   messageRefIntegrityKey: string;
   contactOwner: NurtureEnrollmentContactOwnerV1;
   businessCommunicationReads: InstitutionBusinessCommunicationReadPort;
-  currentOwnerEvidenceSource: NurtureEnrollmentCurrentOwnerEvidenceSourceV1;
+  currentOwnerDerivation: NurtureEnrollmentLocalOwnerDerivationV1;
   protectedContent: ProtectedContentWritePort;
   now?: () => Date;
   preparedCommandTtlMs?: number;
@@ -734,7 +742,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
       now,
     }),
     currentOwnerProvider: createNurtureEnrollmentJourneyCurrentOwnerProvider({
-      source: input.currentOwnerEvidenceSource,
+      localOwnerDerivation: input.currentOwnerDerivation,
       pairOwner: new PrismaEnrollmentPairOwnerRepository(input.prisma, now),
       now,
     }),

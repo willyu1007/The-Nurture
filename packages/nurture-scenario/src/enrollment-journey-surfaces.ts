@@ -76,6 +76,7 @@ import {
   parseNurtureWorkflowRunReservationEvidenceV1,
   type NurtureWorkflowRunReservationEvidenceV1,
 } from "./domain/institution/workflow-run-settlement.js";
+import type { NurtureEnrollmentJourneyCurrentOwnerCarrierV1 } from "./enrollment-journey-current-owner-carrier.js";
 
 export const NURTURE_ENROLLMENT_JOURNEY_QUERY_KEYS = [
   "query_institution_enrollment_journey",
@@ -227,6 +228,8 @@ export type NurtureEnrollmentJourneyTrustedContextV1 = {
   client_surface: WorkflowCommandMeta["client_surface"];
   /** Signed Host reservation evidence; admitted only for inquiry creation. */
   host_workflow_run_reservation?: NurtureWorkflowRunReservationEvidenceV1;
+  /** Request-scoped Host owner evidence; never persisted in prepared state. */
+  current_owner_carrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
 };
 
 type PreparedHeads = {

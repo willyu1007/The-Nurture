@@ -1,14 +1,14 @@
 import type { NurtureEnrollmentContactOwnerV1 } from "@my-chat/scenario-integrations";
-import {
-  assertScenarioCurrentOwnerBindingPairEvidenceV1,
-  type ScenarioCurrentOwnerBindingPairEvidenceV1,
-} from "@my-chat/workflow-contracts";
+import type { ScenarioCurrentOwnerBindingPairEvidenceV1 } from "@my-chat/workflow-contracts";
 import {
   resolveFamilyCareMessageTargetRef,
+  parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1,
   validateEnrollmentGuardianActionOwnerSnapshotV1,
   validateTrialGrantTermsSnapshotV1,
+  validateTrialPairOwnerSnapshotV1,
   type InstitutionBusinessCommunicationReadPort,
   type NurtureEnrollmentContactOwnerSnapshotV1,
+  type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
   type NurtureEnrollmentGuardianActionOwnerSnapshotV1,
   type NurtureEnrollmentNativeSourceOwnerSnapshotV1,
   type NurtureTrialGrantTermsSnapshotV1,
@@ -135,28 +135,22 @@ export function createNurtureEnrollmentNativeSourceProvider(input: {
 }
 
 /**
- * G4-D I3 provider 3: guardian/pair/grant current-owner snapshots. Pair and
- * acceptance facts are backed by wave4
- * `ScenarioCurrentOwnerBindingPairEvidenceV1`; the injected source owns the
- * signed transport (detached Ed25519 + nonce), this factory owns the C30
- * structural assertion and the local currency rereads, and I4 joint
- * conformance binds the real My-Chat endpoints to the source port.
+ * G4-D I4 provider 3: the signed invocation carries Host evidence and the
+ * Guardian action, while a Nurture-local port derives pair/grant facts. This
+ * factory cross-binds both owners and performs the final local currency read.
  */
-export type NurtureEnrollmentCurrentOwnerEvidenceV1 = {
-  evidence: ScenarioCurrentOwnerBindingPairEvidenceV1;
-  guardian_action: NurtureEnrollmentGuardianActionOwnerSnapshotV1;
-  pair?: NurtureTrialPairOwnerSnapshotV1;
-  grant_terms?: NurtureTrialGrantTermsSnapshotV1;
-};
-
-export type NurtureEnrollmentCurrentOwnerEvidenceSourceV1 = {
-  fetchCurrentOwnerEvidence(input: {
+export type NurtureEnrollmentLocalOwnerDerivationV1 = {
+  deriveTrialPair(input: {
     workspace_id: string;
     institution_ref: string;
     workflow_ref: string;
-    purpose_key: "enrollment_family_acceptance" | "enrollment_trial_pair";
+    current_owner_evidence: ScenarioCurrentOwnerBindingPairEvidenceV1;
   }): Promise<
-    | { status: "resolved"; value: NurtureEnrollmentCurrentOwnerEvidenceV1 }
+    | {
+        status: "resolved";
+        pair: NurtureTrialPairOwnerSnapshotV1;
+        grant_terms: NurtureTrialGrantTermsSnapshotV1;
+      }
     | ProviderFailure
   >;
 };
@@ -166,6 +160,7 @@ export type NurtureEnrollmentJourneyCurrentOwnerProviderV1 = {
     workspace_id: string;
     institution_ref: string;
     workflow_ref: string;
+    current_owner_carrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
   }): Promise<
     | { status: "resolved"; snapshot: NurtureEnrollmentGuardianActionOwnerSnapshotV1 }
     | ProviderFailure
@@ -174,6 +169,7 @@ export type NurtureEnrollmentJourneyCurrentOwnerProviderV1 = {
     workspace_id: string;
     institution_ref: string;
     workflow_ref: string;
+    current_owner_carrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
   }): Promise<
     | {
         status: "resolved";
@@ -185,81 +181,92 @@ export type NurtureEnrollmentJourneyCurrentOwnerProviderV1 = {
 };
 
 export function createNurtureEnrollmentJourneyCurrentOwnerProvider(input: {
-  source: NurtureEnrollmentCurrentOwnerEvidenceSourceV1;
+  localOwnerDerivation: NurtureEnrollmentLocalOwnerDerivationV1;
   pairOwner: Pick<PrismaEnrollmentPairOwnerRepository, "isTrialSnapshotCurrent">;
   now?: () => Date;
 }): NurtureEnrollmentJourneyCurrentOwnerProviderV1 {
   const now = input.now ?? (() => new Date());
-  const fetchVerified = async (
-    request: {
-      workspace_id: string;
-      institution_ref: string;
-      workflow_ref: string;
-    },
+  const verifyCarrier = (
+    carrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
     purposeKey: "enrollment_family_acceptance" | "enrollment_trial_pair",
   ) => {
-    let fetched;
-    try {
-      fetched = await input.source.fetchCurrentOwnerEvidence({
-        ...request,
-        purpose_key: purposeKey,
-      });
-    } catch {
-      return {
-        status: "unavailable" as const,
-        reason_code: "current_owner_evidence_unavailable",
-      };
-    }
-    if (fetched.status !== "resolved") return fetched;
-    try {
-      assertScenarioCurrentOwnerBindingPairEvidenceV1(
-        fetched.value.evidence,
-        "enrollment_current_owner_evidence",
-      );
-    } catch {
+    const parsed = parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1(carrier);
+    if (!parsed) {
       return {
         status: "denied" as const,
         reason_code: "current_owner_evidence_invalid",
       };
     }
-    if (fetched.value.evidence.purpose_key !== purposeKey) {
+    if (parsed.currentOwnerEvidence.purpose_key !== purposeKey) {
       return {
         status: "denied" as const,
         reason_code: "current_owner_evidence_purpose_drift",
       };
     }
-    return { status: "resolved" as const, value: fetched.value };
+    return { status: "resolved" as const, carrier: parsed };
   };
 
   return {
     async resolveFamilyAcceptance(request) {
-      const verified = await fetchVerified(request, "enrollment_family_acceptance");
+      const verified = verifyCarrier(
+        request.current_owner_carrier,
+        "enrollment_family_acceptance",
+      );
       if (verified.status !== "resolved") return verified;
+      if (!("guardianAction" in verified.carrier)) {
+        return { status: "denied", reason_code: "current_owner_guardian_action_invalid" };
+      }
       if (
         !validateEnrollmentGuardianActionOwnerSnapshotV1(
-          verified.value.guardian_action,
+          verified.carrier.guardianAction,
         ) ||
-        new Date(verified.value.guardian_action.verified_at) > now()
+        new Date(verified.carrier.guardianAction.verified_at) > now()
       ) {
         return {
           status: "denied",
           reason_code: "current_owner_guardian_action_invalid",
         };
       }
-      return { status: "resolved", snapshot: verified.value.guardian_action };
+      return { status: "resolved", snapshot: verified.carrier.guardianAction };
     },
     async resolveTrialPair(request) {
-      const verified = await fetchVerified(request, "enrollment_trial_pair");
+      const verified = verifyCarrier(
+        request.current_owner_carrier,
+        "enrollment_trial_pair",
+      );
       if (verified.status !== "resolved") return verified;
-      const pair = verified.value.pair;
-      const grantTerms = verified.value.grant_terms;
-      if (!pair || !grantTerms) {
-        return { status: "denied", reason_code: "current_owner_pair_evidence_missing" };
+      let derived;
+      try {
+        derived = await input.localOwnerDerivation.deriveTrialPair({
+          workspace_id: request.workspace_id,
+          institution_ref: request.institution_ref,
+          workflow_ref: request.workflow_ref,
+          current_owner_evidence: verified.carrier.currentOwnerEvidence,
+        });
+      } catch {
+        return { status: "unavailable", reason_code: "current_owner_derivation_unavailable" };
       }
-      if (!pairMatchesEvidence(pair, verified.value.evidence)) {
+      if (derived.status !== "resolved") {
+        return validProviderFailure(derived)
+          ? derived
+          : {
+              status: "unavailable",
+              reason_code: "current_owner_derivation_response_invalid",
+            };
+      }
+      const pair = derived.pair;
+      const grantTerms = derived.grant_terms;
+      const currentTime = now();
+      if (
+        !validateTrialPairOwnerSnapshotV1(pair) ||
+        new Date(pair.verified_at) > currentTime ||
+        new Date(pair.expires_at) <= currentTime
+      ) {
+        return { status: "denied", reason_code: "current_owner_pair_not_current" };
+      }
+      if (!pairMatchesEvidence(pair, verified.carrier.currentOwnerEvidence)) {
         return { status: "denied", reason_code: "current_owner_pair_evidence_drift" };
       }
-      const currentTime = now();
       if (
         !validateTrialGrantTermsSnapshotV1(grantTerms) ||
         new Date(grantTerms.verified_at) > currentTime ||
@@ -279,6 +286,11 @@ export function createNurtureEnrollmentJourneyCurrentOwnerProvider(input: {
       return { status: "resolved", pair, grant_terms: grantTerms };
     },
   };
+}
+
+function validProviderFailure(value: ProviderFailure): boolean {
+  return (value.status === "denied" || value.status === "unavailable") &&
+    /^[a-z][a-z0-9_]{0,119}$/u.test(value.reason_code);
 }
 
 function pairMatchesEvidence(

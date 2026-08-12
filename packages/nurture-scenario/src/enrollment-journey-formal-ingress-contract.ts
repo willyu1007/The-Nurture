@@ -6,6 +6,14 @@ import {
   type NurtureEnrollmentJourneyCommandIntentV1,
   type NurtureEnrollmentJourneyQueryKey,
 } from "./enrollment-journey-surfaces.js";
+import {
+  parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+  type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+} from "./enrollment-journey-current-owner-carrier.js";
+export {
+  parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+  type NurtureEnrollmentJourneyCurrentOwnerCarrierV1,
+} from "./enrollment-journey-current-owner-carrier.js";
 import type { NurtureEnrollmentJourneyCommandKey } from "./domain/institution/enrollment-journey-command.js";
 import {
   parseNurtureWorkflowRunReservationEvidenceV1,
@@ -13,7 +21,8 @@ import {
 } from "./domain/institution/workflow-run-settlement.js";
 
 /**
- * G4-D I3 formal trusted ingress (record 86, G4-E shape). The reviewable and
+ * G4-D formal trusted ingress (record 86 plus the request-scoped owner carrier
+ * in record 91). The reviewable and
  * strong confirmation classes go through the durable prepared-command ledger;
  * the three direct_commit capabilities bypass it on the execute lane with an
  * owner-derived deterministic command id. Consumption happens inside the same
@@ -85,8 +94,8 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1 = Object.freeze({
     method: "POST",
     operation_key: "prepare_enrollment_journey_command",
     input_schema_key: "nurture.enrollment_journey.command.prepare.input",
-    input_schema_version: 1,
-    handler_key: "nurture.enrollment_journey.command.prepare.formal.v1",
+    input_schema_version: 2,
+    handler_key: "nurture.enrollment_journey.command.prepare.formal.v2",
     ingress_key: "nurture.enrollment_journey.command.prepare",
   }),
   execute: Object.freeze({
@@ -94,8 +103,8 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1 = Object.freeze({
     method: "POST",
     operation_key: "execute_prepared_enrollment_journey_command",
     input_schema_key: "nurture.enrollment_journey.command.execute.input",
-    input_schema_version: 2,
-    handler_key: "nurture.enrollment_journey.command.execute.formal.v2",
+    input_schema_version: 3,
+    handler_key: "nurture.enrollment_journey.command.execute.formal.v3",
     ingress_key: "nurture.enrollment_journey.command.execute",
   }),
   settlementStatus: Object.freeze({
@@ -132,7 +141,16 @@ export type NurtureEnrollmentJourneyFormalQueryInputV1 = {
   request: NurtureEnrollmentJourneyAdapterRequest<NurtureEnrollmentJourneyFormalQueryKey>;
 };
 
-export type NurtureEnrollmentJourneyFormalPrepareInputV1 = {
+/** Host-only wire input. `currentOwnerCarrier` is never frozen in the ledger. */
+export type NurtureEnrollmentJourneyFormalPrepareInputV2 = {
+  contractVersion: 2;
+  clientCommandId: string;
+  request: NurtureEnrollmentJourneyCommandIntentV1<NurtureEnrollmentJourneyLedgeredCommandKey>;
+  currentOwnerCarrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
+};
+
+/** Nurture-owned ledger draft after the request-scoped carrier is removed. */
+export type NurtureEnrollmentJourneyPreparedCommandDraftV1 = {
   contractVersion: 1;
   clientCommandId: string;
   request: NurtureEnrollmentJourneyCommandIntentV1<NurtureEnrollmentJourneyLedgeredCommandKey>;
@@ -144,15 +162,16 @@ export type NurtureEnrollmentJourneyFormalPrepareInputV1 = {
  * full intent for exactly the three direct_commit capabilities and no
  * confirmation (the owner derives the deterministic command id).
  */
-export type NurtureEnrollmentJourneyFormalExecuteInputV2 =
+export type NurtureEnrollmentJourneyFormalExecuteInputV3 =
   | {
-      contractVersion: 2;
+      contractVersion: 3;
       commandRequestId: string;
       confirmationRef: string;
       hostWorkflowRunReservation?: NurtureWorkflowRunReservationEvidenceV1;
+      currentOwnerCarrier?: NurtureEnrollmentJourneyCurrentOwnerCarrierV1;
     }
   | {
-      contractVersion: 2;
+      contractVersion: 3;
       clientCommandId: string;
       request: NurtureEnrollmentJourneyCommandIntentV1<NurtureEnrollmentJourneyDirectCommandKey>;
     };
@@ -214,7 +233,7 @@ export type NurtureEnrollmentJourneyPreparedCommandOwnerV1 = {
     invocation_request_id: string;
     client_surface: "web_run_workbench";
     authority: NurtureEnrollmentJourneyLocalAuthorityV1;
-    command: NurtureEnrollmentJourneyFormalPrepareInputV1;
+    command: NurtureEnrollmentJourneyPreparedCommandDraftV1;
   }): Promise<
     | {
         status: "ready_to_confirm";
@@ -293,35 +312,60 @@ export function parseNurtureEnrollmentJourneyFormalQueryInputV1(
     : null;
 }
 
-export function parseNurtureEnrollmentJourneyFormalPrepareInputV1(
+export function parseNurtureEnrollmentJourneyFormalPrepareInputV2(
   value: unknown,
-): NurtureEnrollmentJourneyFormalPrepareInputV1 | null {
+): NurtureEnrollmentJourneyFormalPrepareInputV2 | null {
   if (
-    !exactRecord(value, ["clientCommandId", "contractVersion", "request"]) ||
-    value.contractVersion !== 1 ||
+    !exactRecordOneOf(value, [
+      ["clientCommandId", "contractVersion", "request"],
+      ["clientCommandId", "contractVersion", "currentOwnerCarrier", "request"],
+    ]) ||
+    value.contractVersion !== 2 ||
     !opaqueId(value.clientCommandId)
   ) return null;
   const request = parseNurtureEnrollmentJourneyCommandIntent(value.request);
+  let currentOwnerCarrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1 | undefined;
+  if ("currentOwnerCarrier" in value) {
+    const parsed = parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1(
+      value.currentOwnerCarrier,
+    );
+    if (!parsed) return null;
+    currentOwnerCarrier = parsed;
+  }
   return request &&
     (NURTURE_ENROLLMENT_JOURNEY_LEDGERED_COMMAND_KEYS as readonly string[])
       .includes(request.capabilityKey)
     ? {
-        contractVersion: 1,
+        contractVersion: 2,
         clientCommandId: value.clientCommandId,
-        request: request as NurtureEnrollmentJourneyFormalPrepareInputV1["request"],
+        request: request as NurtureEnrollmentJourneyFormalPrepareInputV2["request"],
+        ...(currentOwnerCarrier === undefined ? {} : { currentOwnerCarrier }),
       }
     : null;
 }
 
-export function parseNurtureEnrollmentJourneyFormalExecuteInputV2(
+export function parseNurtureEnrollmentJourneyFormalExecuteInputV3(
   value: unknown,
-): NurtureEnrollmentJourneyFormalExecuteInputV2 | null {
+): NurtureEnrollmentJourneyFormalExecuteInputV3 | null {
   if (
     exactRecord(value, ["commandRequestId", "confirmationRef", "contractVersion"]) ||
     exactRecord(value, [
       "commandRequestId",
       "confirmationRef",
       "contractVersion",
+      "hostWorkflowRunReservation",
+    ]) ||
+    exactRecord(value, [
+      "commandRequestId",
+      "confirmationRef",
+      "contractVersion",
+      "currentOwnerCarrier",
+    ]) ||
+    exactRecord(value, [
+      "commandRequestId",
+      "confirmationRef",
+      "contractVersion",
+      "currentOwnerCarrier",
       "hostWorkflowRunReservation",
     ])
   ) {
@@ -330,24 +374,33 @@ export function parseNurtureEnrollmentJourneyFormalExecuteInputV2(
           value.hostWorkflowRunReservation,
         )
       : undefined;
+    let currentOwnerCarrier: NurtureEnrollmentJourneyCurrentOwnerCarrierV1 | undefined;
+    if ("currentOwnerCarrier" in value) {
+      const parsed = parseNurtureEnrollmentJourneyCurrentOwnerCarrierV1(
+        value.currentOwnerCarrier,
+      );
+      if (!parsed) return null;
+      currentOwnerCarrier = parsed;
+    }
     if (
-      value.contractVersion !== 2 ||
+      value.contractVersion !== 3 ||
       !opaqueId(value.commandRequestId) ||
       !opaqueRef(value.confirmationRef) ||
       hostReservation === null
     ) return null;
     return {
-      contractVersion: 2,
+      contractVersion: 3,
       commandRequestId: value.commandRequestId,
       confirmationRef: value.confirmationRef,
       ...(hostReservation === undefined
         ? {}
         : { hostWorkflowRunReservation: hostReservation }),
+      ...(currentOwnerCarrier === undefined ? {} : { currentOwnerCarrier }),
     };
   }
   if (
     !exactRecord(value, ["clientCommandId", "contractVersion", "request"]) ||
-    value.contractVersion !== 2 ||
+    value.contractVersion !== 3 ||
     !opaqueId(value.clientCommandId)
   ) return null;
   const request = parseNurtureEnrollmentJourneyCommandIntent(value.request);
@@ -355,10 +408,10 @@ export function parseNurtureEnrollmentJourneyFormalExecuteInputV2(
     (NURTURE_ENROLLMENT_JOURNEY_DIRECT_COMMAND_KEYS as readonly string[])
       .includes(request.capabilityKey)
     ? {
-        contractVersion: 2,
+        contractVersion: 3,
         clientCommandId: value.clientCommandId,
         request: request as Extract<
-          NurtureEnrollmentJourneyFormalExecuteInputV2,
+          NurtureEnrollmentJourneyFormalExecuteInputV3,
           { clientCommandId: string }
         >["request"],
       }
@@ -429,6 +482,14 @@ function exactRecord(
   return keys.length === expectedKeys.length &&
     expectedKeys.every((key) => Object.prototype.hasOwnProperty.call(value, key));
 }
+
+function exactRecordOneOf(
+  value: unknown,
+  expectedKeySets: readonly (readonly string[])[],
+): value is Record<string, unknown> {
+  return expectedKeySets.some((expectedKeys) => exactRecord(value, expectedKeys));
+}
+
 
 function opaqueId(value: unknown): value is string {
   return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,190}$/u.test(value);

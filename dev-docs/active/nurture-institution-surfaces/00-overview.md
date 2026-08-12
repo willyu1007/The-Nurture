@@ -6,7 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **complete the remaining G4-D I4 owner/command/head matrix** over
+- Next step: **implement the Nurture Prisma current-owner derivation adapter
+  and its positive signed command matrix** over
   the now-qualified reservation/settlement protocol. The serialized
   two-database race and response-loss suite passed 6/6 on an approved
   synthetic-only disposable pair
@@ -27,9 +28,13 @@
   route, DI or activation binding. The protocol subset is DB-qualified and
   default-off. Current-owner admission now rejects malformed Guardian actions,
   cross-pair evidence substitution and stale grant terms before local use
-  ([`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)); the
-  request-scoped current-owner carrier, native-source, remaining command families,
-  Guardian/mobile/head negatives and the full I4 exit matrix remain open.
+  ([`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)). The exact
+  request-scoped carrier is now admitted by prepare v2/execute v3, stripped
+  before prepared persistence and handed only to a Nurture-local derivation
+  port; the former mixed remote evidence/source shape is removed
+  ([`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)). The production
+  Prisma derivation adapter, positive command/revoke/expiry/head matrix,
+  native-source remainder, Guardian/mobile and full I4 exit remain open.
   G4-F therefore remains closed. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,

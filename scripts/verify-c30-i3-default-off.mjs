@@ -81,8 +81,8 @@ const expectedTrustedHandlerKeys = [
   "nurture.institution_knowledge.command.prepare.formal.v1",
   "nurture.institution_knowledge.command.execute.formal.v1",
   "nurture.enrollment_journey.query.formal.v1",
-  "nurture.enrollment_journey.command.prepare.formal.v1",
-  "nurture.enrollment_journey.command.execute.formal.v2",
+  "nurture.enrollment_journey.command.prepare.formal.v2",
+  "nurture.enrollment_journey.command.execute.formal.v3",
   "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
   "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v2",
 ];
