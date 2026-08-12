@@ -20,7 +20,7 @@ places drifts in one of them.
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
-| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A/I2-B; I3 default-off; I4-A settlement plus I4-B Prisma current-owner/Admin matrix qualified** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md), [`87`](./87-g4-d-i3-qualification-record.md), [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md), [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md) |
+| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A/I2-B; I3 default-off; I4-A settlement plus I4-B Prisma current-owner/Admin matrix and real Host-carrier signed positive qualified** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md), [`87`](./87-g4-d-i3-qualification-record.md), [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md), [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md), [`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md) |
 | 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal ingress and complete owner source bound default-off; E7 DB qualification `PASS` at `223daa7`; E8 joint conformance `PASS` at `8d41be1`; **G4-E Exit issued (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`, record 85)**; `live_qualified=false` stays the activation gate** | [`64`](./64-g4-0f-scope-freeze.md)–[`85`](./85-g4-e-exit-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
@@ -255,9 +255,11 @@ The production Prisma derivation and three Admin-command positive matrix are
 qualified by [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md):
 current association/authorization ambiguity, Guardian role revoke/expiry and
 Grant policy rotation all fail closed, including a policy reread inside the
-command transaction. The real My-Chat carrier producer and signed positive
-vehicle, native-source remainder, other command families, Guardian/mobile and
-the rest of the negative/replay/head matrix remain open.
+command transaction. Record
+[`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md) qualifies the real
+My-Chat producer and one signed prepare/fresh-execute relationship command
+through the formal handler. Native-source remainder, other command families,
+Guardian/mobile and the rest of the negative/replay/head matrix remain open.
 
 The revision-bearing local C30 adoption lock remains historical G4-D evidence.
 The current cross-repository Workflow/source population is adopted separately
@@ -397,8 +399,10 @@ off slice.
    [`92`](./92-g4-d-i4-b-request-scoped-owner-carrier.md)). The production
    Prisma owner plus local positive Admin matrix are now qualified (record
    [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)); the real
-   Host carrier producer, signed two-database positive path and remaining
-   command/Guardian/mobile/negative matrix are next.
+   Host carrier producer and first signed positive path are also qualified
+   (record [`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md)). The
+   remaining native-source, command-family, Guardian/mobile and complete
+   negative/replay/head matrix is next.
 7. **G4-F** — begin only after the complete I4 matrix passes; do not infer it
    from the ownership preflight or a future single-suite pass.
 
@@ -407,10 +411,12 @@ actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09, G4-D I3, the I4-A Host Run settlement protocol and the local Prisma
-current-owner/Admin-command matrix are closed. I4 now waits on the real Host
-carrier producer and the still-unimplemented signed/remaining command matrix;
-it does not wait on the reservation protocol or a disposable database pair.
+G-09, G4-D I3, the I4-A Host Run settlement protocol, the local Prisma
+current-owner/Admin-command matrix and the first real Host-carrier signed
+positive path are closed. I4 now waits on the remaining native-source,
+command-family, Guardian/mobile and complete negative/replay/head matrix; it
+does not wait on the reservation protocol, Host producer or a disposable
+database pair.
 
 ## Second-round status refinement
 

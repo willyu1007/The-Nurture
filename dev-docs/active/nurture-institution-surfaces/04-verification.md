@@ -1325,3 +1325,23 @@ PRISMA_DERIVATION_AND_POSITIVE_MATRIX_PENDING / G4_F_CLOSED` (record
 Current verdict: `G4_D_I4_B_PRISMA_CURRENT_OWNER_AND_ADMIN_COMMAND_MATRIX_QUALIFIED_DEFAULT_OFF /
 HOST_CARRIER_PRODUCER_AND_REMAINING_I4_MATRIX_PENDING / G4_F_CLOSED` (record
 [`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)).
+
+## 2026-08-12 I4-B Host carrier signed positive qualification
+
+| Check | Result |
+| --- | --- |
+| exact My-Chat producer source | PASS — `ae33b31363b86b0664412e0d053104780048c342` |
+| My-Chat focused carrier/signed-client set | PASS — 4 files / 24 tests |
+| My-Chat full unit / root TypeScript / ESLint | PASS — 166 files / 1154 tests; all typed projects; lint clean |
+| signed request + nonce + formal handler + detached response | PASS |
+| real pair/contact owners and Nurture local derivation | PASS |
+| real prepared-command transaction effect | PASS — one pending Enrollment + one active trial Grant |
+| prepared-carrier/raw-contact privacy | PASS — no carrier material in ledger; no raw contact in inquiry |
+| focused joint file | PASS — 1 file / 8 tests |
+| complete serialized x5 lane | PASS — three consecutive runs, each 5 files / 37 tests |
+| Nurture full unit / root TypeScript | PASS — 97 files / 1049 tests; typecheck clean |
+| runtime effects | NONE — disposable databases only; no route, DI, durable apply, activation or traffic |
+
+Current verdict: `G4_D_I4_B_HOST_CARRIER_SIGNED_POSITIVE_QUALIFIED_DEFAULT_OFF /
+REMAINING_I4_MATRIX_PENDING / G4_F_CLOSED` (record
+[`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md)).

@@ -1724,3 +1724,20 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
 - Regenerated the DB context contract and qualified all 40 migrations only on
   a local disposable PostgreSQL 16 target. No route, persistent apply,
   activation, deployment or traffic was added.
+
+## 2026-08-12 — G4-D I4-B Host carrier signed positive
+
+- Adopted the real My-Chat T-041 carrier producer and signed command client at
+  exact source `ae33b31363b86b0664412e0d053104780048c342`.
+- Extended the existing settlement joint vehicle with one canonical Child/
+  Family pair, current Host contact, signed prepare v2 and fresh execute v3
+  dispatched through Nurture's real formal handler.
+- Seeded the prerequisite Enrollment Journey only through canonical commands;
+  no direct advanced Workflow head or constraint bypass remains.
+- Executed `prepare_trial_relationship` through the production Nurture option,
+  authority, prepared-command and transaction owners, producing the exact
+  pending Enrollment and active trial Grant.
+- Proved that the prepared ledger stores no carrier hash/owner refs and that
+  the raw Host contact value is absent from Nurture inquiry persistence.
+- The complete serialized x5 lane passes 37/37 in three consecutive runs. No
+  route, durable apply, DI binding, activation, deployment or traffic changed.

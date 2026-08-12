@@ -816,3 +816,32 @@
 - **Prevention:** every current-owner repository must encode exact-one,
   explicit priority or a database uniqueness invariant. `findFirst` alone is
   never an ambiguity policy.
+
+## 2026-08-12 - A positive fixture cannot skip append-only journey history
+
+- **Symptom:** signed execute reached the real transaction owner but PostgreSQL
+  rejected the effect because the fixture's advanced Workflow head had no
+  matching transition history.
+- **Root cause:** direct row setup represented final state without producing
+  the canonical command facts required by database invariants.
+- **What was tried:** adjusting the numeric head did not restore the missing
+  history and would have turned the joint vehicle into a constraint bypass.
+- **Fix/workaround:** build the prerequisite journey through six existing
+  command specs, then run signed prepare/execute only for the increment under
+  qualification.
+- **Prevention:** direct setup is acceptable for base identities and owner
+  sources in a disposable fixture; state-machine business history must be
+  created through its canonical command path.
+
+## 2026-08-12 - Canonical Actor and Scenario Participant are not aliases
+
+- **Symptom:** the first Guardian acceptance fixture supplied a Nurture
+  Participant id where the Host carrier required a `my_chat.actor` ref.
+- **Root cause:** both ids represented the same adult in the fixture, but they
+  belong to different owner namespaces and lifecycles.
+- **What was tried:** shape-compatible string reuse failed the real
+  actor/action binding check, as designed.
+- **Fix/workaround:** keep the canonical Host actor in the Guardian action and
+  the Nurture participant only in local role/command facts.
+- **Prevention:** fixtures must name account, Actor, Participant, role and
+  business actor separately even when one human connects them.

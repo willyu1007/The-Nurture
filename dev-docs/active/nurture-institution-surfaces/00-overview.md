@@ -6,9 +6,10 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **implement the real My-Chat current-owner carrier producer and
-  extend the signed joint matrix beyond the three Admin commands now proven
-  locally** over the qualified reservation/settlement protocol. The serialized
+- Next step: **extend the signed joint matrix from the now-qualified real Host
+  carrier path into native-source, remaining command-family and
+  Guardian/mobile coverage** over the qualified reservation/settlement
+  protocol. The serialized
   two-database race and response-loss suite passed 6/6 on an approved
   synthetic-only disposable pair
   ([`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md)).
@@ -38,9 +39,15 @@
   `qualify_capacity_waitlist`, `prepare_trial_relationship` and `start_trial`
   pass through the real prepared-command/surface/transaction composition, and
   role revoke, authorization expiry/ambiguity and policy drift fail closed
-  ([`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)). The real
-  Host carrier producer/signed positive vehicle, native-source remainder,
-  other command families, Guardian/mobile and full I4 exit remain open.
+  ([`93`](./93-g4-d-i4-b-prisma-current-owner-command-matrix.md)). My-Chat
+  `ae33b313...` now issues real current pair/contact carriers; one signed
+  prepare-v2/fresh execute-v3 relationship command passes through the formal
+  handler and production transaction owners. The complete x5 lane is 37/37 in
+  three consecutive runs, with carrier-free prepared persistence and
+  raw-contact absence
+  ([`94`](./94-g4-d-i4-b-host-carrier-signed-positive.md)). Native-source
+  remainder, other command families, Guardian/mobile and full I4 exit remain
+  open.
   G4-F therefore remains closed. E7
   disposable
   qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,
