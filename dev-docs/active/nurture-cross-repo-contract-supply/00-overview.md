@@ -8,8 +8,11 @@
   (`artifacts/w1-guardian-decision-callback-design-draft.md`, additive
   `family_growth_transport@1.1.0` push callback with a collapsed two-value
   decision vocabulary); next is the My-Chat joint review and sign-off of its
-  six open items, then freezing the joint design record. In parallel, start
-  W2 (parent-context presenter v1). The supply order decided 2026-08-11 is
+  six open items, then freezing the joint design record. W2 scope draft is
+  written (`artifacts/w2-parent-context-presenter-scope-draft.md`, proposed
+  `nurture.parent-context-presenter@1.0.0` mapped to P-O01..P-O05 with
+  IR-C01-shaped publication requirements); next is field-level schema
+  authoring against current domain models. The supply order decided 2026-08-11 is
   fixed: parent-context presenter, then IR-C01 parent-communication gates,
   then the director presenter. W1 must conclude before any T-008 G5-A
   Candidate Freeze.

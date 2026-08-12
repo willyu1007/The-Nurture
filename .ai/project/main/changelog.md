@@ -123,3 +123,4 @@ Project: `main`
 - 2026-08-13 task_id=T-011 slug=nurture-cross-repo-contract-supply event=registered dev_docs_path=dev-docs/active/nurture-cross-repo-contract-supply
 - 2026-08-13 task_id=T-002 event=pin-reseal id=C30 result=revision-only-reseal my_chat=1db3f03 content_hashes=unchanged drift_paths=ci-and-dev-docs-only activation=unchanged
 - 2026-08-13 task_id=T-011 event=design-draft id=W1 result=draft-for-joint-review mechanism=push-callback transport_delta=family_growth_transport@1.1.0 vocabulary=admission_activated,admission_closed open_items=6 activation=unchanged
+- 2026-08-13 task_id=T-011 event=design-draft id=W2 result=scope-draft proposed_key=nurture.parent-context-presenter@1.0.0 rows=P-O01..P-O05 publication_shape=IR-C01-five-properties open_items=5 activation=unchanged
