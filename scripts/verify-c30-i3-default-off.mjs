@@ -84,7 +84,7 @@ const expectedTrustedHandlerKeys = [
   "nurture.enrollment_journey.command.prepare.formal.v1",
   "nurture.enrollment_journey.command.execute.formal.v2",
   "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
-  "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v1",
+  "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v2",
 ];
 assert(
   JSON.stringify(contracts.trusted_invocation.operations.map(({ handler_key }) => handler_key)) ===

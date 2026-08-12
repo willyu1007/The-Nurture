@@ -152,6 +152,62 @@ describe("Enrollment Journey prepared-command owner", () => {
     });
   });
 
+  it("verifies the exact inquiry confirmation historically after expiry", async () => {
+    const test = harness({ ttlMs: 1_000 });
+    const prepared = await test.owner.prepare(prepareInput({
+      command: intentCommand("start_enrollment_inquiry", inquiryInput()),
+    }));
+    if (prepared.status !== "ready_to_confirm") throw new Error("prepare failed");
+
+    await expect(test.owner.verifyHistoricalConfirmation({
+      workspace_id: authority.workspace_id,
+      command: {
+        commandRequestId: prepared.command_request_id,
+        confirmationRef: `ejc1.${"b".repeat(43)}`,
+      },
+    })).resolves.toEqual({
+      status: "conflict",
+      reason_code: "prepared_command_reuse_conflict",
+    });
+
+    test.clock.ms += 1_001;
+    await test.ledger.consumeExact({
+      workspace_id: authority.workspace_id,
+      participant_ref: authority.participant_ref,
+      command_request_id: prepared.command_request_id,
+      confirmation_ref_hash: test.confirmationHash(prepared.confirmation_ref),
+      consumed_at: new Date(test.clock.ms).toISOString(),
+    });
+    await expect(test.owner.verifyHistoricalConfirmation({
+      workspace_id: authority.workspace_id,
+      command: {
+        commandRequestId: prepared.command_request_id,
+        confirmationRef: prepared.confirmation_ref,
+      },
+    })).resolves.toEqual({
+      status: "resolved",
+      command_request_id: prepared.command_request_id,
+      effect: "start_enrollment_inquiry",
+    });
+  });
+
+  it("does not admit a non-inquiry prepared command to Run settlement", async () => {
+    const test = harness();
+    const prepared = await test.owner.prepare(prepareInput());
+    if (prepared.status !== "ready_to_confirm") throw new Error("prepare failed");
+
+    await expect(test.owner.verifyHistoricalConfirmation({
+      workspace_id: authority.workspace_id,
+      command: {
+        commandRequestId: prepared.command_request_id,
+        confirmationRef: prepared.confirmation_ref,
+      },
+    })).resolves.toEqual({
+      status: "denied",
+      reason_code: "workflow_run_settlement_command_not_supported",
+    });
+  });
+
   it("fails closed when the stored snapshot no longer matches the row", async () => {
     const test = harness();
     const prepared = await test.owner.prepare(prepareInput());
@@ -320,6 +376,12 @@ function createInMemoryLedger(): NurtureEnrollmentJourneyPreparedCommandLedgerV1
       }
       return { status: "found", record: structuredClone(entry[1]) };
     },
+    async readHistoricalExact(input) {
+      const entry = findByCommandRequestId(input.workspace_id, input.command_request_id);
+      return entry
+        ? { status: "found", record: structuredClone(entry[1]) }
+        : { status: "not_found" };
+    },
     async consumeExact(input) {
       const entry = findByCommandRequestId(input.workspace_id, input.command_request_id);
       if (!entry) return { status: "not_found" };
@@ -361,6 +423,24 @@ function createInMemoryLedger(): NurtureEnrollmentJourneyPreparedCommandLedgerV1
       if (!entry) throw new Error("expected one record to mutate");
       byDedup.set(entry[0], change(structuredClone(entry[1])));
     },
+  };
+}
+
+function inquiryInput() {
+  return {
+    preferredLabel: "Prospective family",
+    birthYearMonth: "2024-03",
+    ageBandKey: undefined,
+    expectedEntryStartDate: "2026-09-01",
+    expectedEntryEndDate: "2026-10-01",
+    targetClassTypeKey: "toddler",
+    targetAgeBandKey: "age_2_3",
+    targetCareGroupOptionRef: undefined,
+    careScheduleNeedKeys: ["full_day"],
+    sourceChannel: "walk_in",
+    safetyLabelKeys: [],
+    initialContactAt: "2026-08-12T00:00:00.000Z",
+    nextTouchpointAt: "2026-08-13T00:00:00.000Z",
   };
 }
 

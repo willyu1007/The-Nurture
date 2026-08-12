@@ -1096,3 +1096,21 @@ retrieval composition remain optional. Missing ports return `unavailable`, and
 there is no application route or activation model. Concrete owners and joint
 conformance are the remaining E7/E8 work; a live provider smoke remains an
 activation-only Q3 gate.
+
+## Enrollment Journey no-effect identity boundary
+
+`confirm_enrollment_journey_workflow_run_settlement_no_effect` is a distinct
+input-schema-v2 operation. Its signed input contains the Host reservation,
+Nurture command request id and the same opaque confirmation used by execute.
+The handler derives Workspace from the verified principal and asks the
+prepared-command owner for a historical identity check before settlement
+registration.
+
+That check compares the owner-issued confirmation derivation and stored
+confirmation hash; while the encrypted snapshot remains present it also
+cross-checks the frozen inquiry command and Workspace. Expired rows may have
+their snapshot scrubbed, so reconciliation relies on the retained HMAC-bound
+identity/capability metadata and never restores the expired body. It does not
+resolve current Participant or authority and cannot execute the command. Only
+after this identity check may the settlement owner acquire the shared command
+writer fence and return `committed|confirmed_no_effect`.

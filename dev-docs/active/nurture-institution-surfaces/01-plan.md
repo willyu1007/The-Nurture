@@ -831,5 +831,16 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
 - Step 5 remains blocked only on the approved disposable My-Chat/Nurture
   database pair and serialized qualification. Unknown outcomes remain
   reserved/quarantined; I4 and G4-F remain open.
-- Step 5 remains blocked on an approved disposable database pair. I4-A, I4 and
-  G4-F remain open.
+
+### Current quality gate before step 5
+
+- [x] Bind signed no-effect to the original confirmation as input schema v2.
+- [x] Verify the historical confirmation before settlement registration and
+  writer-fence acquisition, without reviving prepared TTL/current authority as
+  execution gates.
+- [x] Reject My-Chat coordinator construction for any non-Nurture inquiry
+  scenario/capability/entrypoint binding.
+- [x] Remove the unused status-only signed wrapper and keep one three-operation
+  client as the transport/trust boundary.
+- [ ] Run step 5 on an explicitly approved disposable database pair. I4-A, I4
+  and G4-F remain open until that serialized qualification passes.

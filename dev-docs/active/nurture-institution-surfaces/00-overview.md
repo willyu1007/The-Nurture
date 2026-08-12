@@ -572,3 +572,19 @@ status transport after response loss, the My-Chat proof verifier, two-database
 race/replay qualification and migration apply remain open. Verdict:
 `SIGNED_TRANSPORT_AND_ATOMIC_SETTLEMENT_IMPLEMENTED / HOST_VERIFIER_AND_STATUS_TRANSPORT_PENDING /
 NO_DB_APPLY / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 current protocol checkpoint
+
+Historical signed status, the writer-fenced no-effect mutation and the
+default-off My-Chat coordinator are implemented. The quality audit rotated
+no-effect to input/handler v2: it now carries the original opaque
+`confirmationRef`, and Nurture verifies that exact historical confirmation
+before it registers a settlement or acquires the command writer fence. A
+different confirmation cannot close the real prepared command.
+
+The implementation still adds no public route, DI activation, deployment,
+traffic or database apply. The remaining gate is the serialized two-database
+race/response-loss qualification on an explicitly approved disposable pair.
+Verdict: `CONFIRMATION_BOUND_WRITER_FENCE_AND_HOST_COORDINATOR_IMPLEMENTED /
+LOCAL_CONTRACTS_GREEN / TWO_DATABASE_QUALIFICATION_PENDING / NO_DB_APPLY /
+I4_NOT_QUALIFIED`.

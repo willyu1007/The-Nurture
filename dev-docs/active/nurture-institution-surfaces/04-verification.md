@@ -1210,3 +1210,27 @@ I4_NOT_QUALIFIED`.
 Current verdict: `SIGNED_WRITER_FENCED_NO_EFFECT_AND_HOST_COORDINATOR_IMPLEMENTED /
 LOCAL_CONTRACTS_GREEN / NO_DB_APPLY /
 TWO_DATABASE_QUALIFICATION_PENDING / I4_NOT_QUALIFIED`.
+
+## 2026-08-12 confirmation-bound quality audit and clean baseline
+
+| Check | Result |
+| --- | --- |
+| no-effect declaration + generated manifest | PASS - exact host-transition POST, input/handler v2; v1 absent |
+| historical confirmation owner | PASS - exact HMAC/hash, inquiry-only admission, non-scrubbed snapshot cross-check, expiry-independent reconciliation |
+| wrong-confirmation negative | PASS - zero settlement registration/fence calls |
+| focused prepared-command + formal ingress | PASS - 2 files / 26 tests |
+| full Nurture unit lane | PASS - 97 files / 1047 tests |
+| scenario-service lane | PASS - 14 files / 95 tests |
+| repository-root TypeScript | PASS |
+| routing/persistence/formal-ingress/port/default-off gates | PASS - 178 files; 7 routes; 11 trusted handlers; 0 enabled capabilities |
+| workflow pin verifier tests | PASS - 7/7 |
+| strict T-007 docs | PASS - 157/157 files, 0 errors/warnings |
+| project governance + diff check | PASS |
+| My-Chat counterpart | PASS - `9ac8f16`, focused 17/17, related regression 36 files / 368 tests, root TypeScript + ESLint |
+| exact cross-repository pin | PASS - My-Chat `9ac8f16`, x5 `adef776f...`, wave4 `65d6b0a0...`, Nurture self `65344601...`, Base `536638a` |
+| database apply / serialized x5 | NOT RUN - no approved database pair and no target mutation |
+| runtime effects | NONE / DEFAULT-OFF - no route, DI, activation, credential, deployment or traffic |
+
+Current verdict: `CONFIRMATION_BOUND_WRITER_FENCE_AND_EXACT_HOST_COORDINATOR /
+CLEAN_PINNED_LOCAL_BASELINE / NO_DB_APPLY /
+TWO_DATABASE_QUALIFICATION_PENDING / I4_NOT_QUALIFIED`.

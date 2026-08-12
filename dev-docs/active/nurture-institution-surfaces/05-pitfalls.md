@@ -759,3 +759,15 @@
   Any changed pair conflicts before Scenario transport.
 - **Prevention:** both ledgers must freeze their own side of the operation
   binding; remote observation is not a substitute for local durable identity.
+
+## 2026-08-12 - Writer-fenced no-effect must bind the attempted confirmation
+
+- **Symptom:** a wrong confirmation was denied by execute, but no-effect named
+  only the command id and could still close that command's real prepared row.
+- **Root cause:** the Host ledger froze command + confirmation, while the
+  Scenario mutation boundary projected only the command portion.
+- **Fix/workaround:** rotate no-effect to v2, carry the exact confirmation and
+  verify its owner-held historical HMAC/hash evidence before registering the
+  settlement or acquiring the command writer fence.
+- **Prevention:** destructive reconciliation inputs must preserve the complete
+  semantic identity of the attempted operation across every owner boundary.

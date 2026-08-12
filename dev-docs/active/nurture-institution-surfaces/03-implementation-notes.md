@@ -1624,7 +1624,8 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
 
 - Added one exact manifest-declared signed private operation,
   `confirm_enrollment_journey_workflow_run_settlement_no_effect`, using the
-  same closed command/reservation evidence input as historical status.
+  initial closed command/reservation evidence input used by historical status.
+  The confirmation-bound v2 repair below supersedes that initial input shape.
 - The formal handler derives Workspace only from the verified principal. It
   registers the exact settlement binding first, then calls
   `confirmNoEffect`, which acquires the same advisory writer fence as command
@@ -1640,3 +1641,31 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
 - No Nurture public surface, route, activation, migration apply, deployment or
   traffic changed. Positive I4 remains gated by serialized two-database
   qualification.
+
+## 2026-08-12 - Confirmation-bound no-effect quality repair
+
+- Review found a semantic gap in the initial no-effect input: it carried the
+  command id and Host reservation but not the confirmation attempted by
+  execute. A wrong confirmation could fail execute and then close the real
+  prepared command through the fence operation.
+- Rotated only the no-effect declaration and handler to v2. The status input
+  stays v1 and execute stays v2. The v1 no-effect declaration is removed from
+  the manifest, generated manifest and default-off conformance list rather
+  than retained as an unsafe compatibility lane.
+- Added `verifyHistoricalConfirmation` to the prepared-command owner and an
+  exact Workspace/command historical ledger read. It re-derives the HMAC
+  confirmation, verifies its stored hash and permits only
+  `start_enrollment_inquiry`; a non-scrubbed snapshot is also opened and
+  cross-checked. It intentionally does not re-run current participant,
+  authority or TTL gates because this operation reconciles identity and can
+  never execute an effect.
+- The formal handler performs that check before settlement registration or
+  writer-fence acquisition. Focused tests prove wrong-confirmation denial has
+  zero settlement calls and that exact inquiry confirmation remains verifiable
+  after expiry/snapshot scrubbing.
+- The handler normalizes the injected owner's runtime response and requires the
+  exact inquiry effect even after a TypeScript boundary. Malformed or
+  capability-drifted owner output is unavailable and cannot register or fence.
+- No Prisma field/table/migration was added. The existing prepared-command
+  record already retains the minimal hash/fingerprint/capability evidence.
+  No route, DI, activation, apply, deployment or traffic changed.

@@ -4,6 +4,7 @@ import type {
 } from "@my-chat/workflow-contracts";
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
+  parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2,
   parseNurtureEnrollmentJourneyFormalExecuteInputV2,
   parseNurtureEnrollmentJourneyFormalPrepareInputV1,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
@@ -64,17 +65,35 @@ async function settlementConfirmNoEffect(
     return declarationDrift();
   }
   const input =
-    parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1(
+    parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2(
       verified.invocation.operation.input,
     );
   if (!input) return invalid();
-  if (!deps.workflowRunSettlementOwner) return unavailable();
+  if (!deps.preparedCommandOwner || !deps.workflowRunSettlementOwner) {
+    return unavailable();
+  }
   const ownerInput = {
     workspace_id: verified.invocation.principal.workspace_ref.object_id,
     command_request_id: input.commandRequestId,
     host_reservation: input.hostWorkflowRunReservation,
   };
   try {
+    const confirmation = normalizeHistoricalConfirmationResult(
+      await deps.preparedCommandOwner.verifyHistoricalConfirmation({
+        workspace_id: ownerInput.workspace_id,
+        command: {
+          commandRequestId: input.commandRequestId,
+          confirmationRef: input.confirmationRef,
+        },
+      }),
+    );
+    if (confirmation.status !== "resolved") return confirmation;
+    if (
+      confirmation.command_request_id !== input.commandRequestId
+      || confirmation.effect !== "start_enrollment_inquiry"
+    ) {
+      return { status: "conflict", reason_code: "prepared_command_binding_drift" };
+    }
     const registered = await deps.workflowRunSettlementOwner.register(ownerInput);
     if (
       registered.status === "denied" ||
@@ -401,6 +420,27 @@ function normalizeVerifiedResult(
     frozen_request: value.frozen_request,
     authority: { ...value.authority },
   };
+}
+
+function normalizeHistoricalConfirmationResult(
+  value: Awaited<ReturnType<
+    NurtureEnrollmentJourneyPreparedCommandOwnerV1["verifyHistoricalConfirmation"]
+  >>,
+) {
+  if (value.status === "resolved") {
+    return opaqueId(value.command_request_id)
+      && value.effect === "start_enrollment_inquiry"
+      ? {
+          status: "resolved" as const,
+          command_request_id: value.command_request_id,
+          effect: value.effect,
+        }
+      : unavailable("enrollment_journey_owner_response_invalid");
+  }
+  return ["denied", "conflict", "unavailable"].includes(value.status)
+      && validReasonCode(value.reason_code)
+    ? { status: value.status, reason_code: value.reason_code }
+    : unavailable("enrollment_journey_owner_response_invalid");
 }
 
 function validAuthority(

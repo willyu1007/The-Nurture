@@ -5,6 +5,7 @@ import type {
 import { describe, expect, it } from "vitest";
 import {
   NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
+  parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2,
   parseNurtureEnrollmentJourneyFormalExecuteInputV2,
   parseNurtureEnrollmentJourneyFormalPrepareInputV1,
   parseNurtureEnrollmentJourneyFormalQueryInputV1,
@@ -119,6 +120,35 @@ describe("Enrollment Journey formal ingress", () => {
           ...hostReservation(),
           reservation_evidence_sha256: "invalid",
         },
+      }),
+    ).toBeNull();
+  });
+
+  it("parses no-effect only with the exact confirmation-bound v2 input", () => {
+    const input = {
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: hostReservation(),
+    };
+    expect(
+      parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2(
+        input,
+      ),
+    ).toEqual(input);
+    expect(
+      parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2(
+        {
+          contractVersion: 2,
+          commandRequestId: input.commandRequestId,
+          hostWorkflowRunReservation: input.hostWorkflowRunReservation,
+        },
+      ),
+    ).toBeNull();
+    expect(
+      parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2({
+        ...input,
+        contractVersion: 1,
       }),
     ).toBeNull();
   });
@@ -270,6 +300,23 @@ describe("Enrollment Journey formal ingress", () => {
           return { status: "unavailable", reason_code: "not_used" };
         },
       },
+      preparedCommandOwner: {
+        verifyHistoricalConfirmation: async (input: unknown) => {
+          expect(input).toEqual({
+            workspace_id: "workspace-1",
+            command: {
+              commandRequestId: "command-request-1",
+              confirmationRef: `ejc1.${"a".repeat(43)}`,
+            },
+          });
+          callOrder.push("verify_confirmation");
+          return {
+            status: "resolved",
+            command_request_id: "command-request-1",
+            effect: "start_enrollment_inquiry",
+          };
+        },
+      } as never,
       workflowRunSettlementOwner: {
         register: async (input: unknown) => {
           expect(input).toEqual(ownerInput);
@@ -304,8 +351,9 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const invocation = verifiedInvocation("settlementConfirmNoEffect");
     invocation.invocation.operation.input = {
-      contractVersion: 1,
+      contractVersion: 2,
       commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: hostReservation(),
     };
 
@@ -314,13 +362,24 @@ describe("Enrollment Journey formal ingress", () => {
         NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementConfirmNoEffect
       ]?.(invocation),
     ).resolves.toMatchObject(terminal);
-    expect(callOrder).toEqual(["register", "confirm_no_effect"]);
+    expect(callOrder).toEqual([
+      "verify_confirmation",
+      "register",
+      "confirm_no_effect",
+    ]);
   });
 
   it("does not cross the writer fence when settlement registration fails", async () => {
     let confirmCalls = 0;
     const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
       surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+      preparedCommandOwner: {
+        verifyHistoricalConfirmation: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-1",
+          effect: "start_enrollment_inquiry",
+        }),
+      } as never,
       workflowRunSettlementOwner: {
         register: async () => ({
           status: "unavailable",
@@ -335,8 +394,9 @@ describe("Enrollment Journey formal ingress", () => {
     });
     const invocation = verifiedInvocation("settlementConfirmNoEffect");
     invocation.invocation.operation.input = {
-      contractVersion: 1,
+      contractVersion: 2,
       commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
       hostWorkflowRunReservation: hostReservation(),
     };
 
@@ -349,6 +409,85 @@ describe("Enrollment Journey formal ingress", () => {
       reason_code: "workflow_run_settlement_unavailable",
     });
     expect(confirmCalls).toBe(0);
+  });
+
+  it("does not register or cross the writer fence for another confirmation", async () => {
+    let settlementCalls = 0;
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+      preparedCommandOwner: {
+        verifyHistoricalConfirmation: async () => ({
+          status: "conflict",
+          reason_code: "prepared_command_reuse_conflict",
+        }),
+      } as never,
+      workflowRunSettlementOwner: {
+        register: async () => {
+          settlementCalls += 1;
+          return { status: "unavailable", reason_code: "not_used" };
+        },
+        readStatus: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        confirmNoEffect: async () => {
+          settlementCalls += 1;
+          return { status: "unavailable", reason_code: "not_used" };
+        },
+      } as never,
+    });
+    const invocation = verifiedInvocation("settlementConfirmNoEffect");
+    invocation.invocation.operation.input = {
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"b".repeat(43)}`,
+      hostWorkflowRunReservation: hostReservation(),
+    };
+
+    await expect(handlers[
+      NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementConfirmNoEffect
+    ]?.(invocation)).resolves.toEqual({
+      status: "conflict",
+      reason_code: "prepared_command_reuse_conflict",
+    });
+    expect(settlementCalls).toBe(0);
+  });
+
+  it("fails closed on malformed historical confirmation owner output", async () => {
+    let settlementCalls = 0;
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+      preparedCommandOwner: {
+        verifyHistoricalConfirmation: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-1",
+          effect: "close_inquiry",
+        }),
+      } as never,
+      workflowRunSettlementOwner: {
+        register: async () => {
+          settlementCalls += 1;
+          return { status: "unavailable", reason_code: "not_used" };
+        },
+        readStatus: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        confirmNoEffect: async () => {
+          settlementCalls += 1;
+          return { status: "unavailable", reason_code: "not_used" };
+        },
+      } as never,
+    });
+    const invocation = verifiedInvocation("settlementConfirmNoEffect");
+    invocation.invocation.operation.input = {
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: hostReservation(),
+    };
+
+    await expect(handlers[
+      NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementConfirmNoEffect
+    ]?.(invocation)).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "enrollment_journey_owner_response_invalid",
+    });
+    expect(settlementCalls).toBe(0);
   });
 
   it("carries verified Host invocation metadata into trusted binding context", async () => {
@@ -499,6 +638,10 @@ describe("Enrollment Journey formal ingress", () => {
           frozen_request: frozenRequest,
           authority,
         }),
+        verifyHistoricalConfirmation: async () => ({
+          status: "unavailable",
+          reason_code: "not_used",
+        }),
         deriveDirectContext: async () => ({
           status: "unavailable",
           reason_code: "not_used",
@@ -581,6 +724,10 @@ describe("Enrollment Journey formal ingress", () => {
               evaluated_at: "2026-08-12T00:00:00.000Z",
             },
           } as never),
+          verifyHistoricalConfirmation: async () => ({
+            status: "unavailable",
+            reason_code: "not_used",
+          }),
           deriveDirectContext: async () => ({ status: "unavailable", reason_code: "not_used" }),
         },
         workflowRunSettlementOwner: {} as never,

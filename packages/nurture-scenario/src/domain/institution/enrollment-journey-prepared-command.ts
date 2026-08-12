@@ -75,6 +75,13 @@ export type NurtureEnrollmentJourneyPreparedCommandLedgerV1 = {
     | { status: "found"; record: NurtureEnrollmentJourneyPreparedCommandRecordV1 }
     | { status: "not_found" }
   >;
+  readHistoricalExact(input: {
+    workspace_id: string;
+    command_request_id: string;
+  }): Promise<
+    | { status: "found"; record: NurtureEnrollmentJourneyPreparedCommandRecordV1 }
+    | { status: "not_found" }
+  >;
   consumeExact(input: {
     workspace_id: string;
     participant_ref: string;
@@ -354,6 +361,67 @@ implements NurtureEnrollmentJourneyPreparedCommandOwnerV1 {
       command_request_id: record.command_request_id,
       frozen_request: snapshot.frozen_request,
       authority: snapshot.authority,
+    };
+  }
+
+  async verifyHistoricalConfirmation(
+    input: Parameters<
+      NurtureEnrollmentJourneyPreparedCommandOwnerV1["verifyHistoricalConfirmation"]
+    >[0],
+  ): ReturnType<
+    NurtureEnrollmentJourneyPreparedCommandOwnerV1["verifyHistoricalConfirmation"]
+  > {
+    if (
+      !opaqueId(input.workspace_id)
+      || !opaqueId(input.command.commandRequestId)
+      || !opaqueConfirmation(input.command.confirmationRef)
+    ) return { status: "denied", reason_code: "prepared_confirmation_invalid" };
+
+    let read;
+    try {
+      read = await this.deps.ledger.readHistoricalExact({
+        workspace_id: input.workspace_id,
+        command_request_id: input.command.commandRequestId,
+      });
+    } catch {
+      return { status: "unavailable", reason_code: "prepared_command_ledger_unavailable" };
+    }
+    if (read.status !== "found") {
+      return { status: "denied", reason_code: "prepared_command_not_found" };
+    }
+    const record = read.record;
+    if (
+      !validRecord(record)
+      || record.command_request_id !== input.command.commandRequestId
+      || record.workspace_id !== input.workspace_id
+    ) return { status: "unavailable", reason_code: "prepared_command_ledger_drift" };
+    if (
+      this.deps.protection.issueConfirmation({
+        command_request_id: record.command_request_id,
+        prepare_fingerprint: record.prepare_fingerprint,
+      }) !== input.command.confirmationRef
+      || record.confirmation_ref_hash
+        !== this.tag("confirmation-ref", [input.command.confirmationRef])
+    ) return { status: "conflict", reason_code: "prepared_command_reuse_conflict" };
+    if (record.capability_key !== "start_enrollment_inquiry") {
+      return { status: "denied", reason_code: "workflow_run_settlement_command_not_supported" };
+    }
+    if (record.status !== "expired") {
+      const snapshot = parseSnapshot(this.deps.protection.openSnapshot({
+        codec_version: record.snapshot_codec_version,
+        ciphertext: record.frozen_snapshot_ciphertext,
+      }));
+      if (
+        !snapshot
+        || snapshot.frozen_request.confirmationRef !== input.command.confirmationRef
+        || snapshot.frozen_request.capabilityKey !== record.capability_key
+        || snapshot.authority.workspace_id !== record.workspace_id
+      ) return { status: "unavailable", reason_code: "prepared_command_snapshot_drift" };
+    }
+    return {
+      status: "resolved",
+      command_request_id: record.command_request_id,
+      effect: record.capability_key,
     };
   }
 

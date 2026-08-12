@@ -117,9 +117,9 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1 = Object.freeze({
       "confirm_enrollment_journey_workflow_run_settlement_no_effect",
     input_schema_key:
       "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.input",
-    input_schema_version: 1,
+    input_schema_version: 2,
     handler_key:
-      "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v1",
+      "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v2",
     ingress_key:
       "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect",
   }),
@@ -165,6 +165,20 @@ export type NurtureEnrollmentJourneyFormalExecuteInputV2 =
 export type NurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1 = {
   contractVersion: 1;
   commandRequestId: string;
+  hostWorkflowRunReservation: NurtureWorkflowRunReservationEvidenceV1;
+};
+
+/**
+ * A writer-fenced no-effect decision is valid only for the same confirmation
+ * that identified the frozen prepared command. The confirmation is checked
+ * against owner-held historical evidence before the settlement row is
+ * registered; expiry and current authority do not participate in this
+ * reconciliation-only identity check.
+ */
+export type NurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2 = {
+  contractVersion: 2;
+  commandRequestId: string;
+  confirmationRef: string;
   hostWorkflowRunReservation: NurtureWorkflowRunReservationEvidenceV1;
 };
 
@@ -229,6 +243,17 @@ export type NurtureEnrollmentJourneyPreparedCommandOwnerV1 = {
         command_request_id: string;
         frozen_request: NurtureEnrollmentJourneyAdapterRequest<NurtureEnrollmentJourneyLedgeredCommandKey>;
         authority: NurtureEnrollmentJourneyLocalAuthorityV1;
+      }
+    | { status: "denied" | "conflict" | "unavailable"; reason_code: string }
+  >;
+  verifyHistoricalConfirmation(input: {
+    workspace_id: string;
+    command: { commandRequestId: string; confirmationRef: string };
+  }): Promise<
+    | {
+        status: "resolved";
+        command_request_id: string;
+        effect: "start_enrollment_inquiry";
       }
     | { status: "denied" | "conflict" | "unavailable"; reason_code: string }
   >;
@@ -360,6 +385,34 @@ export function parseNurtureEnrollmentJourneyWorkflowRunSettlementStatusInputV1(
     ? {
         contractVersion: 1,
         commandRequestId: value.commandRequestId,
+        hostWorkflowRunReservation,
+      }
+    : null;
+}
+
+export function parseNurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2(
+  value: unknown,
+): NurtureEnrollmentJourneyWorkflowRunSettlementConfirmNoEffectInputV2 | null {
+  if (
+    !exactRecord(value, [
+      "commandRequestId",
+      "confirmationRef",
+      "contractVersion",
+      "hostWorkflowRunReservation",
+    ]) ||
+    value.contractVersion !== 2 ||
+    !opaqueId(value.commandRequestId) ||
+    !opaqueRef(value.confirmationRef)
+  ) return null;
+  const hostWorkflowRunReservation =
+    parseNurtureWorkflowRunReservationEvidenceV1(
+      value.hostWorkflowRunReservation,
+    );
+  return hostWorkflowRunReservation
+    ? {
+        contractVersion: 2,
+        commandRequestId: value.commandRequestId,
+        confirmationRef: value.confirmationRef,
         hostWorkflowRunReservation,
       }
     : null;

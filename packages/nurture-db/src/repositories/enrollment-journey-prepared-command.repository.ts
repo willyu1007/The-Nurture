@@ -137,6 +137,22 @@ implements NurtureEnrollmentJourneyPreparedCommandLedgerV1 {
     return { status: "found", record: toRecord(row) };
   }
 
+  async readHistoricalExact(
+    input: Parameters<
+      NurtureEnrollmentJourneyPreparedCommandLedgerV1["readHistoricalExact"]
+    >[0],
+  ): ReturnType<
+    NurtureEnrollmentJourneyPreparedCommandLedgerV1["readHistoricalExact"]
+  > {
+    const row = await this.prisma.nurtureEnrollmentJourneyPreparedCommand.findUnique({
+      where: { commandRequestId: input.command_request_id },
+    });
+    if (!row || row.workspaceId !== input.workspace_id) {
+      return { status: "not_found" };
+    }
+    return { status: "found", record: toRecord(row) };
+  }
+
   consumeExact(
     input: Parameters<NurtureEnrollmentJourneyPreparedCommandLedgerV1["consumeExact"]>[0],
   ): ReturnType<NurtureEnrollmentJourneyPreparedCommandLedgerV1["consumeExact"]> {
