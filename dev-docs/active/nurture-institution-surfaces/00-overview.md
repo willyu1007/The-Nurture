@@ -6,19 +6,18 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-12
-- Next step: **add the writer-fenced signed `confirmed_no_effect`
-  reconciliation operation, compose reserve -> execute/status -> settle in the
-  default-off Host coordinator, then run the serialized two-database race and
-  response-loss suite**. The signed historical status operation and exact
-  My-Chat proof verifier are implemented locally; status bypasses prepared TTL
-  and current authority while remaining bound to the original command and
-  reservation evidence. I3 is
+- Next step: **run the serialized two-database race and response-loss suite on
+  an explicitly approved disposable pair**. The writer-fenced signed
+  `confirmed_no_effect` operation and the default-off My-Chat reserve ->
+  execute -> fence/status -> settle coordinator are implemented locally;
+  status bypasses prepared TTL and current authority while remaining bound to
+  the original command and reservation evidence. I3 is
   qualified by record [`87`](./87-g4-d-i3-qualification-record.md). Both
   dedicated ledgers and their additive migrations are implemented locally;
   neither migration is applied. The superseded immediate queued-Run issuer,
   its Nurture adapter and the negative protocol-gap x5 vehicle are removed.
-  The product path remains default-off because no Host coordinator, route or
-  activation is bound. Positive two-database qualification still requires an
+  The product path remains default-off because the Host coordinator has no
+  route, DI or activation binding. Positive two-database qualification still requires an
   approved disposable pair, and
   I4/G4-F remain open. E7
   disposable

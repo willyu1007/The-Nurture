@@ -109,6 +109,20 @@ export const NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1 = Object.freeze({
       "nurture.enrollment_journey.workflow_run_settlement.status.formal.v1",
     ingress_key: "nurture.enrollment_journey.workflow_run_settlement.status",
   }),
+  settlementConfirmNoEffect: Object.freeze({
+    endpoint_key:
+      "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect",
+    method: "POST",
+    operation_key:
+      "confirm_enrollment_journey_workflow_run_settlement_no_effect",
+    input_schema_key:
+      "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.input",
+    input_schema_version: 1,
+    handler_key:
+      "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect.formal.v1",
+    ingress_key:
+      "nurture.enrollment_journey.workflow_run_settlement.confirm_no_effect",
+  }),
   idempotency: "owner_command_request_id_replayed_with_exact_confirmation",
   confirmation: "owner_held_frozen_payload_consumed_with_the_effect",
 } as const);

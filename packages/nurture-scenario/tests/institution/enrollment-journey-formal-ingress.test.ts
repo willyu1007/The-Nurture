@@ -228,6 +228,129 @@ describe("Enrollment Journey formal ingress", () => {
     }]);
   });
 
+  it.each([
+    {
+      name: "confirms the writer-fenced no-effect terminal",
+      terminal: {
+        status: "confirmed_no_effect",
+        outcome: "confirmed_no_effect",
+        proof: {
+          proof_version: 1,
+          outcome: "confirmed_no_effect",
+          writer_fence_receipt_ref: "receipt-no-effect-1",
+          receipt_sha256: "d".repeat(64),
+        },
+      },
+    },
+    {
+      name: "returns committed when the command writer won the fence",
+      terminal: {
+        status: "committed",
+        outcome: "committed",
+        proof: {
+          proof_version: 1,
+          outcome: "committed",
+          writer_fence_receipt_ref: "receipt-committed-1",
+          receipt_sha256: "e".repeat(64),
+        },
+      },
+    },
+  ])("$name without current-authority resolution", async ({ terminal }) => {
+    const callOrder: string[] = [];
+    const ownerInput = {
+      workspace_id: "workspace-1",
+      command_request_id: "command-request-1",
+      host_reservation: hostReservation(),
+    };
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+      authorityResolver: {
+        resolveCurrent: async () => {
+          callOrder.push("authority");
+          return { status: "unavailable", reason_code: "not_used" };
+        },
+      },
+      workflowRunSettlementOwner: {
+        register: async (input: unknown) => {
+          expect(input).toEqual(ownerInput);
+          callOrder.push("register");
+          return {
+            status: "prepared",
+            disposition: "created",
+            settlement_ref: canonical(
+              "nurture",
+              "workflow_run_settlement",
+              "settlement-1",
+            ),
+            run_ref: hostReservation().run_ref,
+            outcome: "unknown",
+          };
+        },
+        readStatus: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        confirmNoEffect: async (input: unknown) => {
+          expect(input).toEqual(ownerInput);
+          callOrder.push("confirm_no_effect");
+          return {
+            ...terminal,
+            settlement_ref: canonical(
+              "nurture",
+              "workflow_run_settlement",
+              "settlement-1",
+            ),
+            run_ref: hostReservation().run_ref,
+          };
+        },
+      } as never,
+    });
+    const invocation = verifiedInvocation("settlementConfirmNoEffect");
+    invocation.invocation.operation.input = {
+      contractVersion: 1,
+      commandRequestId: "command-request-1",
+      hostWorkflowRunReservation: hostReservation(),
+    };
+
+    await expect(
+      handlers[
+        NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementConfirmNoEffect
+      ]?.(invocation),
+    ).resolves.toMatchObject(terminal);
+    expect(callOrder).toEqual(["register", "confirm_no_effect"]);
+  });
+
+  it("does not cross the writer fence when settlement registration fails", async () => {
+    let confirmCalls = 0;
+    const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+      workflowRunSettlementOwner: {
+        register: async () => ({
+          status: "unavailable",
+          reason_code: "workflow_run_settlement_unavailable",
+        }),
+        readStatus: async () => ({ status: "unavailable", reason_code: "not_used" }),
+        confirmNoEffect: async () => {
+          confirmCalls += 1;
+          return { status: "unavailable", reason_code: "not_used" };
+        },
+      } as never,
+    });
+    const invocation = verifiedInvocation("settlementConfirmNoEffect");
+    invocation.invocation.operation.input = {
+      contractVersion: 1,
+      commandRequestId: "command-request-1",
+      hostWorkflowRunReservation: hostReservation(),
+    };
+
+    await expect(
+      handlers[
+        NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.settlementConfirmNoEffect
+      ]?.(invocation),
+    ).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "workflow_run_settlement_unavailable",
+    });
+    expect(confirmCalls).toBe(0);
+  });
+
   it("carries verified Host invocation metadata into trusted binding context", async () => {
     const trustedContexts: unknown[] = [];
     const handlers = createNurtureEnrollmentJourneyFormalInvocationHandlers({
@@ -514,7 +637,12 @@ function intent(capabilityKey: string, operationInput: Record<string, unknown>) 
 }
 
 function verifiedInvocation(
-  lane: "query" | "prepare" | "execute" | "settlementStatus",
+  lane:
+    | "query"
+    | "prepare"
+    | "execute"
+    | "settlementStatus"
+    | "settlementConfirmNoEffect",
 ): WorkflowVerifiedScenarioInvocationV1 {
   const contract = NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1[lane];
   return {
@@ -553,7 +681,11 @@ function verifiedInvocation(
   } as unknown as WorkflowVerifiedScenarioInvocationV1;
 }
 
-function canonical(namespace: "my_chat", objectType: string, objectId: string) {
+function canonical(
+  namespace: "my_chat" | "nurture",
+  objectType: string,
+  objectId: string,
+) {
   return {
     schema_version: 1 as const,
     namespace,

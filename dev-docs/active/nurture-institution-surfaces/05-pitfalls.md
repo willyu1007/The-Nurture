@@ -743,3 +743,19 @@
   format/validate/generate only; do not invoke migrate/apply.
 - **Prevention:** qualification records distinguish schema parsing from database
   execution and explicitly record whether any target was contacted.
+
+## 2026-08-12 - A stable logical key still needs an exact operation binding
+
+- **Symptom:** the Host reservation froze runtime pins but, before Nurture saw
+  the first attempt, the same logical key could be paired with a different
+  prepared command.
+- **Root cause:** transport id, logical replay identity and the semantic
+  command/confirmation pair were treated as if one implied the others.
+- **What was tried:** depending on Nurture's settlement uniqueness closes
+  drift only after the first request reaches Nurture and therefore does not
+  cover a Host crash before transport.
+- **Fix/workaround:** My-Chat stores only a domain-separated SHA-256 of the
+  exact command id + confirmation ref and includes it in reservation evidence.
+  Any changed pair conflicts before Scenario transport.
+- **Prevention:** both ledgers must freeze their own side of the operation
+  binding; remote observation is not a substitute for local durable identity.

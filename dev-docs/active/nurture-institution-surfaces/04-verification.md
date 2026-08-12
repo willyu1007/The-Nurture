@@ -1191,3 +1191,22 @@ NO_DB_APPLY / I4_NOT_QUALIFIED`.
 Current verdict: `HISTORICAL_SIGNED_STATUS_AND_HOST_PROOF_VERIFIER_IMPLEMENTED /
 NO_EFFECT_MUTATION_AND_JOINT_DB_PENDING / DEFAULT_OFF / NO_DB_APPLY /
 I4_NOT_QUALIFIED`.
+
+## 2026-08-12 writer-fenced no-effect / Host coordinator verification
+
+| Check | Result |
+| --- | --- |
+| exact no-effect declaration + generated manifest | PASS - one host-transition POST operation, schema/handler v1 |
+| formal handler focused coverage | PASS - writer-fenced no-effect, writer-won committed, registration failure, no current-authority read |
+| Nurture focused formal + surface contracts | PASS - 2 files / 22 tests at implementation checkpoint |
+| Nurture full unit + scenario service | PASS - 97 files / 1042 tests; 14 files / 95 tests |
+| Nurture typecheck + structural gates | PASS - root typecheck; routing 178 exact; formal ingress, persistence, port topology and C30 default-off |
+| My-Chat coordinator/lifecycle/repository/verifier | PASS - 4 files / 27 tests at implementation checkpoint |
+| response-loss/opposite-terminal/unknown quarantine | PASS, isolated deterministic coverage |
+| exact cross-repository pin | PASS - My-Chat `39140ad`, x5 source `53aa117a...`, wave4 schema-inclusive source `65d6b0a0...`, Nurture self `226b841c...` |
+| database apply / serialized x5 | NOT RUN - no approved database pair and no target mutation |
+| runtime effects | NONE / DEFAULT-OFF - no route, DI, activation, credential, deployment or traffic |
+
+Current verdict: `SIGNED_WRITER_FENCED_NO_EFFECT_AND_HOST_COORDINATOR_IMPLEMENTED /
+LOCAL_CONTRACTS_GREEN / NO_DB_APPLY /
+TWO_DATABASE_QUALIFICATION_PENDING / I4_NOT_QUALIFIED`.

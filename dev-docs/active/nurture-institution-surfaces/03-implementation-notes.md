@@ -1615,7 +1615,28 @@ JOINT_EXECUTION_BLOCKED_BY_X5_DATABASES / I4_NOT_QUALIFIED`.
   verifier. The verifier receives the immutable reservation evidence hash from
   the Host ledger, rereads Nurture status through a detached-response-verified
   call and admits only byte-exact terminal proof for the same Run ref.
-- The `confirmed_no_effect` ledger state can be verified if present, but this
-  increment does not expose the writer-fenced mutation that creates it. Host
-  abandon composition therefore remains fail-closed. No DB apply, route, DI,
-  activation or traffic was added.
+- At this seventh-round checkpoint, `confirmed_no_effect` could be verified if
+  already present, but its signed writer-fenced mutation and Host abandon
+  composition were still pending. The eighth-round section below supersedes
+  that interim gap; no DB apply, route, DI, activation or traffic was added.
+
+## 2026-08-12 - Eighth-round writer-fenced no-effect operation
+
+- Added one exact manifest-declared signed private operation,
+  `confirm_enrollment_journey_workflow_run_settlement_no_effect`, using the
+  same closed command/reservation evidence input as historical status.
+- The formal handler derives Workspace only from the verified principal. It
+  registers the exact settlement binding first, then calls
+  `confirmNoEffect`, which acquires the same advisory writer fence as command
+  execution. Registration failure never crosses the fence.
+- If command execution already won the fence, the operation returns its exact
+  `committed` proof. Only a fenced absence can become
+  `confirmed_no_effect`; neither timeout, prepared expiry nor authority revoke
+  is treated as evidence.
+- The My-Chat default-off coordinator now owns reserve -> signed execute ->
+  signed fence/status -> verified confirm/abandon. It freezes a Host-private
+  hash of the command/confirmation pair, and contradictory or unavailable
+  proof leaves the reservation non-executable.
+- No Nurture public surface, route, activation, migration apply, deployment or
+  traffic changed. Positive I4 remains gated by serialized two-database
+  qualification.

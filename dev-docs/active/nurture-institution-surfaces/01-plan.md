@@ -823,8 +823,13 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
   ledger and accepts only a detached-response-verified terminal status whose
   Run ref and proof bytes match exactly.
 - The committed branch can now be confirmed without replaying formal execute.
-  Writer-fenced `confirmed_no_effect` still needs a separately declared signed
-  mutation before the abandon branch can be composed. No route, DI binding,
-  activation, migration apply or traffic is added.
+  The writer-fenced `confirmed_no_effect` mutation and default-off Host
+  coordinator now close the local implementation portion of step 4. The Host
+  also freezes a body-free hash of command id + confirmation ref so a logical
+  operation cannot be rebound before Nurture observes it. No route, DI
+  binding, activation, migration apply or traffic is added.
+- Step 5 remains blocked only on the approved disposable My-Chat/Nurture
+  database pair and serialized qualification. Unknown outcomes remain
+  reserved/quarantined; I4 and G4-F remain open.
 - Step 5 remains blocked on an approved disposable database pair. I4-A, I4 and
   G4-F remain open.
