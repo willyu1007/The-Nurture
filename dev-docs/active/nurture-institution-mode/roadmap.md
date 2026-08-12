@@ -386,3 +386,470 @@ dev-docs/active/nurture-institution-mode/
 ```
 
 当前阶段为 Pilot-0 readiness。晚到的 My-Chat platform Child/Family identity 变更曾使 C-3/C4 终审重开；现已锁定唯一的 My-Chat binding -> typed anchor -> workspace association 模型和严格 C-3/C-4 实施/资格化链。Pilot-0-C 为 `DECISION COMPLETE / IMPLEMENTATION OPEN / EXTERNAL TRAFFIC NO-GO`；Pilot-0-D 在三路独立评估和累计修复后为 `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`，两阶段均为 `DR-P0=0 / DR-P1=0 / DR-P2=0`。当前 readiness census 为六个 open `TR-P0`、三个 open `TR-P1`，以及一个 `TR-P1-3a-native-external-delivery=accepted_scope_exclusion`；后者只表示首轮 responsive-Web 内部范围排除，不代表能力完成。没有 qualified/complete candidate、QR、persistent gate、allowlist 或 capability enablement；C-3/C4/D implementation、Pilot-0-E、Pilot-1..4、DB apply、ACR、secret 和 traffic 均未授权。
+
+## Joint G5 parallel-development overlay（2026-08-12）
+
+### Goal and governance decision
+
+- Goal: advance The Nurture and My-Chat in parallel from the current
+  default-off G4 posture to one exact `InternalBetaDecisionV1`, without
+  treating implementation, recorded transport, emulators or an undeployed
+  Candidate as internal-beta evidence.
+- Project-orchestrator decision: `REUSE_TASKS`. This T-002 roadmap is the sole
+  cross-repository coordination SSOT; no duplicate coordination task is
+  created. Execution truth remains in Nurture T-007/T-010/T-008 and My-Chat
+  T-028/T-036/T-038/T-039/T-040/T-041/T-027/T-033.
+- Mapping: Nurture `M-002 > F-002/F-003 > T-002/T-007/T-008`, Nurture
+  `M-004 > F-005 > T-010`, and My-Chat `M-001/M-003/M-006 >
+  F-001/F-008/F-009/F-019/F-020 > T-028/T-036/T-038/T-039/T-040/T-041`.
+- Final target: G5 Internal Beta Decision. External beta, production
+  activation, Pilot traffic and real-child data remain separate decisions.
+- Equipment constraint: no usable deployment environment or physical-device
+  matrix is currently available. This does not stop contract, owner, consumer,
+  Mobile and Candidate-readiness work, but it is a hard stop for an observed
+  `NurtureDeploymentBindingV1`, internal-store real-device
+  `PlatformValidationRecordV1` records and the final G5 decision.
+
+### Planning-mode context and merge policy
+
+- Runtime mode signal: Default.
+- User confirmation when signal is unknown: not-needed.
+- Host plan artifact paths: (none).
+- Requirements baseline: user-confirmed decisions in the 2026-08-12 planning
+  conversation plus existing task roadmaps.
+- Merge method: set-union.
+- Conflict precedence: latest user-confirmed instruction > existing task
+  requirement/architecture decisions > existing roadmaps > model inference.
+- Repository SSOT output:
+  `dev-docs/active/nurture-institution-mode/roadmap.md`.
+- Mode fallback used: non-Plan default applied: no; Default was an explicit
+  runtime signal.
+
+### Input sources and usage
+
+| Source | Path/reference | Used for | Trust level | Notes |
+| --- | --- | --- | --- | --- |
+| User-confirmed instructions | 2026-08-12 planning conversation | G5 endpoint, critical-path parallelism, T-002 SSOT ownership and unavailable equipment constraint | highest | Latest direction. |
+| T-007 live evidence | `../nurture-institution-surfaces/87-g4-d-i3-qualification-record.md` and `41-t007-gap-and-next-register.md` | Establish that G4-D I3 is complete and I4 is next | high | Overrides the stale I3-next sentence in T-007 `00-overview.md`. |
+| T-010 plan | `../nurture-family-sharing-eligibility/01-plan.md` | I4-C2 through C4 ordering and cleanup fence | high | C1 is reviewed, preview-only and unapplied. |
+| T-008 roadmap | `../nurture-store-beta-readiness/roadmap.md` | G5 Candidate, Binding, dual-platform and decision gates | high | Real internal-store hardware is mandatory. |
+| My-Chat T-039 roadmap | `D:/Else/My-Chat/dev-docs/active/mobile-uiux-delivery/roadmap.md` | Device-independent Mobile work and final qualification split | high | Phase 0/1 complete; Phase 2 implementation complete; Phase 3/4 active. |
+| My-Chat active task bundles | T-028/T-036/T-038/T-040/T-041/T-027/T-033 | Identity, contract, knowledge, environment and device prerequisites | high | Task docs remain their own execution SoT. |
+| Model inference | N/A | Parallel-wave grouping and handoff order only | lowest | Does not create a new contract verdict or capability. |
+
+### Non-goals
+
+- Do not make environment or physical-device evidence optional and do not
+  replace it with simulators, emulators, screenshots or recorded transport.
+- Do not activate Nurture or My-Chat product capabilities, apply a durable
+  migration, create store credentials, deploy a Candidate or authorize traffic
+  from this roadmap.
+- Do not copy Nurture facts, permissions, ORM or runtime into My-Chat, and do
+  not turn platform Child/Family identity or a Host Actor into Nurture
+  authority.
+- Do not create a second cross-repository status ledger or duplicate task-level
+  implementation details here.
+- Do not require live Qwen/Bailian qualification before Candidate readiness;
+  it is required only if the knowledge capability is separately selected for
+  activation in the beta profile.
+
+### Open questions and assumptions
+
+#### Open questions (answer before the named gate)
+
+- Q-JG5-01: who owns the future deployment environment and the date/window in
+  which it can be made available? Required before G5-B observed Binding.
+- Q-JG5-02: which exact iOS and OEM Android devices/store accounts form the
+  G5-D coverage profile? Required before build/signing or platform evidence.
+- Q-JG5-03: when G5-D becomes executable, does My-Chat T-039 remain the
+  platform-validation governance home or is a bounded companion-validation
+  task needed? Decide at the G5-0 governance checkpoint; do not create it now.
+
+#### Assumptions
+
+- A-JG5-01: repository-local builds, unit/integration tests and disposable DB
+  qualification remain available even though durable environments and physical
+  devices are not (risk: medium; recheck at every phase entry).
+- A-JG5-02: My-Chat can continue fixture-backed UI implementation while keeping
+  each Live axis blocked and production fixture fallback absent (risk: low;
+  governed by T-039's three-axis matrix).
+- A-JG5-03: T-008 Beta Profile v0 remains the current profile until G5-0
+  reconciliation proves otherwise (risk: medium; drift creates a new profile
+  and invalidates affected downstream preparation).
+
+### Merge decisions and conflict log
+
+| ID | Topic | Conflicting inputs | Chosen decision | Precedence reason | Follow-up |
+| --- | --- | --- | --- | --- | --- |
+| JG5-C1 | End state | Equipment unavailable vs requested G5 Decision | Preserve G5 Decision as final target; add a mandatory pause between device-independent readiness and G5-B/D execution | User confirmed target; T-008 hardware/Binding gates cannot be weakened | Resolve Q-JG5-01/02 before Wave 5. |
+| JG5-C2 | Current T-007 step | Stale overview says I3 next; Git/record 87 says I3 qualified | Start at G4-D I4 | Landed Git and verification evidence outrank stale summary prose | Reconcile T-007 docs during its next task update. |
+| JG5-C3 | Coordination ownership | New joint task vs existing overlapping tasks | Reuse T-002 as roadmap SSOT and original tasks as execution SoT | User confirmation and duplicate-work prevention | No new task now. |
+| JG5-C4 | My-Chat utilization | Wait for equipment vs continue local work | Continue identity adoption, strict consumers, Mobile states/surfaces, contract tests and G5-C readiness | Equipment is irrelevant to these reversible outputs | Never mark Live/device axes complete without execution. |
+| JG5-C5 | Knowledge live gate | Adapter-qualified G4-E vs live provider request | Keep adapter-qualified path valid for default-off Candidate work; run live qualification only before activation | Existing T-040/T-007 boundary | Preserve `live_qualified=false`. |
+
+### Scope and impact
+
+- Nurture execution owners:
+  - T-007: G4-D I4, then G4-F integration qualification and exact Beta Profile
+    Handoff.
+  - T-010: family-sharing I4-C2 current reader, C3 private transport/cleanup
+    and C4 exact-pin joint qualification.
+  - T-008: G5-0 reconciliation, G5-A Candidate Freeze, then environment/device
+    dependent G5-B through E.
+- My-Chat execution owners:
+  - T-028: close the exact Nurture P1/P2 cross-owner adoption review and local
+    authorization/contract negatives; environment discard/cutover work stays
+    separately gated.
+  - T-036/T-039: finish owner-mapped states, strict clients, caches,
+    communication/authorization consumers, remaining teacher/director UI and
+    integration tests without claiming Live/device completion.
+  - T-038: retain existing presenter/action/cache evidence; archive still waits
+    for physical-device evidence.
+  - T-040: close public Knowledge/RAG backward-compatibility evidence; live
+    provider qualification remains activation-only.
+  - T-041: no new local implementation; its completed default-off
+    prospective-contact owner is consumed by T-007.
+  - T-027/T-033: keep environment and OEM-device gates visible; do not block
+    unrelated repository-local work.
+- Data/storage impact: additive Nurture schema/migrations may be authored and
+  qualified only through their task DB-SSOT gates. Durable apply remains
+  environment-specific and separately approved.
+- Backward compatibility: exact interface pins, strict no-fallback parsing and
+  append-only invalidation apply across both repositories.
+
+### Consistency baseline for dual-repository artifacts
+
+- [x] Goal matches T-008's Internal Beta boundary.
+- [x] Ownership boundaries match both repositories' AGENTS/contracts.
+- [x] T-007 I4/G4-F precedes T-008 Candidate Freeze.
+- [x] T-010 and T-039 family authorization join only after exact conformance.
+- [x] My-Chat device-independent work remains separable from final device
+  evidence.
+- Intentional divergence: this overlay sequences both repositories in one
+  place; it does not mirror the same prose into My-Chat roadmaps. My-Chat task
+  roadmaps keep detailed execution ownership and link back at handoff time.
+
+### Project structure change preview (non-binding)
+
+#### Existing areas likely to change
+
+- The Nurture:
+  - `packages/nurture-scenario/` — T-007 I4/G4-F and T-010 private owner
+    composition.
+  - `packages/nurture-db/` and `prisma/` — reviewed additive owner facts,
+    cleanup and disposable qualification only.
+  - `dev-docs/active/nurture-institution-surfaces/`,
+    `nurture-family-sharing-eligibility/` and
+    `nurture-store-beta-readiness/` — execution evidence and handoffs.
+- My-Chat:
+  - `packages/scenario-integrations/`, `packages/api-client/` and `apps/api/`
+    — exact Nurture consumer contracts and fail-closed adapters.
+  - `apps/mobile/` — remaining parent/teacher/director UI, state and consumer
+    composition behind independent default-off gates.
+  - existing T-028/T-036/T-039/T-040 documentation — local evidence and
+    readiness updates.
+- Delete/move/rename: none pre-authorized.
+
+#### New additions
+
+- New task: none now.
+- New shared runtime: none.
+- Candidate/Binding/platform/composite evidence artifacts are introduced only
+  by T-008 at their existing G5 gates; exact landing paths are confirmed at
+  G5-0 rather than guessed here.
+
+### Parallel waves and handoffs
+
+#### Wave 0 — Rebaseline and branch-safe work allocation
+
+- Objective: turn current Git/task evidence into one dependency ledger without
+  changing product state.
+- Nurture:
+  - reconcile T-007's stale overview with record 87;
+  - freeze I4 inputs and the G4-F evidence matrix;
+  - recheck T-010 C1 review outputs before C2.
+- My-Chat:
+  - pin the exact Nurture inputs used by T-028/T-039/T-040/T-041;
+  - assign one integration owner for shared API-client/Mobile shell files;
+  - classify every remaining T-039 row as `local-ready`, `owner-blocked` or
+    `equipment-blocked`.
+- Exit: no ambiguous current step, no floating pin, no shared-file ownership
+  collision and no equipment-only blocker on a repository-local task.
+- Rollback: documentation/pin-selection only; revert the wave record.
+
+#### Wave 1A — Institution critical path: T-007 I4
+
+- Nurture deliverable: current-owner evidence transport, negative/replay,
+  Mobile/Web head and end-to-end Journey command conformance through the
+  qualified I3 formal owner path.
+- My-Chat parallel deliverables:
+  - T-028 exact Nurture adoption review and local authorization negatives;
+  - T-040 public Knowledge/RAG backward-compatibility tests;
+  - T-036/T-039 strict consumer/state work that needs no new Nurture action.
+- Exit: one exact G4-D I4 record; My-Chat owner/consumer inputs used by it are
+  pinned and locally green. No durable apply or activation.
+- Rollback: invalidate the I4 record and restore the prior exact pins; do not
+  mutate I3 evidence.
+
+#### Wave 1B — Family-sharing parallel path: T-010 C2 through C4
+
+- Nurture deliverables:
+  1. C2 coherent current-authority reader with single-axis, drift, duplicate,
+     ambiguity and outage negatives;
+  2. C3 detached-signature private transport, no-store output and explicit
+     derived-store cleanup owner;
+  3. C4 fresh-database and exact My-Chat grant/withdrawal/replay/response-loss/
+     cleanup conformance.
+- My-Chat parallel deliverables:
+  - keep the implemented `my-chat.family-nurture-authorization@1.1.0`
+    canonical/API/client chain pinned and fail-closed;
+  - extend transport/controller tests for unavailable, stale, partial cleanup,
+    replay and outcome-unknown without production Mobile injection;
+  - prepare T-039 authorization presentation/cache invalidation for the exact
+    qualified result.
+- Exit: exact owner/consumer conformance and cleanup receipt pass; both sides
+  remain default-off.
+- Rollback: disable/remove the Nurture provider binding and keep My-Chat's
+  public API returning unavailable; canonical consent history is not rolled
+  back.
+
+#### Wave 2 — G4-F and device-independent My-Chat completion
+
+- Nurture deliverable: T-007 G4-F joins formal ingress, real pinned owners,
+  cross-surface consistency, privacy/negative matrix, final false/empty census
+  and the exact T-007 Beta Profile Handoff.
+- My-Chat deliverables that do not require equipment:
+  - complete T-036 loading/empty/error/partial/offline/stale/revoked/hidden/
+    deleted specifications and contract/component mapping;
+  - continue T-039 Phase 4 owner-backed parent surfaces as contracts land;
+  - implement Phase 5 teacher and Phase 6 director UI/state against bounded
+    sanitized fixtures and published typed seams, while keeping Live blocked;
+  - complete strict API-client parsing, contract-ref/digest mismatch denial,
+    actor/context cache partitioning, revoke/redaction invalidation, outcome
+    reconciliation and no-fallback tests;
+  - prepare build, coverage and evidence manifests without store credentials,
+    signing or claims of execution.
+- Exit: T-007 Exit is citable; My-Chat has no known source/contract/UI blocker
+  that can be resolved without a deployment environment or device. Remaining
+  gaps are explicitly owner- or equipment-gated.
+- Rollback: disable individual Mobile lenses/adapters; Nurture and My-Chat
+  canonical facts remain unchanged.
+
+#### Wave 3 — T-008 G5-0 reconciliation and G5-A Candidate Freeze
+
+- Entry: T-004 through T-007 exact handoffs pass; the Candidate-consumed T-002
+  owner subset is current; no required-path gap is hidden as optional.
+- Nurture deliverables:
+  - reconcile Beta Profile v0, pins, limitations and drift;
+  - mint one immutable, undeployed, capability-default-off Service Candidate;
+  - produce deterministic local/source-level qualification inputs and exact
+    interface handoff material.
+- My-Chat deliverables:
+  - freeze the strict companion client against the exact interface ref/digest;
+  - finish compatibility matrix, sanitized fixtures, negative conformance,
+    cache/offline rules, recovery and rollback guidance;
+  - prove builds/tests that do not require store signing or real devices.
+- Exit: a planning-only **device/environment execution readiness checkpoint**.
+  This is not a `DeploymentBinding`, `PlatformValidationRecord`, Composite or
+  G5 verdict.
+- Rollback: append-only invalidate/supersede the Candidate if a
+  Candidate-defining input drifts; never patch it in place.
+
+#### Wave 4 — Mandatory pause: acquire external prerequisites
+
+- Required inputs:
+  - approved target environment and owner;
+  - exact Candidate-deploy path and readback access;
+  - approved internal-store apps/accounts/signing path;
+  - versioned iOS/OEM Android device/OS/accessibility coverage profile;
+  - sanitized test identities/data and retention/cleanup owner.
+- Exit: Q-JG5-01/02/03 resolved and a separately authorized execution window.
+- If unavailable: remain at the Wave 3 readiness checkpoint. Do not create a
+  partial Binding, synthetic platform record or limited PASS.
+
+#### Wave 5 — G5-B/C/D/E execution and final decision
+
+- G5-B: deploy the exact Candidate, read back executable/migration/config/
+  owner/gate state and mint immutable `NurtureDeploymentBindingV1`; run local
+  black-box qualification against that Binding.
+- G5-C: finalize My-Chat consumer handoff against the same Binding and exact
+  interface.
+- G5-D: create separate internal-store real-device iOS and Android
+  `PlatformValidationRecordV1` records using the same Candidate/interface/
+  Binding/profile/suite.
+- G5-E: compose exact local+iOS+Android evidence into
+  `CompositeValidationBindingV1` and issue `InternalBetaDecisionV1`.
+- Exit: `PASS` or only a rules-compliant `PASS_WITH_LIMITATIONS`; required,
+  authority, privacy, lifecycle, migration, contract or real-device failures
+  are `NO_GO`.
+- Rollback: disable internal-test enablement, preserve immutable evidence and
+  create the smallest owning successor Candidate/Binding/build/record.
+
+### What My-Chat can advance without devices or an environment
+
+| Work area | Can advance now | Cannot claim now |
+| --- | --- | --- |
+| T-028 identity | Exact Nurture adoption review, pinned owner contracts, parent/steward and actor/organization negatives, replay/concurrency/local contract tests | Per-environment destructive cutover, durable migration/apply or cloud activation |
+| T-036 product/contract | Complete state matrix, copy/accessibility/component contracts, owner-to-field/action traceability | Physical interaction/accessibility evidence |
+| T-039 Mobile | Remaining fixture-backed parent/teacher/director UI; strict API clients; cache/context/revoke/offline/outcome tests; default-off controller composition after owner conformance | Authenticated target-environment journey, internal-store install or physical-device qualification |
+| T-040 knowledge | Public Knowledge/RAG backward-compatibility regression and default-off composition tests | Real Qwen/Bailian live qualification or activated product traffic |
+| G5 companion readiness | Exact interface client, compatibility matrix, sanitized fixtures, negative suite, recovery/rollback and evidence-manifest preparation | Observed Deployment Binding, platform records, Composite or Internal Beta Decision |
+
+### Verification and acceptance criteria
+
+- Every wave records exact repository revisions, contract refs/digests and
+  commands in its owning task's `04-verification.md`.
+- Nurture gates include targeted/full unit, contract, production-shape DB and
+  disposable qualification appropriate to T-007/T-010/T-008.
+- My-Chat pre-equipment gates include typecheck, targeted unit/integration,
+  API-client runtime parsing, UI governance, context/cache/revoke negatives,
+  deterministic sanitized fixtures and governance lint.
+- Cross-owner acceptance requires exact-pin positive and denial/unavailable/
+  stale/revoke/replay/response-loss/outcome-unknown/cleanup paths.
+- No phase may mark `Live`, `DeploymentBinding`, platform-device evidence or
+  G5 Decision complete from an unexecuted step.
+- Final acceptance requires the exact T-008 G5-B through E evidence chain; if
+  equipment remains unavailable, the plan remains incomplete by design.
+
+### Risks and mitigations
+
+| Risk | Likelihood | Impact | Mitigation | Detection | Rollback |
+| --- | ---: | ---: | --- | --- | --- |
+| Environment/devices remain unavailable | high | high | Front-load Waves 0-3 and maintain an explicit Wave 4 stop | Unresolved Q-JG5-01/02 | Stay default-off at readiness checkpoint |
+| UI work outruns owner contracts | high | high | Three-axis UI/Contract/Live matrix; no production fixture fallback | T-039 readiness audit | Disable the affected lens/adapter |
+| Exact pins drift during parallel work | medium | high | Freeze handoff inputs per wave; rerun affected conformance only | Pin/digest gates | Invalidate downstream evidence |
+| Shared My-Chat shell/client conflicts | medium | medium | One integration owner and small reversible slices | Diff/rebase review | Revert the affected slice |
+| T-028 expands into unavailable environment cleanup | medium | medium | Limit current wave to exact Nurture adoption and local contracts | Phase-entry scope check | Defer environment legs |
+| Adapter-qualified knowledge is called live-qualified | low | high | Keep `live_qualified=false` until a real provider receipt exists | T-040/T-007 evidence review | Disable knowledge activation |
+| A readiness checkpoint is mistaken for G5 completion | medium | high | Use no machine verdict for Wave 3; list missing Binding/platform records | T-008 gate audit | Withdraw the claim and retain Candidate history |
+
+### Optional detailed documentation layout
+
+No new bundle is created. Existing execution bundles retain the repository
+convention:
+
+```text
+The-Nurture/dev-docs/active/
+  nurture-institution-mode/          # this coordination roadmap
+  nurture-institution-surfaces/      # T-007 execution/evidence
+  nurture-family-sharing-eligibility/# T-010 execution/evidence
+  nurture-store-beta-readiness/      # T-008 G5 execution/evidence
+
+My-Chat/dev-docs/active/
+  child-identity/                    # T-028
+  mobile-chat-dashboard-uiux/       # T-036
+  scenario-dashboard/               # T-038
+  mobile-uiux-delivery/              # T-039
+  nurture-knowledge-owner/           # T-040
+  nurture-enrollment-contact-owner/  # T-041
+```
+
+### Joint-plan to-dos
+
+- [x] Confirm G5 Internal Beta Decision as the final endpoint.
+- [x] Confirm critical-path parallelism instead of equal work allocation.
+- [x] Confirm T-002 as the single coordination-roadmap SSOT.
+- [x] Record environment/device unavailability as a hard evidence gate, not a
+  reason to stop device-independent work.
+- [x] Execute Wave 0 and reconcile the T-007 stale overview.
+- [ ] Close T-007 G4-D I4 and T-010 C2-C4 in parallel.
+- [ ] Close G4-F and the device-independent My-Chat readiness backlog.
+- [ ] Run T-008 G5-0/A only after exact entry gates pass.
+- [ ] Resolve Q-JG5-01/02/03 before any G5-B/D execution.
+- [ ] Produce the exact G5-B/C/D/E evidence chain and final decision.
+
+### First execution checkpoint (2026-08-12)
+
+- Wave 0 is complete: T-007 now cites qualified I3 record 87 and the current
+  I4 step; My-Chat T-039 classifies work as `local-ready`, `owner-blocked` or
+  `equipment-blocked` without weakening its UI/Contract/Live axes.
+- T-007 I4-A preflight found a prerequisite ownership gap: Nurture still mints
+  a Host-owned `my_chat/workflow_run` ref. The attempted deterministic local
+  repair and joint vehicle were rejected and removed. My-Chat must first issue
+  or reserve the Run through a pinned trusted seam; the fresh two-database run
+  remains a second blocker and I4 is unqualified.
+- T-010 C2 has a coherent fail-closed current-authority reader with 16 contract
+  tests. Real PostgreSQL execution against the unapplied C1 schema remains the
+  approved C4 disposable qualification gate; C3/C4 remain open.
+- My-Chat T-040 public Knowledge/RAG compatibility is closed by an offline
+  API-to-RAG regression suite. `live_qualified=false` and default-off remain.
+- My-Chat T-036 now publishes a validated three-role/eight-state async boundary
+  contract. T-039 adoption and ASYNC-01 through ASYNC-12 component/model tests
+  are the next device-independent consumer increment.
+- The combined Nurture self-pin is `3276062e…` over 291 files. My-Chat
+  `ec9f298` and Base `536638a` remain exact; the workflow pin verifier and its
+  7 tests pass.
+
+### Second execution checkpoint (2026-08-12)
+
+- My-Chat T-041 implements the generic Host Workflow Run owner prerequisite as
+  a default-off local candidate. The Run id is generated by canonical
+  Postgres, queued Run and body-free creation outbox commit together, exact
+  replay keeps the identity after lifecycle advance, and no Nurture business
+  fact crosses the boundary. The candidate has no route or activation.
+- T-007 has not adopted that candidate. Because the My-Chat worktree remains
+  uncommitted, `ec9f298` cannot honestly pin the changed `x5_joint_api` source;
+  Nurture's workflow verifier now records this as expected cross-worktree
+  source drift pending a referencable revision. Record 88's joint vehicle and
+  two-database execution remain open.
+- T-010 C3 is locally contract-qualified and default-off: the dedicated
+  signed/no-store private transport resolves anchors to the local pair inside
+  Nurture, and the idempotent cleanup owner exposes only Nurture-local purge
+  scope. Transport/cleanup 11/11 and exact-pair query contract 6/6 pass. C4
+  still requires approved disposable PostgreSQL execution and joint
+  conformance; no schema was applied.
+- My-Chat T-039 adopts the T-036 cross-role async contract on real parent and
+  teacher state owners. ASYNC-01 through ASYNC-12, synchronous revoke purge,
+  late-completion denial and transient-only retry pass 70 tests. Director
+  stays unmounted fixture-only; no live/device claim is made.
+- The Nurture self-pin rotates to `c701ed9f...` over 297 files. It is valid for
+  the current Nurture source population, while the complete cross-repository
+  verifier remains intentionally red on the uncommitted My-Chat source drift.
+
+### Third execution checkpoint (2026-08-12)
+
+- T-007 now has a narrow Nurture adapter for the uncommitted My-Chat Workflow
+  Run owner candidate, but production adoption remains fail-closed. The review
+  proved a two-database protocol gap: `issueRun` commits a queued Host Run and
+  outbox before Nurture commits locally, while no confirm/abandon/orphan
+  reconciliation or stable logical retry identity is contracted. I4-A/I4/G4-F
+  therefore remain unqualified; the x5 file is a negative protocol-gap vehicle,
+  not a positive joint qualification.
+- T-010 C4 now has an explicit empty-disposable qualification runner and a
+  production-shape test vehicle. The same increment repairs same-key,
+  different-fingerprint cleanup races with a PostgreSQL advisory transaction
+  lock before any local idempotent purge. Environment-free C2/C3/C4 checks pass
+  28/28 plus 11/11 transport regression; real migration, SQL and advisory-lock
+  execution remain pending because no approved database exists.
+- My-Chat T-039 completes the local-ready parent-garden P-O01 through P-O05
+  async closure on the existing state owner: exact family-scope masking,
+  revoke/scope sheet cleanup, privacy fail-closed behavior and late-completion
+  rejection pass 50 focused tests. Owner/live/device axes remain blocked.
+- Root verification passes Nurture typecheck, 97 unit files / 1033 tests,
+  My-Chat repository typecheck, the 10-test Host Run candidate suite and the
+  50-test Mobile suite. The combined Nurture routing census is 178 files:
+  unit 97, production DB 49, dev host 11, scenario service 17 and x5 joint 4.
+- Nurture's settled exact-runtime self-pin is `5a59039b...` over 298 files.
+  The complete pin verifier remains intentionally red only on My-Chat's
+  uncommitted `x5_joint_api` source population. No database apply, route,
+  activation, deployment, traffic or fabricated external revision occurred.
+
+### Fourth execution checkpoint (2026-08-12)
+
+- The obsolete immediate queued-Run owner/adapter and its negative x5 vehicle
+  are removed. My-Chat and Nurture now each have one dedicated dormant ledger:
+  Host non-executable reservation and Nurture historical commit/no-effect
+  settlement.
+- The current T-007 step is signed reservation transport plus atomic command
+  settlement and Host proof verification. Production remains fail-closed
+  before contact/protected/effect work until this is complete.
+- T-010 C2-C4 remains locally ready and default-off. The qualification runner
+  requires an explicitly approved empty disposable PostgreSQL target and has
+  no `DATABASE_URL` fallback. The cleanup owner now rejects malformed ledger
+  receipt substitution.
+- Current routing is 178 files: 97 unit, 50 production DB, 11 dev host, 17
+  scenario service and 3 x5. No migration was applied and no device/live claim
+  was introduced.
+- The next baseline action is to commit My-Chat, rotate the exact Nurture pin
+  to that referencable revision/source hash, then continue the signed transport
+  implementation without reintroducing a second protocol track.
