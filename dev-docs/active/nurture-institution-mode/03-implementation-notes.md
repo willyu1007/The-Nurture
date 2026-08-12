@@ -3,24 +3,31 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-08-11
+- Last updated: 2026-08-12
 
 ## Next concrete actions
 
-1. Let My-Chat T-039 independently implement its canonical family-side
-   authorization/write/outbox and public API boundary against the accepted exact
-   eligibility pin.
-2. Before Nurture adds a concrete current-authority adapter, separately review
-   role/Grant/release/receiving/lifecycle persistence semantics. Media and focus
-   sharing require an honest authority model; do not alias existing data classes.
-3. Keep C30-I4-C, schema/database work, C31-C35, T-008, capability/Workspace
-   activation, deployment, Pilot and traffic closed until separately authorized.
+1. Complete the T-007 G4-D I4 native-source/current-owner transport, remaining
+   commands and Guardian/mobile/head matrix.
+2. Run that complete matrix at the exact current pins; open G4-F only on PASS.
+3. Close the T-010 governance handoff without treating its default-off
+   qualification as durable apply or activation.
+4. Keep C31-C35, T-008, capability/Workspace activation, deployment, Pilot and
+   traffic closed until separately authorized.
 
-The current family-sharing handoff is Nurture source `be3d58d…`, My-Chat
-adoption `6295b4f…`, cumulative source hash `752bc3d6…ddc8a` and unchanged
-default-off census `448d37e1…3c3e`.
+The current C30 qualification binds Base `536638a`, My-Chat `6d4baee`, Nurture
+scenario `54353008…` and owner lock `4fccdc1c…`; record 22 is authoritative.
 
 ## What changed
+
+- 2026-08-12: Requalified C30 Step 5 at current pins and recorded
+  `C30_CURRENT_PIN_REQUAL_PASS` in record 22. The run consumed the separately
+  qualified T-007/T-041 settlement and T-010 family-sharing protocols, replayed
+  39 Nurture and 43 My-Chat migrations from empty with no diff, passed every
+  routed Nurture population plus My-Chat/Base regression gates, and repaired
+  stale G2 pin, G3 table-census and single-/two-database test-routing checks.
+  Both named disposable containers were destroyed; no durable environment,
+  activation, deployment or traffic changed.
 
 - 2026-08-11: Published
   `nurture.family-sharing-eligibility@1.0.0` at digest

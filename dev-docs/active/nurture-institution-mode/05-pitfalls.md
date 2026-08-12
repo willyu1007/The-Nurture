@@ -4,6 +4,15 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not count a two-database test as x5 without also excluding it from the
+  production single-database Vitest config. The routing census and collector
+  config must agree mechanically.
+- Do not rotate an exact pin file while leaving hardcoded assertions on the old
+  revisions or hashes. Run every consumer gate after the rotation, then reseal
+  source locks only from committed bytes.
+- Do not put a large bounded quantifier such as `{0,511}` into a PostgreSQL
+  regular-expression check. Enforce the length with `char_length` and keep the
+  regex responsible only for character shape.
 - Do not reuse a cross-repository task ID as though task IDs were global; resolve
   the task independently in each repository before attaching a commit trailer.
 - TypeScript assertion helpers called by exported assertion functions require an

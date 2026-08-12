@@ -8,6 +8,19 @@
 
 My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、stewardship/membership/scenario binding 和场景外壳；Nurture 通过无 PII/无权限 typed anchors 与 exact workspace associations 连接平台 identity，并拥有 workspace-local 托育生态图谱、角色、入托、授权、家园沟通、照护记录和媒体归属。
 
+## Current qualification overlay（2026-08-12）
+
+| Track | State | Next gate |
+| --- | --- | --- |
+| T-002 C30 current pins | `C30_CURRENT_PIN_REQUAL_PASS`, default-off; Base `536638a`, My-Chat `6d4baee`, record 22 | Preserve exact source/schema/default-off locks; no activation. |
+| T-007 / My-Chat T-041 settlement | I4-A two-database matrix 6/6 | Implement native-source/current-owner transport, remaining commands and Guardian/mobile/head negatives. |
+| T-010 family sharing | `I4_C4_EXIT_PASS_DEFAULT_OFF`; 12/12 guarded production-shape, 5/5 joint cleanup | Governance handoff/closure only; durable apply is separate. |
+| T-007 G4-F | Closed | Opens only after the complete G4-D I4 matrix passes. |
+
+The two qualification containers have been destroyed. C31-C35, T-008
+Candidate Freeze, deployment, capability activation, Pilot and external
+traffic remain closed.
+
 ## My-Chat/T-030 coordination overlay（2026-07-28）
 
 | Item | Owner / input | State | Next gate |

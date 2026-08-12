@@ -10,7 +10,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-08-11
+- Last updated: 2026-08-12
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
   `C30-I0-A/B/C/D` gates remain complete. Artifact 50 reaccepts C30-I1-F after
   the successor repair closes all four artifact-49 findings. Artifact 48 remains
@@ -43,6 +43,23 @@
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30 current-pin three-repository requalification — 2026-08-12
+
+| Check | Result |
+| --- | --- |
+| Exact inputs | PASS — Base `536638a`, My-Chat `6d4baee`, contract parity `85cf56e2…`, Nurture scenario `54353008…`, owner lock `4fccdc1c…`. |
+| Joint prerequisite protocols | PASS — T-007/T-041 settlement 6/6; T-010 guarded C4 12/12 with zero residue; family-sharing joint 5/5; full x5 35/35. |
+| Owner/C30 gates | PASS — formal owner integration 68/68, every assert gate, upstream/owner/default-off and exact pin checks. |
+| Fresh schemas | PASS — Nurture 39/39 and My-Chat 43/43 migrations, both current with no schema diff; DB context contracts current. |
+| Nurture regressions | PASS — unit 97/1047; production DB 50/437; dev host 11/27; scenario service 14/95 plus DB 3/68; x5 5/35; typecheck and frontend lint. |
+| My-Chat/Base regressions | PASS — My-Chat typecheck/ESLint and 164/1147 ordinary tests; Base workflow conformance 441/441. |
+| Cleanup/effects | PASS — the two named disposable containers were destroyed and ports 55450/55438 are free; no durable apply, activation, deployment or traffic. |
+
+Current verdict: `C30_CURRENT_PIN_REQUAL_PASS / DEFAULT_OFF /
+T007_I4_REMAINDER_NEXT / G4_F_CLOSED`.
+Normative record:
+[`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md).
 
 ## C30-I4-A/B provider adoption — 2026-08-11
 

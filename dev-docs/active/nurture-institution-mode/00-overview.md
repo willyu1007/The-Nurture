@@ -7,33 +7,26 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-12
 - **Owner:** willyu1007
-- **Execution refresh (2026-08-12, current main):** the joint plan still
-  reuses T-002 as coordination SSOT. T-007 and My-Chat T-041 have completed
-  the default-off Host reservation / signed Nurture settlement / historical
-  status / writer-fenced no-effect protocol locally at Nurture `5d489ac` and
-  My-Chat `9ac8f16`. T-010 has completed I4-C2 and I4-C3 and has an
-  environment-free C4 production-shape vehicle ready. Docker is now available
-  locally; the immediate gate is execution against explicitly approved,
-  disposable PostgreSQL targets, not further protocol design. None of these
-  facts is I4, G4-F, deployment, activation or traffic evidence.
-- **Landing status (2026-08-08):** C30 landed as one coordinated
-  three-repository sequence per
-  [`20-c30-cross-repository-landing-plan.md`](./20-c30-cross-repository-landing-plan.md).
-  Base main is at `4350086…`, My-Chat main at `dc3607e…`, the Nurture pins are
-  rotated (`d33276a`) and this repository has restored the C30 merge. **Step 5,
-  the single three-repository requalification, is still outstanding** — until it
-  passes, the acceptances recorded below are the branch's own evidence at its
-  original topology, not current-pin evidence. The `Current gate` block further
-  down still cites the superseded `a019566` / `06303e9` pins for the same
-  reason.
-- Next step: run the authorized disposable qualification lanes in dependency
-  order: (1) the serialized T-007/T-041 two-database race, response-loss,
-  revoke, unknown and opposite-terminal matrix; (2) T-010 C4 fresh-database
-  production-shape plus exact My-Chat grant/withdrawal/cleanup conformance;
-  and (3) C30 Step 5 current-pin requalification. If all pass, freeze and run
-  T-007 G4-F. My-Chat T-039 continues device-independent local-ready work
-  without treating fixtures as Live evidence. C31-C35, T-008 Candidate Freeze,
-  durable environment apply,
+- **Execution refresh (2026-08-12, current main):** the authorized joint plan
+  passed all three disposable qualification tracks. T-007/My-Chat T-041
+  workflow-run settlement passes the six-case two-database replay,
+  response-loss, unknown and writer-fence matrix. T-010 passes 39/39 fresh
+  migrations, 12/12 production-shape cases, zero synthetic residue and 5/5
+  joint grant/withdrawal/cleanup cases. C30 Step 5 passes at Base `536638a`,
+  My-Chat `6d4baee` and the current Nurture source locks. Exact evidence is in
+  [`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md).
+  Both disposable containers were destroyed; ports `55450` and `55438` are
+  free.
+- **Landing status (2026-08-12):** C30 has current-pin three-repository
+  evidence again. The 2026-08-08 record remains historical after its revision
+  binding was invalidated; record 22 is authoritative for the current pin.
+  All capabilities remain default-off and no durable environment was touched.
+- Next step: complete the still-unimplemented T-007 G4-D I4 remainder:
+  native-source/current-owner transport, remaining commands and the
+  Guardian/mobile/head matrix. Only the complete passing I4 matrix may open
+  G4-F. T-010 is ready for governance handoff/closure, while My-Chat T-039
+  continues device-independent local-ready work without treating fixtures as
+  Live evidence. C31-C35, T-008 Candidate Freeze, durable environment apply,
   deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
   Exit, T-006 G3 Exit, all `C30-I0` gates and `C30-I1-A` are PASS. `C30-I1`
   remains decomposed into ordered I1-A through I1-F
@@ -95,17 +88,14 @@
   authorized I4 scope review remains eligible.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
-- Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
-  `06303e9` (workflow-contract parity `8dd53be4…a34d`, `x5_joint_api`
-  `89a61355…`, `wave4_binding_host` `960afb2c…`); the Nurture self-pin is
-  `ec763a27…f152` (41 paths / 54 files). G1 Joint Conformance passed on
-  2026-08-01 through the formal NestJS ingress against these exact pins
-  (`18-g1-joint-conformance-record.md`), opening protected T-005～T-007
-  implementation only. All consumers remain default-disabled; the drifting
-  sibling My-Chat checkout is still not adoption authority.
-  C31, C4, D implementation, Pilot-0-E, Pilot-1, persistent database apply,
-  artifact publication, capability activation, and external traffic remain
-  separately unauthorized.
+- Current gate: T-002 current-pin qualification binds Base `536638a`, My-Chat
+  `6d4baee`, contract parity `85cf56e2…`, `x5_joint_api=39a9689c…`,
+  `wave4_binding_host=65d6b0a0…` and Nurture self-pin `54353008…`.
+  [`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md)
+  is the current evidence. G1 remains historical prerequisite evidence; every
+  consumer remains default-disabled. C31, G4-F, D implementation, Pilot-0-E,
+  Pilot-1, persistent database apply, artifact publication, capability
+  activation and external traffic remain separately unauthorized.
 - C30-I0 exact topology: Base `20c4b7a…` (immutable joint-pin verifier repair),
   My-Chat `dc4a77b…`, Nurture qualification input `cc8b034…` over runtime
   checkpoint `882d80f…`. Joint Git pins/source hashes, the build-aware canonical

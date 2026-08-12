@@ -1,5 +1,9 @@
 # C30 Landing Requalification Record
 
+> Historical evidence: this 2026-08-08 revision binding was invalidated by
+> later pin drift. The current-pin replacement is
+> [`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md).
+
 ## Verdict
 
 - Date: 2026-08-08

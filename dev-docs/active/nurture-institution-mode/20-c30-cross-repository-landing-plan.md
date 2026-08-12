@@ -247,25 +247,19 @@ For reference, the conflict resolution this step restored:
 Re-verify the census after restoring — if any repository gained test files in
 the interim, the numbers move.
 
-### Step 5 — One three-repository requalification ✅ DONE 2026-08-08 · ⚠️ since invalidated by pin drift
+### Step 5 — One three-repository requalification — current-pin PASS 2026-08-12
 
-> 2026-08-12 note: the 2026-08-08 pass bound My-Chat `51ad97f7` and surface
-> contract `1.17.0` under record 21's own invalidation clause ("live checkouts
-> … any sibling commit invalidates the revision binding"). Sibling pins have
-> since rotated repeatedly, so Step 5 must be re-executed at current pins (or
-> with a detached topology) before its acceptance counts as current-pin
-> evidence — `00-overview.md` and the dashboard carry the authoritative
-> "outstanding" status. The `c30-i3-owner-adoption-lock.json` host-head
-> refresh belongs to that re-execution.
+The invalidated 2026-08-08 pass remains historical in record 21. The authorized
+2026-08-12 rerun completed against Base `536638a`, My-Chat `6d4baee` and the
+current Nurture source populations. The exact replacement evidence is
+[`22-c30-current-pin-requalification-record.md`](./22-c30-current-pin-requalification-record.md).
+Both disposable PostgreSQL containers were destroyed after the run.
 
-`C30_LANDING_REQUAL_PASS` — full record in
-[`21-c30-landing-requalification-record.md`](./21-c30-landing-requalification-record.md).
-Five pre-existing defects were found and fixed, all surfaced because this run
-executed gates the branch's own qualification never did. The 23 migrations
-replayed from empty with no diff, settling the interleaving question. One
-deviation from the T-009 discipline is recorded there: live checkouts were used
-instead of a detached topology, because all three were verified clean and at
-exactly the pinned heads.
+Current verdict: `C30_CURRENT_PIN_REQUAL_PASS`. The rerun replayed 39 Nurture
+and 43 My-Chat migrations from empty with no schema diff, passed every routed
+test population and repaired three additional stale qualification gates/test
+routes. The older `C30_LANDING_REQUAL_PASS` record remains the historical
+landing proof only.
 
 The plan as originally written, retained for reference:
 
@@ -298,10 +292,8 @@ Then the full scope, following the T-009 closing-requalification discipline:
 
 ## What this unlocks
 
-The Step 5 record was intended as the current-pin evidence that T-002's owner
-path has lacked since the T-009 rotations — a role the 2026-08-08 run no
-longer fills after its invalidation (see the Step 5 note above); the
-re-execution at current pins will restore it. It is what restores the G4-0A ledger row
+The 2026-08-12 Step 5 record restores the current-pin evidence that T-002's
+owner path lacked after the T-009 rotations. It restores the G4-0A ledger row
 from `DEFINED_UNQUALIFIED` to `PRESENT_PINNED`
 (`dev-docs/active/nurture-institution-surfaces/07-g4-0a-inventory-record.md`,
 "Pin Rebind"), which is why option C was chosen over the two T-007 0C paths on
@@ -309,11 +301,12 @@ from `DEFINED_UNQUALIFIED` to `PRESENT_PINNED`
 
 ## What this does not authorize
 
-Landing C30 does not start or complete `C30-I4`, open C31-C35, satisfy any
-T-007 G4 gate, create a Service Candidate, or authorize persistent database
-apply, capability activation, deployment, Pilot or traffic. Every C30
-capability remains default-off. After Step 5, only a separately authorized
-`C30-I4` scope review is eligible.
+The current-pin pass does not complete the remaining T-007 G4-D I4 matrix,
+open G4-F or C31-C35, create a Service Candidate, or authorize persistent
+database apply, capability activation, deployment, Pilot or traffic. Every
+C30 capability remains default-off. T-010 is handoff-ready; T-007 next owns
+the native-source/current-owner transport, remaining commands and
+Guardian/mobile/head matrix before G4-F can begin.
 
 ## Risks
 
