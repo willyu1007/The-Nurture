@@ -155,10 +155,10 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Requalified on 2026-08-12 against the My-Chat settlement qualification
-  // and refreshed host-adoption lock. The shared Base/My-Chat workflow
-  // contract remains byte-identical.
-  "6d4baeea3f8b23ff5a836c6e9c6e9c8ce55fe36b",
+  // Requalified on 2026-08-12 after the signed execute declaration repair.
+  // The shared Base/My-Chat workflow contract and C30 Host profile remain
+  // byte-identical.
+  "4673712d4d829a2450d5ea712ece3afec8c984d1",
   "My-Chat revision",
 );
 assertEqual(

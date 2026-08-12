@@ -8,10 +8,11 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 
 // Base and My-Chat independently committed and sealed the dedicated trusted
 // invocation handler registry before Nurture adoption. Later My-Chat default-off
-// owner commits are content-inert for the C30 Host source profiles.
+// owner and signed-route repairs are content-inert for the C30 Host source
+// profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  hostHead: "6d4baeea3f8b23ff5a836c6e9c6e9c8ce55fe36b",
+  hostHead: "4673712d4d829a2450d5ea712ece3afec8c984d1",
 };
 
 const run = (command, args, cwd) =>
