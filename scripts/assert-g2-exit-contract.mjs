@@ -149,27 +149,22 @@ const workflowPin = readJson(
 );
 assertEqual(
   workflowPin.myWorkflowBase?.revision,
-  // Rotated once in the T-009 I6 batch (D-T009-04), then again on 2026-08-08
-  // by the C30 cross-repository landing.
-  "4350086993d837baa8030564f4e19593dedd96b0",
+  // Requalified on 2026-08-12 against the current C30 upstream pin.
+  "536638a204865ebdc43bca70992388352789a36f",
   "My-Workflow-Base revision",
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Rotated once in the T-009 I6 batch (D-T009-04), then again on 2026-08-08
-  // by the C30 cross-repository landing. Advanced 2026-08-11 to the exact
-  // My-Chat mainline containing both the
-  // `nurture.teacher-release-owner@3.0.0` consumer and the subsequently landed
-  // family-authorization owner closure. The shared Base/My-Chat workflow
-  // contract remains byte-identical; the separately pinned My-Chat owner
-  // populations rotate to their exact current source.
-  "6d909bcfde64d4152add902679ba29907cc91883",
+  // Requalified on 2026-08-12 against the My-Chat settlement qualification
+  // and refreshed host-adoption lock. The shared Base/My-Chat workflow
+  // contract remains byte-identical.
+  "6d4baeea3f8b23ff5a836c6e9c6e9c8ce55fe36b",
   "My-Chat revision",
 );
 assertEqual(
   workflowPin.myWorkflowBase?.contractSha256,
-  // 11 files -> 21: C30 adds the neutral scenario contracts on both sides.
-  "98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f",
+  // The current Base/My-Chat contract populations remain byte-identical.
+  "85cf56e24227e730f23f5b5f68684aec507d04b017e8746e4d078a2dd2151225",
   "My-Workflow-Base workflow contract hash",
 );
 assertEqual(
