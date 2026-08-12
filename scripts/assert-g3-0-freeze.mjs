@@ -399,7 +399,8 @@ const expectedTableCensus = [
   "NurtureWorkflowCapture",
   "NurtureWorkflowCheckpoint",
   "NurtureWorkflowProject",
-  "NurtureWorkflowReview"
+  "NurtureWorkflowReview",
+  "NurtureWorkflowRunSettlement"
 ];
 assertDeepEqual(
   [...tableNames].sort(),
