@@ -5,6 +5,8 @@ import {
 } from "@my-chat/workflow-contracts";
 import {
   resolveFamilyCareMessageTargetRef,
+  validateEnrollmentGuardianActionOwnerSnapshotV1,
+  validateTrialGrantTermsSnapshotV1,
   type InstitutionBusinessCommunicationReadPort,
   type NurtureEnrollmentContactOwnerSnapshotV1,
   type NurtureEnrollmentGuardianActionOwnerSnapshotV1,
@@ -184,8 +186,10 @@ export type NurtureEnrollmentJourneyCurrentOwnerProviderV1 = {
 
 export function createNurtureEnrollmentJourneyCurrentOwnerProvider(input: {
   source: NurtureEnrollmentCurrentOwnerEvidenceSourceV1;
-  pairOwner: PrismaEnrollmentPairOwnerRepository;
+  pairOwner: Pick<PrismaEnrollmentPairOwnerRepository, "isTrialSnapshotCurrent">;
+  now?: () => Date;
 }): NurtureEnrollmentJourneyCurrentOwnerProviderV1 {
+  const now = input.now ?? (() => new Date());
   const fetchVerified = async (
     request: {
       workspace_id: string;
@@ -231,6 +235,17 @@ export function createNurtureEnrollmentJourneyCurrentOwnerProvider(input: {
     async resolveFamilyAcceptance(request) {
       const verified = await fetchVerified(request, "enrollment_family_acceptance");
       if (verified.status !== "resolved") return verified;
+      if (
+        !validateEnrollmentGuardianActionOwnerSnapshotV1(
+          verified.value.guardian_action,
+        ) ||
+        new Date(verified.value.guardian_action.verified_at) > now()
+      ) {
+        return {
+          status: "denied",
+          reason_code: "current_owner_guardian_action_invalid",
+        };
+      }
       return { status: "resolved", snapshot: verified.value.guardian_action };
     },
     async resolveTrialPair(request) {
@@ -240,6 +255,17 @@ export function createNurtureEnrollmentJourneyCurrentOwnerProvider(input: {
       const grantTerms = verified.value.grant_terms;
       if (!pair || !grantTerms) {
         return { status: "denied", reason_code: "current_owner_pair_evidence_missing" };
+      }
+      if (!pairMatchesEvidence(pair, verified.value.evidence)) {
+        return { status: "denied", reason_code: "current_owner_pair_evidence_drift" };
+      }
+      const currentTime = now();
+      if (
+        !validateTrialGrantTermsSnapshotV1(grantTerms) ||
+        new Date(grantTerms.verified_at) > currentTime ||
+        new Date(grantTerms.expires_at) <= currentTime
+      ) {
+        return { status: "denied", reason_code: "current_owner_grant_terms_not_current" };
       }
       let current;
       try {
@@ -253,4 +279,17 @@ export function createNurtureEnrollmentJourneyCurrentOwnerProvider(input: {
       return { status: "resolved", pair, grant_terms: grantTerms };
     },
   };
+}
+
+function pairMatchesEvidence(
+  pair: NurtureTrialPairOwnerSnapshotV1,
+  evidence: ScenarioCurrentOwnerBindingPairEvidenceV1,
+): boolean {
+  const [child, family] = evidence.owner_bindings;
+  return child.binding_slot === "child" &&
+    child.owner_ref.object_id === pair.child_owner_ref &&
+    child.owner_ref.version === pair.child_owner_version &&
+    family.binding_slot === "family" &&
+    family.owner_ref.object_id === pair.family_owner_ref &&
+    family.owner_ref.version === pair.family_owner_version;
 }

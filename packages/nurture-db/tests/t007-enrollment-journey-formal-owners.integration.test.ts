@@ -5,13 +5,17 @@ import {
   NurtureEnrollmentJourneyPreparedCommandCrypto,
   type InstitutionBusinessCommunicationReadPort,
 } from "@the-nurture/scenario";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import { createAesGcmProtectedContentPort } from "../src/index.js";
 import {
   bindPrismaNurtureEnrollmentJourneyFormalOwners,
   createPrismaNurtureEnrollmentJourneyFormalOwners,
 } from "../src/enrollment-journey-owners.composition.js";
+import {
+  createNurtureEnrollmentJourneyCurrentOwnerProvider,
+  type NurtureEnrollmentCurrentOwnerEvidenceV1,
+} from "../src/enrollment-journey-owner-providers.js";
 import { PrismaNurtureCommandRepository } from "../src/repositories/institution-core.repositories.js";
 
 const prisma = createPrismaClient();
@@ -26,6 +30,94 @@ const PREPARED_ENCRYPTION_KEY = "t007-enrollment-prepared-encryption-001";
 const MESSAGE_REF_KEY = "t007-enrollment-message-ref-integrity-01";
 
 describe("T-007 Prisma formal Enrollment Journey owners", () => {
+  it("rejects malformed, cross-pair and expired current-owner source facts", async () => {
+    const now = new Date("2026-08-12T10:00:00.000Z");
+    const pairOwner = { isTrialSnapshotCurrent: vi.fn(async () => true) };
+    const sourceValue = currentOwnerSourceValue(now);
+    let returned = sourceValue;
+    const provider = createNurtureEnrollmentJourneyCurrentOwnerProvider({
+      source: {
+        fetchCurrentOwnerEvidence: async () => ({
+          status: "resolved",
+          value: returned,
+        }),
+      },
+      pairOwner,
+      now: () => now,
+    });
+    const request = {
+      workspace_id: "workspace-current-owner",
+      institution_ref: "institution-current-owner",
+      workflow_ref: "workflow-current-owner",
+    };
+
+    returned = {
+      ...sourceValue,
+      evidence: {
+        ...sourceValue.evidence,
+        purpose_key: "enrollment_family_acceptance",
+      },
+      guardian_action: {
+        ...sourceValue.guardian_action,
+        action_ref: { ...sourceValue.guardian_action.action_ref, namespace: "nurture" },
+      },
+    } as typeof sourceValue;
+    await expect(provider.resolveFamilyAcceptance(request)).resolves.toEqual({
+      status: "denied",
+      reason_code: "current_owner_guardian_action_invalid",
+    });
+
+    returned = {
+      ...sourceValue,
+      pair: sourceValue.pair && {
+        ...sourceValue.pair,
+        child_owner_ref: "nurture_child_binding_anchor_v1:another-child",
+      },
+    };
+    await expect(provider.resolveTrialPair(request)).resolves.toEqual({
+      status: "denied",
+      reason_code: "current_owner_pair_evidence_drift",
+    });
+    expect(pairOwner.isTrialSnapshotCurrent).not.toHaveBeenCalled();
+
+    returned = {
+      ...sourceValue,
+      grant_terms: sourceValue.grant_terms && {
+        ...sourceValue.grant_terms,
+        expires_at: now.toISOString(),
+      },
+    };
+    await expect(provider.resolveTrialPair(request)).resolves.toEqual({
+      status: "denied",
+      reason_code: "current_owner_grant_terms_not_current",
+    });
+    expect(pairOwner.isTrialSnapshotCurrent).not.toHaveBeenCalled();
+  });
+
+  it("admits only the exact current pair after the local owner reread", async () => {
+    const now = new Date("2026-08-12T10:00:00.000Z");
+    const value = currentOwnerSourceValue(now);
+    const pairOwner = { isTrialSnapshotCurrent: vi.fn(async () => true) };
+    const provider = createNurtureEnrollmentJourneyCurrentOwnerProvider({
+      source: {
+        fetchCurrentOwnerEvidence: async () => ({ status: "resolved", value }),
+      },
+      pairOwner,
+      now: () => now,
+    });
+
+    await expect(provider.resolveTrialPair({
+      workspace_id: "workspace-current-owner",
+      institution_ref: "institution-current-owner",
+      workflow_ref: "workflow-current-owner",
+    })).resolves.toEqual({
+      status: "resolved",
+      pair: value.pair,
+      grant_terms: value.grant_terms,
+    });
+    expect(pairOwner.isTrialSnapshotCurrent).toHaveBeenCalledOnce();
+  });
+
   it("prepares, verifies and consumes inside the command transaction", async () => {
     const scope = await seedAdminScope("consume");
     const clock = { now: new Date("2026-08-12T10:00:00.000Z") };
@@ -432,6 +524,74 @@ function startInquiryInput(clock: { now: Date }) {
   };
 }
 
+function currentOwnerSourceValue(
+  now: Date,
+): NurtureEnrollmentCurrentOwnerEvidenceV1 {
+  const childOwnerRef = "nurture_child_binding_anchor_v1:child-current-owner";
+  const familyOwnerRef = "nurture_family_binding_anchor_v1:family-current-owner";
+  return {
+    evidence: {
+      binding_evidence_version: 1 as const,
+      purpose_key: "enrollment_trial_pair",
+      owner_bindings: [
+        {
+          owner_binding_ref_version: 1 as const,
+          binding_slot: "child" as const,
+          owner_ref: {
+            ...canonical("scenario-owner", "child_binding_owner", childOwnerRef),
+            version: 2,
+          },
+        },
+        {
+          owner_binding_ref_version: 1 as const,
+          binding_slot: "family" as const,
+          owner_ref: {
+            ...canonical("scenario-owner", "family_binding_owner", familyOwnerRef),
+            version: 3,
+          },
+        },
+      ],
+      pair_relation_evidence_hash: "a".repeat(64),
+      current_owner_evidence_hash: "b".repeat(64),
+    },
+    guardian_action: {
+      contract_version: "1.0.0" as const,
+      actor_ref: canonical("my_chat", "actor", "actor-current-owner"),
+      contact_ref: canonical("my_chat", "nurture_prospective_contact", "contact-current-owner"),
+      action_ref: canonical("my_chat", "enrollment_action", "action-current-owner"),
+      occurred_at: new Date(now.getTime() - 2_000).toISOString(),
+      verified_at: new Date(now.getTime() - 1_000).toISOString(),
+    },
+    pair: {
+      contract_version: "1.0.0" as const,
+      actor_ref: canonical("my_chat", "actor", "actor-current-owner"),
+      guardian_participant_ref: "guardian-current-owner",
+      guardian_role_assignment_ref: "guardian-role-current-owner",
+      child_owner_ref: childOwnerRef,
+      child_owner_version: 2,
+      family_owner_ref: familyOwnerRef,
+      family_owner_version: 3,
+      child_association_ref: "child-association-current-owner",
+      child_association_head: 4,
+      family_association_ref: "family-association-current-owner",
+      family_association_head: 5,
+      child_care_process_ref: "care-process-current-owner",
+      verified_at: new Date(now.getTime() - 1_000).toISOString(),
+      expires_at: new Date(now.getTime() + 30_000).toISOString(),
+    },
+    grant_terms: {
+      contract_version: "1.0.0" as const,
+      policy_ref: "policy-current-owner",
+      policy_revision: 1,
+      directions: ["family_to_org", "org_to_family"] as const,
+      data_classes: ["daily_care_log"] as const,
+      purposes: ["trial_care"],
+      verified_at: new Date(now.getTime() - 1_000).toISOString(),
+      expires_at: new Date(now.getTime() + 30_000).toISOString(),
+    },
+  };
+}
+
 async function seedAdminScope(label: string): Promise<SeededScope> {
   const suffix = `${label}-${randomUUID()}`;
   const scope: SeededScope = {
@@ -520,7 +680,7 @@ function hostReservation(suffix: string) {
 }
 
 function canonical(
-  namespace: "my_chat" | "nurture",
+  namespace: "my_chat" | "nurture" | "scenario-owner",
   objectType: string,
   objectId: string,
 ) {

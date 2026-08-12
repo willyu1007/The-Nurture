@@ -11,7 +11,10 @@
   two-database race and response-loss suite passed 6/6 on an approved
   synthetic-only disposable pair
   ([`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md)).
-  The writer-fenced signed
+  A post-qualification audit repaired a stale My-Chat signed execute
+  declaration and qualified the exact detached request/nonce/formal-handler/
+  detached-response round trip; the complete x5 lane is now 36/36
+  ([`90`](./90-g4-d-i4-a-signed-ingress-requalification-record.md)). The writer-fenced signed
   `confirmed_no_effect` operation and the default-off My-Chat reserve ->
   execute -> fence/status -> settle coordinator are implemented locally;
   status bypasses prepared TTL and current authority while remaining bound to
@@ -22,7 +25,10 @@
   its Nurture adapter and the negative protocol-gap x5 vehicle are removed.
   The product path remains default-off because the Host coordinator has no
   route, DI or activation binding. The protocol subset is DB-qualified and
-  default-off; native-source, current-owner, remaining command families,
+  default-off. Current-owner admission now rejects malformed Guardian actions,
+  cross-pair evidence substitution and stale grant terms before local use
+  ([`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)); the
+  request-scoped current-owner carrier, native-source, remaining command families,
   Guardian/mobile/head negatives and the full I4 exit matrix remain open.
   G4-F therefore remains closed. E7
   disposable

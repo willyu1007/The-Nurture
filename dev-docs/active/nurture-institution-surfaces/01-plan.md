@@ -828,9 +828,10 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
   also freezes a body-free hash of command id + confirmation ref so a logical
   operation cannot be rebound before Nurture observes it. No route, DI
   binding, activation, migration apply or traffic is added.
-- Step 5 remains blocked only on the approved disposable My-Chat/Nurture
-  database pair and serialized qualification. Unknown outcomes remain
-  reserved/quarantined; I4 and G4-F remain open.
+- Step 5 passed on the approved disposable My-Chat/Nurture database pair;
+  record [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md)
+  captures the 6/6 focused protocol cases and 35/35 complete x5 lane. Unknown
+  outcomes remain reserved/quarantined; the I4 remainder and G4-F remain open.
 
 ### Current quality gate before step 5
 
@@ -842,5 +843,6 @@ Do not admit positive I4/x5, G4-F, a route or traffic before steps 2-5 pass.
   scenario/capability/entrypoint binding.
 - [x] Remove the unused status-only signed wrapper and keep one three-operation
   client as the transport/trust boundary.
-- [ ] Run step 5 on an explicitly approved disposable database pair. I4-A, I4
-  and G4-F remain open until that serialized qualification passes.
+- [x] Run step 5 on an explicitly approved disposable database pair. I4-A is
+  DB-qualified default-off by record [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md);
+  the remaining owner/command/head matrix and G4-F stay open.

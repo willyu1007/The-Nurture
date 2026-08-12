@@ -1127,6 +1127,7 @@ function verified(
   } as const;
   const [endpointKey, operationKey] = bindings[lane];
   const requestId = overrides.requestId ?? `e8-invocation-${randomUUID()}`;
+  const issuedAt = new Date();
   return {
     declaration: {
       scenario_key: "nurture",
@@ -1166,8 +1167,8 @@ function verified(
       request: {
         request_id: requestId,
         correlation_id: `e8-correlation-${randomUUID()}`,
-        issued_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 60_000).toISOString(),
+        issued_at: issuedAt.toISOString(),
+        expires_at: new Date(issuedAt.getTime() + 60_000).toISOString(),
         nonce: `e8-nonce-${randomUUID()}`,
       },
       operation: { operation_key: operationKey, input_schema_version: 1, input },

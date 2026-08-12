@@ -736,6 +736,7 @@ export function createPrismaNurtureEnrollmentJourneyFormalOwners(input: {
     currentOwnerProvider: createNurtureEnrollmentJourneyCurrentOwnerProvider({
       source: input.currentOwnerEvidenceSource,
       pairOwner: new PrismaEnrollmentPairOwnerRepository(input.prisma, now),
+      now,
     }),
     protectedContent: input.protectedContent,
     workflowRunSettlementOwner,

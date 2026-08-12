@@ -1250,3 +1250,34 @@ TWO_DATABASE_QUALIFICATION_PENDING / I4_NOT_QUALIFIED`.
 
 Verdict: `G4_D_I4_A_WORKFLOW_RUN_SETTLEMENT_DB_QUALIFIED_DEFAULT_OFF /
 I4_REMAINDER_PENDING / G4_F_CLOSED`.
+
+## 2026-08-12 I4-A signed-ingress quality requalification
+
+| Check | Result |
+| --- | --- |
+| stale My-Chat signed execute declaration | FOUND and repaired — old endpoint/operation would fail Nurture declaration admission |
+| exact cross-repository declaration equality | PASS — formal execute v2 tuple |
+| detached request, nonce, real formal handler and detached response | PASS — focused joint file / 7 tests |
+| complete serialized x5 lane after deterministic time-window repair | PASS — three consecutive runs, each 5 files / 36 tests |
+| empty-database replay | PASS — My-Chat 43/43; Nurture 39/39 |
+| exact workflow pin | PASS — My-Chat `4673712`, x5 source `312d0477...` |
+| runtime effects | NONE — default-off; no persistent apply, route, DI, activation or traffic |
+
+Verdict: `G4_D_I4_A_SIGNED_EXECUTE_DECLARATION_REQUALIFIED_DEFAULT_OFF /
+I4_REMAINDER_PENDING / G4_F_CLOSED` (record [`90`](./90-g4-d-i4-a-signed-ingress-requalification-record.md)).
+
+## 2026-08-12 I4-B current-owner admission hardening
+
+| Check | Result |
+| --- | --- |
+| Host evidence -> trial-pair exact owner ref/version binding | PASS — cross-pair substitution denied before local read |
+| Guardian action structural/future-time validation | PASS — malformed action denied |
+| grant terms structural/current-time validation | PASS — expired terms denied before local read |
+| exact positive pair + current Nurture authority reread | PASS |
+| focused formal-owner PostgreSQL suite | PASS — 1 file / 6 tests |
+| full production PostgreSQL lane | PASS — 50 files / 439 tests |
+| runtime effects | NONE — default-off; no persistent apply, route, DI, activation or traffic |
+
+Verdict: `G4_D_I4_B_CURRENT_OWNER_ADMISSION_HARDENED /
+CARRIER_AND_POSITIVE_COMMAND_MATRIX_PENDING / DEFAULT_OFF` (record
+[`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md)).

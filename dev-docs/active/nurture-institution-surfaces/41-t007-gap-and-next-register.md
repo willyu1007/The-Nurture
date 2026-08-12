@@ -374,9 +374,15 @@ off slice.
    settlement owner on a fresh disposable pair.~~ Done 2026-08-12: 6/6 focused
    protocol cases and 35/35 complete x5 cases; record
    [`89`](./89-g4-d-i4-a-workflow-run-settlement-qualification-record.md).
+   The post-audit signed declaration repair and exact request/response
+   round trip raise the current complete lane to 36/36; record
+   [`90`](./90-g4-d-i4-a-signed-ingress-requalification-record.md).
 6. **G4-D I4 remainder** — add native-source/current-owner transport, remaining
    command families, Guardian/mobile and the complete negative/replay/head
-   matrix over the qualified I3 paths (record 87 boundaries).
+   matrix over the qualified I3 paths (record 87 boundaries). Current-owner
+   admission now rejects cross-pair, malformed action and stale grant-term
+   composition (record [`91`](./91-g4-d-i4-b-current-owner-admission-hardening.md));
+   the request-scoped Host carrier and positive command matrix remain next.
 7. **G4-F** — begin only after the complete I4 matrix passes; do not infer it
    from the ownership preflight or a future single-suite pass.
 

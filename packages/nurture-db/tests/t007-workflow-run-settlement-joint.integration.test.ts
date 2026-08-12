@@ -1,15 +1,27 @@
-import { randomUUID } from "node:crypto";
+import { generateKeyPairSync, randomUUID } from "node:crypto";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import {
   createPrismaClient as createMyChatPrismaClient,
   PrismaWorkflowRunReservationLifecycleRepository,
 } from "@my-chat/db";
 import {
+  NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V2,
+  createSignedNurtureEnrollmentJourneyRunSettlementClient,
   createNurtureEnrollmentJourneyRunCoordinator,
   type VerifiedNurtureEnrollmentJourneyRunSettlementClientV2,
 } from "@my-chat/scenario-integrations";
 import {
+  InMemoryAtomicScenarioNonceStore,
+  signScenarioResponse,
+  verifyScenarioInvocation,
+  type ScenarioPrivateTransport,
+} from "@my-chat/workflow-runtime";
+import {
+  NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS,
+  NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1,
   createNurtureWorkflowRunSettlementOwner,
+  createNurtureEnrollmentJourneyFormalInvocationHandlers,
+  defaultNurtureEnrollmentJourneySurfaceDeps,
   NurtureCommandRunner,
   withNurtureWorkflowRunSettlementFinalizer,
   workflowRunSettlementBinding,
@@ -85,6 +97,129 @@ afterAll(async () => {
 });
 
 describe("T-007/T-041 two-database Workflow Run settlement", () => {
+  it("accepts the exact signed My-Chat execute declaration at the Nurture formal ingress", async () => {
+    const requestKeys = generateKeyPairSync("ed25519");
+    const responseKeys = generateKeyPairSync("ed25519");
+    const now = new Date("2026-08-12T09:00:00.000Z");
+    const formalExecute = NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.execute;
+    expect(NURTURE_ENROLLMENT_JOURNEY_EXECUTE_OPERATION_V2).toEqual({
+      scenario_key: "nurture",
+      endpoint_key: formalExecute.endpoint_key,
+      method: formalExecute.method,
+      ingress_category: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.ingress_category,
+      ingress_key: formalExecute.ingress_key,
+      principal_origin: NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.principal_origin,
+      operation_key: formalExecute.operation_key,
+      input_schema_version: formalExecute.input_schema_version,
+    });
+
+    const handler = createNurtureEnrollmentJourneyFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureEnrollmentJourneySurfaceDeps,
+    })[NURTURE_ENROLLMENT_JOURNEY_FORMAL_HANDLER_KEYS.execute];
+    if (!handler) throw new Error("Nurture formal execute handler is absent");
+    const nonceStore = new InMemoryAtomicScenarioNonceStore();
+    const transport: ScenarioPrivateTransport = {
+      async send(input) {
+        const invocation = JSON.parse(Buffer.from(input.body).toString("utf8")) as unknown;
+        const verified = await verifyScenarioInvocation({
+          invocation,
+          signature: input.signature,
+          transport_credential_subject: "my-chat.scenario-runtime",
+          trust_policies: [{
+            issuer: "my-chat.host",
+            assertion_audience: "nurture.scenario",
+            caller_subject: "my-chat.scenario-runtime",
+            credential_subject: "my-chat.scenario-runtime",
+            key_id: "host-request-key-1",
+            algorithm: "Ed25519",
+            public_key: requestKeys.publicKey,
+            declarations: [{
+              scenario_key: "nurture",
+              endpoint_key: formalExecute.endpoint_key,
+              method: formalExecute.method,
+              operation_key: formalExecute.operation_key,
+              input_schema_version: formalExecute.input_schema_version,
+              ingress_category:
+                NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.ingress_category,
+              ingress_key: formalExecute.ingress_key,
+              principal_origins: [
+                NURTURE_ENROLLMENT_JOURNEY_FORMAL_INGRESS_V1.principal_origin,
+              ],
+            }],
+          }],
+          nonce_store: nonceStore,
+          now,
+        });
+        const result = await handler({
+          invocation: verified.invocation,
+          declaration: verified.declaration,
+        });
+        const body = Buffer.from(JSON.stringify(result), "utf8");
+        return {
+          status: 200,
+          body,
+          signature: signScenarioResponse({
+            invocation: verified.invocation,
+            response_status: 200,
+            response_body: body,
+            identity: {
+              issuer: "nurture.scenario",
+              assertion_audience: "my-chat.host",
+              caller_subject: "my-chat.scenario-runtime",
+              key_id: "nurture-response-key-1",
+              algorithm: "Ed25519",
+              private_key: responseKeys.privateKey,
+              validity_ms: 30_000,
+            },
+            now,
+          }),
+          transport_credential_subject: "nurture.scenario-service",
+        };
+      },
+    };
+    const client = createSignedNurtureEnrollmentJourneyRunSettlementClient({
+      contract_hash: "a".repeat(64),
+      principal: {
+        principal_version: 1,
+        principal_kind: "human_user",
+        account_ref: canonicalRef("user", "user-1"),
+        actor_ref: canonicalRef("actor", "actor-1"),
+        workspace_ref: canonicalRef("workspace", "workspace-1"),
+        principal_origin: "interactive_session",
+      },
+      signing_identity: {
+        issuer: "my-chat.host",
+        assertion_audience: "nurture.scenario",
+        caller_subject: "my-chat.scenario-runtime",
+        key_id: "host-request-key-1",
+        algorithm: "Ed25519",
+        private_key: requestKeys.privateKey,
+      },
+      response_trust_policies: [{
+        issuer: "nurture.scenario",
+        assertion_audience: "my-chat.host",
+        caller_subject: "my-chat.scenario-runtime",
+        credential_subject: "nurture.scenario-service",
+        key_id: "nurture-response-key-1",
+        algorithm: "Ed25519",
+        public_key: responseKeys.publicKey,
+      }],
+      transport,
+      now: () => now,
+      request_context: () => ({ correlation_id: "correlation-1" }),
+    });
+
+    await expect(client.execute({
+      contractVersion: 2,
+      commandRequestId: "command-request-1",
+      confirmationRef: `ejc1.${"a".repeat(43)}`,
+      hostWorkflowRunReservation: reservationEvidence("signed-route"),
+    })).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "enrollment_journey_formal_ingress_unavailable",
+    });
+  });
+
   it("commits one Nurture execution before materializing one Host Run and body-free event", async () => {
     const request = protocolRequest("commit");
     const client = new DatabaseProtocolClient(request.workspace_id, "commit");
@@ -369,6 +504,29 @@ function protocolRequest(tag: string) {
 function expectedConfirmation(workspaceId: string): string {
   const seed = workspaceId.replaceAll(/[^A-Za-z0-9_-]/gu, "a");
   return `ejc1.${seed.padEnd(43, "a").slice(0, 43)}`;
+}
+
+function canonicalRef(objectType: string, objectId: string) {
+  return {
+    schema_version: 1 as const,
+    namespace: "my_chat" as const,
+    object_type: objectType,
+    object_id: objectId,
+  };
+}
+
+function reservationEvidence(tag: string): ExecuteInput["hostWorkflowRunReservation"] {
+  return {
+    evidence_version: 1,
+    logical_operation_id: `logical-${tag}`,
+    reservation_ref: {
+      ...canonicalRef("workflow_run_reservation", `reservation-${tag}`),
+      version: 1,
+    },
+    run_ref: canonicalRef("workflow_run", `run-${tag}`),
+    binding_fingerprint_sha256: "b".repeat(64),
+    reservation_evidence_sha256: "e".repeat(64),
+  };
 }
 
 function ownerRequest(
