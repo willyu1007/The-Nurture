@@ -187,11 +187,12 @@ const computeLock = () => {
       aggregate_source_hash: "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7",
     },
     host: {
-      // 2a2bb3c seals the trusted registry adoption. Later default-off owner
-      // commits are content-inert for the C30 Host adoption source profiles.
-      head_revision: "ae563988a0ee77c8faad5c3b29399dc0688d51a7",
-      runtime_revision: "a57e1aedf960e008f34f06c3f898e5cfc35fc522",
-      aggregate_source_hash: "cfd2f1d1c4e060aa468b20e71120a1e9e73abb7e4809f01faa0802cba2e1edb7",
+      // Step-5 requalification binds the current clean Host head while the
+      // runtime revision points at the committed source population sealed by
+      // My-Chat's independently verified adoption lock.
+      head_revision: "6d4baeea3f8b23ff5a836c6e9c6e9c8ce55fe36b",
+      runtime_revision: "149424c9a05a28aa8c1654258bb919a434208732",
+      aggregate_source_hash: "aac525c4f13953671040ce759da8eadf0f55dee9063db8b6389282f78635617d",
     },
     source_hash: sha256(
       sourceProfiles.map(({ source_identity, source_hash }) =>

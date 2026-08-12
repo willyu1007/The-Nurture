@@ -433,7 +433,7 @@ dev-docs/active/nurture-institution-mode/
 | T-007 live evidence | `../nurture-institution-surfaces/87-g4-d-i3-qualification-record.md` and `41-t007-gap-and-next-register.md` | Establish that G4-D I3 is complete and I4 is next | high | Overrides the stale I3-next sentence in T-007 `00-overview.md`. |
 | T-010 plan | `../nurture-family-sharing-eligibility/01-plan.md` | I4-C2 through C4 ordering and cleanup fence | high | C1 is reviewed, preview-only and unapplied. |
 | T-008 roadmap | `../nurture-store-beta-readiness/roadmap.md` | G5 Candidate, Binding, dual-platform and decision gates | high | Real internal-store hardware is mandatory. |
-| My-Chat T-039 roadmap | `D:/Else/My-Chat/dev-docs/active/mobile-uiux-delivery/roadmap.md` | Device-independent Mobile work and final qualification split | high | Phase 0/1 complete; Phase 2 implementation complete; Phase 3/4 active. |
+| My-Chat T-039 roadmap | `/Volumes/DataDisk/Project/My-Chat/dev-docs/active/mobile-uiux-delivery/roadmap.md` | Device-independent Mobile work and final qualification split | high | Phase 0/1 complete; Phase 2 implementation complete; Phase 3/4 active. |
 | My-Chat active task bundles | T-028/T-036/T-038/T-040/T-041/T-027/T-033 | Identity, contract, knowledge, environment and device prerequisites | high | Task docs remain their own execution SoT. |
 | Model inference | N/A | Parallel-wave grouping and handoff order only | lowest | Does not create a new contract verdict or capability. |
 
@@ -752,6 +752,10 @@ My-Chat/dev-docs/active/
 - [x] Record environment/device unavailability as a hard evidence gate, not a
   reason to stop device-independent work.
 - [x] Execute Wave 0 and reconcile the T-007 stale overview.
+- [x] Complete the default-off T-007/T-041 reservation and settlement protocol
+  implementation prerequisite for I4-A.
+- [x] Complete T-010 C2/C3 and make the guarded C4 production-shape vehicle
+  executable without a generic database fallback.
 - [ ] Close T-007 G4-D I4 and T-010 C2-C4 in parallel.
 - [ ] Close G4-F and the device-independent My-Chat readiness backlog.
 - [ ] Run T-008 G5-0/A only after exact entry gates pass.
@@ -768,6 +772,7 @@ My-Chat/dev-docs/active/
   repair and joint vehicle were rejected and removed. My-Chat must first issue
   or reserve the Run through a pinned trusted seam; the fresh two-database run
   remains a second blocker and I4 is unqualified.
+
 - T-010 C2 has a coherent fail-closed current-authority reader with 16 contract
   tests. Real PostgreSQL execution against the unapplied C1 schema remains the
   approved C4 disposable qualification gate; C3/C4 remain open.
@@ -853,3 +858,27 @@ My-Chat/dev-docs/active/
 - The next baseline action is to commit My-Chat, rotate the exact Nurture pin
   to that referencable revision/source hash, then continue the signed transport
   implementation without reintroducing a second protocol track.
+
+### Fifth execution checkpoint (2026-08-12, current main)
+
+- This checkpoint supersedes the earlier implementation-open statements. The
+  Host-ownership gap is closed in local/default-off source. My-Chat `9ac8f16`
+  owns the non-executable reservation and proof-gated confirm/abandon
+  lifecycle; Nurture `5d489ac` owns signed execution, historical status and
+  confirmation-bound writer-fenced no-effect. No route, DI activation, durable
+  environment apply or traffic exists.
+- T-007/T-041 now wait on one serialized qualification against a fresh
+  disposable database pair. The required matrix includes commit and no-effect
+  races, response loss, exact replay, revoke/expiry, unknown quarantine,
+  opposite terminal denial and orphan absence.
+- T-010 C2/C3 are implemented and contract-qualified. Its guarded C4 runner is
+  vehicle-ready and waits on a separate empty disposable PostgreSQL database;
+  the joint My-Chat grant/withdrawal/cleanup matrix follows the local
+  production-shape run.
+- Docker is available locally at this checkpoint. The user explicitly
+  authorized creation, migration, test use and destruction of synthetic-only
+  disposable databases. This authorization does not extend to staging,
+  production, a persistent shared database, activation or traffic.
+- T-040 has closed public Knowledge/RAG compatibility; live Qwen/Bailian
+  qualification remains an activation-only gate. T-036/T-039 have adopted the
+  cross-role async boundary and continue local-ready work independently.

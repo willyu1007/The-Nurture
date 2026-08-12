@@ -5,8 +5,17 @@
 - State: in-progress
 - **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（quality-repaired and reaccepted, default-off）/ C30-I4 family-sharing provider A/B（accepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-08-11
+- **Updated:** 2026-08-12
 - **Owner:** willyu1007
+- **Execution refresh (2026-08-12, current main):** the joint plan still
+  reuses T-002 as coordination SSOT. T-007 and My-Chat T-041 have completed
+  the default-off Host reservation / signed Nurture settlement / historical
+  status / writer-fenced no-effect protocol locally at Nurture `5d489ac` and
+  My-Chat `9ac8f16`. T-010 has completed I4-C2 and I4-C3 and has an
+  environment-free C4 production-shape vehicle ready. Docker is now available
+  locally; the immediate gate is execution against explicitly approved,
+  disposable PostgreSQL targets, not further protocol design. None of these
+  facts is I4, G4-F, deployment, activation or traffic evidence.
 - **Landing status (2026-08-08):** C30 landed as one coordinated
   three-repository sequence per
   [`20-c30-cross-repository-landing-plan.md`](./20-c30-cross-repository-landing-plan.md).
@@ -17,12 +26,14 @@
   original topology, not current-pin evidence. The `Current gate` block further
   down still cites the superseded `a019566` / `06303e9` pins for the same
   reason.
-- Next step: C30-I4-A/B is accepted default-off by artifacts 62 and 63. My-Chat
-  T-039 may independently implement its canonical consent/withdrawal, receipt,
-  outbox and public API boundary against the exact provider pin. On Nurture,
-  separately review the current authority adapter/persistence semantics before
-  implementing them; the existing Grant enum cannot be stretched to represent
-  media or focus sharing. C31-C35, T-008, persistent database apply,
+- Next step: run the authorized disposable qualification lanes in dependency
+  order: (1) the serialized T-007/T-041 two-database race, response-loss,
+  revoke, unknown and opposite-terminal matrix; (2) T-010 C4 fresh-database
+  production-shape plus exact My-Chat grant/withdrawal/cleanup conformance;
+  and (3) C30 Step 5 current-pin requalification. If all pass, freeze and run
+  T-007 G4-F. My-Chat T-039 continues device-independent local-ready work
+  without treating fixtures as Live evidence. C31-C35, T-008 Candidate Freeze,
+  durable environment apply,
   deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
   Exit, T-006 G3 Exit, all `C30-I0` gates and `C30-I1-A` are PASS. `C30-I1`
   remains decomposed into ordered I1-A through I1-F
