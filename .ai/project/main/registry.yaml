@@ -47,7 +47,7 @@ features:
     milestone_id: M-002
   - id: F-003
     title: "Six-surface store-beta readiness"
-    status: planned
+    status: in-progress
     description: "Turn the six-surface product design into a qualified Nurture service candidate and versioned interface that My-Chat can integrate and validate through TestFlight Internal and Google Play Internal Testing."
     milestone_id: M-002
   - id: F-004
@@ -67,6 +67,11 @@ requirements:
     status: done
     description: "Nurture must resolve every family-sharing category from current canonical owner facts and verified pair evidence without treating identity, association or unrelated Grant classes as permission, and must fail closed on drift, ambiguity or outage."
     feature_id: F-005
+  - id: R-002
+    title: "Cross-repo contract supply and guardian-decision callback"
+    status: in-progress
+    description: "Conclude the guardian-decision callback joint design before any T-008 G5-A Candidate Freeze, and register the Nurture-owned presenter contracts in the agreed order (parent-context presenter, IR-C01 parent-communication gates, director presenter) as versioned, default-off owner DTOs that My-Chat adopts only via exact pins."
+    feature_id: F-003
 
 tasks:
   - id: T-001
@@ -150,3 +155,12 @@ tasks:
       - private-transport
       - withdrawal-cleanup
       - fail-closed
+  - id: T-011
+    slug: nurture-cross-repo-contract-supply
+    status: in-progress
+    milestone_id: M-002
+    feature_id: F-003
+    requirement_ids:
+      - R-002
+    dev_docs_path: dev-docs/active/nurture-cross-repo-contract-supply
+    updated: 2026-08-13

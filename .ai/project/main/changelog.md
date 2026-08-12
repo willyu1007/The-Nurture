@@ -120,3 +120,4 @@ Project: `main`
 - 2026-08-13 task_id=T-010 event=gate-exit id=I4-C result=I4_C4_EXIT_PASS_DEFAULT_OFF level=EXACT_OWNER_CONSUMER_AND_CLEANUP_QUALIFIED durable_apply=closed deployment=closed traffic=closed next=governance-closure activation=unchanged
 - 2026-08-13 task_id=T-008 event=authorization id=G5-0 result=separately-authorized scope=readiness-inventory-and-beta-profile sequence=after-T-011-W1-W2 c31=deferred-until-after-g5-a activation=unchanged
 - 2026-08-13 task_id=T-010 slug=nurture-family-sharing-eligibility event=status from=in-progress to=archived
+- 2026-08-13 task_id=T-011 slug=nurture-cross-repo-contract-supply event=registered dev_docs_path=dev-docs/active/nurture-cross-repo-contract-supply

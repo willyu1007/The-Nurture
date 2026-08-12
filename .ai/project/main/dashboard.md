@@ -72,7 +72,7 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 10 (planned: 1, in-progress: 1, blocked: 0, done: 0, archived: 8)
+- Tasks: 11 (planned: 1, in-progress: 2, blocked: 0, done: 0, archived: 8)
 
 ## Recent tasks
 
@@ -80,6 +80,7 @@ Project: `main`
 | --- | --- | --- | --- |
 | T-007 nurture-institution-surfaces | archived | F-003 | dev-docs/archive/nurture-institution-surfaces |
 | T-010 nurture-family-sharing-eligibility | archived | F-005 | dev-docs/archive/nurture-family-sharing-eligibility |
+| T-011 nurture-cross-repo-contract-supply | in-progress | F-003 | dev-docs/active/nurture-cross-repo-contract-supply |
 | T-001 nurture-mvp | archived | F-001 | dev-docs/archive/nurture-mvp |
 | T-003 nurture-uiux-pitch | archived | F-002 | dev-docs/archive/nurture-uiux-pitch |
 | T-004 nurture-surface-contract-foundation | archived | F-003 | dev-docs/archive/nurture-surface-contract-foundation |

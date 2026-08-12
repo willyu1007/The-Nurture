@@ -370,7 +370,7 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 (`archived`); T-005 (`archived`); T-006 (`archived`);
-  T-007 (`in-progress`); T-008 (`planned`).
+  T-007 (`archived`); T-008 (`planned`); T-011 (`in-progress`).
 - Current posture: T-007 completed 0C, 0D and the full frozen 0E chain at
   private I1. G4-D increments 2–5 are qualified through 33 migrations on
   disposable PostgreSQL. I2-A publishes the exact three-query/21-action
@@ -405,9 +405,13 @@ Project: `main`
   answer-safety and owner contract `2.0.0`, all 13 service/contract pins and 15
   fixtures × 2 attempts = 30 unique invocation ids. Pre-V2 evidence
   is invalid/non-current. `live_qualified=false` remains the activation gate;
-  recorded/synthetic transport is never live evidence. G-09 is closed. T-008
-  remains planned and requires separate authorization; Candidate Freeze,
-  durable apply, deployment, activation and external traffic remain closed.
+  recorded/synthetic transport is never live evidence. G-09 is closed.
+  2026-08-13: T-008 G5-0 is separately authorized and starts after the T-011
+  W1/W2 supply steps; T-011 owns the guardian-decision callback joint design
+  (must conclude before any G5-A Candidate Freeze) and the presenter supply
+  order (parent-context presenter, IR-C01 parent-communication gates,
+  director presenter). Candidate Freeze, durable apply, deployment,
+  activation and external traffic remain closed.
 
 ### F-004 Family growth material provider
 
@@ -527,6 +531,7 @@ Project: `main`
 | T-006 nurture-child-care-boards | archived | dev-docs/archive/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | archived | dev-docs/archive/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |
+| T-011 nurture-cross-repo-contract-supply | in-progress | dev-docs/active/nurture-cross-repo-contract-supply |
 
 ### F-004 Family growth material provider
 
