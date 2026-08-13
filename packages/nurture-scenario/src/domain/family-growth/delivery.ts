@@ -1,6 +1,20 @@
-import type { FamilyGrowthAdmissionReceiptV1 } from "./envelope.js";
-import type { FamilyGrowthDeliveryConsequenceV1 } from "./receipt.js";
-import { parseAdmissionReceiptV1, receiptConsequenceV1 } from "./receipt.js";
+import type {
+  FamilyGrowthAdmissionReceiptV1,
+  FamilyGrowthLifecycleEventV1,
+  FamilyGrowthLifecycleKindV1,
+  FamilyGrowthReleaseEventV1,
+} from "./envelope.js";
+import { validateLifecycleEventV1, validateReleaseEventV1 } from "./envelope.js";
+import { lifecyclePayloadDigestV1, releasePayloadDigestV1 } from "./jcs.js";
+import type {
+  FamilyGrowthDeliveryConsequenceV1,
+  FamilyGrowthExpectedReceiptCoordinatesV1,
+} from "./receipt.js";
+import {
+  parseAdmissionReceiptV1,
+  receiptConsequenceV1,
+  receiptMatchesExpectedCoordinatesV1,
+} from "./receipt.js";
 
 /**
  * T-009 I3b delivery engine, pure half. Parameters are FROZEN by
@@ -41,6 +55,8 @@ export type FamilyGrowthDeliveryDecisionV1 =
   | {
       kind: "settle";
       receipt: FamilyGrowthAdmissionReceiptV1;
+      /** Full response body; unknown fields remain part of receipt identity. */
+      rawReceiptPayload: unknown;
       consequence: FamilyGrowthDeliveryConsequenceV1;
     }
   | {
@@ -50,15 +66,70 @@ export type FamilyGrowthDeliveryDecisionV1 =
       operatorAttention: boolean;
     };
 
+export type FamilyGrowthDeliveryEnvelopeKindV1 = "released" | FamilyGrowthLifecycleKindV1;
+
+/**
+ * Revalidate the durable envelope before transport and bind its receipt
+ * coordinates to the claimed row. A corrupt or mismatched row is not sent.
+ */
+export const expectedReceiptCoordinatesFromEnvelopeV1 = (input: {
+  eventId: string;
+  kind: FamilyGrowthDeliveryEnvelopeKindV1;
+  payloadDigest: string;
+  envelope: unknown;
+}): FamilyGrowthExpectedReceiptCoordinatesV1 | null => {
+  const violations = input.kind === "released"
+    ? validateReleaseEventV1(input.envelope)
+    : validateLifecycleEventV1(input.envelope);
+  if (violations.length > 0) return null;
+
+  if (input.kind === "released") {
+    const envelope = input.envelope as FamilyGrowthReleaseEventV1;
+    const { source, target, admission, material, retention } = envelope;
+    if (
+      envelope.event_id !== input.eventId
+      || envelope.event_kind !== input.kind
+      || envelope.payload_digest !== input.payloadDigest
+      || releasePayloadDigestV1({ source, target, admission, material, retention })
+        !== input.payloadDigest
+    ) {
+      return null;
+    }
+    return {
+      releaseEventId: envelope.event_id,
+      sourceScenarioKey: source.scenario_key,
+      sourceReleaseRef: source.publication_release_ref,
+      familyId: target.family_id,
+    };
+  }
+
+  const envelope = input.envelope as FamilyGrowthLifecycleEventV1;
+  const { source, target, correction } = envelope;
+  if (
+    envelope.event_id !== input.eventId
+    || envelope.event_kind !== input.kind
+    || envelope.payload_digest !== input.payloadDigest
+    || lifecyclePayloadDigestV1({ source, target, correction }) !== input.payloadDigest
+  ) {
+    return null;
+  }
+  return {
+    releaseEventId: envelope.event_id,
+    sourceScenarioKey: source.scenario_key,
+    sourceReleaseRef: source.publication_release_ref,
+    familyId: target.family_id,
+  };
+};
+
 /**
  * The frozen settlement rule: ONLY a valid 200 receipt whose
- * `release_event_id` names this exact event settles it. Timeouts, 5xx, 4xx
- * without a receipt, unparsable receipts and mismatched receipts are all
- * `outcome_unknown` — retriable with the same event id and digest, never
+ * coordinates echo this exact stored envelope settles it. Timeouts, 5xx,
+ * 4xx without a receipt, unparsable receipts and any coordinate mismatch are
+ * all `outcome_unknown` — retriable with the same event id and digest, never
  * assumed delivered or failed.
  */
 export const decideFamilyGrowthDelivery = (input: {
-  eventId: string;
+  expectedReceipt: FamilyGrowthExpectedReceiptCoordinatesV1 | null;
   attemptCount: number;
   now: Date;
   jitterUnit: number;
@@ -67,8 +138,16 @@ export const decideFamilyGrowthDelivery = (input: {
   if (input.result.kind === "response" && input.result.status === 200) {
     try {
       const receipt = parseAdmissionReceiptV1(input.result.body);
-      if (receipt.release_event_id === input.eventId) {
-        return { kind: "settle", receipt, consequence: receiptConsequenceV1(receipt) };
+      if (
+        input.expectedReceipt
+        && receiptMatchesExpectedCoordinatesV1(receipt, input.expectedReceipt)
+      ) {
+        return {
+          kind: "settle",
+          receipt,
+          rawReceiptPayload: input.result.body,
+          consequence: receiptConsequenceV1(receipt),
+        };
       }
     } catch {
       // fall through to retry: a malformed receipt settles nothing.

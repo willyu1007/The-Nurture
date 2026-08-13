@@ -331,14 +331,44 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
     const [outboxRow] = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
       where: { workspaceId: world.workspaceId, kind: "released" },
     });
-    await new PrismaFamilyGrowthOutboxPort(prisma).recordReceipt({
+    const outbox = new PrismaFamilyGrowthOutboxPort(prisma);
+    const [claimed] = await outbox.claimDue({
+      now: new Date("2026-08-08T09:59:00.000Z"),
+      limit: 1,
+      workspaceId: world.workspaceId,
+    });
+    expect(claimed?.eventId).toBe(outboxRow!.id);
+    const envelope = outboxRow!.envelopePayload as {
+      event_id: string;
+      source: { scenario_key: string; publication_release_ref: string };
+      target: { family_id: string };
+    };
+    const receiptPayload = {
+      contract_key: "family_growth_material_admission_receipt",
+      contract_version: "1.0.0",
+      receipt_id: "rcpt-queue-1",
+      release_event_id: envelope.event_id,
+      source_scenario_key: envelope.source.scenario_key,
+      source_release_ref: envelope.source.publication_release_ref,
+      family_id: envelope.target.family_id,
+      status: "pending_guardian_confirmation",
+      processed_at: "2026-08-08T10:00:00.000Z",
+      consumer_contract_version: "1.0.0",
+      admission_ref: "adm-1",
+    };
+    await outbox.recordReceipt({
       workspaceId: world.workspaceId,
       outboxEventId: outboxRow!.id,
+      attemptCount: claimed!.attemptCount,
+      releaseEventId: receiptPayload.release_event_id,
+      sourceScenarioKey: receiptPayload.source_scenario_key,
+      sourceReleaseRef: receiptPayload.source_release_ref,
+      familyId: receiptPayload.family_id,
       receiptId: "rcpt-queue-1",
       status: "pending_guardian_confirmation",
       admissionRef: "adm-1",
       processedAt: new Date("2026-08-08T10:00:00.000Z"),
-      receiptPayload: {},
+      receiptPayload,
     });
     page = await list();
     row = page.rows.find((entry) => entry.process_key === world.process.processKey);
@@ -351,15 +381,17 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
     // display deterministically, even at an identical createdAt millisecond
     // (id is the tiebreaker), and moves the head again.
     const headsMid = structuredClone(page.heads);
-    await new PrismaFamilyGrowthOutboxPort(prisma).recordReceipt({
-      workspaceId: world.workspaceId,
-      outboxEventId: outboxRow!.id,
-      receiptId: "rcpt-queue-2",
-      status: "applied",
-      admissionRef: "adm-1",
-      materialRef: "mat-1",
-      processedAt: new Date("2026-08-08T10:05:00.000Z"),
-      receiptPayload: {},
+    await prisma.nurtureFamilyGrowthAdmissionReceipt.create({
+      data: {
+        workspaceId: world.workspaceId,
+        outboxEventId: outboxRow!.id,
+        receiptId: "rcpt-queue-2",
+        status: "applied",
+        admissionRef: "adm-1",
+        materialRef: "mat-1",
+        processedAt: new Date("2026-08-08T10:05:00.000Z"),
+        receiptPayload: {},
+      },
     });
     page = await list();
     row = page.rows.find((entry) => entry.process_key === world.process.processKey);

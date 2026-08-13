@@ -18,7 +18,7 @@ records are not rewritten; fixes are forward-only.
   Fix: carry heads/expiry in the prepared emission; reread inside the
   serializable transaction; reject on drift; revoke-between-prepare-and-
   commit tests.
-- [ ] N2 Stale delivery worker can overwrite newer outbox outcomes: no
+- [x] N2 Stale delivery worker can overwrite newer outbox outcomes: no
   CAS on `attemptCount`. Files:
   `packages/nurture-db/src/repositories/family-growth-outbox.transaction.ts:29,137,180`,
   `apps/scenario-service/src/family-growth-delivery.worker.ts:118`.
@@ -30,7 +30,7 @@ records are not rewritten; fixes are forward-only.
   `prisma/migrations/20260807080000_t009_family_growth_provider_outbox/migration.sql:74`.
   Fix: composite target uniques/FKs (workspace_id-scoped); additive
   migration + disposable qualification; cross-workspace insert tests.
-- [ ] N5 Receipts not bound to all claimed coordinates:
+- [x] N5 Receipts not bound to all claimed coordinates:
   `source_scenario_key` / `source_release_ref` / `family_id` unchecked at
   settlement. Files:
   `packages/nurture-scenario/src/domain/family-growth/delivery.ts:60,70`,
@@ -38,7 +38,7 @@ records are not rewritten; fixes are forward-only.
   `apps/scenario-service/src/family-growth-delivery.worker.ts:109`.
   Fix: pass expected coordinates into the decision; mismatch stays
   `outcome_unknown`; wrong-family/wrong-source tests.
-- [ ] N6 Conflicting receipt replay mutates state without appending its
+- [x] N6 Conflicting receipt replay mutates state without appending its
   evidence (`createMany skipDuplicates`). Files:
   `packages/nurture-db/src/repositories/family-growth-outbox.transaction.ts:177,187,206`.
   Fix: inspect insert count; on duplicate compare canonical payload;
@@ -54,7 +54,7 @@ Closed during the audit session: N4 guard/pin disagreement — fixed by
 
 ## P2
 
-- [ ] N8 Binding reader orders historical associations by `updatedAt`
+- [x] N8 Binding reader orders historical associations by `updatedAt`
   instead of selecting the current row
   (`packages/nurture-db/src/repositories/family-growth-binding.read.ts:41,54`).
 - [ ] N9 Formal-ingress guard censuses seven legacy routes only; the

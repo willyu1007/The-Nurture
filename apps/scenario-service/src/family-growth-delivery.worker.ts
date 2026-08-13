@@ -1,5 +1,6 @@
 import {
   decideFamilyGrowthDelivery,
+  expectedReceiptCoordinatesFromEnvelopeV1,
   FAMILY_GROWTH_DELIVERING_LEASE_MS,
   FAMILY_GROWTH_REQUEST_TIMEOUT_MS,
   type FamilyGrowthTransportResultV1,
@@ -7,6 +8,8 @@ import {
 import type {
   FamilyGrowthOutboxClaimedRowV1,
   FamilyGrowthReceiptRecordInputV1,
+  FamilyGrowthReceiptRecordResultV1,
+  FamilyGrowthTransportFailureRecordResultV1,
 } from "@the-nurture/db";
 import type { FamilyGrowthDeliveryConfig } from "./family-growth-runtime.js";
 
@@ -27,8 +30,15 @@ export type FamilyGrowthDeliveryOutboxPort = {
     limit: number;
     staleClaimBefore?: Date;
   }): Promise<FamilyGrowthOutboxClaimedRowV1[]>;
-  recordReceipt(input: FamilyGrowthReceiptRecordInputV1): Promise<void>;
-  recordTransportFailure(input: { outboxEventId: string; nextAttemptAt: Date }): Promise<void>;
+  recordReceipt(
+    input: FamilyGrowthReceiptRecordInputV1,
+  ): Promise<FamilyGrowthReceiptRecordResultV1>;
+  recordTransportFailure(input: {
+    workspaceId: string;
+    outboxEventId: string;
+    attemptCount: number;
+    nextAttemptAt: Date;
+  }): Promise<FamilyGrowthTransportFailureRecordResultV1>;
 };
 
 export type FamilyGrowthDeliveryLog = (
@@ -101,25 +111,40 @@ export class FamilyGrowthDeliveryWorker {
     for (const row of rows) {
       const outcome = await this.deliver(row);
       if (outcome === "settled") settled += 1;
-      else retried += 1;
+      if (outcome === "retried") retried += 1;
     }
     return { claimed: rows.length, settled, retried };
   }
 
-  private async deliver(row: FamilyGrowthOutboxClaimedRowV1): Promise<"settled" | "retried"> {
-    const result = await this.deps.transport(row.envelope);
-    const decision = decideFamilyGrowthDelivery({
+  private async deliver(
+    row: FamilyGrowthOutboxClaimedRowV1,
+  ): Promise<"settled" | "retried" | "ignored"> {
+    const expectedReceipt = expectedReceiptCoordinatesFromEnvelopeV1({
       eventId: row.eventId,
+      kind: row.kind,
+      payloadDigest: row.payloadDigest,
+      envelope: row.envelope,
+    });
+    const result: FamilyGrowthTransportResultV1 = expectedReceipt
+      ? await this.deps.transport(row.envelope)
+      : { kind: "transport_error" };
+    const decision = decideFamilyGrowthDelivery({
+      expectedReceipt,
       attemptCount: row.attemptCount,
       now: this.deps.now?.() ?? new Date(),
       jitterUnit: this.deps.jitterUnit?.() ?? Math.random(),
       result,
     });
     if (decision.kind === "settle") {
-      const { receipt, consequence } = decision;
-      await this.deps.outbox.recordReceipt({
+      const { receipt, rawReceiptPayload, consequence } = decision;
+      const recorded = await this.deps.outbox.recordReceipt({
         workspaceId: row.workspaceId,
         outboxEventId: row.eventId,
+        attemptCount: row.attemptCount,
+        releaseEventId: receipt.release_event_id,
+        sourceScenarioKey: receipt.source_scenario_key,
+        sourceReleaseRef: receipt.source_release_ref,
+        familyId: receipt.family_id,
         receiptId: receipt.receipt_id,
         status: receipt.status,
         ...(consequence.refs.admissionRef !== undefined
@@ -135,21 +160,37 @@ export class FamilyGrowthDeliveryWorker {
           ? { reasonCode: consequence.refs.reasonCode }
           : {}),
         processedAt: new Date(receipt.processed_at),
-        receiptPayload: receipt,
+        receiptPayload: rawReceiptPayload,
       });
+      if (recorded === "receipt_conflict") {
+        this.deps.log("family_growth_delivery_receipt_conflict", {
+          level: "warn",
+          eventId: row.eventId,
+          kind: row.kind,
+          attemptCount: row.attemptCount,
+          signal: "family_growth_delivery_receipt_conflicts_total",
+          signalIncrement: 1,
+        });
+        return "ignored";
+      }
+      if (recorded !== "settled" && recorded !== "replayed") return "ignored";
       this.deps.log("family_growth_delivery_settled", {
         eventId: row.eventId,
         kind: row.kind,
         status: receipt.status,
         delivery: consequence.delivery,
         attemptCount: row.attemptCount,
+        replayed: recorded === "replayed" ? 1 : 0,
       });
       return "settled";
     }
-    await this.deps.outbox.recordTransportFailure({
+    const recorded = await this.deps.outbox.recordTransportFailure({
+      workspaceId: row.workspaceId,
       outboxEventId: row.eventId,
+      attemptCount: row.attemptCount,
       nextAttemptAt: decision.nextAttemptAt,
     });
+    if (recorded !== "recorded") return "ignored";
     this.deps.log(
       decision.operatorAttention
         ? "family_growth_delivery_attention"

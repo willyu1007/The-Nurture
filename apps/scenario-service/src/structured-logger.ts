@@ -39,6 +39,7 @@ export type ScenarioStructuredLogRecord =
           | "family_growth_delivery_settled"
           | "family_growth_delivery_retry"
           | "family_growth_delivery_attention"
+          | "family_growth_delivery_receipt_conflict"
           | "family_growth_delivery_tick_failed";
       } & Record<string, string | number>
     >;
@@ -90,6 +91,7 @@ export class ScenarioStructuredLogger {
       | "family_growth_delivery_settled"
       | "family_growth_delivery_retry"
       | "family_growth_delivery_attention"
+      | "family_growth_delivery_receipt_conflict"
       | "family_growth_delivery_tick_failed",
     fields: Record<string, string | number>,
   ): void {

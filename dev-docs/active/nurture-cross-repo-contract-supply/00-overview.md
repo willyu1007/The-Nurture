@@ -15,7 +15,11 @@
   authoring against current domain models. The supply order decided 2026-08-11 is
   fixed: parent-context presenter, then IR-C01 parent-communication gates,
   then the director presenter. W1 must conclude before any T-008 G5-A
-  Candidate Freeze.
+  Candidate Freeze. W5 findings N2, N5, N6 and N8 plus their five review
+  repairs are implemented; package typechecks, focused mocked suites, unit tests
+  and routing verification pass. The focused real-PostgreSQL T-009 run could
+  not connect to the configured local database and remains unclaimed. N1, N3,
+  N7, N9, N10 and N11 remain outside that scoped fix batch.
 
 ## Goal
 

@@ -31,6 +31,13 @@ export type FamilyGrowthDeliveryConsequenceV1 = {
   };
 };
 
+export type FamilyGrowthExpectedReceiptCoordinatesV1 = Readonly<{
+  releaseEventId: string;
+  sourceScenarioKey: string;
+  sourceReleaseRef: string;
+  familyId: string;
+}>;
+
 export class FamilyGrowthReceiptError extends Error {
   readonly path: string;
   constructor(path: string, message: string) {
@@ -153,6 +160,16 @@ export const parseAdmissionReceiptV1 = (value: unknown): FamilyGrowthAdmissionRe
 
   return receipt;
 };
+
+/** A receipt is evidence only for the exact envelope coordinates it echoes. */
+export const receiptMatchesExpectedCoordinatesV1 = (
+  receipt: FamilyGrowthAdmissionReceiptV1,
+  expected: FamilyGrowthExpectedReceiptCoordinatesV1,
+): boolean =>
+  receipt.release_event_id === expected.releaseEventId
+  && receipt.source_scenario_key === expected.sourceScenarioKey
+  && receipt.source_release_ref === expected.sourceReleaseRef
+  && receipt.family_id === expected.familyId;
 
 /**
  * Map a validated receipt to its provider-side consequence. Every receipt is

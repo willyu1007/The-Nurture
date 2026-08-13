@@ -1,4 +1,10 @@
 import { Prisma } from "@prisma/client";
+import {
+  canonicalJson,
+  expectedReceiptCoordinatesFromEnvelopeV1,
+  parseAdmissionReceiptV1,
+  receiptMatchesExpectedCoordinatesV1,
+} from "@the-nurture/scenario/family-growth";
 import type { NurturePrismaClient } from "../client.js";
 
 /**
@@ -38,6 +44,12 @@ export type FamilyGrowthOutboxClaimedRowV1 = {
 export type FamilyGrowthReceiptRecordInputV1 = {
   workspaceId: string;
   outboxEventId: string;
+  /** Lease version returned by `claimDue`; settlement is CAS-bound to it. */
+  attemptCount: number;
+  releaseEventId: string;
+  sourceScenarioKey: string;
+  sourceReleaseRef: string;
+  familyId: string;
   receiptId: string;
   status:
     | "applied"
@@ -51,12 +63,71 @@ export type FamilyGrowthReceiptRecordInputV1 = {
   suppressionRef?: string;
   reasonCode?: string;
   processedAt: Date;
-  /** The full wire receipt, kept for audit. */
+  /** The full raw wire receipt, canonicalized for audit and replay identity. */
   receiptPayload: unknown;
 };
 
+export type FamilyGrowthReceiptRecordResultV1 =
+  | "settled"
+  | "replayed"
+  | "stale"
+  | "not_settled"
+  | "receipt_coordinate_mismatch"
+  | "receipt_conflict";
+
+export type FamilyGrowthTransportFailureRecordResultV1 = "recorded" | "stale";
+
 const asJson = (value: unknown): Prisma.InputJsonValue =>
   JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+
+const asCanonicalJson = (value: unknown): Prisma.InputJsonValue =>
+  JSON.parse(canonicalJson(value)) as Prisma.InputJsonValue;
+
+type StoredFamilyGrowthReceipt = Readonly<{
+  status: string;
+  admissionRef: string | null;
+  materialRef: string | null;
+  suppressionRef: string | null;
+  reasonCode: string | null;
+  processedAt: Date;
+  receiptPayload: Prisma.JsonValue;
+}>;
+
+const receiptReplayMatches = (
+  stored: StoredFamilyGrowthReceipt,
+  input: FamilyGrowthReceiptRecordInputV1,
+  receiptPayload: Prisma.InputJsonValue,
+): boolean =>
+  stored.status === input.status
+  && stored.admissionRef === (input.admissionRef ?? null)
+  && stored.materialRef === (input.materialRef ?? null)
+  && stored.suppressionRef === (input.suppressionRef ?? null)
+  && stored.reasonCode === (input.reasonCode ?? null)
+  && stored.processedAt.getTime() === input.processedAt.getTime()
+  && canonicalJson(stored.receiptPayload) === canonicalJson(receiptPayload);
+
+const parsedReceiptMatchesInput = (
+  receipt: ReturnType<typeof parseAdmissionReceiptV1>,
+  input: FamilyGrowthReceiptRecordInputV1,
+): boolean =>
+  receipt.receipt_id === input.receiptId
+  && receipt.status === input.status
+  && Date.parse(receipt.processed_at) === input.processedAt.getTime()
+  && receipt.admission_ref === input.admissionRef
+  && receipt.material_ref === input.materialRef
+  && receipt.suppression_ref === input.suppressionRef
+  && receipt.reason_code === input.reasonCode;
+
+const receiptCoordinatesMatchInput = (
+  receipt: ReturnType<typeof parseAdmissionReceiptV1>,
+  input: FamilyGrowthReceiptRecordInputV1,
+): boolean =>
+  receipt.release_event_id === input.releaseEventId
+  && receipt.source_scenario_key === input.sourceScenarioKey
+  && receipt.source_release_ref === input.sourceReleaseRef
+  && receipt.family_id === input.familyId;
+
+class FamilyGrowthReceiptConflictRollback extends Error {}
 
 /**
  * Append one outbox row inside the caller's open transaction. Standalone so
@@ -145,10 +216,19 @@ export class PrismaFamilyGrowthOutboxPort {
                 deliveryState: "delivering",
                 lastAttemptAt: { lte: input.staleClaimBefore },
               }
-            : {
-                id: candidate.id,
-                deliveryState: { in: ["pending", "outcome_unknown"] },
-              },
+            : candidate.deliveryState === "pending"
+              ? {
+                  id: candidate.id,
+                  deliveryState: "pending",
+                }
+              : {
+                  // Re-check due time as well as state. A different worker may
+                  // have moved this row back to outcome_unknown with a future
+                  // backoff after the candidate read.
+                  id: candidate.id,
+                  deliveryState: "outcome_unknown",
+                  OR: [{ nextAttemptAt: null }, { nextAttemptAt: { lte: input.now } }],
+                },
         data: {
           deliveryState: "delivering",
           attemptCount: { increment: 1 },
@@ -174,44 +254,180 @@ export class PrismaFamilyGrowthOutboxPort {
   /**
    * Record a consumed admission receipt and settle the outbox row:
    * `rejected`/`conflict` land as `failed`, everything else as `delivered`.
-   * Idempotent on the receipt identity — an exact replay of the same receipt
-   * re-settles the row and appends nothing.
+   * Idempotent on the receipt identity — an exact replay against a matching
+   * terminal row returns `replayed` and mutates nothing.
    */
-  async recordReceipt(input: FamilyGrowthReceiptRecordInputV1): Promise<void> {
+  async recordReceipt(
+    input: FamilyGrowthReceiptRecordInputV1,
+  ): Promise<FamilyGrowthReceiptRecordResultV1> {
     const terminalState =
       input.status === "rejected" || input.status === "conflict" ? "failed" : "delivered";
-    await this.prisma.$transaction(async (tx) => {
-      // `skipDuplicates` (ON CONFLICT DO NOTHING) is the replay path: a
-      // caught unique violation would abort the surrounding Postgres
-      // transaction (25P02), so the no-op must happen inside the INSERT.
-      await tx.nurtureFamilyGrowthAdmissionReceipt.createMany({
-        data: [
-          {
-            workspaceId: input.workspaceId,
-            outboxEventId: input.outboxEventId,
-            receiptId: input.receiptId,
-            status: input.status,
-            ...(input.admissionRef !== undefined ? { admissionRef: input.admissionRef } : {}),
-            ...(input.materialRef !== undefined ? { materialRef: input.materialRef } : {}),
-            ...(input.suppressionRef !== undefined
-              ? { suppressionRef: input.suppressionRef }
-              : {}),
-            ...(input.reasonCode !== undefined ? { reasonCode: input.reasonCode } : {}),
-            processedAt: input.processedAt,
-            receiptPayload: asJson(input.receiptPayload),
+    let parsedReceipt: ReturnType<typeof parseAdmissionReceiptV1>;
+    try {
+      parsedReceipt = parseAdmissionReceiptV1(input.receiptPayload);
+    } catch {
+      return "receipt_conflict";
+    }
+    if (!receiptCoordinatesMatchInput(parsedReceipt, input)) {
+      return "receipt_coordinate_mismatch";
+    }
+    if (!parsedReceiptMatchesInput(parsedReceipt, input)) {
+      return "receipt_conflict";
+    }
+    const receiptPayload = asCanonicalJson(input.receiptPayload);
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const storedOutbox = await tx.nurtureFamilyGrowthOutboxEvent.findUnique({
+          where: { id: input.outboxEventId },
+          select: {
+            id: true,
+            workspaceId: true,
+            kind: true,
+            payloadDigest: true,
+            envelopePayload: true,
           },
-        ],
-        skipDuplicates: true,
+        });
+        if (!storedOutbox || storedOutbox.workspaceId !== input.workspaceId) {
+          return "receipt_coordinate_mismatch";
+        }
+        const expectedReceipt = expectedReceiptCoordinatesFromEnvelopeV1({
+          eventId: storedOutbox.id,
+          kind: storedOutbox.kind,
+          payloadDigest: storedOutbox.payloadDigest,
+          envelope: storedOutbox.envelopePayload,
+        });
+        if (
+          !expectedReceipt
+          || !receiptMatchesExpectedCoordinatesV1(parsedReceipt, expectedReceipt)
+        ) {
+          return "receipt_coordinate_mismatch";
+        }
+
+        const receiptIdentity = {
+          workspaceId: input.workspaceId,
+          outboxEventId: input.outboxEventId,
+          receiptId: input.receiptId,
+        };
+        const existing = await tx.nurtureFamilyGrowthAdmissionReceipt.findUnique({
+          where: { workspaceId_outboxEventId_receiptId: receiptIdentity },
+          select: {
+            status: true,
+            admissionRef: true,
+            materialRef: true,
+            suppressionRef: true,
+            reasonCode: true,
+            processedAt: true,
+            receiptPayload: true,
+          },
+        });
+        if (existing && !receiptReplayMatches(existing, input, receiptPayload)) {
+          return "receipt_conflict";
+        }
+
+        const settlement = await tx.nurtureFamilyGrowthOutboxEvent.updateMany({
+          where: {
+            id: input.outboxEventId,
+            workspaceId: input.workspaceId,
+            deliveryState: "delivering",
+            attemptCount: input.attemptCount,
+          },
+          data: {
+            deliveryState: terminalState,
+            deliveredAt: input.processedAt,
+            nextAttemptAt: null,
+          },
+        });
+        if (settlement.count !== 1) {
+          const [currentOutbox, currentReceipt] = await Promise.all([
+            tx.nurtureFamilyGrowthOutboxEvent.findUnique({
+              where: { id: input.outboxEventId },
+              select: {
+                workspaceId: true,
+                deliveryState: true,
+                attemptCount: true,
+              },
+            }),
+            existing
+              ? Promise.resolve(existing)
+              : tx.nurtureFamilyGrowthAdmissionReceipt.findUnique({
+                  where: { workspaceId_outboxEventId_receiptId: receiptIdentity },
+                  select: {
+                    status: true,
+                    admissionRef: true,
+                    materialRef: true,
+                    suppressionRef: true,
+                    reasonCode: true,
+                    processedAt: true,
+                    receiptPayload: true,
+                  },
+                }),
+          ]);
+          if (
+            currentOutbox?.workspaceId === input.workspaceId
+            && currentOutbox.deliveryState === terminalState
+            && currentReceipt
+            && receiptReplayMatches(currentReceipt, input, receiptPayload)
+          ) {
+            return "replayed";
+          }
+          if (
+            currentOutbox?.workspaceId === input.workspaceId
+            && currentOutbox.attemptCount > input.attemptCount
+          ) {
+            return "stale";
+          }
+          if (currentReceipt) return "receipt_conflict";
+          return "not_settled";
+        }
+        if (existing) return "settled";
+
+        // `skipDuplicates` (ON CONFLICT DO NOTHING) keeps the transaction
+        // usable after a replay. Its count is authoritative: a duplicate is
+        // admitted only when every stored receipt field is an exact replay.
+        const inserted = await tx.nurtureFamilyGrowthAdmissionReceipt.createMany({
+          data: [
+            {
+              ...receiptIdentity,
+              status: input.status,
+              ...(input.admissionRef !== undefined ? { admissionRef: input.admissionRef } : {}),
+              ...(input.materialRef !== undefined ? { materialRef: input.materialRef } : {}),
+              ...(input.suppressionRef !== undefined
+                ? { suppressionRef: input.suppressionRef }
+                : {}),
+              ...(input.reasonCode !== undefined ? { reasonCode: input.reasonCode } : {}),
+              processedAt: input.processedAt,
+              receiptPayload,
+            },
+          ],
+          skipDuplicates: true,
+        });
+        if (inserted.count === 1) return "settled";
+
+        const duplicate = await tx.nurtureFamilyGrowthAdmissionReceipt.findUnique({
+          where: { workspaceId_outboxEventId_receiptId: receiptIdentity },
+          select: {
+            status: true,
+            admissionRef: true,
+            materialRef: true,
+            suppressionRef: true,
+            reasonCode: true,
+            processedAt: true,
+            receiptPayload: true,
+          },
+        });
+        if (!duplicate || !receiptReplayMatches(duplicate, input, receiptPayload)) {
+          // Roll back the CAS above as well: conflicting evidence cannot
+          // change the row's prior delivery state.
+          throw new FamilyGrowthReceiptConflictRollback();
+        }
+        return "settled";
       });
-      await tx.nurtureFamilyGrowthOutboxEvent.update({
-        where: { id: input.outboxEventId },
-        data: {
-          deliveryState: terminalState,
-          deliveredAt: input.processedAt,
-          nextAttemptAt: null,
-        },
-      });
-    });
+    } catch (error) {
+      if (error instanceof FamilyGrowthReceiptConflictRollback) {
+        return "receipt_conflict";
+      }
+      throw error;
+    }
   }
 
   /**
@@ -220,12 +436,20 @@ export class PrismaFamilyGrowthOutboxPort {
    * event id and payload digest. Never assume success or failure here.
    */
   async recordTransportFailure(input: {
+    workspaceId: string;
     outboxEventId: string;
+    attemptCount: number;
     nextAttemptAt: Date;
-  }): Promise<void> {
-    await this.prisma.nurtureFamilyGrowthOutboxEvent.update({
-      where: { id: input.outboxEventId },
+  }): Promise<FamilyGrowthTransportFailureRecordResultV1> {
+    const result = await this.prisma.nurtureFamilyGrowthOutboxEvent.updateMany({
+      where: {
+        id: input.outboxEventId,
+        workspaceId: input.workspaceId,
+        deliveryState: "delivering",
+        attemptCount: input.attemptCount,
+      },
       data: { deliveryState: "outcome_unknown", nextAttemptAt: input.nextAttemptAt },
     });
+    return result.count === 1 ? "recorded" : "stale";
   }
 }

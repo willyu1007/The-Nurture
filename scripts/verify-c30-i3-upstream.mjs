@@ -12,9 +12,9 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-13 revision-only reseal: ci/docs-only Host drift, all pinned
-  // content hashes unchanged.
-  hostHead: "1db3f03c69dfa7c8cd77a2cd4b9aebd4a868acdb",
+  // 2026-08-13 T-042 reseal: x5_joint_api content rotated by the
+  // authorization-hardening batch; C30 Host source profiles unchanged.
+  hostHead: "b90cce2e11e17dec238854b39954b4dae31e14db",
 };
 
 const run = (command, args, cwd) =>

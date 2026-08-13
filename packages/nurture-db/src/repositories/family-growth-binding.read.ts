@@ -9,10 +9,10 @@ import type { NurturePrismaClient } from "../client.js";
 /**
  * T-009 I4: the binding read behind canonical target resolution (N1).
  *
- * Loads the LATEST family-anchor association state for one care process —
- * not only the `currentKey = "current"` row — so a revoked or quarantined
- * chain denies with its precise reason instead of presenting as "missing".
- * Currency itself is judged by the resolver, not here.
+ * Loads the one current family-anchor association for a care process, then
+ * follows that row's exact child-association reference. Historical rows are
+ * never candidates: touching one after revocation must not shadow the current
+ * binding and create a false denial.
  */
 export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingReadPort {
   constructor(private readonly prisma: NurturePrismaClient) {}
@@ -38,29 +38,29 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
     workspaceId: string;
     childCareProcessId: string;
   }): Promise<FamilyGrowthBindingSnapshotV1 | null> {
-    const association = await this.prisma.nurtureFamilyAnchorAssociation.findFirst({
+    const associations = await this.prisma.nurtureFamilyAnchorAssociation.findMany({
       where: {
         workspaceId: input.workspaceId,
         childCareProcessId: input.childCareProcessId,
+        currentKey: "current",
       },
-      // Latest state wins; the current row (if any) is also the newest by
-      // construction because revocation updates the row it clears. The id
-      // tiebreaker keeps same-instant rows deterministic.
-      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+      take: 2,
       include: { familyAnchor: true, childAnchor: true },
     });
-    if (!association) return null;
+    if (associations.length !== 1) return null;
+    const association = associations[0]!;
 
-    const childAssociation = await this.prisma.nurtureChildAnchorAssociation.findFirst({
+    const childAssociations = await this.prisma.nurtureChildAnchorAssociation.findMany({
       where: {
+        id: association.childAssociationId,
         workspaceId: input.workspaceId,
-        childAnchorId: association.childAnchorId,
-        childId: association.childId,
+        currentKey: "current",
       },
-      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+      take: 2,
       select: { status: true, currentKey: true },
     });
-    if (!childAssociation) return null;
+    if (childAssociations.length !== 1) return null;
+    const childAssociation = childAssociations[0]!;
 
     const [childAuthorization, familyAuthorization] = await Promise.all([
       this.latestAuthorization(input.workspaceId, "child", association.childAnchorId),

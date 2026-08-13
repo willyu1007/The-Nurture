@@ -193,11 +193,11 @@ describe("T-009 I4: canonical target resolution over real binding rows", () => {
     expect(result).toEqual({ status: "denied", reason: "binding_missing" });
   });
 
-  it("denies a revoked family association with its precise reason", async () => {
+  it("treats a revoked historical family association as no current binding", async () => {
     const world = await seedBinding({ familyAssociation: "revoked" });
     expect(await resolve(world)).toEqual({
       status: "denied",
-      reason: "family_association_not_current",
+      reason: "binding_missing",
     });
   });
 

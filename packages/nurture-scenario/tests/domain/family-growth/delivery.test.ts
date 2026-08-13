@@ -7,6 +7,12 @@ import {
 } from "../../../src/domain/family-growth/delivery.js";
 
 const NOW = new Date("2026-08-07T10:00:00.000Z");
+const expectedReceipt = {
+  releaseEventId: "evt-1",
+  sourceScenarioKey: "nurture",
+  sourceReleaseRef: "pub-rel-1",
+  familyId: "mc-family-1",
+};
 
 const receipt = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
   contract_key: "family_growth_material_admission_receipt",
@@ -29,7 +35,7 @@ const decide = (
   attemptCount = 1,
 ) =>
   decideFamilyGrowthDelivery({
-    eventId: "evt-1",
+    expectedReceipt,
     attemptCount,
     now: NOW,
     jitterUnit: 0.5, // exactly zero jitter spread
@@ -58,6 +64,7 @@ describe("decideFamilyGrowthDelivery", () => {
     expect(decision.kind).toBe("settle");
     if (decision.kind !== "settle") return;
     expect(decision.receipt.status).toBe("applied");
+    expect(decision.rawReceiptPayload).toEqual(receipt());
     expect(decision.consequence.delivery).toBe("delivered");
   });
 
@@ -93,6 +100,25 @@ describe("decideFamilyGrowthDelivery", () => {
       if (decision.kind !== "retry") continue;
       expect(decision.nextAttemptAt.getTime()).toBe(NOW.getTime() + 30_000);
       expect(decision.operatorAttention).toBe(false);
+    }
+  });
+
+  it("keeps a wrong-family receipt outcome_unknown", () => {
+    const decision = decide({
+      kind: "response",
+      status: 200,
+      body: receipt({ family_id: "mc-family-other" }),
+    });
+    expect(decision.kind).toBe("retry");
+  });
+
+  it("keeps wrong-source receipts outcome_unknown", () => {
+    for (const body of [
+      receipt({ source_scenario_key: "education" }),
+      receipt({ source_release_ref: "pub-rel-other" }),
+    ]) {
+      const decision = decide({ kind: "response", status: 200, body });
+      expect(decision.kind).toBe("retry");
     }
   });
 

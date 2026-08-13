@@ -191,7 +191,7 @@ const computeLock = () => {
       // runtime revision points at the committed source population sealed by
       // My-Chat's independently verified adoption lock. 2026-08-13: head
       // resealed after ci/docs-only drift; source hashes unchanged.
-      head_revision: "1db3f03c69dfa7c8cd77a2cd4b9aebd4a868acdb",
+      head_revision: "b90cce2e11e17dec238854b39954b4dae31e14db",
       runtime_revision: "149424c9a05a28aa8c1654258bb919a434208732",
       aggregate_source_hash: "aac525c4f13953671040ce759da8eadf0f55dee9063db8b6389282f78635617d",
     },

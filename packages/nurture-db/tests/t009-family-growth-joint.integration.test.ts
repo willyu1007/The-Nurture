@@ -27,6 +27,7 @@ import {
 } from "@the-nurture/db";
 import {
   decideFamilyGrowthDelivery,
+  expectedReceiptCoordinatesFromEnvelopeV1,
   FAMILY_GROWTH_DELIVERING_LEASE_MS,
   releasePayloadDigestV1,
   type FamilyGrowthCanonicalExchangePort,
@@ -646,7 +647,12 @@ describe("T-009 I7b: joint N8 against the real My-Chat consumer", () => {
         result = { kind: "transport_error" };
       }
       const decision = decideFamilyGrowthDelivery({
-        eventId: row.eventId,
+        expectedReceipt: expectedReceiptCoordinatesFromEnvelopeV1({
+          eventId: row.eventId,
+          kind: row.kind,
+          payloadDigest: row.payloadDigest,
+          envelope: row.envelope,
+        }),
         attemptCount: row.attemptCount,
         now: clock,
         jitterUnit: 0.5,
@@ -657,6 +663,11 @@ describe("T-009 I7b: joint N8 against the real My-Chat consumer", () => {
         await port.recordReceipt({
           workspaceId: row.workspaceId,
           outboxEventId: row.eventId,
+          attemptCount: row.attemptCount,
+          releaseEventId: decision.receipt.release_event_id,
+          sourceScenarioKey: decision.receipt.source_scenario_key,
+          sourceReleaseRef: decision.receipt.source_release_ref,
+          familyId: decision.receipt.family_id,
           receiptId: decision.receipt.receipt_id,
           status: decision.receipt.status,
           ...(decision.consequence.refs.admissionRef !== undefined
@@ -672,12 +683,14 @@ describe("T-009 I7b: joint N8 against the real My-Chat consumer", () => {
             ? { reasonCode: decision.consequence.refs.reasonCode }
             : {}),
           processedAt: new Date(decision.receipt.processed_at),
-          receiptPayload: decision.receipt,
+          receiptPayload: decision.rawReceiptPayload,
         });
       } else {
         retried += 1;
         await port.recordTransportFailure({
+          workspaceId: row.workspaceId,
           outboxEventId: row.eventId,
+          attemptCount: row.attemptCount,
           nextAttemptAt: decision.nextAttemptAt,
         });
       }

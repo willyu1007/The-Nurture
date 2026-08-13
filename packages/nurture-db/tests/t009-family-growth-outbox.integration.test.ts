@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
+import { assembleReleaseEventV1 } from "@the-nurture/scenario/family-growth";
 import { createPrismaClient } from "../src/client.js";
 import { PrismaFamilyGrowthOutboxPort } from "../src/repositories/family-growth-outbox.transaction.js";
 
@@ -9,6 +10,48 @@ afterAll(async () => {
 });
 
 const DIGEST = "a".repeat(64);
+
+const releaseEnvelope = (input: {
+  eventId: string;
+  publicationReleaseRef: string;
+  familyId?: string;
+}) =>
+  assembleReleaseEventV1({
+    eventId: input.eventId,
+    occurredAt: "2026-08-07T11:59:00.000Z",
+    source: {
+      publication_release_ref: input.publicationReleaseRef,
+      publish_process_ref: "pub-proc-1",
+      publish_revision_ref: "pub-rev-1",
+      publish_revision: 1,
+      content_digest: DIGEST,
+      receipt_ref: "source-receipt-1",
+      source_target_ref: "target-1",
+      committed_at: "2026-08-07T11:58:00.000Z",
+    },
+    target: { child_id: "mc-child-1", family_id: input.familyId ?? "mc-family-1" },
+    admission: { mode: "direct_family_release", policy_ref: "policy-1", policy_version: 1 },
+    material: {
+      occurredAt: "2026-08-07T11:00:00.000Z",
+      displaySnapshot: { title: "Growth", source_label: "Class A" },
+      attribution: {
+        source_contributor_ref: "contributor-1",
+        source_organization_ref: "organization-1",
+        contributed_at: "2026-08-07T11:00:00.000Z",
+      },
+      media: [
+        {
+          source_asset_ref: "asset-1",
+          source_media_revision: 1,
+          content_digest: "b".repeat(64),
+          family_rendition_ref: "rendition-1",
+          mime_type: "image/jpeg",
+          access_mode: "authorized_short_lived_url",
+        },
+      ],
+    },
+    retentionMode: "family_retained",
+  });
 
 /** Minimal chain up to one committed per-target release (direct seeding). */
 const seedRelease = async () => {
@@ -250,14 +293,18 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
   it("claims due rows once and settles them from receipts", async () => {
     const world = await seedRelease();
     const eventId = randomUUID();
+    const envelope = releaseEnvelope({
+      eventId,
+      publicationReleaseRef: world.release.id,
+    });
     await prisma.$transaction(async (tx) => {
       await port().appendWithin(tx, {
         workspaceId: world.workspaceId,
         eventId,
         kind: "released",
         publicationReleaseId: world.release.id,
-        payloadDigest: DIGEST,
-        envelope: { event_id: eventId },
+        payloadDigest: envelope.payload_digest,
+        envelope,
       });
     });
 
@@ -276,7 +323,12 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
 
     // Transport failure: retriable outcome_unknown, due only after backoff.
     const backoff = new Date(now.getTime() + 60_000);
-    await port().recordTransportFailure({ outboxEventId: eventId, nextAttemptAt: backoff });
+    await port().recordTransportFailure({
+      workspaceId: world.workspaceId,
+      outboxEventId: eventId,
+      attemptCount: 1,
+      nextAttemptAt: backoff,
+    });
     expect(
       (await port().claimDue({ now, limit: 50, workspaceId: world.workspaceId })).filter(
         (row) => row.workspaceId === world.workspaceId,
@@ -290,19 +342,47 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
 
     // Receipt settles the row; replaying the same receipt is a no-op append.
     const processedAt = new Date();
-    const record = () =>
+    const receiptPayload = (familyId: string = envelope.target.family_id) => ({
+      contract_key: "family_growth_material_admission_receipt",
+      contract_version: "1.0.0",
+      receipt_id: "rcpt-1",
+      release_event_id: envelope.event_id,
+      source_scenario_key: envelope.source.scenario_key,
+      source_release_ref: envelope.source.publication_release_ref,
+      family_id: familyId,
+      status: "applied",
+      processed_at: processedAt.toISOString(),
+      consumer_contract_version: "1.0.0",
+      admission_ref: "adm-1",
+      material_ref: "mat-1",
+    });
+    const record = (familyId?: string) =>
       port().recordReceipt({
         workspaceId: world.workspaceId,
         outboxEventId: eventId,
+        attemptCount: 2,
+        releaseEventId: envelope.event_id,
+        sourceScenarioKey: envelope.source.scenario_key,
+        sourceReleaseRef: envelope.source.publication_release_ref,
+        familyId: familyId ?? envelope.target.family_id,
         receiptId: "rcpt-1",
         status: "applied",
         admissionRef: "adm-1",
         materialRef: "mat-1",
         processedAt,
-        receiptPayload: { receipt_id: "rcpt-1" },
+        receiptPayload: receiptPayload(familyId),
       });
-    await record();
-    await record();
+    expect(await record("mc-family-other")).toBe("receipt_coordinate_mismatch");
+    expect(
+      await prisma.nurtureFamilyGrowthOutboxEvent.findUniqueOrThrow({ where: { id: eventId } }),
+    ).toMatchObject({ deliveryState: "delivering" });
+    expect(
+      await prisma.nurtureFamilyGrowthAdmissionReceipt.count({
+        where: { workspaceId: world.workspaceId, outboxEventId: eventId },
+      }),
+    ).toBe(0);
+    expect(await record()).toBe("settled");
+    expect(await record()).toBe("replayed");
     const settled = await prisma.nurtureFamilyGrowthOutboxEvent.findUniqueOrThrow({
       where: { id: eventId },
     });
@@ -365,14 +445,18 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
   it("enforces receipt companion refs and settles rejections as failed", async () => {
     const world = await seedRelease();
     const eventId = randomUUID();
+    const envelope = releaseEnvelope({
+      eventId,
+      publicationReleaseRef: world.release.id,
+    });
     await prisma.$transaction(async (tx) => {
       await port().appendWithin(tx, {
         workspaceId: world.workspaceId,
         eventId,
         kind: "released",
         publicationReleaseId: world.release.id,
-        payloadDigest: DIGEST,
-        envelope: {},
+        payloadDigest: envelope.payload_digest,
+        envelope,
       });
     });
     // applied without material_ref violates the companion CHECK.
@@ -390,15 +474,40 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
       }),
     ).rejects.toThrow();
 
-    await port().recordReceipt({
+    const [claimed] = await port().claimDue({
+      now: new Date(),
+      limit: 1,
+      workspaceId: world.workspaceId,
+    });
+    expect(claimed?.eventId).toBe(eventId);
+    const processedAt = new Date();
+    const receiptPayload = {
+      contract_key: "family_growth_material_admission_receipt",
+      contract_version: "1.0.0",
+      receipt_id: "rcpt-2",
+      release_event_id: envelope.event_id,
+      source_scenario_key: envelope.source.scenario_key,
+      source_release_ref: envelope.source.publication_release_ref,
+      family_id: envelope.target.family_id,
+      status: "rejected",
+      processed_at: processedAt.toISOString(),
+      consumer_contract_version: "1.0.0",
+      reason_code: "policy_prerequisite_failed",
+    };
+    expect(await port().recordReceipt({
       workspaceId: world.workspaceId,
       outboxEventId: eventId,
+      attemptCount: claimed!.attemptCount,
+      releaseEventId: receiptPayload.release_event_id,
+      sourceScenarioKey: receiptPayload.source_scenario_key,
+      sourceReleaseRef: receiptPayload.source_release_ref,
+      familyId: receiptPayload.family_id,
       receiptId: "rcpt-2",
       status: "rejected",
       reasonCode: "policy_prerequisite_failed",
-      processedAt: new Date(),
-      receiptPayload: {},
-    });
+      processedAt,
+      receiptPayload,
+    })).toBe("settled");
     const settled = await prisma.nurtureFamilyGrowthOutboxEvent.findUniqueOrThrow({
       where: { id: eventId },
     });
