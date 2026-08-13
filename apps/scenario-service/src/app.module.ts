@@ -39,6 +39,12 @@ import {
   type ParentContextPresenterConfig,
   ParentContextPresenterServiceAuthGuard,
 } from "./parent-context-presenter.controller.js";
+import {
+  PARENT_COMMUNICATION_OWNER_CONFIG,
+  ParentCommunicationOwnerController,
+  type ParentCommunicationOwnerConfig,
+  ParentCommunicationOwnerServiceAuthGuard,
+} from "./parent-communication-owner.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
 
@@ -50,6 +56,7 @@ import { ScenarioStructuredLogger } from "./structured-logger.js";
     FamilyGrowthRenditionController,
     TeacherReleaseOwnerController,
     ParentContextPresenterController,
+    ParentCommunicationOwnerController,
     FamilySharingPrivateController,
   ],
 })
@@ -61,6 +68,7 @@ export class AppModule {
     familyGrowthRendition: FamilyGrowthRenditionRuntime;
     teacherReleaseOwner: TeacherReleaseOwnerConfig;
     parentContextPresenter: ParentContextPresenterConfig;
+    parentCommunicationOwner?: ParentCommunicationOwnerConfig;
     familySharingPrivate: FamilySharingPrivateConfig;
   }): DynamicModule {
     return {
@@ -105,6 +113,15 @@ export class AppModule {
           useValue: Object.freeze({ ...input.parentContextPresenter }),
         },
         ParentContextPresenterServiceAuthGuard,
+        {
+          provide: PARENT_COMMUNICATION_OWNER_CONFIG,
+          useValue: Object.freeze({
+            ...(input.parentCommunicationOwner ?? {
+              serviceAuth: input.parentContextPresenter.serviceAuth,
+            }),
+          }),
+        },
+        ParentCommunicationOwnerServiceAuthGuard,
         {
           provide: FAMILY_SHARING_PRIVATE_CONFIG,
           useValue: Object.freeze({ ...input.familySharingPrivate }),

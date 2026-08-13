@@ -1,0 +1,573 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.parent-communication-owner",
+    "version": "1.0.0",
+    "kind": "private_owner_query_and_command"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "digest": "sha256:35d6340f60aa2d81523b0c8af977c8c5bb8f01a05a84d1a73b5baffbe8654273",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "media_stream_ingress": "reserved_not_mounted_p0",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": {
+      "mode": "service_bearer",
+      "credential_contract": "NURTURE_INTERNAL_SERVICE_TOKEN",
+      "host_actor_fields": [
+        "workspace_id",
+        "my_chat_user_id"
+      ],
+      "fallback": "forbidden"
+    },
+    "response_headers": {
+      "cache-control": "private, no-store",
+      "pragma": "no-cache"
+    },
+    "paths": {
+      "summary_query": "/internal/nurture/parent-communication-owner/v1/summary",
+      "detail_query": "/internal/nurture/parent-communication-owner/v1/detail",
+      "media_access_query": "/internal/nurture/parent-communication-owner/v1/media-access",
+      "send_text_exchange": "/internal/nurture/parent-communication-owner/v1/send-text"
+    }
+  },
+  "owner_resolution": {
+    "frequency": "every_operation_and_every_send_subexchange",
+    "accepted_caller_context": [
+      "interface_contract",
+      "workspace_id",
+      "my_chat_user_id",
+      "host_request_id",
+      "context_ref"
+    ],
+    "forbidden_caller_authority_fields": [
+      "participant_id",
+      "participant_ref",
+      "role",
+      "role_assignment_id",
+      "role_assignment_ref",
+      "scope_id",
+      "scope_ref",
+      "family_id",
+      "child_id",
+      "enrollment_id",
+      "grant_id",
+      "care_group_id",
+      "institution_id"
+    ],
+    "current_owner_facts": [
+      "active Participant bound from the authenticated My-Chat user",
+      "current Guardian role assignment",
+      "exact family and child-care-process association selected by context_ref",
+      "one current Enrollment and its exact CareGroup",
+      "current communication grant, purpose, lifecycle and protected-display policy"
+    ],
+    "context_ref_rule": "context_ref routes owner resolution and partitions protected state; it never authorizes a read or command.",
+    "ambiguous_enrollment_rule": "Zero or multiple current Enrollment candidates fail closed; Nurture never picks the first candidate."
+  },
+  "privacy_and_minimization": {
+    "summary": "Contains only availability and bounded unread counts. It contains no member rows, message bodies, message refs, receipts or media refs.",
+    "detail": "May be requested only after explicit surface entry. It is bounded to 20 members and 50 messages and carries display-safe opaque refs only.",
+    "protected_content": "Plaintext is unsealed only inside the Nurture owner query after current authority is resolved. My-Chat never receives Nurture storage envelopes or canonical row ids.",
+    "logging": "Message bodies, display names, message refs, media refs, access refs and confirmation refs are forbidden in logs and metrics.",
+    "cache": "All responses are private/no-store. Consumer memory partitions include actor, workspace, context_ref, resolution_ref, scope_version, operation and presentation_version and are purged on any access change."
+  },
+  "command_semantics": {
+    "p0_scope": "text_only_teacher_segment",
+    "prepare": "Creates no business fact. The owner rechecks current authority and returns a body-free, expiring confirmation bound to the exact command_request_id, segment, presentation_version and preview digest.",
+    "confirm": "The owner rechecks current authority inside the canonical transaction and writes the Nurture message, audit/receipt and outbox atomically.",
+    "replay": "The same command_request_id returns one exact committed message_ref with execution_disposition replayed; it never creates a second message.",
+    "outcome_unknown": "Transport or commit ambiguity returns outcome_unknown with reconcile_same_command. The caller preserves the draft and retries with the same command_request_id.",
+    "new_intent": "Editing the body or changing the segment creates a new command_request_id. Refreshing presentation state does not change an existing command id.",
+    "attachments": "Attachment upload and send are outside P0. The contract does not admit attachment fields."
+  },
+  "media_policy": {
+    "p0_scope": "read_only",
+    "p0_runtime_rule": "The access contract and path namespace are frozen in P0, but media stream ingress is not mounted. A runtime owner port must return unavailable until the private stream ingress and My-Chat proxy are implemented and verified.",
+    "access_form": "opaque_owner_stream_ref",
+    "url_policy": "No signed URL, provider URL or storage path crosses this interface. The returned relative stream_path must be served by the Nurture private owner and proxied by My-Chat before Mobile access.",
+    "maximum_access_ttl_seconds": 60,
+    "maximum_image_bytes": 10485760,
+    "content_types": [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ],
+    "redirects": "forbidden",
+    "currentness": "Every access query rechecks purpose, message/media binding, lifecycle and current authority. Access refs are actor/context/presentation/message/media/expiry bound and single-origin.",
+    "invalidation": [
+      "scope change",
+      "revocation",
+      "context replacement",
+      "presentation replacement",
+      "device background",
+      "offline transition",
+      "expiry"
+    ]
+  },
+  "safe_reason_codes": [
+    "access_changed",
+    "context_changed",
+    "ambiguous_context",
+    "protected_display_denied",
+    "content_unavailable",
+    "temporarily_unavailable",
+    "stale_presentation",
+    "permission_denied",
+    "unsupported_segment",
+    "message_rejected",
+    "confirmation_expired",
+    "confirmation_replayed",
+    "invalid_confirmation"
+  ],
+  "operations": {
+    "summary_query": {
+      "path": "/internal/nurture/parent-communication-owner/v1/summary",
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/summary_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/summary_response"
+    },
+    "detail_query": {
+      "path": "/internal/nurture/parent-communication-owner/v1/detail",
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/detail_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/detail_response"
+    },
+    "media_access_query": {
+      "path": "/internal/nurture/parent-communication-owner/v1/media-access",
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/media_access_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/media_access_response"
+    },
+    "send_text_exchange": {
+      "path": "/internal/nurture/parent-communication-owner/v1/send-text",
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/send_text_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1#/$defs/send_text_response"
+    }
+  },
+  "contract_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:nurture:parent-communication-owner:1",
+    "$defs": {
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "version", "digest"],
+        "properties": {
+          "key": { "const": "nurture.parent-communication-owner" },
+          "version": { "const": "1.0.0" },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      },
+      "segment": {
+        "enum": ["teachers", "class_group"]
+      },
+      "summary_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["interface_contract", "workspace_id", "my_chat_user_id", "host_request_id", "context_ref"],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "my_chat_user_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "host_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 }
+        }
+      },
+      "detail_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["interface_contract", "workspace_id", "my_chat_user_id", "host_request_id", "context_ref", "segment", "page_size"],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "my_chat_user_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "host_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "segment": { "$ref": "#/$defs/segment" },
+          "page_size": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "cursor": { "type": "string", "minLength": 1, "maxLength": 2048 }
+        }
+      },
+      "media_access_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["interface_contract", "workspace_id", "my_chat_user_id", "host_request_id", "context_ref", "presentation_version", "segment", "message_ref", "media_ref", "purpose"],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "my_chat_user_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "host_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "segment": { "$ref": "#/$defs/segment" },
+          "message_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "media_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "purpose": { "const": "family_teacher_communication" }
+        }
+      },
+      "send_text_prepare_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "interface_contract", "workspace_id", "my_chat_user_id", "host_request_id", "context_ref", "presentation_version", "segment", "command_request_id", "body", "purpose"],
+        "properties": {
+          "kind": { "const": "prepare" },
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "my_chat_user_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "host_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "segment": { "const": "teachers" },
+          "command_request_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$" },
+          "body": { "type": "string", "minLength": 1, "maxLength": 2000 },
+          "purpose": { "const": "family_teacher_communication" }
+        }
+      },
+      "send_text_confirm_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "interface_contract", "workspace_id", "my_chat_user_id", "host_request_id", "context_ref", "presentation_version", "segment", "command_request_id", "confirmation_ref", "prepared_preview_digest", "purpose"],
+        "properties": {
+          "kind": { "const": "confirm" },
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "my_chat_user_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "host_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "segment": { "const": "teachers" },
+          "command_request_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$" },
+          "confirmation_ref": { "type": "string", "minLength": 32, "maxLength": 256 },
+          "prepared_preview_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "purpose": { "const": "family_teacher_communication" }
+        }
+      },
+      "send_text_request": {
+        "oneOf": [
+          { "$ref": "#/$defs/send_text_prepare_request" },
+          { "$ref": "#/$defs/send_text_confirm_request" }
+        ]
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["presentation_role", "scope_kind", "context_ref", "resolution_ref", "scope_version"],
+        "properties": {
+          "presentation_role": { "const": "parent" },
+          "scope_kind": { "const": "parent_communication" },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "resolution_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "scope_version": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["interface_key", "interface_version", "contract_digest", "workspace_id", "my_chat_user_id", "context_ref", "resolution_ref", "scope_version", "operation", "presentation_version", "expires_at"],
+        "properties": {
+          "interface_key": { "const": "nurture.parent-communication-owner" },
+          "interface_version": { "const": "1.0.0" },
+          "contract_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "workspace_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "my_chat_user_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "resolution_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "scope_version": { "type": "integer", "minimum": 0 },
+          "operation": { "enum": ["summary_query", "detail_query", "media_access_query", "send_text_exchange"] },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "expires_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "masked": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "context_ref", "masked_at", "mask_signal"],
+        "properties": {
+          "status": { "const": "masked" },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "masked_at": { "type": "string", "format": "date-time" },
+          "mask_signal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "reason_code", "purge_partition", "content_masked", "actions_disabled", "media_access_invalidated"],
+            "properties": {
+              "kind": { "const": "mask" },
+              "reason_code": { "enum": ["access_changed", "context_changed", "ambiguous_context", "protected_display_denied"] },
+              "purge_partition": { "const": true },
+              "content_masked": { "const": true },
+              "actions_disabled": { "const": true },
+              "media_access_invalidated": { "const": true }
+            }
+          }
+        }
+      },
+      "unavailable": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "context_ref", "failed_at", "reason_code", "retryable"],
+        "properties": {
+          "status": { "const": "unavailable" },
+          "context_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "failed_at": { "type": "string", "format": "date-time" },
+          "reason_code": { "enum": ["content_unavailable", "temporarily_unavailable", "unsupported_segment"] },
+          "retryable": { "type": "boolean" }
+        }
+      },
+      "segment_summary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["available", "unread_count"],
+        "properties": {
+          "available": { "type": "boolean" },
+          "unread_count": { "type": "integer", "minimum": 0, "maximum": 999 }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "available": { "const": false } },
+              "required": ["available"]
+            },
+            "then": {
+              "properties": { "unread_count": { "const": 0 } }
+            }
+          }
+        ]
+      },
+      "summary_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "presentation_version", "refreshed_at", "segments", "owner_resolution", "cache_partition"],
+        "properties": {
+          "status": { "const": "ready" },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "refreshed_at": { "type": "string", "format": "date-time" },
+          "segments": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["teachers", "class_group"],
+            "properties": {
+              "teachers": { "$ref": "#/$defs/segment_summary" },
+              "class_group": { "$ref": "#/$defs/segment_summary" }
+            }
+          },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" }
+        }
+      },
+      "summary_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/summary_ready" },
+          { "$ref": "#/$defs/masked" },
+          { "$ref": "#/$defs/unavailable" }
+        ]
+      },
+      "member": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["member_ref", "display_name", "role_display"],
+        "properties": {
+          "member_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "display_name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "role_display": { "type": "string", "minLength": 1, "maxLength": 40 }
+        }
+      },
+      "instruction_receipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["receipt_ref", "status", "instruction_display", "recorded_at"],
+        "properties": {
+          "receipt_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "status": { "enum": ["accepted", "revoked", "expired"] },
+          "instruction_display": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "recorded_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "text_message": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "message_ref", "sender_kind", "sender_display", "sent_at", "delivery_state", "body"],
+        "properties": {
+          "kind": { "const": "text" },
+          "message_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "sender_kind": { "enum": ["parent", "teacher", "system", "agent"] },
+          "sender_display": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "sent_at": { "type": "string", "format": "date-time" },
+          "delivery_state": { "enum": ["sent", "delivered", "read", "not_applicable"] },
+          "body": { "type": "string", "minLength": 1, "maxLength": 4000 },
+          "instruction_receipt": { "$ref": "#/$defs/instruction_receipt" }
+        }
+      },
+      "media_message": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "message_ref", "sender_kind", "sender_display", "sent_at", "delivery_state", "media"],
+        "properties": {
+          "kind": { "const": "media" },
+          "message_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "sender_kind": { "enum": ["parent", "teacher", "system", "agent"] },
+          "sender_display": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "sent_at": { "type": "string", "format": "date-time" },
+          "delivery_state": { "enum": ["sent", "delivered", "read", "not_applicable"] },
+          "media": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["media_ref", "media_kind", "lifecycle", "alt_display"],
+            "properties": {
+              "media_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+              "media_kind": { "const": "image" },
+              "lifecycle": { "enum": ["available", "revoked", "expired"] },
+              "alt_display": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "caption_display": { "type": "string", "minLength": 1, "maxLength": 500 }
+            }
+          }
+        }
+      },
+      "detail_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "segment", "presentation_version", "refreshed_at", "unread_count", "members", "messages", "page_info", "owner_resolution", "cache_partition"],
+        "properties": {
+          "status": { "const": "ready" },
+          "segment": { "$ref": "#/$defs/segment" },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "refreshed_at": { "type": "string", "format": "date-time" },
+          "unread_count": { "type": "integer", "minimum": 0, "maximum": 999 },
+          "members": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/member" } },
+          "messages": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "oneOf": [
+                { "$ref": "#/$defs/text_message" },
+                { "$ref": "#/$defs/media_message" }
+              ]
+            }
+          },
+          "page_info": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["has_more"],
+            "properties": {
+              "has_more": { "type": "boolean" },
+              "next_cursor": { "type": "string", "minLength": 1, "maxLength": 2048 }
+            }
+          },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" }
+        }
+      },
+      "detail_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/detail_ready" },
+          { "$ref": "#/$defs/masked" },
+          { "$ref": "#/$defs/unavailable" }
+        ]
+      },
+      "media_access_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "presentation_version", "message_ref", "media_ref", "access_ref", "stream_path", "expires_at", "content_type", "max_bytes", "owner_resolution", "cache_partition"],
+        "properties": {
+          "status": { "const": "ready" },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "message_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "media_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "access_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "stream_path": { "type": "string", "pattern": "^/internal/nurture/parent-communication-owner/v1/media/[A-Za-z0-9._:-]+$" },
+          "expires_at": { "type": "string", "format": "date-time" },
+          "content_type": { "enum": ["image/jpeg", "image/png", "image/webp"] },
+          "max_bytes": { "type": "integer", "minimum": 1, "maximum": 10485760 },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" }
+        }
+      },
+      "media_access_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/media_access_ready" },
+          { "$ref": "#/$defs/masked" },
+          { "$ref": "#/$defs/unavailable" }
+        ]
+      },
+      "send_ready_to_confirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "segment", "presentation_version", "command_request_id", "confirmation_ref", "prepared_preview_digest", "expires_at", "preview", "owner_resolution", "cache_partition"],
+        "properties": {
+          "status": { "const": "ready_to_confirm" },
+          "segment": { "const": "teachers" },
+          "presentation_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "command_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "confirmation_ref": { "type": "string", "minLength": 32, "maxLength": 256 },
+          "prepared_preview_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "expires_at": { "type": "string", "format": "date-time" },
+          "preview": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["body", "target_display", "effect"],
+            "properties": {
+              "body": { "type": "string", "minLength": 1, "maxLength": 2000 },
+              "target_display": { "type": "string", "minLength": 1, "maxLength": 80 },
+              "effect": { "const": "send_text_message" }
+            }
+          },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" }
+        }
+      },
+      "send_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "execution_disposition", "command_request_id", "message_ref", "receipt_ref", "committed_at"],
+        "properties": {
+          "status": { "const": "committed" },
+          "execution_disposition": { "enum": ["executed", "replayed"] },
+          "command_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "message_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "receipt_ref": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "committed_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "send_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "command_request_id", "reason_code", "recovery"],
+        "properties": {
+          "status": { "const": "not_committed" },
+          "command_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "reason_code": { "enum": ["access_changed", "context_changed", "stale_presentation", "permission_denied", "unsupported_segment", "message_rejected", "confirmation_expired", "confirmation_replayed", "invalid_confirmation"] },
+          "recovery": { "enum": ["resolve_context_again", "refresh_presentation", "retry_same_command", "edit_message", "none"] }
+        }
+      },
+      "send_outcome_unknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "command_request_id", "reason_code", "recovery"],
+        "properties": {
+          "status": { "const": "outcome_unknown" },
+          "command_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "reason_code": { "const": "send_outcome_unknown" },
+          "recovery": { "const": "reconcile_same_command" }
+        }
+      },
+      "send_text_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/send_ready_to_confirm" },
+          { "$ref": "#/$defs/send_committed" },
+          { "$ref": "#/$defs/send_not_committed" },
+          { "$ref": "#/$defs/send_outcome_unknown" },
+          { "$ref": "#/$defs/masked" },
+          { "$ref": "#/$defs/unavailable" }
+        ]
+      }
+    }
+  }
+}

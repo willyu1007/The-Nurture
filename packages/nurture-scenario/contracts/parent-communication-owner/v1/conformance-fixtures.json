@@ -1,0 +1,595 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.parent-communication-owner",
+    "version": "1.0.0",
+    "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+  },
+  "fixtures": [
+    {
+      "fixture_id": "summary-ready-minimized",
+      "operation": "summary_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-summary-a",
+        "context_ref": "context-a"
+      },
+      "response": {
+        "status": "ready",
+        "presentation_version": "communication-v8",
+        "refreshed_at": "2026-08-14T01:00:00.000Z",
+        "segments": {
+          "teachers": { "available": true, "unread_count": 2 },
+          "class_group": { "available": false, "unread_count": 0 }
+        },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "summary_query",
+          "presentation_version": "communication-v8",
+          "expires_at": "2026-08-14T01:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "detail-ready-bounded",
+      "operation": "detail_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-detail-a",
+        "context_ref": "context-a",
+        "segment": "teachers",
+        "page_size": 50
+      },
+      "response": {
+        "status": "ready",
+        "segment": "teachers",
+        "presentation_version": "communication-v8",
+        "refreshed_at": "2026-08-14T01:00:00.000Z",
+        "unread_count": 2,
+        "members": [
+          { "member_ref": "member-teacher-a", "display_name": "王老师", "role_display": "主班老师" }
+        ],
+        "messages": [
+          {
+            "kind": "text",
+            "message_ref": "message-family-a",
+            "sender_kind": "parent",
+            "sender_display": "我",
+            "sent_at": "2026-08-14T00:30:00.000Z",
+            "delivery_state": "read",
+            "body": "今天午睡后有些咳嗽，请老师帮忙留意。",
+            "instruction_receipt": {
+              "receipt_ref": "receipt-a",
+              "status": "accepted",
+              "instruction_display": "午睡后留意咳嗽情况",
+              "recorded_at": "2026-08-14T00:35:00.000Z"
+            }
+          },
+          {
+            "kind": "media",
+            "message_ref": "message-teacher-a",
+            "sender_kind": "teacher",
+            "sender_display": "王老师",
+            "sent_at": "2026-08-14T00:45:00.000Z",
+            "delivery_state": "delivered",
+            "media": {
+              "media_ref": "media-a",
+              "media_kind": "image",
+              "lifecycle": "available",
+              "alt_display": "午睡后的活动照片",
+              "caption_display": "精神状态正常，已继续观察。"
+            }
+          }
+        ],
+        "page_info": { "has_more": false },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "detail_query",
+          "presentation_version": "communication-v8",
+          "expires_at": "2026-08-14T01:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "class-group-explicitly-unavailable",
+      "operation": "detail_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-detail-b",
+        "context_ref": "context-a",
+        "segment": "class_group",
+        "page_size": 50
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context-a",
+        "failed_at": "2026-08-14T01:00:00.000Z",
+        "reason_code": "unsupported_segment",
+        "retryable": false
+      }
+    },
+    {
+      "fixture_id": "media-access-owner-stream",
+      "operation": "media_access_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-media-a",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "teachers",
+        "message_ref": "message-teacher-a",
+        "media_ref": "media-a",
+        "purpose": "family_teacher_communication"
+      },
+      "response": {
+        "status": "ready",
+        "presentation_version": "communication-v8",
+        "message_ref": "message-teacher-a",
+        "media_ref": "media-a",
+        "access_ref": "access-a",
+        "stream_path": "/internal/nurture/parent-communication-owner/v1/media/access-a",
+        "expires_at": "2026-08-14T01:01:00.000Z",
+        "content_type": "image/jpeg",
+        "max_bytes": 10485760,
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "media_access_query",
+          "presentation_version": "communication-v8",
+          "expires_at": "2026-08-14T01:01:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "send-text-ready-to-confirm",
+      "operation": "send_text_exchange",
+      "request": {
+        "kind": "prepare",
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-send-prepare-a",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "teachers",
+        "command_request_id": "command-a",
+        "body": "今天午睡后有些咳嗽，请老师帮忙留意。",
+        "purpose": "family_teacher_communication"
+      },
+      "response": {
+        "status": "ready_to_confirm",
+        "segment": "teachers",
+        "presentation_version": "communication-v8",
+        "command_request_id": "command-a",
+        "confirmation_ref": "confirmation_ref_1234567890123456",
+        "prepared_preview_digest": "sha256:1d420ddeb2441cdcdcb05f73385ea1af2812dfdc7aa79f3565181c9c4080bb7d",
+        "expires_at": "2026-08-14T01:05:00.000Z",
+        "preview": {
+          "body": "今天午睡后有些咳嗽，请老师帮忙留意。",
+          "target_display": "带班老师",
+          "effect": "send_text_message"
+        },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "send_text_exchange",
+          "presentation_version": "communication-v8",
+          "expires_at": "2026-08-14T01:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "send-text-committed",
+      "operation": "send_text_exchange",
+      "request": {
+        "kind": "confirm",
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-send-confirm-a",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "teachers",
+        "command_request_id": "command-a",
+        "confirmation_ref": "confirmation_ref_1234567890123456",
+        "prepared_preview_digest": "sha256:1d420ddeb2441cdcdcb05f73385ea1af2812dfdc7aa79f3565181c9c4080bb7d",
+        "purpose": "family_teacher_communication"
+      },
+      "response": {
+        "status": "committed",
+        "execution_disposition": "executed",
+        "command_request_id": "command-a",
+        "message_ref": "message-family-a",
+        "receipt_ref": "send-receipt-a",
+        "committed_at": "2026-08-14T01:00:10.000Z"
+      }
+    },
+    {
+      "fixture_id": "send-text-replayed",
+      "operation": "send_text_exchange",
+      "request": {
+        "kind": "confirm",
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-send-replay-a",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "teachers",
+        "command_request_id": "command-a",
+        "confirmation_ref": "confirmation_ref_1234567890123456",
+        "prepared_preview_digest": "sha256:1d420ddeb2441cdcdcb05f73385ea1af2812dfdc7aa79f3565181c9c4080bb7d",
+        "purpose": "family_teacher_communication"
+      },
+      "response": {
+        "status": "committed",
+        "execution_disposition": "replayed",
+        "command_request_id": "command-a",
+        "message_ref": "message-family-a",
+        "receipt_ref": "send-receipt-a",
+        "committed_at": "2026-08-14T01:00:10.000Z"
+      }
+    },
+    {
+      "fixture_id": "send-text-outcome-unknown",
+      "operation": "send_text_exchange",
+      "request": {
+        "kind": "confirm",
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-send-unknown-a",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "teachers",
+        "command_request_id": "command-b",
+        "confirmation_ref": "confirmation_ref_abcdefghijklmnop",
+        "prepared_preview_digest": "sha256:1d420ddeb2441cdcdcb05f73385ea1af2812dfdc7aa79f3565181c9c4080bb7d",
+        "purpose": "family_teacher_communication"
+      },
+      "response": {
+        "status": "outcome_unknown",
+        "command_request_id": "command-b",
+        "reason_code": "send_outcome_unknown",
+        "recovery": "reconcile_same_command"
+      }
+    },
+    {
+      "fixture_id": "detail-scope-loss-masked",
+      "operation": "detail_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-detail-revoked-a",
+        "context_ref": "context-a",
+        "segment": "teachers",
+        "page_size": 50
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context-a",
+        "masked_at": "2026-08-14T01:00:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "request-caller-role-forbidden",
+      "operation": "summary_query",
+      "target": "request",
+      "value": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-invalid-a",
+        "context_ref": "context-a",
+        "role": "guardian"
+      }
+    },
+    {
+      "fixture_id": "summary-message-body-forbidden",
+      "operation": "summary_query",
+      "target": "response",
+      "value": {
+        "status": "ready",
+        "presentation_version": "communication-v8",
+        "refreshed_at": "2026-08-14T01:00:00.000Z",
+        "segments": {
+          "teachers": { "available": true, "unread_count": 2, "body": "private" },
+          "class_group": { "available": false, "unread_count": 0 }
+        },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "summary_query",
+          "presentation_version": "communication-v8"
+        }
+      }
+    },
+    {
+      "fixture_id": "summary-unavailable-segment-unread-forbidden",
+      "operation": "summary_query",
+      "target": "response",
+      "value": {
+        "status": "ready",
+        "presentation_version": "communication-v8",
+        "refreshed_at": "2026-08-14T01:00:00.000Z",
+        "segments": {
+          "teachers": { "available": true, "unread_count": 2 },
+          "class_group": { "available": false, "unread_count": 1 }
+        },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "summary_query",
+          "presentation_version": "communication-v8",
+          "expires_at": "2026-08-14T01:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "detail-raw-family-id-forbidden",
+      "operation": "detail_query",
+      "target": "response",
+      "value": {
+        "status": "ready",
+        "segment": "teachers",
+        "presentation_version": "communication-v8",
+        "refreshed_at": "2026-08-14T01:00:00.000Z",
+        "unread_count": 0,
+        "members": [],
+        "messages": [],
+        "page_info": { "has_more": false },
+        "family_id": "family-a",
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "detail_query",
+          "presentation_version": "communication-v8"
+        }
+      }
+    },
+    {
+      "fixture_id": "media-signed-url-forbidden",
+      "operation": "media_access_query",
+      "target": "response",
+      "value": {
+        "status": "ready",
+        "presentation_version": "communication-v8",
+        "message_ref": "message-a",
+        "media_ref": "media-a",
+        "access_ref": "access-a",
+        "stream_path": "/internal/nurture/parent-communication-owner/v1/media/access-a",
+        "signed_url": "https://storage.example.test/private",
+        "expires_at": "2026-08-14T01:01:00.000Z",
+        "content_type": "image/jpeg",
+        "max_bytes": 10485760,
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+          "workspace_id": "workspace-a",
+          "my_chat_user_id": "user-a",
+          "context_ref": "context-a",
+          "resolution_ref": "resolution-a",
+          "scope_version": 7,
+          "operation": "media_access_query",
+          "presentation_version": "communication-v8"
+        }
+      }
+    },
+    {
+      "fixture_id": "send-attachment-field-forbidden",
+      "operation": "send_text_exchange",
+      "target": "request",
+      "value": {
+        "kind": "prepare",
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-invalid-attachment",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "teachers",
+        "command_request_id": "command-a",
+        "body": "请老师留意。",
+        "attachment_ref": "attachment-a",
+        "purpose": "family_teacher_communication"
+      }
+    },
+    {
+      "fixture_id": "send-class-group-forbidden-p0",
+      "operation": "send_text_exchange",
+      "target": "request",
+      "value": {
+        "kind": "prepare",
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+        },
+        "workspace_id": "workspace-a",
+        "my_chat_user_id": "user-a",
+        "host_request_id": "request-invalid-class-group-send",
+        "context_ref": "context-a",
+        "presentation_version": "communication-v8",
+        "segment": "class_group",
+        "command_request_id": "command-a",
+        "body": "收到。",
+        "purpose": "family_teacher_communication"
+      }
+    },
+    {
+      "fixture_id": "send-fresh-command-recovery-forbidden",
+      "operation": "send_text_exchange",
+      "target": "response",
+      "value": {
+        "status": "outcome_unknown",
+        "command_request_id": "command-a",
+        "reason_code": "send_outcome_unknown",
+        "recovery": "retry_new_command"
+      }
+    }
+  ]
+}

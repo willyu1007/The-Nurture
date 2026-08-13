@@ -22,6 +22,10 @@ route availability does not activate a scenario capability or authorize traffic.
 | `POST` | `/internal/nurture/parent-context-presenter/v1/activity-detail` | Default-off detail for an activity ref returned by the day presenter |
 | `POST` | `/internal/nurture/parent-context-presenter/v1/notices` | Default-off list/prepare/confirm presenter with a closed kind/status matrix and five-field confirmation identity |
 | `POST` | `/internal/nurture/parent-context-presenter/v1/freshness-attendance` | Default-off freshness and attendance projection |
+| `POST` | `/internal/nurture/parent-communication-owner/v1/summary` | Default-off minimized communication availability and unread summary; no private detail |
+| `POST` | `/internal/nurture/parent-communication-owner/v1/detail` | Default-off explicit-open bounded members and teacher timeline |
+| `POST` | `/internal/nurture/parent-communication-owner/v1/media-access` | Default-off P0 contract ingress; resolves current authority but returns `content_unavailable` until the private stream ingress and My-Chat proxy are implemented |
+| `POST` | `/internal/nurture/parent-communication-owner/v1/send-text` | Default-off text prepare/confirm exchange with same-command reconciliation |
 
 All other paths return a body-safe `404`. The legacy Fastify workflow harness
 and `user_attention` route do not run in this service. Every private route uses
@@ -58,6 +62,7 @@ The service reads configuration only through `src/config.ts`.
 | `NURTURE_PROTECTED_CONTENT_KEY` | unset | secret of at least 32 characters; absence disables the Harness runtime |
 | `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `false` | exact `true` enables only the additional Institution owner-read route after the Harness is available |
 | `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED` | `false` | exact `true` permits parent-context composition only when the exact adopted digest and all owner ports are also configured |
+| `NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED` | `false` | exact `true` permits parent-communication composition only when the exact adopted digest and authority/owner/async ports are also configured |
 
 The service token is loaded into a dedicated timing-safe authenticator rather
 than the printable non-secret configuration object. The evidence key is loaded

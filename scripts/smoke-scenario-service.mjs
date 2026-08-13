@@ -73,6 +73,22 @@ try {
   );
   await assertResponse(harnessDisabled, 503, { error: "harness_disabled" });
 
+  const parentCommunicationDisabled = await fetch(
+    `${baseUrl}/internal/nurture/parent-communication-owner/v1/summary`,
+    {
+      method: "POST",
+      headers: {
+        authorization: "Bearer smoke-service-token",
+        connection: "close",
+        "content-type": "application/json",
+      },
+      body: "{}",
+    },
+  );
+  await assertResponse(parentCommunicationDisabled, 503, {
+    error: "service_unavailable",
+  });
+
   const legacy = await fetch(
     `${baseUrl}/internal/nurture/activation/user-attention/resolve`,
     { method: "POST", headers: { connection: "close" } },
@@ -80,7 +96,7 @@ try {
   await assertResponse(legacy, 404, { error: "not_found" });
 
   process.stdout.write(
-    `[ok] scenario-service build/start/health port=${port} binding-owner=disabled harness=disabled legacy-route=absent\n`,
+    `[ok] scenario-service build/start/health port=${port} binding-owner=disabled harness=disabled parent-communication-owner=disabled legacy-route=absent\n`,
   );
 } catch (error) {
   process.stderr.write(`${String(error)}\n${stdout}${stderr}`);

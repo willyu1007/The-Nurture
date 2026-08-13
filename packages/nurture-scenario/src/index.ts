@@ -128,4 +128,5 @@ export * from "./c30/canonical-action.js";
 export * from "./c30/protected-content.js";
 export * from "./teacher-release-owner-contract.js";
 export * from "./parent-context-presenter-contract.js";
+export * from "./parent-communication-owner-contract.js";
 export type * from "@my-chat/workflow-contracts";

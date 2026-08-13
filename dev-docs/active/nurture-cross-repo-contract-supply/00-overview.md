@@ -3,8 +3,21 @@
 ## Status
 
 - State: in-progress
-- Updated: 2026-08-13
-- Next step: W1 is FROZEN (2026-08-13):
+- Updated: 2026-08-14
+- Next step: W3 P0 is implemented and exact-pin adopted without activation.
+  The standalone `nurture.parent-communication-owner@1.0.0` contract is
+  frozen at digest
+  `sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f`.
+  It supplies minimized summary, explicit-open bounded detail, a frozen
+  protected-media access contract and teacher-only text prepare/confirm with
+  same-command reconciliation. Four private routes are mounted default-off;
+  every operation re-resolves current owner authority. P0 media access always
+  returns `content_unavailable` until the private stream ingress and My-Chat
+  proxy exist; `class_group` can be read as explicitly unavailable and cannot
+  send. My-Chat T-039 has the exact-pin dormant consumer. Next, keep both flags
+  false and either implement the real Nurture owner/async ports for controlled
+  W3 qualification or begin W4 director contract design. W1 is FROZEN
+  (2026-08-13):
   `artifacts/w1-guardian-decision-callback-design-draft.md` is the frozen
   joint design record for the additive `family_growth_transport@1.1.0`
   push callback, closed through a four-round owner-delegated adversarial
@@ -21,9 +34,9 @@
   accepted exact-pin handoff for My-Chat T-039. My-Chat completed the W2 P0
   exact-pin consumer adoption on 2026-08-13 across its default-off private
   source, public API/client and production Mobile controller; joint negative
-  conformance passes with no activation. The next supply work is W3,
-  the IR-C01 parent-communication owner contracts, followed by W4 director
-  presenter. My-Chat owns the separate W2 consumer adoption and must preserve
+  conformance passes with no activation. W3 now has the P0 contract/runtime
+  boundary and exact consumer adoption described above; W4 director presenter
+  remains the next contract-supply workstream. My-Chat owns consumer adoption and must preserve
   default-off behavior. The closing quality pass removed the obsolete W2 scope
   draft, made the accepted digest pin the only active handoff, repaired
   generated-client typecheck drift and passed the repository unit/typecheck,
@@ -116,11 +129,13 @@ conformance fixtures, all default-off.
   remain mounted default-off and require the explicit gate, service auth,
   complete Q6 owner ports and the active consumer-generation boundary port;
   their presence is not activation.
-- [ ] W3: parent-communication owner contracts are registered with
-  negative-path fixtures.
+- [x] W3 P0: parent-communication owner contracts, four default-off private
+  routes, response-schema enforcement, negative-path fixtures and exact My-Chat
+  consumer adoption are implemented. Real owner ports, media streaming,
+  deployment and traffic remain separate gates.
 - [ ] W4: the director presenter contract is registered after W2/W3.
 - [x] W5: every open ledger item is fixed forward-only with its negative
   test; N3's additive migration passes disposable-target qualification;
   N2/N5/N6/N8 land before or with the W1 callback implementation.
-- [ ] Everything remains default-off; no durable apply, activation,
+- [x] W3 implementation remains default-off; no durable apply, activation,
   deployment or traffic results from this task.

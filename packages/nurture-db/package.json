@@ -5,7 +5,11 @@
   "type": "module",
   "description": "The Nurture data layer: Prisma client + repository implementations of the scenario repository ports. The only package allowed to import Prisma (business layer stays Prisma-free).",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
     "./binding-owner": {
       "types": "./src/binding-owner.ts",
       "import": "./dist/binding-owner.js",

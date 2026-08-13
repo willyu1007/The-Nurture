@@ -40,6 +40,11 @@ import {
   createParentContextPresenterComposition,
   type ParentContextPresenterOwnerBindingV1,
 } from "./parent-context-presenter-runtime.js";
+import type { ParentCommunicationOwnerComposition } from "./parent-communication-owner-composition.js";
+import {
+  createParentCommunicationOwnerComposition,
+  type ParentCommunicationOwnerBindingV1,
+} from "./parent-communication-owner-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -59,6 +64,8 @@ export async function createScenarioServiceApplication(input?: {
   teacherReleaseOwnerComposition?: TeacherReleaseOwnerComposition;
   parentContextPresenterComposition?: ParentContextPresenterComposition;
   parentContextPresenterOwnerBinding?: ParentContextPresenterOwnerBindingV1;
+  parentCommunicationOwnerComposition?: ParentCommunicationOwnerComposition;
+  parentCommunicationOwnerBinding?: ParentCommunicationOwnerBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -98,6 +105,15 @@ export async function createScenarioServiceApplication(input?: {
         ? { ownerBinding: input.parentContextPresenterOwnerBinding }
         : {}),
     });
+  const parentCommunicationOwnerComposition =
+    input?.parentCommunicationOwnerComposition
+    ?? createParentCommunicationOwnerComposition({
+      enabled: config.parentCommunicationOwnerEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.parentCommunicationOwnerBinding
+        ? { ownerBinding: input.parentCommunicationOwnerBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -116,6 +132,10 @@ export async function createScenarioServiceApplication(input?: {
       },
       parentContextPresenter: {
         composition: parentContextPresenterComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      parentCommunicationOwner: {
+        composition: parentCommunicationOwnerComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

@@ -14,6 +14,7 @@ export type ScenarioServiceConfig = Readonly<{
   institutionBusinessCommunicationReadEnabled: boolean;
   teacherReleaseOwnerEnabled: boolean;
   parentContextPresenterEnabled: boolean;
+  parentCommunicationOwnerEnabled: boolean;
 }>;
 
 const DEFAULT_SERVICE_NAME = "the-nurture";
@@ -48,6 +49,10 @@ export function loadScenarioServiceConfig(
     parentContextPresenterEnabled: parseBoolean(
       env.NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED,
       "NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED",
+    ),
+    parentCommunicationOwnerEnabled: parseBoolean(
+      env.NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED,
+      "NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED",
     ),
   });
 }

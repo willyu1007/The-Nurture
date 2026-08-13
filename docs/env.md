@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-13T05:54:14Z`
+Generated at (UTC): `2026-08-13T21:54:25Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -24,6 +24,7 @@ Generated at (UTC): `2026-08-13T05:54:14Z`
 | `NURTURE_HARNESS_INTEGRITY_KEY` | `active` | `string` | no | yes | `` | `nurture_harness_integrity_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) for Harness confirmation input-integrity tags and owner-issued target refs; absence keeps both Harness routes disabled. |
 | `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption. |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `nurture_internal_service_token` | `*` | `` | `` | `` | Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged. |
+| `NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the parent-communication owner v1 composition; true requires the exact adopted contract digest, complete authority/owner/async ports and separately authorized activation. |
 | `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the parent-context presenter v1 owner composition; true requires the exact adopted contract digest and separately authorized owner-port activation. |
 | `NURTURE_PROTECTED_CONTENT_KEY` | `active` | `string` | no | yes | `` | `nurture_protected_content_key` | `*` | `` | `` | `` | AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext. |
 | `NURTURE_TEACHER_RELEASE_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation. |

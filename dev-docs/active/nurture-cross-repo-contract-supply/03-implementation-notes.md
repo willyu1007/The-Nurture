@@ -296,3 +296,39 @@
   outbox emission. Added bilateral gates, validator-first token sequencing,
   successor teacher DTO deployment and scoped golden-byte gates.
 - No schema, route, token, deployment, activation or runtime change was made.
+## 2026-08-14 — W3 parent communication P0 vertical slice
+
+- Published `nurture.parent-communication-owner@1.0.0` at exact digest
+  `sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f`
+  with four closed request/response operations, nine positive fixtures and
+  eight invalid fixtures. Summary has no member/message/media detail and an
+  unavailable segment must expose zero unread; detail is explicit-open and
+  bounded to 20 members/50 messages.
+- Mounted summary, detail, media-access and send-text private routes in the
+  formal scenario service. The explicit boolean gate defaults false and
+  composition additionally requires service auth, a current-authority resolver,
+  owner port and async-generation boundary.
+- Send P0 is one semantic track: teacher text only, prepare creates no business
+  fact, confirm retains the exact command id, replay is exact, and transport or
+  commit ambiguity returns `outcome_unknown/reconcile_same_command`.
+  A malformed or foreign confirm receipt uses the same result because the
+  canonical write may already have happened; it is never downgraded to a
+  generic retry with a new command.
+  `class_group`, attachments and voice are not admitted into this command.
+- Froze the protected-image access request/response policy, but made the P0
+  runtime return `content_unavailable` after current-authority resolution. The
+  access-stream path namespace is reserved but not mounted, preventing a ready
+  access response that no ingress could honor.
+- Removed unused schema fragments, made cache expiry explicit, fixed the
+  scenario-service package typecheck root, raised the scenario-service test
+  census to 19 and synchronized the env contract with a non-secret default-false
+  flag. No database schema, migration, deploy, activation or traffic changed.
+- Repaired the root runtime exports of `@the-nurture/scenario` and
+  `@the-nurture/db` to resolve built `dist` modules while retaining TypeScript
+  sources for types. The maintained scenario-service smoke now starts the real
+  build and verifies the parent-communication owner is default-off.
+- My-Chat T-039 adopted the exact digest through a strict private source,
+  public API/client and dormant Mobile controller. The remaining next actions
+  are: implement real owner/async ports, implement and qualify the media stream
+  plus proxy if promoted into P1, and run controlled deployed/native
+  qualification before either flag changes.

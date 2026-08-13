@@ -1,11 +1,6 @@
-# Environment Contract Diff
+# W3 parent-communication environment contract diff
 
-## Change
-
-- Added `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED` as an optional, non-secret
-  boolean with default `false` for all environments.
-- No keys were removed, renamed, deprecated, or changed.
-
-## Security
-
-No secret or secret reference was introduced.
+- Add `NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED` as optional `bool`.
+- Default remains `false` in every environment.
+- No secret value or secret reference is added.
+- No existing configuration behavior changes while the key is absent.

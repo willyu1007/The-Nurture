@@ -80,6 +80,11 @@ variables:
     required: false
     default: false
     description: Default-off gate for the parent-context presenter v1 owner composition; true requires the exact adopted contract digest and separately authorized owner-port activation.
+  NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED:
+    type: bool
+    required: false
+    default: false
+    description: Default-off gate for the parent-communication owner v1 composition; true requires the exact adopted contract digest, complete authority/owner/async ports and separately authorized activation.
   FAMILY_GROWTH_EVENTS_SERVICE_TOKEN:
     type: string
     required: false

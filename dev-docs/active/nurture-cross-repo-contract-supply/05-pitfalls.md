@@ -39,3 +39,41 @@
   exception-filter chain, before the guard can throw.
 - Prevention: for guard-error behavior, pin controller-scoped filter metadata
   and providers; do not infer route ownership from a global filter host.
+## 2026-08-14 — A frozen media access shape could imply an unmounted stream
+
+- Symptom: the first W3 draft could return a ready owner-relative stream path,
+  but no private media stream controller existed.
+- Root cause: freezing the access contract and implementing an executable P0
+  runtime were treated as the same delivery milestone.
+- Attempted approach: documenting the path as future work was insufficient
+  because enabling the common flag could still return an unusable ready result.
+- Fix: reserve the path namespace in the contract, explicitly record
+  `reserved_not_mounted_p0`, and force runtime media access to
+  `content_unavailable` after current-authority resolution.
+- Prevention: every ready capability must have an executable downstream ingress;
+  otherwise keep the shape frozen but the runtime outcome unavailable.
+
+## 2026-08-14 — P0 text send briefly admitted a class-group second track
+
+- Symptom: the contract narrative said teacher-only text, while schema, API
+  types and Mobile requests still allowed `class_group`.
+- Root cause: the shared read-segment type was reused at the narrower command
+  boundary.
+- Attempted approach: relying on the owner to return unsupported was rejected;
+  it leaves an advertised action that P0 never supports.
+- Fix: narrow owner schema/parser, strict source, public validation/client and
+  Mobile composition to `teachers`; add negative class-group fixtures/tests.
+- Prevention: derive read and command admissibility separately even when they
+  share display segment names.
+
+## 2026-08-14 — Workspace root exports bypassed built runtime modules
+
+- Symptom: the scenario-service compiled, but its smoke process exited before
+  health because `@the-nurture/db` resolved `src/index.ts`, whose ESM `.js`
+  imports do not exist beside TypeScript sources.
+- Root cause: root package exports were source-only while subpath exports
+  already separated `types` from runtime `import` targets.
+- Fix: route both scenario and DB root `types` to `src/index.ts` and runtime
+  imports to `dist/index.js`; extend smoke to the new default-off owner route.
+- Prevention: package build acceptance must execute the compiled entry, not
+  stop at TypeScript emit.

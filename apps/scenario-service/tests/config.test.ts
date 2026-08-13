@@ -15,6 +15,7 @@ describe("scenario-service configuration", () => {
       institutionBusinessCommunicationReadEnabled: false,
       teacherReleaseOwnerEnabled: false,
       parentContextPresenterEnabled: false,
+      parentCommunicationOwnerEnabled: false,
     });
   });
 
@@ -36,6 +37,10 @@ describe("scenario-service configuration", () => {
       { NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED: "TRUE" },
       "NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED",
     ],
+    [
+      { NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED: "TRUE" },
+      "NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED",
+    ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
       `Invalid scenario-service configuration: ${field}`,
@@ -55,6 +60,14 @@ describe("scenario-service configuration", () => {
       loadScenarioServiceConfig({
         NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED: "true",
       }).parentContextPresenterEnabled,
+    ).toBe(true);
+  });
+
+  it("loads the parent communication owner gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED: "true",
+      }).parentCommunicationOwnerEnabled,
     ).toBe(true);
   });
 

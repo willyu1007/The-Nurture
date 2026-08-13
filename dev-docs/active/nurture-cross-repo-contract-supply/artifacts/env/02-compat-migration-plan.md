@@ -1,19 +1,6 @@
-# Compatibility and Migration Plan
+# W3 parent-communication environment compatibility plan
 
-## Classification
-
-- Backward compatible: yes
-- Coordinated rollout required: no
-- Secret-manager change required: no
-
-## Plan
-
-Regenerate the public environment artifacts from `env/contract.yaml`. Existing
-deployments omit the key and therefore retain the default-off behavior. Any
-future activation remains a separate authorized rollout and also requires a
-complete owner-port composition.
-
-## Rollback
-
-The code and contract can retain the false-valued gate without activating any
-route. No compatibility window or secret cleanup is needed.
+This is an additive, non-breaking change. Existing deployments continue to
+resolve the gate as false. A later, separately authorized rollout must supply
+the exact string `true` together with complete owner ports and service auth;
+this contract publication does not perform that rollout.

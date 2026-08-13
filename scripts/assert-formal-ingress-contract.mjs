@@ -43,6 +43,16 @@ const parentContextPresenterPaths = {
   PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH:
     "/internal/nurture/parent-context-presenter/v1/freshness-attendance",
 };
+const parentCommunicationOwnerPaths = {
+  PARENT_COMMUNICATION_OWNER_SUMMARY_PATH:
+    "/internal/nurture/parent-communication-owner/v1/summary",
+  PARENT_COMMUNICATION_OWNER_DETAIL_PATH:
+    "/internal/nurture/parent-communication-owner/v1/detail",
+  PARENT_COMMUNICATION_OWNER_MEDIA_ACCESS_PATH:
+    "/internal/nurture/parent-communication-owner/v1/media-access",
+  PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH:
+    "/internal/nurture/parent-communication-owner/v1/send-text",
+};
 const expectedPaths = [
   healthPath,
   ownerPath,
@@ -72,6 +82,10 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_DAY_PATH`,
   `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH`,
   `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_NOTICES_PATH`,
+  `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_DETAIL_PATH`,
+  `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_MEDIA_ACCESS_PATH`,
+  `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH`,
+  `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_SUMMARY_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -80,11 +94,13 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/family-growth-rendition.controller.ts#FamilyGrowthRenditionController",
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",
   "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
+  "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",
   "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
+  "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -697,6 +713,160 @@ for (const route of [
     parentContextPresenterRuntimeSource,
     "!input.enabled",
     `${route.handler} remains default-off`,
+  );
+}
+
+const parentCommunicationOwnerControllerSource = read(
+  "apps/scenario-service/src/parent-communication-owner.controller.ts",
+);
+const parentCommunicationOwnerHttpSource = read(
+  "apps/scenario-service/src/parent-communication-owner-http.ts",
+);
+const parentCommunicationOwnerRuntimeSource = read(
+  "apps/scenario-service/src/parent-communication-owner-runtime.ts",
+);
+const parentCommunicationOwnerCompositionSource = read(
+  "apps/scenario-service/src/parent-communication-owner-composition.ts",
+);
+const parentCommunicationOwnerResponseValidatorSource = read(
+  "apps/scenario-service/src/parent-communication-owner-response-validator.ts",
+);
+const parentCommunicationOwnerContractSource = read(
+  "packages/nurture-scenario/src/parent-communication-owner-contract.ts",
+);
+const parentCommunicationOwnerArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/parent-communication-owner/v1/parent-communication-owner.owner-contract.json",
+  ),
+);
+
+assertIncludes(
+  parentCommunicationOwnerControllerSource,
+  "@Controller()\n@UseFilters(PrivateResponseExceptionFilter)\n@UseGuards(ParentCommunicationOwnerServiceAuthGuard)",
+  "parent-communication routes use private response and service-bearer guards",
+);
+assertIncludes(
+  parentCommunicationOwnerControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "parent-communication guard fails closed without full composition",
+);
+for (const fragment of [
+  'key: "nurture.parent-communication-owner"',
+  'version: "1.0.0"',
+  "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'p0_send_scope: "text_only_teacher_segment"',
+]) {
+  assertIncludes(
+    parentCommunicationOwnerContractSource,
+    fragment,
+    `parent-communication exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  parentCommunicationOwnerArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "parent-communication mounted route posture",
+);
+assertEqual(
+  parentCommunicationOwnerArtifact.command_semantics?.p0_scope,
+  "text_only_teacher_segment",
+  "parent-communication P0 command scope",
+);
+assertEqual(
+  parentCommunicationOwnerArtifact.media_policy?.maximum_access_ttl_seconds,
+  60,
+  "parent-communication media TTL",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED",
+  "parent-communication has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+  "|| !binding.asyncBoundary",
+]) {
+  assertIncludes(
+    parentCommunicationOwnerRuntimeSource,
+    fragment,
+    `parent-communication complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  parentCommunicationOwnerResponseValidatorSource,
+  "ajv.addSchema(artifact.contract_schema)",
+  "parent-communication runtime compiles the published schema artifact",
+);
+assertIncludes(
+  parentCommunicationOwnerResponseValidatorSource,
+  "digest !== PARENT_COMMUNICATION_OWNER_INTERFACE.digest",
+  "parent-communication runtime hard-checks the artifact pin",
+);
+for (const fragment of [
+  "assertPublishedParentCommunicationOwnerResponse(operation, response)",
+  'recovery: "reconcile_same_command"',
+  "response.preview.body === request.body",
+  "response.messages.length <= request.page_size",
+]) {
+  assertIncludes(
+    parentCommunicationOwnerCompositionSource,
+    fragment,
+    `parent-communication composition rule ${fragment}`,
+  );
+}
+for (const route of [
+  {
+    constant: "PARENT_COMMUNICATION_OWNER_SUMMARY_PATH",
+    handler: "summary",
+    parser: "parseParentCommunicationSummaryRequestV1",
+  },
+  {
+    constant: "PARENT_COMMUNICATION_OWNER_DETAIL_PATH",
+    handler: "detail",
+    parser: "parseParentCommunicationDetailRequestV1",
+  },
+  {
+    constant: "PARENT_COMMUNICATION_OWNER_MEDIA_ACCESS_PATH",
+    handler: "mediaAccess",
+    parser: "parseParentCommunicationMediaAccessRequestV1",
+  },
+  {
+    constant: "PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH",
+    handler: "sendText",
+    parser: "parseParentCommunicationSendTextRequestV1",
+  },
+]) {
+  const expectedPath = parentCommunicationOwnerPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    parentCommunicationOwnerContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    parentCommunicationOwnerControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    parentCommunicationOwnerHttpSource,
+    "body.interface_contract.digest !== PARENT_COMMUNICATION_OWNER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
   );
 }
 

@@ -329,3 +329,51 @@ LIVE_QUALIFICATION_PENDING`.
   files, zero errors and zero warnings.
 - No code, schema, migration, runtime or build verification was required for
   this documentation-only revision.
+## 2026-08-14 — W3 parent communication P0 implementation
+
+- `pnpm exec tsx packages/nurture-scenario/contracts/parent-communication-owner/v1/validate-contract.mjs`
+  - Pass: exact digest, four operations, nine positive fixtures and eight
+    invalid fixtures, including unavailable-segment unread minimization.
+- `pnpm --filter @the-nurture/scenario-service typecheck`
+  - Pass with the standard package command after repairing its rootDir.
+- `pnpm --filter @the-nurture/scenario-service test -- --run tests/parent-communication-owner-controller.e2e.test.ts tests/config.test.ts`
+  - Pass: 2 files / 27 tests. Coverage includes default-off/auth, exact digest,
+    caller-authority rejection, five mask causes, media P0 unavailable,
+    teacher-only send, late/throwing/malformed confirm uncertainty and response
+    leakage.
+- `pnpm test:unit`
+  - Pass: repository unit lane, 97 files / 1083 tests.
+- `pnpm test:scenario-service`
+  - Pass: 16 files / 128 tests.
+- `pnpm verify:test-routing && pnpm verify:formal-ingress-contract`
+  - Pass: 183 tests correctly routed with scenario-service 19; controller
+    census is 23 and all four W3 routes are registered.
+- `pnpm typecheck`
+  - Pass when run serially. A prior parallel run raced scenario-service pretest
+    cleanup against root TypeScript and produced transient missing `dist/*.d.ts`
+    diagnostics; no source diagnostic remained in the serial run.
+- `pnpm --filter @the-nurture/frontend lint`
+  - Pass: frontend ESLint and stylelint completed with zero diagnostics.
+- `pnpm build:scenario-service && pnpm smoke:scenario-service`
+  - Pass: compiled runtime starts, health succeeds, legacy route remains absent,
+    and binding, harness and parent-communication owners are all default-off.
+- `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main && node .ai/scripts/ctl-project-governance.mjs lint --strict --project main`
+  - Pass: T-011 remains accurately `in-progress`; project hub is synchronized.
+- `node .ai/scripts/lint-docs.mjs --strict --path dev-docs/active/nurture-cross-repo-contract-supply`
+  - Pass: 14 Markdown files, zero errors and zero warnings.
+- `pnpm lint`
+  - The pre-commit run correctly failed closed while My-Chat W3 was uncommitted.
+    After My-Chat commit `c09ee23`, the pin was resealed to revision
+    `c09ee23dbc096ca054eaa6080d03d68aba579186`, exact `x5_joint_api` source hash
+    `09aa42ed2b40eac4e0a0266cb1722534c3d6d4f04f9f9c62b5dfe744239929fd`
+    and Nurture scenario hash
+    `776c209a2c86eb3b32aea5ec036a6c5bc8f004147eb7c408f218a0edb687ea23`.
+  - Pass: final `pnpm lint` verifies pinned Base contract/source, My-Chat
+    contract/source, Base/My-Chat parity and Nurture scenario source before
+    frontend ESLint/stylelint. Base was already exactly at recorded revision
+    `536638a204865ebdc43bca70992388352789a36f`; no alternate checkout was needed.
+- `git diff --check`
+  - Pass.
+
+Verdict: `W3_P0_IMPLEMENTATION_PASS / EXACT_DIGEST / DEFAULT_OFF /
+NO_MEDIA_STREAM / NO_DEPLOYMENT_OR_TRAFFIC_CLAIM`.
