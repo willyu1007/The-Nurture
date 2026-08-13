@@ -56,14 +56,15 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **T-011 W1/W2**: conclude the guardian-decision callback joint design with
-   My-Chat and register parent-context presenter v1 as a versioned owner
-   contract, both default-off.
-2. **Start T-008 G5-0** (authorized 2026-08-13) once W1/W2 are underway:
-   readiness inventory and Beta Profile finalization only; no Candidate
-   identity before G5-A.
-3. **Continue T-002 only from C31** after a G5-A Candidate Freeze, per the
-   2026-08-13 sequencing decision; do not infer C31 from any exit.
+1. **My-Chat IR-C01 adoption** of `nurture.parent-context-presenter@1.0.0`
+   (`sha256:3ac0906c…`) in T-039, and the W5-hardened settlement surface as
+   the base for the W1 callback implementation batch (both default-off).
+2. **Operator package** (user action): synthetic-user token, parent/teacher
+   closure alignment, Q3 live qualification prerequisite, dual-platform
+   devices — the remaining inputs before any G5-A scheduling decision.
+3. **G5-A Candidate Freeze** stays strictly serial and separately
+   authorized; W1 frozen design and profile v1.0.0 satisfy its design
+   preconditions. **Continue T-002 only from C31** after a G5-A Freeze.
    No result authorizes durable apply, activation, deployment or traffic.
 
 ## Notes (manual)

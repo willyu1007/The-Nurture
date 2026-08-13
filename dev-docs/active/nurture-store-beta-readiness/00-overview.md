@@ -6,13 +6,14 @@
 - Task: T-008
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-13
-- Next step: G5-0 已在单独授权（2026-08-13，见项目 changelog）下启动：
-  readiness inventory、drift ledger 与 carry-forward census 见
-  [`07-g5-0-readiness-inventory.md`](./07-g5-0-readiness-inventory.md)。
-  T-007 G4-F Exit 与 Beta Profile Handoff 已就绪（records 95/96）。G5-0 只做
-  profile 确认/终版化与 pre-candidate inventory，不分配 Candidate identity、
-  不实现 release-control runtime；G5-A Freeze 前必须先结论 T-011 W1
-  guardian-decision callback 联合设计。
+- Next step: G5-0 已完成（2026-08-13）：readiness inventory、drift
+  ledger 与 census 见
+  [`07-g5-0-readiness-inventory.md`](./07-g5-0-readiness-inventory.md)，
+  profile v1.0.0 已确认冻结（[`08-beta-profile-v1.md`](./08-beta-profile-v1.md)，
+  `CONFIRMED_G5_INPUT`，无必选集变更）。T-011 W1 已冻结、W2 已发布，
+  G5-A 的设计前置全部满足。G5-A Freeze 仍是严格串行门，需要单独授权，
+  且等待 operator 包（synthetic token、closure 对齐、Q3 live 前置、
+  真机）。不分配 Candidate identity、不实现 release-control runtime。
 
 ## Goal
 
@@ -87,6 +88,9 @@ D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建�
 
 ## Next Step
 
-维护 Beta Profile v0 的显式 drift ledger；T-005 G2 与 T-006 G3 exact handoff 已
-通过，继续等待 T-007 G4 Exit 后才可进入 G5-0 Readiness。T-007 未通过且 T-008
-未单独授权前不分配正式 Candidate identity，也不实现 release-control runtime。
+G5-0 已于 2026-08-13 完成：profile v1.0.0（`CONFIRMED_G5_INPUT`）取代 v0，
+inventory/census 收口于 `07-g5-0-readiness-inventory.md`。下一个门是
+G5-A Candidate Freeze——严格串行、需单独授权，且等待 operator 包
+（synthetic token、closure 对齐、Q3 live 前置、双平台真机）与 My-Chat
+IR-C01 对 W2 exact pin 的采纳进度。不提前分配 Candidate identity，
+不实现 release-control runtime。
