@@ -145,3 +145,4 @@ Project: `main`
 - 2026-08-13 task_id=T-010 event=maintenance-requalification result=pass fixture=authorization-clock-port typecheck=pass unit=1083 semantics=unchanged
 - 2026-08-13 task_id=T-011 event=quality-closure id=W2-P0 result=pass scope_draft=removed handoff=digest-pin-only typecheck=pass unit=1083 frontend_lint=pass exact_pin=pass my_chat=1f306cb x5_joint_api=561614f0 scenario_hash=976cd876 next=W3 activation=unchanged
 - 2026-08-13 task_id=T-008 event=readiness-reconcile id=G5-A-input result=closure-aligned w2_quality=pass double_track=none successor_candidate=not-required activation=unchanged
+- 2026-08-14 task_id=T-011 event=quality-closure id=W3-P0 result=pass exact_pin=nurture.parent-communication-owner@1.0.0:sha256:b1dce3a7 my_chat=30a14d0 validator=maintained-gate read_segments=teachers,class_group send_segments=teachers unit=1083 scenario_service=128 smoke=pass scenario_hash=2adf6bba live=blocked activation=unchanged

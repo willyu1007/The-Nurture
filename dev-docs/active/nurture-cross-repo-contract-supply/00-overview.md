@@ -14,7 +14,10 @@
   every operation re-resolves current owner authority. P0 media access always
   returns `content_unavailable` until the private stream ingress and My-Chat
   proxy exist; `class_group` can be read as explicitly unavailable and cannot
-  send. My-Chat T-039 has the exact-pin dormant consumer. Next, keep both flags
+  send. The final 2026-08-14 audit verified the same narrow write union in
+  My-Chat Mobile DTOs and Composer guards, promoted the contract validator into
+  the maintained formal-ingress gate, and resealed the consumer at My-Chat
+  `30a14d0`. My-Chat T-039 has the exact-pin dormant consumer. Next, keep both flags
   false and either implement the real Nurture owner/async ports for controlled
   W3 qualification or begin W4 director contract design. W1 is FROZEN
   (2026-08-13):

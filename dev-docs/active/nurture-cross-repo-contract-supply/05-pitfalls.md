@@ -77,3 +77,34 @@
   imports to `dist/index.js`; extend smoke to the new default-off owner route.
 - Prevention: package build acceptance must execute the compiled entry, not
   stop at TypeScript emit.
+
+## 2026-08-14 — Cross-repo closure was documented before the last Mobile DTO closed
+
+- Symptom: this task's earlier class-group pitfall said Mobile had been narrowed
+  to `teachers`, but the landed My-Chat model constructor and positive unit
+  fixture still accepted the shared read union. Runtime UI happened to block
+  the path, so ordinary behavior tests did not expose the semantic drift.
+- Root cause: provider-side schema/API closure was treated as proof of the final
+  consumer command type, and the task document was updated before a field-by-
+  field consumer census.
+- What was tried: keeping the prior record unchanged as sufficient historical
+  evidence was rejected because it would leave a false closed-loop claim.
+- Fix: My-Chat narrowed and runtime-guarded its Mobile DTO/constructor/Composer;
+  Nurture rechecked the exact pin and recorded this correction append-only.
+- Prevention: do not mark a cross-repo restriction resolved until provider
+  schema, provider parser, consumer source, public API/client and final UI
+  command constructor have all been compared independently.
+
+## 2026-08-14 — Published contract validator was not part of a maintained gate
+
+- Symptom: the W3 validator passed when invoked by its deep path, but no named
+  package command or formal ingress gate guaranteed it would run again.
+- Root cause: publication evidence and repeatable repository verification were
+  treated as separate concerns.
+- What was tried: invoking the `.mjs` with plain `node` after adding the script
+  failed because its canonicalizer imports TypeScript syntax unsupported by
+  Node 25 strip-only mode.
+- Fix: add a named `tsx` validator command and chain it into
+  `verify:formal-ingress-contract`; retain one canonical JSON implementation.
+- Prevention: every published owner artifact validator must be reachable from
+  a maintained top-level gate with its actual runtime declared.

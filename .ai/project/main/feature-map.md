@@ -406,10 +406,14 @@ Project: `main`
   fixtures × 2 attempts = 30 unique invocation ids. Pre-V2 evidence
   is invalid/non-current. `live_qualified=false` remains the activation gate;
   recorded/synthetic transport is never live evidence. G-09 is closed.
-  2026-08-13: T-008 G5-0 is complete. T-011 W1 is frozen and W2 is published;
-  My-Chat T-039 completed exact-pin P0 consumer adoption, so the W2 input is
-  ready for Candidate shared-input closure. T-011 continues the supply order with IR-C01
-  parent-communication gates and then the director presenter. Q3 live
+  2026-08-14: T-008 G5-0 is complete. T-011 W1 is frozen; W2 and W3 P0 are
+  published and exact-pin adopted by My-Chat T-039. W3 provides minimized
+  summary, explicit bounded detail and teacher-only same-command send at
+  `nurture.parent-communication-owner@1.0.0` / `sha256:b1dce3a7…`, remains
+  default-off and is live-blocked on real Nurture owner/async ports plus
+  deployed/native qualification. W2/W3 inputs are ready for Candidate
+  shared-input closure without activation. T-011 next chooses W3 controlled
+  live-port qualification or W4 director presenter supply. Q3 live
   qualification gates G5-D scoped internal-test enablement, not G5-A Freeze.
   Candidate Freeze, durable apply, deployment,
   activation and external traffic remain closed.

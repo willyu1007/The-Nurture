@@ -332,3 +332,25 @@
   are: implement real owner/async ports, implement and qualify the media stream
   plus proxy if promoted into P1, and run controlled deployed/native
   qualification before either flag changes.
+
+## 2026-08-14 — W3 P0 quality and governance closure
+
+- Promoted the standalone parent-communication artifact validator to
+  `pnpm verify:parent-communication-owner-contract` and made the maintained
+  `verify:formal-ingress-contract` command invoke it before the runtime/route
+  census. The validator now cannot silently drift as a manual-only deep-path
+  script.
+- The first promoted run exposed that direct `node` cannot execute the imported
+  TypeScript canonicalizer under Node 25 strip-only mode. The named command now
+  uses the repository's existing `tsx` runtime; no duplicate canonical JSON or
+  JavaScript fallback was added.
+- Cross-checked the exact owner key/version/digest, all four private paths,
+  summary/detail read union and teacher-only write union against My-Chat
+  `30a14d07d2bad6d7fbc2280ad1d46bece047632a`. My-Chat corrected its final
+  Mobile DTO/constructor/Composer drift; `class_group` remains read-only and
+  unavailable, not a second write track.
+- Resealed the maintained cross-repo pin without changing Base/My-Chat contract
+  parity, `x5_joint_api` or `wave4_binding_host` hashes. The Nurture scenario
+  hash changed only because `package.json` now contains the maintained
+  validator command. No database, deployment, activation or traffic action was
+  performed.

@@ -17,8 +17,12 @@ Validate the exact artifact, schemas, fixtures, minimization rules and command
 bindings with:
 
 ```sh
-pnpm exec tsx packages/nurture-scenario/contracts/parent-communication-owner/v1/validate-contract.mjs
+pnpm verify:parent-communication-owner-contract
 ```
+
+The broader `pnpm verify:formal-ingress-contract` gate invokes this validator
+first and then checks the mounted controller, runtime binding and route census;
+the artifact is therefore not an isolated manual-only proof.
 
 The publication does not authorize owner-port composition, capability
 activation, deployment or traffic.
