@@ -6,6 +6,7 @@ import {
   assembleReleaseEventV1,
   FamilyGrowthAssemblyError,
   type FamilyGrowthPreparedReleaseEmissionV1,
+  type FamilyGrowthResolvedLocalBindingHeadsV1,
 } from "@the-nurture/scenario/family-growth";
 import { appendFamilyGrowthOutboxEventWithin } from "./family-growth-outbox.transaction.js";
 import type {
@@ -97,6 +98,226 @@ const canonicalRef = (objectType: string, objectId: string) => ({
   object_id: objectId,
   version: 1,
 });
+
+type FamilyGrowthBindingHeadReader = Pick<Prisma.TransactionClient, "$queryRaw">;
+
+const parsePreparedInstant = (value: string | null): Date | null | undefined => {
+  if (value === null) return null;
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed : undefined;
+};
+
+export const familyGrowthPreparedHeadsMatchReleaseTarget = (
+  input: {
+    workspace_id: string;
+    family_growth?: Pick<FamilyGrowthPreparedReleaseEmissionV1, "localBindingHeads" | "target">;
+  },
+  target: { workspaceId: string; childCareProcessId: string; familyRefKey: string },
+): boolean => {
+  const prepared = input.family_growth;
+  if (!prepared) return true;
+  const heads = prepared.localBindingHeads;
+  const familyRefMatches =
+    target.familyRefKey === heads.localFamilyId
+    || target.familyRefKey === `${input.workspace_id}:${heads.localFamilyId}`;
+  return heads.workspaceId === input.workspace_id
+    && target.workspaceId === input.workspace_id
+    && heads.childCareProcessId === target.childCareProcessId
+    && familyRefMatches
+    && prepared.target.child_id === heads.canonicalTarget.child_id
+    && prepared.target.family_id === heads.canonicalTarget.family_id;
+};
+
+/**
+ * Revalidate every local head that justified the pre-transaction canonical
+ * target resolution. One SQL statement observes and SHARE-locks the binding,
+ * association, authorization, Guardian-role and Participant rows. A concurrent
+ * revocation/rebind therefore waits (or conflicts) at every PostgreSQL
+ * isolation level; the surrounding Serializable retry remains a second line
+ * of defense for predicate-changing inserts.
+ */
+export const familyGrowthPreparedBindingHeadsAreCurrent = async (
+  tx: FamilyGrowthBindingHeadReader,
+  heads: FamilyGrowthResolvedLocalBindingHeadsV1,
+  at: Date,
+): Promise<boolean> => {
+  const childExpiresAt = new Date(heads.childAuthorization.expiresAt);
+  const familyExpiresAt = new Date(heads.familyAuthorization.expiresAt);
+  const ownerEvidenceExpiresAt = new Date(heads.canonicalOwnerEvidenceExpiresAt);
+  const childRoleStartsAt = parsePreparedInstant(heads.childAuthorization.guardianRole.startsAt);
+  const childRoleEndsAt = parsePreparedInstant(heads.childAuthorization.guardianRole.endsAt);
+  const familyRoleStartsAt = parsePreparedInstant(heads.familyAuthorization.guardianRole.startsAt);
+  const familyRoleEndsAt = parsePreparedInstant(heads.familyAuthorization.guardianRole.endsAt);
+  if (
+    !Number.isFinite(childExpiresAt.getTime())
+    || !Number.isFinite(familyExpiresAt.getTime())
+    || !Number.isFinite(ownerEvidenceExpiresAt.getTime())
+    || childRoleStartsAt === undefined
+    || childRoleEndsAt === undefined
+    || familyRoleStartsAt === undefined
+    || familyRoleEndsAt === undefined
+    || heads.childAuthorization.purpose !== "scenario_binding_write"
+    || heads.familyAuthorization.purpose !== "scenario_binding_write"
+    || heads.childAuthorization.guardianRole.role !== "guardian"
+    || heads.familyAuthorization.guardianRole.role !== "guardian"
+    || heads.childAuthorization.guardianRole.status !== "active"
+    || heads.familyAuthorization.guardianRole.status !== "active"
+    || heads.childAuthorization.participant.status !== "active"
+    || heads.familyAuthorization.participant.status !== "active"
+    || childExpiresAt <= at
+    || familyExpiresAt <= at
+    || ownerEvidenceExpiresAt <= at
+  ) {
+    return false;
+  }
+
+  const rows = await tx.$queryRaw<Array<{ matched: number }>>(
+    Prisma.sql`
+      SELECT 1 AS matched
+      FROM "nurture_family_anchor_association" family_association
+      INNER JOIN "nurture_child_anchor_association" child_association
+        ON child_association."id" = family_association."child_association_id"
+        AND child_association."id" = family_association."current_child_association_id"
+        AND child_association."workspace_id" = family_association."workspace_id"
+        AND child_association."child_anchor_id" = family_association."child_anchor_id"
+        AND child_association."child_id" = family_association."child_id"
+      INNER JOIN "nurture_child_binding_anchor" child_anchor
+        ON child_anchor."id" = family_association."child_anchor_id"
+      INNER JOIN "nurture_family_binding_anchor" family_anchor
+        ON family_anchor."id" = family_association."family_anchor_id"
+      INNER JOIN LATERAL (
+        SELECT authorization."id", authorization."status",
+          authorization."expires_at", authorization."revoked_at",
+          authorization."aggregate_version", authorization."owner_ref",
+          authorization."owner_version", authorization."purpose",
+          authorization."authorization_source_ref",
+          authorization."authorization_source_version"
+        FROM "nurture_scenario_binding_authorization" authorization
+        WHERE authorization."workspace_id" = family_association."workspace_id"
+          AND authorization."subject_type" = 'child'
+          AND authorization."child_anchor_id" = child_anchor."id"
+        ORDER BY authorization."verified_at" DESC, authorization."id" DESC
+        LIMIT 1
+        FOR SHARE OF authorization
+      ) child_authorization ON TRUE
+      INNER JOIN LATERAL (
+        SELECT authorization."id", authorization."status",
+          authorization."expires_at", authorization."revoked_at",
+          authorization."aggregate_version", authorization."owner_ref",
+          authorization."owner_version", authorization."purpose",
+          authorization."authorization_source_ref",
+          authorization."authorization_source_version"
+        FROM "nurture_scenario_binding_authorization" authorization
+        WHERE authorization."workspace_id" = family_association."workspace_id"
+          AND authorization."subject_type" = 'family'
+          AND authorization."family_anchor_id" = family_anchor."id"
+        ORDER BY authorization."verified_at" DESC, authorization."id" DESC
+        LIMIT 1
+        FOR SHARE OF authorization
+      ) family_authorization ON TRUE
+      INNER JOIN "nurture_care_role_assignment" child_role
+        ON child_authorization."authorization_source_ref" = 'nurture-care-role:' || child_role."id"
+        AND child_role."workspace_id" = family_association."workspace_id"
+      INNER JOIN "nurture_participant" child_participant
+        ON child_participant."id" = child_role."participant_id"
+        AND child_participant."workspace_id" = child_role."workspace_id"
+      INNER JOIN "nurture_care_role_assignment" family_role
+        ON family_authorization."authorization_source_ref" = 'nurture-care-role:' || family_role."id"
+        AND family_role."workspace_id" = family_association."workspace_id"
+      INNER JOIN "nurture_participant" family_participant
+        ON family_participant."id" = family_role."participant_id"
+        AND family_participant."workspace_id" = family_role."workspace_id"
+      WHERE family_association."id" = ${heads.familyAssociation.associationId}
+        AND family_association."workspace_id" = ${heads.workspaceId}
+        AND family_association."child_care_process_id" = ${heads.childCareProcessId}
+        AND family_association."family_id" = ${heads.localFamilyId}
+        AND family_association."aggregate_version" = ${heads.familyAssociation.aggregateVersion}
+        AND family_association."status" = 'active'
+        AND family_association."current_key" = 'current'
+        AND family_association."revoked_at" IS NULL
+        AND family_association."quarantined_at" IS NULL
+        AND child_association."id" = ${heads.childAssociation.associationId}
+        AND child_association."aggregate_version" = ${heads.childAssociation.aggregateVersion}
+        AND child_association."status" = 'active'
+        AND child_association."current_key" = 'current'
+        AND child_association."revoked_at" IS NULL
+        AND child_association."quarantined_at" IS NULL
+        AND child_anchor."id" = ${heads.childAnchor.anchorId}
+        AND child_anchor."aggregate_version" = ${heads.childAnchor.aggregateVersion}
+        AND child_anchor."status" = 'associated'
+        AND child_anchor."revoked_at" IS NULL
+        AND child_anchor."quarantined_at" IS NULL
+        AND family_anchor."id" = ${heads.familyAnchor.anchorId}
+        AND family_anchor."aggregate_version" = ${heads.familyAnchor.aggregateVersion}
+        AND family_anchor."status" = 'associated'
+        AND family_anchor."revoked_at" IS NULL
+        AND family_anchor."quarantined_at" IS NULL
+        AND child_authorization."id" = ${heads.childAuthorization.authorizationId}
+        AND child_authorization."aggregate_version" = ${heads.childAuthorization.aggregateVersion}
+        AND child_authorization."status" = 'active'
+        AND child_authorization."revoked_at" IS NULL
+        AND child_authorization."expires_at" = ${childExpiresAt}
+        AND child_authorization."expires_at" > ${at}
+        AND child_authorization."owner_ref" = ${heads.childAuthorization.ownerRef}
+        AND child_authorization."owner_version" = ${heads.childAuthorization.ownerVersion}
+        AND child_authorization."owner_ref" = 'nurture_child_binding_anchor_v1:' || child_anchor."id"
+        AND child_authorization."owner_version" = child_anchor."aggregate_version"
+        AND child_authorization."purpose" = ${heads.childAuthorization.purpose}
+        AND child_authorization."purpose" = 'scenario_binding_write'
+        AND child_authorization."authorization_source_ref" = ${heads.childAuthorization.authorizationSourceRef}
+        AND child_authorization."authorization_source_version" = ${heads.childAuthorization.authorizationSourceVersion}
+        AND child_role."id" = ${heads.childAuthorization.guardianRole.roleAssignmentId}
+        AND child_role."participant_id" = ${heads.childAuthorization.guardianRole.participantId}
+        AND child_role."aggregate_version" = ${heads.childAuthorization.guardianRole.aggregateVersion}
+        AND child_role."aggregate_version" = child_authorization."authorization_source_version"
+        AND child_role."role" = 'guardian'
+        AND child_role."status" = 'active'
+        AND child_role."starts_at" IS NOT DISTINCT FROM ${childRoleStartsAt}
+        AND child_role."ends_at" IS NOT DISTINCT FROM ${childRoleEndsAt}
+        AND child_role."deleted_at" IS NULL
+        AND (child_role."starts_at" IS NULL OR child_role."starts_at" <= ${at})
+        AND (child_role."ends_at" IS NULL OR child_role."ends_at" > ${at})
+        AND child_participant."id" = ${heads.childAuthorization.participant.participantId}
+        AND child_participant."aggregate_version" = ${heads.childAuthorization.participant.aggregateVersion}
+        AND child_participant."status" = 'active'
+        AND child_participant."deleted_at" IS NULL
+        AND family_authorization."id" = ${heads.familyAuthorization.authorizationId}
+        AND family_authorization."aggregate_version" = ${heads.familyAuthorization.aggregateVersion}
+        AND family_authorization."status" = 'active'
+        AND family_authorization."revoked_at" IS NULL
+        AND family_authorization."expires_at" = ${familyExpiresAt}
+        AND family_authorization."expires_at" > ${at}
+        AND family_authorization."owner_ref" = ${heads.familyAuthorization.ownerRef}
+        AND family_authorization."owner_version" = ${heads.familyAuthorization.ownerVersion}
+        AND family_authorization."owner_ref" = 'nurture_family_binding_anchor_v1:' || family_anchor."id"
+        AND family_authorization."owner_version" = family_anchor."aggregate_version"
+        AND family_authorization."purpose" = ${heads.familyAuthorization.purpose}
+        AND family_authorization."purpose" = 'scenario_binding_write'
+        AND family_authorization."authorization_source_ref" = ${heads.familyAuthorization.authorizationSourceRef}
+        AND family_authorization."authorization_source_version" = ${heads.familyAuthorization.authorizationSourceVersion}
+        AND family_role."id" = ${heads.familyAuthorization.guardianRole.roleAssignmentId}
+        AND family_role."participant_id" = ${heads.familyAuthorization.guardianRole.participantId}
+        AND family_role."aggregate_version" = ${heads.familyAuthorization.guardianRole.aggregateVersion}
+        AND family_role."aggregate_version" = family_authorization."authorization_source_version"
+        AND family_role."role" = 'guardian'
+        AND family_role."status" = 'active'
+        AND family_role."starts_at" IS NOT DISTINCT FROM ${familyRoleStartsAt}
+        AND family_role."ends_at" IS NOT DISTINCT FROM ${familyRoleEndsAt}
+        AND family_role."deleted_at" IS NULL
+        AND (family_role."starts_at" IS NULL OR family_role."starts_at" <= ${at})
+        AND (family_role."ends_at" IS NULL OR family_role."ends_at" > ${at})
+        AND family_participant."id" = ${heads.familyAuthorization.participant.participantId}
+        AND family_participant."aggregate_version" = ${heads.familyAuthorization.participant.aggregateVersion}
+        AND family_participant."status" = 'active'
+        AND family_participant."deleted_at" IS NULL
+      LIMIT 2
+      FOR SHARE OF family_association, child_association,
+        child_anchor, family_anchor, child_role, child_participant,
+        family_role, family_participant
+    `,
+  );
+  return rows.length === 1;
+};
 
 /**
  * The release and post-release safety owner (G3-D).
@@ -596,6 +817,21 @@ export class PrismaPublicationReleasePort
             reason !== "purpose_not_allowed",
         );
         if (mediaBlock) return { status: "rejected", reason_code: mediaBlock };
+
+        if (input.family_growth) {
+          if (!familyGrowthPreparedHeadsMatchReleaseTarget(input, target)) {
+            return { status: "rejected", reason_code: "binding_target_mismatch" };
+          }
+          if (
+            !(await familyGrowthPreparedBindingHeadsAreCurrent(
+              tx,
+              input.family_growth.localBindingHeads,
+              at,
+            ))
+          ) {
+            return { status: "rejected", reason_code: "binding_unavailable" };
+          }
+        }
 
         if (process.state === "pending_release") {
           // Freeze before issuing any target effect. The CAS is part of this

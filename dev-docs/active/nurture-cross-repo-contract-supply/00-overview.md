@@ -18,9 +18,16 @@
   then the director presenter. W1 must conclude before any T-008 G5-A
   Candidate Freeze. W5 findings N2, N5, N6 and N8 plus their five review
   repairs are implemented; package typechecks, focused mocked suites, unit tests
-  and routing verification pass. The focused real-PostgreSQL T-009 run could
-  not connect to the configured local database and remains unclaimed. N1, N3,
-  N7, N9, N10 and N11 remain outside that scoped fix batch.
+  and routing verification pass. N1 and N3 are now implemented: release commit
+  binds the prepared tuple to the loaded target and revalidates/SHARE-locks the
+  exact association, anchor, authorization-provenance, Guardian-role and
+  Participant heads in one statement, and the provider outbox has a
+  preview-only transactional composite-FK migration, parsed static guard and
+  three-phase qualification vehicle. An approved loopback disposable run on
+  `t011_n3_disposable_20260813b` passed phase A replay from empty, phase B1
+  populated upgrade validation, and phase B2 FK-caused pass-by-abort; final
+  emptiness was proven and the disposable containers were destroyed. N7, N9,
+  N10 and N11 remain.
 
 ## Goal
 

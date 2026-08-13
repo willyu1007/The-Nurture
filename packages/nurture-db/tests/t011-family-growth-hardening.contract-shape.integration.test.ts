@@ -3,6 +3,10 @@ import { assembleReleaseEventV1 } from "@the-nurture/scenario/family-growth";
 import type { NurturePrismaClient } from "../src/client.js";
 import { PrismaFamilyGrowthBindingReadPort } from "../src/repositories/family-growth-binding.read.js";
 import {
+  familyGrowthPreparedBindingHeadsAreCurrent,
+  familyGrowthPreparedHeadsMatchReleaseTarget,
+} from "../src/repositories/publication-release.transaction.js";
+import {
   PrismaFamilyGrowthOutboxPort,
   type FamilyGrowthReceiptRecordInputV1,
 } from "../src/repositories/family-growth-outbox.transaction.js";
@@ -400,8 +404,9 @@ describe("T-011 N8 family-growth current binding read", () => {
       familyAnchorId,
       status: "active",
       currentKey: "current",
-      childAnchor: { id: childAnchorId, status: "associated" },
-      familyAnchor: { id: familyAnchorId, status: "associated" },
+      aggregateVersion: 4,
+      childAnchor: { id: childAnchorId, status: "associated", aggregateVersion: 1 },
+      familyAnchor: { id: familyAnchorId, status: "associated", aggregateVersion: 2 },
     };
     const touchedHistorical = {
       ...current,
@@ -427,14 +432,51 @@ describe("T-011 N8 family-growth current binding read", () => {
           childReads.push(args.where);
           return args.where.id === childAssociationId
             && args.where.currentKey === "current"
-            ? [{ status: "active", currentKey: "current" }]
-            : [{ status: "revoked", currentKey: null }];
+            ? [{
+                id: childAssociationId,
+                aggregateVersion: 3,
+                status: "active",
+                currentKey: "current",
+              }]
+            : [{
+                id: "child-association-historical",
+                aggregateVersion: 8,
+                status: "revoked",
+                currentKey: null,
+              }];
         },
       },
       nurtureScenarioBindingAuthorization: {
-        findFirst: async () => ({
+        findFirst: async (args: { where: { subjectType: "child" | "family" } }) => ({
+          id: "authorization-1",
+          aggregateVersion: 5,
           status: "active",
           expiresAt: new Date("2026-08-14T00:00:00.000Z"),
+          ownerRef: args.where.subjectType === "child"
+            ? `nurture_child_binding_anchor_v1:${childAnchorId}`
+            : `nurture_family_binding_anchor_v1:${familyAnchorId}`,
+          ownerVersion: args.where.subjectType === "child" ? 1 : 2,
+          purpose: "scenario_binding_write",
+          authorizationSourceRef: "nurture-care-role:guardian-role-1",
+          authorizationSourceVersion: 6,
+        }),
+      },
+      nurtureCareRoleAssignment: {
+        findFirst: async () => ({
+          id: "guardian-role-1",
+          participantId: "guardian-1",
+          aggregateVersion: 6,
+          status: "active",
+          role: "guardian",
+          startsAt: null,
+          endsAt: null,
+          deletedAt: null,
+          participant: {
+            id: "guardian-1",
+            aggregateVersion: 7,
+            status: "active",
+            deletedAt: null,
+          },
         }),
       },
     } as unknown as NurturePrismaClient;
@@ -444,11 +486,185 @@ describe("T-011 N8 family-growth current binding read", () => {
       childCareProcessId: "process-1",
     });
     expect(result?.localFamilyId).toBe("family-current");
-    expect(result?.childAssociation).toEqual({ status: "active", currentKey: "current" });
+    expect(result?.childAssociation).toEqual({
+      associationId: childAssociationId,
+      aggregateVersion: 3,
+      status: "active",
+      currentKey: "current",
+    });
     expect(familyReads[0]).toMatchObject({ currentKey: "current" });
     expect(childReads[0]).toMatchObject({
       id: childAssociationId,
       currentKey: "current",
     });
+  });
+});
+
+describe("T-011 N1 prepared binding-head commit guard", () => {
+  const heads = () => ({
+    canonicalTarget: { child_id: "mc-child-1", family_id: "mc-family-1" },
+    workspaceId: "ws-1",
+    localFamilyId: "family-1",
+    childCareProcessId: "process-1",
+    childAnchor: { anchorId: "child-anchor-1", aggregateVersion: 1 },
+    familyAnchor: { anchorId: "family-anchor-1", aggregateVersion: 2 },
+    childAssociation: { associationId: "child-association-1", aggregateVersion: 3 },
+    familyAssociation: { associationId: "family-association-1", aggregateVersion: 4 },
+    childAuthorization: {
+      authorizationId: "child-authorization-1",
+      aggregateVersion: 5,
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      ownerRef: "nurture_child_binding_anchor_v1:child-anchor-1",
+      ownerVersion: 1,
+      purpose: "scenario_binding_write",
+      authorizationSourceRef: "nurture-care-role:guardian-role-1",
+      authorizationSourceVersion: 7,
+      guardianRole: {
+        roleAssignmentId: "guardian-role-1",
+        participantId: "guardian-1",
+        aggregateVersion: 7,
+        status: "active",
+        role: "guardian",
+        startsAt: null,
+        endsAt: null,
+      },
+      participant: {
+        participantId: "guardian-1",
+        aggregateVersion: 8,
+        status: "active",
+      },
+    },
+    familyAuthorization: {
+      authorizationId: "family-authorization-1",
+      aggregateVersion: 6,
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      ownerRef: "nurture_family_binding_anchor_v1:family-anchor-1",
+      ownerVersion: 2,
+      purpose: "scenario_binding_write",
+      authorizationSourceRef: "nurture-care-role:guardian-role-1",
+      authorizationSourceVersion: 7,
+      guardianRole: {
+        roleAssignmentId: "guardian-role-1",
+        participantId: "guardian-1",
+        aggregateVersion: 7,
+        status: "active",
+        role: "guardian",
+        startsAt: null,
+        endsAt: null,
+      },
+      participant: {
+        participantId: "guardian-1",
+        aggregateVersion: 8,
+        status: "active",
+      },
+    },
+    canonicalOwnerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
+  });
+
+  it("uses one locking statement and accepts exactly one unchanged head tuple", async () => {
+    let reads = 0;
+    let sql = "";
+    const transaction = {
+      $queryRaw: async (statement: { strings: readonly string[] }) => {
+        reads += 1;
+        sql = statement.strings.join("?").replace(/\s+/gu, " ");
+        return [{ matched: 1 }];
+      },
+    };
+    expect(
+      await familyGrowthPreparedBindingHeadsAreCurrent(
+        transaction,
+        heads(),
+        new Date("2026-08-13T08:00:00.000Z"),
+      ),
+    ).toBe(true);
+    expect(reads).toBe(1);
+    expect(sql).toContain("FOR SHARE OF authorization");
+    expect(sql).toContain(
+      "FOR SHARE OF family_association, child_association, child_anchor, family_anchor, child_role, child_participant, family_role, family_participant",
+    );
+    expect(sql).toContain('child_authorization."authorization_source_ref"');
+    expect(sql).toContain('child_participant."aggregate_version"');
+  });
+
+  it("fails closed when revocation changes the prepared authorization head", async () => {
+    const transaction = { $queryRaw: async () => [] };
+    expect(
+      await familyGrowthPreparedBindingHeadsAreCurrent(
+        transaction,
+        heads(),
+        new Date("2026-08-13T08:00:00.000Z"),
+      ),
+    ).toBe(false);
+  });
+
+  it("fails closed when rebind changes the prepared association head", async () => {
+    const transaction = { $queryRaw: async () => [] };
+    expect(
+      await familyGrowthPreparedBindingHeadsAreCurrent(
+        transaction,
+        heads(),
+        new Date("2026-08-13T08:00:00.000Z"),
+      ),
+    ).toBe(false);
+  });
+
+  it("rejects valid heads cross-paired with another workspace/process/family target", () => {
+    const family_growth = {
+      target: { child_id: "mc-child-1", family_id: "mc-family-1" },
+      localBindingHeads: heads(),
+    };
+    expect(
+      familyGrowthPreparedHeadsMatchReleaseTarget(
+        { workspace_id: "ws-1", family_growth },
+        { workspaceId: "ws-1", childCareProcessId: "process-1", familyRefKey: "ws-1:family-1" },
+      ),
+    ).toBe(true);
+    expect(
+      familyGrowthPreparedHeadsMatchReleaseTarget(
+        { workspace_id: "ws-1", family_growth },
+        { workspaceId: "ws-1", childCareProcessId: "process-other", familyRefKey: "ws-1:family-1" },
+      ),
+    ).toBe(false);
+    expect(
+      familyGrowthPreparedHeadsMatchReleaseTarget(
+        { workspace_id: "ws-1", family_growth },
+        { workspaceId: "ws-1", childCareProcessId: "process-1", familyRefKey: "ws-1:family-other" },
+      ),
+    ).toBe(false);
+    expect(
+      familyGrowthPreparedHeadsMatchReleaseTarget(
+        {
+          workspace_id: "ws-1",
+          family_growth: {
+            ...family_growth,
+            target: { child_id: "mc-child-other", family_id: "mc-family-other" },
+          },
+        },
+        { workspaceId: "ws-1", childCareProcessId: "process-1", familyRefKey: "ws-1:family-1" },
+      ),
+    ).toBe(false);
+  });
+
+  it("rejects expired owner evidence without issuing a database read", async () => {
+    let reads = 0;
+    const transaction = {
+      $queryRaw: async () => {
+        reads += 1;
+        return [{ matched: 1 }];
+      },
+    };
+    const expired = {
+      ...heads(),
+      canonicalOwnerEvidenceExpiresAt: "2026-08-13T08:00:00.000Z",
+    };
+    expect(
+      await familyGrowthPreparedBindingHeadsAreCurrent(
+        transaction,
+        expired,
+        new Date("2026-08-13T08:00:00.000Z"),
+      ),
+    ).toBe(false);
+    expect(reads).toBe(0);
   });
 });

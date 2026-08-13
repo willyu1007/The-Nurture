@@ -572,6 +572,7 @@ const exchangeFor = (world: World): FamilyGrowthCanonicalExchangePort => ({
           status: "exchanged",
           childId: child.canonical.childId,
           familyId: child.canonical.familyId,
+          ownerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
         };
       }
     }

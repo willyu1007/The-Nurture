@@ -271,6 +271,23 @@ describe("G3-D release loop", () => {
     expect(followUp.requiresNewProcessForContentChange).toBe(true);
   });
 
+  it("never retries commit-bound integrity drift rejections", async () => {
+    for (const reasonCode of [
+      "binding_unavailable",
+      "binding_target_mismatch",
+      "publication_policy_drift",
+      "revision_conflict",
+    ]) {
+      const decision = await release(facts(), () => ({
+        status: "rejected",
+        reason_code: reasonCode,
+      })).run();
+      expect(decision.status).toBe("still_pending");
+      if (decision.status === "denied") continue;
+      expect(derivePartialReleaseFollowUp(decision).retryableTargets).toEqual([]);
+    }
+  });
+
   it("uses the same command identity for every target of one attempt", async () => {
     const { dependencies, run } = release(
       facts({ targets: [target({ target_key: "t-1" }), target({ target_key: "t-2" })] }),
@@ -647,6 +664,65 @@ describe("G3-D release formal-ingress entry", () => {
 describe("T-009 family-growth pre-commit preparation", () => {
   const emission = (): FamilyGrowthPreparedReleaseEmissionV1 => ({
     target: { child_id: "mc-child-1", family_id: "mc-family-1" },
+    localBindingHeads: {
+      canonicalTarget: { child_id: "mc-child-1", family_id: "mc-family-1" },
+      workspaceId: "workspace-1",
+      localFamilyId: "family-local-1",
+      childCareProcessId: "child-1",
+      childAnchor: { anchorId: "child-anchor-1", aggregateVersion: 1 },
+      familyAnchor: { anchorId: "family-anchor-1", aggregateVersion: 1 },
+      childAssociation: { associationId: "child-association-1", aggregateVersion: 1 },
+      familyAssociation: { associationId: "family-association-1", aggregateVersion: 1 },
+      childAuthorization: {
+        authorizationId: "child-authorization-1",
+        aggregateVersion: 1,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        ownerRef: "nurture_child_binding_anchor_v1:child-anchor-1",
+        ownerVersion: 1,
+        purpose: "scenario_binding_write",
+        authorizationSourceRef: "nurture-care-role:guardian-role-1",
+        authorizationSourceVersion: 1,
+        guardianRole: {
+          roleAssignmentId: "guardian-role-1",
+          participantId: "guardian-1",
+          aggregateVersion: 1,
+          status: "active",
+          role: "guardian",
+          startsAt: null,
+          endsAt: null,
+        },
+        participant: {
+          participantId: "guardian-1",
+          aggregateVersion: 1,
+          status: "active",
+        },
+      },
+      familyAuthorization: {
+        authorizationId: "family-authorization-1",
+        aggregateVersion: 1,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        ownerRef: "nurture_family_binding_anchor_v1:family-anchor-1",
+        ownerVersion: 1,
+        purpose: "scenario_binding_write",
+        authorizationSourceRef: "nurture-care-role:guardian-role-1",
+        authorizationSourceVersion: 1,
+        guardianRole: {
+          roleAssignmentId: "guardian-role-1",
+          participantId: "guardian-1",
+          aggregateVersion: 1,
+          status: "active",
+          role: "guardian",
+          startsAt: null,
+          endsAt: null,
+        },
+        participant: {
+          participantId: "guardian-1",
+          aggregateVersion: 1,
+          status: "active",
+        },
+      },
+      canonicalOwnerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
+    },
     admission: { mode: "direct_family_release", policy_ref: "pol-1", policy_version: 1 },
     material: {
       occurredAt: "2026-08-01T09:00:00.000Z",

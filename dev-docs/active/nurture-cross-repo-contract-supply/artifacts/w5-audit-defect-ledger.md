@@ -8,28 +8,36 @@ records are not rewritten; fixes are forward-only.
 
 ## P1
 
-- [ ] N1 Release-commit staleness: binding and canonical target resolved
+- [x] N1 Release-commit staleness: binding and canonical target resolved
   before the release transaction; no in-transaction reread of local
   association/authorization heads. Files:
   `packages/nurture-scenario/src/harness/publication-release.ts:640`,
   `packages/nurture-db/src/repositories/family-growth-binding.read.ts:41`,
   `packages/nurture-scenario/src/domain/family-growth/emission.ts:20`,
   `packages/nurture-db/src/repositories/publication-release.transaction.ts:627`.
-  Fix: carry heads/expiry in the prepared emission; reread inside the
-  serializable transaction; reject on drift; revoke-between-prepare-and-
-  commit tests.
+  Fix: carry the complete target/anchor/association/authorization provenance
+  and Guardian/Participant heads plus mapping expiry; bind them to the loaded
+  target; reread and `FOR SHARE` lock every source row inside the serializable
+  transaction; classify drift as terminal; cover cross-pairing and a
+  two-connection revoke-after-lock race.
 - [x] N2 Stale delivery worker can overwrite newer outbox outcomes: no
   CAS on `attemptCount`. Files:
   `packages/nurture-db/src/repositories/family-growth-outbox.transaction.ts:29,137,180`,
   `apps/scenario-service/src/family-growth-delivery.worker.ts:118`.
   Fix: lease-version CAS (`WHERE state='delivering' AND attempt_count=?`);
   stale completion is a no-op; test stale-success and stale-failure.
-- [ ] N3 Provider-outbox FKs lack tenant/lineage scope: no
+- [x] N3 Provider-outbox FKs lack tenant/lineage scope: no
   `workspace_id` in FKs; visibility event not bound to the outbox row's
   release. Files: `prisma/schema.prisma:4061,4088`,
   `prisma/migrations/20260807080000_t009_family_growth_provider_outbox/migration.sql:74`.
   Fix: composite target uniques/FKs (workspace_id-scoped); additive
-  migration + disposable qualification; cross-workspace insert tests.
+  migration + disposable qualification; cross-workspace insert tests. The
+  qualification vehicle now covers empty replay, populated previous-head
+  upgrade and a separate expected fail-closed abort, with an exact-URL digest
+  plus literal-database-name approval. Loopback/private-address checks are
+  defense-in-depth only. The approved `t011_n3_disposable_20260813b` run passed
+  A/B1/B2 with final emptiness before the containers were destroyed; no durable
+  apply is authorized.
 - [x] N5 Receipts not bound to all claimed coordinates:
   `source_scenario_key` / `source_release_ref` / `family_id` unchecked at
   settlement. Files:

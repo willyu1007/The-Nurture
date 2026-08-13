@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   releasePayloadDigestV1,
@@ -27,6 +27,8 @@ afterAll(async () => {
 });
 
 const DIGEST = "c".repeat(64);
+const hash = (value: string): string => createHash("sha256").update(value).digest("hex");
+const BINDING_EXPIRY = new Date("2099-01-01T00:00:00.000Z");
 
 const SCHEDULE = {
   scheduledAt: new Date("2026-08-03T09:00:00.000Z"),
@@ -95,6 +97,17 @@ const seedWorld = async () => {
       status: "active",
     },
   });
+  const guardianRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId,
+      participantId: guardian!.id,
+      role: "guardian",
+      scopeType: "family",
+      scopeId: family.id,
+      status: "active",
+      aggregateVersion: 1,
+    },
+  });
   const enrollment = await prisma.nurtureEnrollment.create({
     data: {
       workspaceId,
@@ -155,11 +168,147 @@ const seedWorld = async () => {
       grantId: grant.id,
     },
   });
-  return { workspaceId, teacher: teacher!, teacherRole, process, revision, target };
+  const childAnchor = await prisma.nurtureChildBindingAnchor.create({
+    data: { reservationKeyHash: hash(`child:${workspaceId}`), status: "associated" },
+  });
+  const familyAnchor = await prisma.nurtureFamilyBindingAnchor.create({
+    data: { reservationKeyHash: hash(`family:${workspaceId}`), status: "associated" },
+  });
+  const childAssociation = await prisma.nurtureChildAnchorAssociation.create({
+    data: {
+      workspaceId,
+      childAnchorId: childAnchor.id,
+      childId: child.id,
+      status: "active",
+      currentKey: "current",
+    },
+  });
+  const familyAssociation = await prisma.nurtureFamilyAnchorAssociation.create({
+    data: {
+      workspaceId,
+      familyAnchorId: familyAnchor.id,
+      childAnchorId: childAnchor.id,
+      childAssociationId: childAssociation.id,
+      currentChildAssociationId: childAssociation.id,
+      childId: child.id,
+      childCareProcessId: careProcess.id,
+      familyId: family.id,
+      status: "active",
+      currentKey: "current",
+    },
+  });
+  const authorization = (subjectType: "child" | "family", anchorId: string) =>
+    prisma.nurtureScenarioBindingAuthorization.create({
+      data: {
+        workspaceId,
+        subjectType,
+        ...(subjectType === "child" ? { childAnchorId: anchorId } : { familyAnchorId: anchorId }),
+        ownerRef: `nurture_${subjectType}_binding_anchor_v1:${anchorId}`,
+        ownerVersion: 1,
+        idempotencyKeyHash: hash(`auth:${subjectType}:${workspaceId}`),
+        requestFingerprint: hash(`fp:${subjectType}:${workspaceId}`),
+        subjectEvidenceHash: hash("subject"),
+        userEvidenceHash: hash("user"),
+        actorEvidenceHash: hash("actor"),
+        purpose: "scenario_binding_write",
+        authorizationSourceRef: `nurture-care-role:${guardianRole.id}`,
+        authorizationSourceVersion: guardianRole.aggregateVersion,
+        status: "active",
+        verifiedAt: new Date("2026-08-05T08:00:00.000Z"),
+        expiresAt: BINDING_EXPIRY,
+      },
+    });
+  const [childAuthorization, familyAuthorization] = await Promise.all([
+    authorization("child", childAnchor.id),
+    authorization("family", familyAnchor.id),
+  ]);
+  const localBindingHeads = {
+    canonicalTarget: { child_id: "mc-child-1", family_id: "mc-family-1" },
+    workspaceId,
+    localFamilyId: family.id,
+    childCareProcessId: careProcess.id,
+    childAnchor: {
+      anchorId: childAnchor.id,
+      aggregateVersion: childAnchor.aggregateVersion,
+    },
+    familyAnchor: {
+      anchorId: familyAnchor.id,
+      aggregateVersion: familyAnchor.aggregateVersion,
+    },
+    childAssociation: {
+      associationId: childAssociation.id,
+      aggregateVersion: childAssociation.aggregateVersion,
+    },
+    familyAssociation: {
+      associationId: familyAssociation.id,
+      aggregateVersion: familyAssociation.aggregateVersion,
+    },
+    childAuthorization: {
+      authorizationId: childAuthorization.id,
+      aggregateVersion: childAuthorization.aggregateVersion,
+      expiresAt: BINDING_EXPIRY.toISOString(),
+      ownerRef: childAuthorization.ownerRef,
+      ownerVersion: childAuthorization.ownerVersion,
+      purpose: childAuthorization.purpose,
+      authorizationSourceRef: childAuthorization.authorizationSourceRef,
+      authorizationSourceVersion: childAuthorization.authorizationSourceVersion,
+      guardianRole: {
+        roleAssignmentId: guardianRole.id,
+        participantId: guardianRole.participantId,
+        aggregateVersion: guardianRole.aggregateVersion,
+        status: guardianRole.status,
+        role: guardianRole.role,
+        startsAt: null,
+        endsAt: null,
+      },
+      participant: {
+        participantId: guardian!.id,
+        aggregateVersion: guardian!.aggregateVersion,
+        status: guardian!.status,
+      },
+    },
+    familyAuthorization: {
+      authorizationId: familyAuthorization.id,
+      aggregateVersion: familyAuthorization.aggregateVersion,
+      expiresAt: BINDING_EXPIRY.toISOString(),
+      ownerRef: familyAuthorization.ownerRef,
+      ownerVersion: familyAuthorization.ownerVersion,
+      purpose: familyAuthorization.purpose,
+      authorizationSourceRef: familyAuthorization.authorizationSourceRef,
+      authorizationSourceVersion: familyAuthorization.authorizationSourceVersion,
+      guardianRole: {
+        roleAssignmentId: guardianRole.id,
+        participantId: guardianRole.participantId,
+        aggregateVersion: guardianRole.aggregateVersion,
+        status: guardianRole.status,
+        role: guardianRole.role,
+        startsAt: null,
+        endsAt: null,
+      },
+      participant: {
+        participantId: guardian!.id,
+        aggregateVersion: guardian!.aggregateVersion,
+        status: guardian!.status,
+      },
+    },
+    canonicalOwnerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
+  };
+  return {
+    workspaceId,
+    teacher: teacher!,
+    teacherRole,
+    process,
+    revision,
+    target,
+    localBindingHeads,
+  };
 };
 
-const preparedEmission = (): FamilyGrowthPreparedReleaseEmissionV1 => ({
+const preparedEmission = (
+  world: Awaited<ReturnType<typeof seedWorld>>,
+): FamilyGrowthPreparedReleaseEmissionV1 => ({
   target: { child_id: "mc-child-1", family_id: "mc-family-1" },
+  localBindingHeads: world.localBindingHeads,
   admission: { mode: "direct_family_release", policy_ref: "pol-1", policy_version: 1 },
   material: {
     occurredAt: "2026-08-07T03:30:00.000Z",
@@ -207,7 +356,7 @@ const commit = (
 describe("T-009 I3: release commit emits the family-growth outbox event", () => {
   it("lands release, receipt and outbox event as one transaction", async () => {
     const world = await seedWorld();
-    const result = await commit(world, { familyGrowth: preparedEmission() });
+    const result = await commit(world, { familyGrowth: preparedEmission(world) });
     expect(result.status).toBe("committed");
     if (result.status !== "committed") return;
 
@@ -244,8 +393,14 @@ describe("T-009 I3: release commit emits the family-growth outbox event", () => 
   it("an exact replay returns the original refs and appends no second event", async () => {
     const world = await seedWorld();
     const commandRequestId = `cmd:${randomUUID()}`;
-    const first = await commit(world, { commandRequestId, familyGrowth: preparedEmission() });
-    const replay = await commit(world, { commandRequestId, familyGrowth: preparedEmission() });
+    const first = await commit(world, {
+      commandRequestId,
+      familyGrowth: preparedEmission(world),
+    });
+    const replay = await commit(world, {
+      commandRequestId,
+      familyGrowth: preparedEmission(world),
+    });
     expect(first).toEqual(replay);
     expect(
       await prisma.nurtureFamilyGrowthOutboxEvent.count({
@@ -256,7 +411,7 @@ describe("T-009 I3: release commit emits the family-growth outbox event", () => 
 
   it("rejects an invalid prepared emission write-free, freeze included", async () => {
     const world = await seedWorld();
-    const invalid = preparedEmission();
+    const invalid = preparedEmission(world);
     invalid.contentDigest = "not-a-digest";
     const result = await commit(world, { familyGrowth: invalid });
     expect(result).toEqual({
@@ -299,7 +454,7 @@ describe("T-009 I3: release commit emits the family-growth outbox event", () => 
 describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
   it("shows the receipt-backed state per target and stays silent without evidence", async () => {
     const world = await seedWorld();
-    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    const committed = await commit(world, { familyGrowth: preparedEmission(world) });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
 
@@ -403,7 +558,7 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
 
   it("I8: overlays committed lifecycle events with precedence, moving the head each time", async () => {
     const world = await seedWorld();
-    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    const committed = await commit(world, { familyGrowth: preparedEmission(world) });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
     // One visibility event per (release, command, kind) is a domain unique —
@@ -487,7 +642,7 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
       command_request_id: `cmd:${randomUUID()}`,
       trigger: "immediate",
       family_growth: {
-        ...preparedEmission(),
+        ...preparedEmission(world),
         target: { child_id: "mc-child-2", family_id: "mc-family-2" },
       },
     });
@@ -604,7 +759,7 @@ describe("T-009 I3: lifecycle finalize emits paired outbox events", () => {
 
   it("emits the lifecycle envelope for a delivered release, target copied from storage", async () => {
     const world = await seedWorld();
-    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    const committed = await commit(world, { familyGrowth: preparedEmission(world) });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
     const executionId = await seedExecution(world);
@@ -658,7 +813,7 @@ describe("T-009 I3: lifecycle finalize emits paired outbox events", () => {
 
   it("a correction without display-safe text on a delivered release fails the pair closed", async () => {
     const world = await seedWorld();
-    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    const committed = await commit(world, { familyGrowth: preparedEmission(world) });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
     const executionId = await seedExecution(world);
@@ -681,7 +836,7 @@ describe("T-009 I3: lifecycle finalize emits paired outbox events", () => {
 
   it("redaction emits without a correction body", async () => {
     const world = await seedWorld();
-    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    const committed = await commit(world, { familyGrowth: preparedEmission(world) });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
     const executionId = await seedExecution(world);

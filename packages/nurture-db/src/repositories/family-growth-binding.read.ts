@@ -29,9 +29,77 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
         ...(subjectType === "child" ? { childAnchorId: anchorId } : { familyAnchorId: anchorId }),
       },
       orderBy: [{ verifiedAt: "desc" }, { id: "desc" }],
-      select: { status: true, expiresAt: true },
+      select: {
+        id: true,
+        status: true,
+        expiresAt: true,
+        aggregateVersion: true,
+        ownerRef: true,
+        ownerVersion: true,
+        purpose: true,
+        authorizationSourceRef: true,
+        authorizationSourceVersion: true,
+      },
     });
-    return row ? { status: row.status, expiresAt: row.expiresAt } : null;
+    if (!row) return null;
+    const sourcePrefix = "nurture-care-role:";
+    const roleAssignmentId = row.authorizationSourceRef.startsWith(sourcePrefix)
+      ? row.authorizationSourceRef.slice(sourcePrefix.length)
+      : null;
+    const role = roleAssignmentId
+      ? await this.prisma.nurtureCareRoleAssignment.findFirst({
+          where: { id: roleAssignmentId, workspaceId },
+          select: {
+            id: true,
+            participantId: true,
+            aggregateVersion: true,
+            status: true,
+            role: true,
+            startsAt: true,
+            endsAt: true,
+            deletedAt: true,
+            participant: {
+              select: {
+                id: true,
+                aggregateVersion: true,
+                status: true,
+                deletedAt: true,
+              },
+            },
+          },
+        })
+      : null;
+    return {
+      authorizationId: row.id,
+      aggregateVersion: row.aggregateVersion,
+      status: row.status,
+      ownerRef: row.ownerRef,
+      ownerVersion: row.ownerVersion,
+      purpose: row.purpose,
+      authorizationSourceRef: row.authorizationSourceRef,
+      authorizationSourceVersion: row.authorizationSourceVersion,
+      expiresAt: row.expiresAt,
+      guardianRole: role
+        ? {
+            roleAssignmentId: role.id,
+            participantId: role.participantId,
+            aggregateVersion: role.aggregateVersion,
+            status: role.status,
+            role: role.role,
+            startsAt: role.startsAt,
+            endsAt: role.endsAt,
+            deletedAt: role.deletedAt,
+          }
+        : null,
+      participant: role
+        ? {
+            participantId: role.participant.id,
+            aggregateVersion: role.participant.aggregateVersion,
+            status: role.participant.status,
+            deletedAt: role.participant.deletedAt,
+          }
+        : null,
+    };
   }
 
   async loadCurrentBinding(input: {
@@ -57,7 +125,7 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
         currentKey: "current",
       },
       take: 2,
-      select: { status: true, currentKey: true },
+      select: { id: true, aggregateVersion: true, status: true, currentKey: true },
     });
     if (childAssociations.length !== 1) return null;
     const childAssociation = childAssociations[0]!;
@@ -73,19 +141,25 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
       childCareProcessId: association.childCareProcessId,
       childAnchor: {
         anchorId: association.childAnchor.id,
+        aggregateVersion: association.childAnchor.aggregateVersion,
         status: association.childAnchor.status,
         ownerRef: formatNurtureBindingOwnerRef("child", association.childAnchor.id),
       },
       familyAnchor: {
         anchorId: association.familyAnchor.id,
+        aggregateVersion: association.familyAnchor.aggregateVersion,
         status: association.familyAnchor.status,
         ownerRef: formatNurtureBindingOwnerRef("family", association.familyAnchor.id),
       },
       childAssociation: {
+        associationId: childAssociation.id,
+        aggregateVersion: childAssociation.aggregateVersion,
         status: childAssociation.status,
         currentKey: childAssociation.currentKey,
       },
       familyAssociation: {
+        associationId: association.id,
+        aggregateVersion: association.aggregateVersion,
         status: association.status,
         currentKey: association.currentKey,
       },

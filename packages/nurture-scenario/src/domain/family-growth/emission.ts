@@ -6,7 +6,10 @@ import type {
   FamilyGrowthMediaItemV1,
   FamilyGrowthRetentionModeV1,
 } from "./envelope.js";
-import type { FamilyGrowthTargetDenyReasonV1 } from "./target-resolution.js";
+import type {
+  FamilyGrowthResolvedLocalBindingHeadsV1,
+  FamilyGrowthTargetDenyReasonV1,
+} from "./target-resolution.js";
 
 /**
  * T-009 I3 (non-wire half): the prepared per-target emission contract.
@@ -20,6 +23,18 @@ import type { FamilyGrowthTargetDenyReasonV1 } from "./target-resolution.js";
 export type FamilyGrowthPreparedReleaseEmissionV1 = {
   /** Canonical pair from the fail-closed I4 resolution. */
   target: FamilyGrowthCanonicalTargetV1;
+  /**
+   * Commit-bound authority facts: exact workspace/process/family association
+   * heads, anchor heads, stored authorization identity/provenance, the current
+   * Guardian-role and Participant heads behind that provenance, and the
+   * required canonical-owner mapping expiry. The release transaction rereads
+   * and locks these local rows because any prepare-to-commit drift can revoke
+   * the identity/authority basis for the canonical target. Canonical IDs stay
+   * out of local persistence and the transaction performs no owner-network
+   * call; the short-lived mapping is commit-bound by the canonical target
+   * copied into these heads and by its expiry.
+   */
+  localBindingHeads: FamilyGrowthResolvedLocalBindingHeadsV1;
   admission: FamilyGrowthAdmissionV1;
   material: {
     occurredAt: string;

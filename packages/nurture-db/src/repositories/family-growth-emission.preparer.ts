@@ -171,6 +171,7 @@ export class PrismaFamilyGrowthEmissionPreparer
       status: "prepared",
       emission: {
         target: resolution.target,
+        localBindingHeads: resolution.evidence,
         admission: {
           mode: "direct_family_release",
           policy_ref: process.schedulePolicyRef,

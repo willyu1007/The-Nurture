@@ -731,11 +731,25 @@ export type PartialReleaseFollowUpV1 = {
   requiresNewProcessForContentChange: boolean;
 };
 
+const TERMINAL_INTEGRITY_DRIFT_REJECTIONS = new Set([
+  "binding_unavailable",
+  "binding_target_mismatch",
+  "publication_policy_drift",
+  "revision_conflict",
+  "family_growth_emission_invalid",
+  "command_identity_conflict",
+  "receipt_evidence_unavailable",
+]);
+
 export const derivePartialReleaseFollowUp = (
   decision: Extract<ReleaseDecisionV1, { status: "released" | "still_pending" }>,
 ): PartialReleaseFollowUpV1 => ({
   retryableTargets: decision.results
-    .filter((result) => result.outcome === "rejected")
+    .filter(
+      (result) =>
+        result.outcome === "rejected"
+        && !TERMINAL_INTEGRITY_DRIFT_REJECTIONS.has(result.reasonCode ?? ""),
+    )
     .map((result) => result.targetRef),
   reconcileTargets: decision.results
     .filter((result) => result.outcome === "outcome_unknown")

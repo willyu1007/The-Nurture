@@ -1,5 +1,54 @@
 # Implementation notes
 
+## 2026-08-13 — W5 N1/N3 hardening
+
+- N1: prepared family-growth emissions now carry the exact workspace/local
+  pair, child/family anchor IDs and aggregate versions, child/family
+  association IDs and aggregate versions, the selected authorization IDs,
+  aggregate versions, owner refs/versions, purpose, authorization-source refs/
+  versions and expiries, current Guardian-role/Participant heads, the required
+  canonical-owner evidence expiry, and the exact canonical child/family target
+  returned by that exchange. The Serializable release transaction binds both
+  the local tuple and canonical tuple to its loaded target and checks the whole
+  chain with one `SELECT ... FOR SHARE` statement before its first retained
+  write. Revocation/rebind updates must wait or conflict after lock acquisition;
+  head/currentness/authority/expiry drift returns terminal
+  `binding_unavailable`, while cross-pairing returns the distinct terminal
+  `binding_target_mismatch`. Real-PostgreSQL lane cases at Read Committed,
+  Repeatable Read and Serializable open the guard transaction and attempt
+  revocation from a second connection mid-flight;
+  the focused no-database suite pins the exact locking SQL shape.
+- N3: Prisma now expresses composite release, release/visibility lineage and
+  receipt/outbox relations. Migration
+  `20260813120000_t011_family_growth_outbox_scope` adds four supporting uniques
+  and three strictly stronger composite FKs while retaining all original FKs;
+  it contains no drop or data mutation/backfill.
+- Added the N3 schema-diff preview and migration plan, parsed static invariant
+  guard, and a guarded three-phase qualification runner. Phase A replays from
+  empty and runs the existing controls/probes. Phase B1 migrates to the
+  previous head, seeds CHECK-valid coherent legacy rows, applies only T-011 and
+  verifies populated validation. Phase B2 executes the exact failing FK in a
+  rollback-only transaction, requires SQLSTATE `23503`, then records PASS only
+  when the transactional migration aborts and leaves no T-011 object. The
+  runner accepts only a loopback `t011_n3_*` URL, requires approval to repeat
+  the literal database name and bind the SHA-256 of the exact URL, and censuses
+  relations, sequences, routines, domains, enums and non-default extensions.
+  Loopback/private-server assertions are defense-in-depth only and cannot prove
+  local Docker ownership. Prisma CLI reasserts identity with the exact
+  migration URL immediately before every deploy.
+- The approved loopback disposable qualification executed against
+  `t011_n3_disposable_20260813b`: phase A replayed all migrations from empty,
+  phase B1 validated the populated previous-head upgrade, phase B2 passed by
+  FK-caused abort with rollback proof, final emptiness passed, and the
+  disposable containers were destroyed.
+- Qualification release fixtures now derive digest/lifecycle values from the
+  existing CHECK constraints. In particular `command_request_id_hash`, revision
+  content identity and routing identity are 64-hex digests, replacing the
+  invalid `qualification:<uuid>` placeholder that failed a real disposable run.
+- Regenerated the Prisma client offline and refreshed/strictly verified the DB
+  context contract. Default-off runtime posture and workflow pins are
+  unchanged.
+
 ## 2026-08-13 — W5 scoped hardening (N2/N5/N6/N8)
 
 - N2: `attemptCount` is now the delivery lease version. Receipt and transport

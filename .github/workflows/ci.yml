@@ -264,6 +264,7 @@ jobs:
           pnpm verify:workflow-contract-pin
           pnpm typecheck
           pnpm verify:test-routing
+          pnpm verify:family-growth-outbox-invariants
           pnpm verify:persistence-boundaries
 
       - name: Run unit population

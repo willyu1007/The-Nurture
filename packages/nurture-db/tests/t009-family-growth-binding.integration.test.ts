@@ -42,6 +42,24 @@ const seedBinding = async (options: SeedOptions = {}) => {
       status: "active",
     },
   });
+  const guardian = await prisma.nurtureParticipant.create({
+    data: {
+      workspaceId,
+      myChatUserId: `guardian:${workspaceId}`,
+      status: "active",
+    },
+  });
+  const guardianRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId,
+      participantId: guardian.id,
+      role: "guardian",
+      scopeType: "family",
+      scopeId: family.id,
+      status: "active",
+      aggregateVersion: 1,
+    },
+  });
   const anchorLifecycle = (status: string) => ({
     status: status as never,
     ...(status === "revoked" ? { revokedAt: NOW } : {}),
@@ -71,7 +89,7 @@ const seedBinding = async (options: SeedOptions = {}) => {
     },
   });
   const familyAssociationCurrent = (options.familyAssociation ?? "current") === "current";
-  await prisma.nurtureFamilyAnchorAssociation.create({
+  const familyAssociation = await prisma.nurtureFamilyAnchorAssociation.create({
     data: {
       workspaceId,
       familyAnchorId: familyAnchor.id,
@@ -97,8 +115,8 @@ const seedBinding = async (options: SeedOptions = {}) => {
     anchorId: string,
     kind: "active" | "expired" | "revoked" | "missing",
   ) => {
-    if (kind === "missing") return;
-    await prisma.nurtureScenarioBindingAuthorization.create({
+    if (kind === "missing") return undefined;
+    return prisma.nurtureScenarioBindingAuthorization.create({
       data: {
         workspaceId,
         subjectType,
@@ -111,8 +129,8 @@ const seedBinding = async (options: SeedOptions = {}) => {
         userEvidenceHash: hash("user"),
         actorEvidenceHash: hash("actor"),
         purpose: "scenario_binding_write",
-        authorizationSourceRef: "my_chat_child_identity",
-        authorizationSourceVersion: 1,
+        authorizationSourceRef: `nurture-care-role:${guardianRole.id}`,
+        authorizationSourceVersion: guardianRole.aggregateVersion,
         status: kind === "revoked" ? "revoked" : "active",
         verifiedAt: new Date("2026-08-05T08:00:00.000Z"),
         expiresAt: kind === "expired" ? PAST : FUTURE,
@@ -120,10 +138,30 @@ const seedBinding = async (options: SeedOptions = {}) => {
       },
     });
   };
-  await authorization("child", childAnchor.id, options.childAuthorization ?? "active");
-  await authorization("family", familyAnchor.id, options.familyAuthorization ?? "active");
+  const childAuthorization = await authorization(
+    "child",
+    childAnchor.id,
+    options.childAuthorization ?? "active",
+  );
+  const familyAuthorization = await authorization(
+    "family",
+    familyAnchor.id,
+    options.familyAuthorization ?? "active",
+  );
 
-  return { workspaceId, careProcess, family, childAnchor, familyAnchor };
+  return {
+    workspaceId,
+    careProcess,
+    family,
+    childAnchor,
+    familyAnchor,
+    childAssociation,
+    familyAssociation,
+    childAuthorization,
+    familyAuthorization,
+    guardian,
+    guardianRole,
+  };
 };
 
 const exchangeOk: FamilyGrowthCanonicalExchangePort = {
@@ -131,6 +169,7 @@ const exchangeOk: FamilyGrowthCanonicalExchangePort = {
     status: "exchanged",
     childId: "mc-child-1",
     familyId: "mc-family-1",
+    ownerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
   }),
 };
 
@@ -161,15 +200,87 @@ describe("T-009 I4: canonical target resolution over real binding rows", () => {
       exchange: async (input) => {
         seenChildRef = input.childOwnerRef;
         seenFamilyRef = input.familyOwnerRef;
-        return { status: "exchanged", childId: "mc-child-1", familyId: "mc-family-1" };
+        return {
+          status: "exchanged",
+          childId: "mc-child-1",
+          familyId: "mc-family-1",
+          ownerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
+        };
       },
     });
     expect(result).toEqual({
       status: "resolved",
       target: { child_id: "mc-child-1", family_id: "mc-family-1" },
       evidence: {
-        childAnchorId: world.childAnchor.id,
-        familyAnchorId: world.familyAnchor.id,
+        canonicalTarget: { child_id: "mc-child-1", family_id: "mc-family-1" },
+        workspaceId: world.workspaceId,
+        localFamilyId: world.family.id,
+        childCareProcessId: world.careProcess.id,
+        childAnchor: {
+          anchorId: world.childAnchor.id,
+          aggregateVersion: world.childAnchor.aggregateVersion,
+        },
+        familyAnchor: {
+          anchorId: world.familyAnchor.id,
+          aggregateVersion: world.familyAnchor.aggregateVersion,
+        },
+        childAssociation: {
+          associationId: world.childAssociation.id,
+          aggregateVersion: world.childAssociation.aggregateVersion,
+        },
+        familyAssociation: {
+          associationId: world.familyAssociation.id,
+          aggregateVersion: world.familyAssociation.aggregateVersion,
+        },
+        childAuthorization: {
+          authorizationId: world.childAuthorization!.id,
+          aggregateVersion: world.childAuthorization!.aggregateVersion,
+          expiresAt: FUTURE.toISOString(),
+          ownerRef: world.childAuthorization!.ownerRef,
+          ownerVersion: world.childAuthorization!.ownerVersion,
+          purpose: world.childAuthorization!.purpose,
+          authorizationSourceRef: world.childAuthorization!.authorizationSourceRef,
+          authorizationSourceVersion: world.childAuthorization!.authorizationSourceVersion,
+          guardianRole: {
+            roleAssignmentId: world.guardianRole.id,
+            participantId: world.guardianRole.participantId,
+            aggregateVersion: world.guardianRole.aggregateVersion,
+            status: world.guardianRole.status,
+            role: world.guardianRole.role,
+            startsAt: null,
+            endsAt: null,
+          },
+          participant: {
+            participantId: world.guardian.id,
+            aggregateVersion: world.guardian.aggregateVersion,
+            status: world.guardian.status,
+          },
+        },
+        familyAuthorization: {
+          authorizationId: world.familyAuthorization!.id,
+          aggregateVersion: world.familyAuthorization!.aggregateVersion,
+          expiresAt: FUTURE.toISOString(),
+          ownerRef: world.familyAuthorization!.ownerRef,
+          ownerVersion: world.familyAuthorization!.ownerVersion,
+          purpose: world.familyAuthorization!.purpose,
+          authorizationSourceRef: world.familyAuthorization!.authorizationSourceRef,
+          authorizationSourceVersion: world.familyAuthorization!.authorizationSourceVersion,
+          guardianRole: {
+            roleAssignmentId: world.guardianRole.id,
+            participantId: world.guardianRole.participantId,
+            aggregateVersion: world.guardianRole.aggregateVersion,
+            status: world.guardianRole.status,
+            role: world.guardianRole.role,
+            startsAt: null,
+            endsAt: null,
+          },
+          participant: {
+            participantId: world.guardian.id,
+            aggregateVersion: world.guardian.aggregateVersion,
+            status: world.guardian.status,
+          },
+        },
+        canonicalOwnerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
       },
     });
     expect(seenChildRef).toBe(`nurture_child_binding_anchor_v1:${world.childAnchor.id}`);

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-12T15:37:03.287Z",
+  "updatedAt": "2026-08-13T02:38:20.183Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -18361,9 +18361,11 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
             "outboxEventId"
           ],
           "references": [
+            "workspaceId",
             "id"
           ]
         }
@@ -18559,9 +18561,11 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
             "publicationReleaseId"
           ],
           "references": [
+            "workspaceId",
             "id"
           ]
         },
@@ -18581,9 +18585,13 @@
           "list": false,
           "relationName": null,
           "fields": [
+            "workspaceId",
+            "publicationReleaseId",
             "visibilityEventId"
           ],
           "references": [
+            "workspaceId",
+            "publicationReleaseId",
             "id"
           ]
         }
@@ -18607,6 +18615,25 @@
           ],
           "name": null,
           "map": "ix_nurture_family_growth_outbox_release"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_growth_outbox_workspace_id"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publicationReleaseId",
+            "visibilityEventId"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_growth_outbox_workspace_visibility"
         }
       ]
     },
@@ -25473,6 +25500,15 @@
           ],
           "name": null,
           "map": "ix_nurture_publication_release_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_publication_release_workspace_id"
         }
       ]
     },
@@ -25650,6 +25686,16 @@
           ],
           "name": null,
           "map": "uq_nurture_publication_visibility_command"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publicationReleaseId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_visibility_event_workspace_release_id"
         }
       ]
     },

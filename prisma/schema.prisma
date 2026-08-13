@@ -3999,6 +3999,7 @@ model NurturePublicationRelease {
   // command hash added nothing — the single-column unique always fires first —
   // while reading as though the command identity were part of the guarantee.
   // The replay check is explicit in `commitTargetRelease`.
+  @@unique([workspaceId, id], map: "uq_nurture_publication_release_workspace_id")
   @@index([workspaceId, publishProcessId, committedAt], map: "ix_nurture_publication_release_process")
   @@map("nurture_publication_release")
 }
@@ -4023,6 +4024,7 @@ model NurturePublicationVisibilityEvent {
   commandExecution        NurtureCommandExecution?        @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict)
   familyGrowthOutboxEvent NurtureFamilyGrowthOutboxEvent?
 
+  @@unique([workspaceId, publicationReleaseId, id], map: "uq_nurture_visibility_event_workspace_release_id")
   @@unique([workspaceId, publicationReleaseId, commandExecutionId, kind], map: "uq_nurture_publication_visibility_command")
   @@index([workspaceId, publicationReleaseId, occurredAt], map: "ix_nurture_publication_visibility_release")
   @@map("nurture_publication_visibility_event")
@@ -4058,10 +4060,12 @@ model NurtureFamilyGrowthOutboxEvent {
   createdAt            DateTime                         @default(now()) @map("created_at")
   updatedAt            DateTime                         @updatedAt @map("updated_at")
 
-  publicationRelease NurturePublicationRelease             @relation(fields: [publicationReleaseId], references: [id], onDelete: Restrict)
-  visibilityEvent    NurturePublicationVisibilityEvent?    @relation(fields: [visibilityEventId], references: [id], onDelete: Restrict)
+  publicationRelease NurturePublicationRelease             @relation(fields: [workspaceId, publicationReleaseId], references: [workspaceId, id], onDelete: Restrict, map: "fk_nurture_fg_outbox_workspace_release")
+  visibilityEvent    NurturePublicationVisibilityEvent?    @relation(fields: [workspaceId, publicationReleaseId, visibilityEventId], references: [workspaceId, publicationReleaseId, id], onDelete: Restrict, map: "fk_nurture_fg_outbox_workspace_release_visibility")
   receipts           NurtureFamilyGrowthAdmissionReceipt[]
 
+  @@unique([workspaceId, id], map: "uq_nurture_family_growth_outbox_workspace_id")
+  @@unique([workspaceId, publicationReleaseId, visibilityEventId], map: "uq_nurture_family_growth_outbox_workspace_visibility")
   @@index([deliveryState, nextAttemptAt], map: "ix_nurture_family_growth_outbox_claim")
   @@index([workspaceId, publicationReleaseId, createdAt], map: "ix_nurture_family_growth_outbox_release")
   @@map("nurture_family_growth_outbox_event")
@@ -4085,7 +4089,7 @@ model NurtureFamilyGrowthAdmissionReceipt {
   receiptPayload Json                             @map("receipt_payload")
   createdAt      DateTime                         @default(now()) @map("created_at")
 
-  outboxEvent NurtureFamilyGrowthOutboxEvent @relation(fields: [outboxEventId], references: [id], onDelete: Restrict)
+  outboxEvent NurtureFamilyGrowthOutboxEvent @relation(fields: [workspaceId, outboxEventId], references: [workspaceId, id], onDelete: Restrict, map: "fk_nurture_fg_receipt_workspace_outbox")
 
   @@unique([workspaceId, outboxEventId, receiptId], map: "uq_nurture_family_growth_receipt_identity")
   @@index([workspaceId, status, processedAt], map: "ix_nurture_family_growth_receipt_status")
