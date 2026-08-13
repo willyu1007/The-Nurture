@@ -1,5 +1,103 @@
 # Verification
 
+## 2026-08-13 — W2 second adoption-review repair
+
+- `node --import tsx packages/nurture-scenario/contracts/parent-context-presenter/v1/validate-contract.mjs`
+  — passed at
+  `sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196`;
+  five operation schema pairs, the discriminated notice exchange, 16 valid
+  fixtures, eight required-invalid fixtures, 11 consistency probes and 10
+  strict authority/foreign-field probes passed.
+- Focused real-route parent-context suite — final rerun passed 1/1 file and
+  12/12 tests through `Test.createTestingModule` and in-memory HTTP injection
+  against the mounted Nest/Express adapter. It includes the full five-field
+  confirmation tuple, `list + not_committed`, unpublished
+  `private_care_note`, generic private/no-store 500 behavior and application
+  ASYNC-12 rejection.
+- The first focused attempt executed zero tests because startup schema
+  compilation referenced a non-hoisted helper; the helper was changed to a
+  function declaration. TCP and Unix-domain listener reruns were then blocked
+  uniformly by sandbox `listen EPERM`; no route assertions ran in those two
+  attempts. The final in-memory HTTP transport requires no listener and is the
+  passing route evidence above.
+- `pnpm exec tsc --noEmit -p tsconfig.json --rootDir ../..` from
+  `apps/scenario-service` — passed after runtime validation, async-boundary,
+  test-module, filter-DI and in-memory HTTP changes; no build was invoked.
+- `node scripts/assert-formal-ingress-contract.mjs` — passed; 19 controller
+  routes remain pinned, including all five parent-context routes, and the
+  census now asserts startup response-schema compilation, exact runtime pin,
+  complete owner/async binding, notice matrix and application ASYNC-12 gate.
+- `pnpm --filter @the-nurture/scenario typecheck` — passed; the generated
+  Scenario manifest is current and package TypeScript is clean.
+- `pnpm test:unit` — passed, 97/97 files and 1083/1083 tests.
+- `pnpm verify:test-routing` — passed; 182 files routed as unit 97,
+  production-db 51, dev-host 11, scenario-service 18 and x5-joint 5.
+- `node .ai/scripts/lint-docs.mjs --strict --path
+  dev-docs/active/nurture-cross-repo-contract-supply` — passed, 15/15 Markdown
+  files with zero errors and warnings. `git diff --check` also passed.
+- Per explicit scope, no build, commit, push, database apply, deployment,
+  activation or traffic operation was performed.
+
+## 2026-08-13 — W2 adoption-review repair
+
+- `node scripts/assert-formal-ingress-contract.mjs` — passed; the AST census
+  pins 19 controller routes, including all five parent-context routes, the
+  service-bearer guard, controller-scoped private-response filter, default-off
+  runtime gate and filter-provider registration.
+- `node --import tsx packages/nurture-scenario/contracts/parent-context-presenter/v1/validate-contract.mjs`
+  — passed at
+  `sha256:e19642198f5022f0e68e5908e6d17098abee6a12942f47a247e7e5a8db633fd6`;
+  five operations, 16 valid fixtures, eight required-invalid fixtures, eight
+  operation-consistency probes and 10 strict authority/foreign-field probes
+  passed.
+- Focused parent-context ingress conformance — 1/1 file and 10/10 tests passed.
+  The suite uses the real Nest module/controller/guard/private-filter graph in
+  process and covers all routes, auth and contract negatives, Q6 resolution,
+  six masking classes, bound notice confirmation, replay and ASYNC-12 late
+  result rejection.
+- `pnpm --filter @the-nurture/scenario typecheck` — passed; generated Scenario
+  manifest current and TypeScript clean.
+- `pnpm exec tsc --noEmit -p tsconfig.json --rootDir ../..` from
+  `apps/scenario-service` — passed for service source and non-DB tests without
+  invoking a build.
+- `pnpm test:unit` — 97/97 files and 1083/1083 tests passed.
+- `pnpm verify:test-routing` — passed; 182 files routed as unit 97,
+  production-db 51, dev-host 11, scenario-service 18 and x5-joint 5.
+- Environment-contract validation/generation and
+  `node .ai/tests/run.mjs --suite environment` — passed for the new optional,
+  non-secret, default-false presenter gate.
+- Strict task-document lint — passed, 15/15 Markdown files with zero errors or
+  warnings. `git diff --check` passed, and the changed-file census contains no
+  pin JSON.
+- Per explicit scope, no `pnpm lint`, build, commit, push, database apply,
+  deployment, activation or traffic operation was performed.
+
+## 2026-08-13 — W2 parent-context presenter v1 initial authoring (pre-review)
+
+- `node --import tsx packages/nurture-scenario/contracts/parent-context-presenter/v1/validate-contract.mjs`
+  — passed. The repository's strict RFC 8785 implementation computed
+  `sha256:121ae526c1628c0ed040c77b064c192498f4be6cf307533efdcab40987127d64`;
+  all five request/response schema pairs compiled; 16 fixtures passed; every
+  operation had positive and negative coverage; all six required negative
+  scenarios, notice list/prepare/confirm and late-completion coverage were
+  present; 10 caller-authority/foreign-response rejection probes passed.
+- No Vitest file was added: the requested small standalone validator is the
+  conformance vehicle, so no focused Vitest command was applicable and the
+  repository's exact unit-test routing census remained unchanged.
+- `pnpm --filter @the-nurture/scenario typecheck` — passed; generated Scenario
+  manifest current and TypeScript clean.
+- `pnpm test:unit` — 97/97 files and 1083/1083 tests passed.
+- `pnpm verify:test-routing` — passed; 181 files routed as unit 97,
+  production-db 51, dev-host 11, scenario-service 17 and x5-joint 5.
+- `node .ai/scripts/lint-docs.mjs --strict --path
+  dev-docs/active/nurture-cross-repo-contract-supply` — passed after W2
+  authoring; 10/10 Markdown files with zero errors and warnings.
+- `git diff --check` — passed. The changed-file census contains no existing
+  `*pin*.json`, Surface source, route/controller, runtime composition, schema or
+  migration file.
+- Per explicit scope, no `pnpm lint`, build, commit, push, database apply,
+  deployment, activation or traffic operation was performed.
+
 ## 2026-08-13 — W5 N9 adversarial review repair
 
 - `node scripts/assert-formal-ingress-contract.mjs` — passed; AST census found

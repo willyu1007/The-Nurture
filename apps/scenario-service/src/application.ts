@@ -35,6 +35,11 @@ import {
   createDisabledFamilySharingPrivateRuntime,
   type FamilySharingPrivateRuntime,
 } from "./family-sharing-private-runtime.js";
+import type { ParentContextPresenterComposition } from "./parent-context-presenter-composition.js";
+import {
+  createParentContextPresenterComposition,
+  type ParentContextPresenterOwnerBindingV1,
+} from "./parent-context-presenter-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -52,6 +57,8 @@ export async function createScenarioServiceApplication(input?: {
   harnessRuntime?: HarnessRuntime;
   familyGrowthRendition?: FamilyGrowthRenditionRuntime;
   teacherReleaseOwnerComposition?: TeacherReleaseOwnerComposition;
+  parentContextPresenterComposition?: ParentContextPresenterComposition;
+  parentContextPresenterOwnerBinding?: ParentContextPresenterOwnerBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -82,6 +89,15 @@ export async function createScenarioServiceApplication(input?: {
       serviceAuth: bindingOwnerServiceAuth,
       harnessRuntime,
     });
+  const parentContextPresenterComposition =
+    input?.parentContextPresenterComposition
+    ?? createParentContextPresenterComposition({
+      enabled: config.parentContextPresenterEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.parentContextPresenterOwnerBinding
+        ? { ownerBinding: input.parentContextPresenterOwnerBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -96,6 +112,10 @@ export async function createScenarioServiceApplication(input?: {
       familyGrowthRendition,
       teacherReleaseOwner: {
         composition: teacherReleaseOwnerComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      parentContextPresenter: {
+        composition: parentContextPresenterComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

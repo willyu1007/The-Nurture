@@ -75,6 +75,11 @@ variables:
     required: false
     default: false
     description: Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation.
+  NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED:
+    type: bool
+    required: false
+    default: false
+    description: Default-off gate for the parent-context presenter v1 owner composition; true requires the exact adopted contract digest and separately authorized owner-port activation.
   FAMILY_GROWTH_EVENTS_SERVICE_TOKEN:
     type: string
     required: false

@@ -17,12 +17,23 @@ route availability does not activate a scenario capability or authorize traffic.
 | `POST` | `/internal/nurture/harness/query` | Reads one role-safe capability projection |
 | `POST` | `/internal/nurture/harness/read-result` | Re-reads the current projection for a committed command |
 | `POST` | `/internal/nurture/institution/business-communications:read` | Additional default-off Institution Admin owner-read route |
+| `POST` | `/internal/nurture/parent-context-presenter/v1/day` | Default-off parent day presenter with bounded activity summaries |
+| `POST` | `/internal/nurture/parent-context-presenter/v1/daily-care` | Default-off daily-care card presenter |
+| `POST` | `/internal/nurture/parent-context-presenter/v1/activity-detail` | Default-off detail for an activity ref returned by the day presenter |
+| `POST` | `/internal/nurture/parent-context-presenter/v1/notices` | Default-off list/prepare/confirm presenter with a closed kind/status matrix and five-field confirmation identity |
+| `POST` | `/internal/nurture/parent-context-presenter/v1/freshness-attendance` | Default-off freshness and attendance projection |
 
 All other paths return a body-safe `404`. The legacy Fastify workflow harness
 and `user_attention` route do not run in this service. Every private route uses
 the same service bearer; the Harness remains disabled until service auth,
 `DATABASE_URL`, the integrity key and the protected-content key are all present.
 Institution business-communication read additionally requires its explicit flag.
+The five parent-context presenter routes require their explicit flag, the
+shared service bearer, complete Q6 owner ports and an active
+consumer-generation boundary port. Every composed response is checked against
+the published closed schema before it can cross the controller. Missing
+configuration is always a private `503`; route registration alone does not
+activate the routes.
 
 The owner route returns `503 {"error":"binding_owner_disabled"}` when either
 the authorizer composition or the service token is absent. Only when both are
@@ -46,6 +57,7 @@ The service reads configuration only through `src/config.ts`.
 | `NURTURE_HARNESS_INTEGRITY_KEY` | unset | secret of at least 32 characters; absence disables the Harness runtime |
 | `NURTURE_PROTECTED_CONTENT_KEY` | unset | secret of at least 32 characters; absence disables the Harness runtime |
 | `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `false` | exact `true` enables only the additional Institution owner-read route after the Harness is available |
+| `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED` | `false` | exact `true` permits parent-context composition only when the exact adopted digest and all owner ports are also configured |
 
 The service token is loaded into a dedicated timing-safe authenticator rather
 than the printable non-secret configuration object. The evidence key is loaded

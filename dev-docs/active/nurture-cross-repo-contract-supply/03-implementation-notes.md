@@ -1,5 +1,98 @@
 # Implementation notes
 
+## 2026-08-13 — W2 second adoption-review repair
+
+- Bound every confirm fixture to the prepared five-field identity tuple:
+  `action_ref`, `action_version`, RFC 8785 `prepared_preview_digest`,
+  `confirmation_ref` and `command_request_id`. The validator lookup and
+  real-route e2e both compare the complete tuple, with executed drift probes
+  for the two previously omitted fields.
+- Added a Draft 2020-12 `notice_operation_exchange` schema whose `oneOf`
+  branches discriminate `list`, `prepare_confirmation` and `confirm` and admit
+  only their allowed response-status sets. The validator executes that schema
+  for every notice fixture and rejects `list + not_committed`; the composition
+  has the same closed matrix as an independent runtime check.
+- Added startup compilation of all five published response schemas from the
+  canonical artifact. Every owner and composition response is schema-checked;
+  schema or semantic drift throws across the private filter as generic
+  `500 internal_error`. The real route proves an owner-only
+  `private_care_note` is rejected and never forwarded.
+- Replaced manual guard/controller/filter dispatch with
+  `Test.createTestingModule` plus in-memory Node HTTP injection through the
+  mounted Express adapter. All routing, decorators, parsing, guards and filters
+  are real. The route suite also exposed and repaired transform-sensitive
+  filter DI by making both filter dependencies explicit.
+- Made ASYNC-12 an application rule. Enabled composition now requires an async
+  boundary port that captures the response generation and reads current
+  generation/context state; the composition performs equality and returns a
+  closed unavailable response instead of forwarding a late owner result.
+- Rotated the strict RFC 8785 adoption digest across artifact consumers and
+  records to
+  `sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196`.
+  No pin JSON, route enablement, deployment or traffic posture changed.
+
+## 2026-08-13 — W2 adoption-review repair
+
+- Added a bounded `activities[]` source to the day response: at most 20 opaque
+  activity refs with bounded title, UTC timestamp and presenter media state.
+  Activity detail remains a separate operation, and validator probes require a
+  detail ref to originate from the same context/date day response.
+- Bound notice list, prepare and confirm through one action ref/version and an
+  RFC 8785 digest of byte-equivalent confirmation preview copy. Confirm must
+  echo the exact identity and digest; list/prepare/confirm fixture consistency
+  and prepared digest recomputation now fail hard on drift.
+- Mounted all five private `POST` routes in scenario-service behind
+  `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED`. The guard requires configured
+  service bearer auth plus a complete Q6 authority-resolver/owner binding;
+  otherwise it returns private/no-store `503`. The controller, scoped private
+  exception filter, providers and all five routes are pinned in the formal
+  ingress AST census.
+- Added a focused in-process Nest e2e suite covering all five paths, auth and
+  exact-pin negatives, Q6 resolution before every owner call, all six masking
+  classes, action/digest mismatch, replay and ASYNC-12 late-result rejection.
+  The in-process transport exercises the real controller/guard/filter graph
+  without opening a listener in restricted test environments.
+- Added eight mutation fixtures that the AJV schemas must reject and operation-
+  specific probes for selected date, cache query key, day-to-detail activity
+  refs, notice/action foreign consistency, preview identity/digest, media-state
+  exclusions, unique refs and pagination cursor requirements.
+- Hard-pinned the published RFC 8785 adoption digest in the validator and
+  rotated the artifact, fixtures, source constant and records to
+  `sha256:e19642198f5022f0e68e5908e6d17098abee6a12942f47a247e7e5a8db633fd6`.
+  No pin JSON changed; routes remain default-off and no deployment or traffic
+  was enabled.
+
+## 2026-08-13 — W2 parent-context presenter v1 initial authoring (pre-review)
+
+- Published a standalone, default-off
+  `nurture.parent-context-presenter@1.0.0` source artifact over the unchanged
+  `nurture.surface-contract@1.20.0` baseline. The artifact declares five
+  service-bearer internal ingress paths but adds no controller, route,
+  composition, feature flag or runtime adapter.
+- Embedded strict Draft 2020-12 request/response schemas for day navigation,
+  partial daily-care cards, activity detail with opaque protected-media access,
+  notice list/prepare/confirm and freshness/attendance display projection.
+  Every call accepts Host identity plus `context_ref` only and requires fresh
+  Nurture owner resolution; caller Participant/role/scope fields and recursive
+  foreign fields are rejected.
+- Froze a reviewed 14-code safe reason vocabulary, explicit mask signals for
+  access/scope/context/policy/non-retryable-refresh drift, universal private
+  no-store response rules, and the complete protected-cache dimension and
+  invalidation semantics referencing ASYNC-01 through ASYNC-12. Presenter
+  display enums are isolated from Prisma/domain business enums.
+- Resolved protected media to opaque, actor/context/expiry-bound owner-stream
+  access refs with no URL or storage ref. Resolved attendance tokens as display
+  states only, not canonical attendance facts. Notice confirmation uses closed
+  list/prepare/confirm sub-exchanges with same-command reconciliation only.
+- Added 16 joint conformance fixtures and an offline schema/digest validator.
+  The matrix has positive and negative coverage for every operation plus scope
+  loss, revocation, stale `context_ref`, ambiguous Enrollment,
+  protected-display denial, non-retryable refresh, replay and late completion.
+- Computed the canonical source digest with the repository's strict RFC 8785
+  implementation and recorded the exact pin plus all five IR-C01 properties in
+  `artifacts/w2-parent-context-presenter-v1-digest-pin.md`. No pin JSON was
+  changed. W2 acceptance remains unticked pending adoption-readiness review.
+
 ## 2026-08-13 — W5 N9 adversarial review repair
 
 - Replaced the formal-ingress filename/decorator regex with a TypeScript AST

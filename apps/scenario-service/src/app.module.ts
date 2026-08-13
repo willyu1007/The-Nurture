@@ -33,6 +33,12 @@ import {
   type FamilySharingPrivateConfig,
 } from "./family-sharing-private.controller.js";
 import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
+import {
+  PARENT_CONTEXT_PRESENTER_CONFIG,
+  ParentContextPresenterController,
+  type ParentContextPresenterConfig,
+  ParentContextPresenterServiceAuthGuard,
+} from "./parent-context-presenter.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
 
@@ -43,6 +49,7 @@ import { ScenarioStructuredLogger } from "./structured-logger.js";
     HarnessController,
     FamilyGrowthRenditionController,
     TeacherReleaseOwnerController,
+    ParentContextPresenterController,
     FamilySharingPrivateController,
   ],
 })
@@ -53,6 +60,7 @@ export class AppModule {
     harness: HarnessGuardConfig;
     familyGrowthRendition: FamilyGrowthRenditionRuntime;
     teacherReleaseOwner: TeacherReleaseOwnerConfig;
+    parentContextPresenter: ParentContextPresenterConfig;
     familySharingPrivate: FamilySharingPrivateConfig;
   }): DynamicModule {
     return {
@@ -92,6 +100,11 @@ export class AppModule {
           useValue: Object.freeze({ ...input.teacherReleaseOwner }),
         },
         TeacherReleaseOwnerServiceAuthGuard,
+        {
+          provide: PARENT_CONTEXT_PRESENTER_CONFIG,
+          useValue: Object.freeze({ ...input.parentContextPresenter }),
+        },
+        ParentContextPresenterServiceAuthGuard,
         {
           provide: FAMILY_SHARING_PRIVATE_CONFIG,
           useValue: Object.freeze({ ...input.familySharingPrivate }),

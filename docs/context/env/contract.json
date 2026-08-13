@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-11T01:06:14Z",
+  "generated_at_utc": "2026-08-13T05:54:14Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -233,6 +233,23 @@
       "secret_ref": "nurture_internal_service_token",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the parent-context presenter v1 owner composition; true requires the exact adopted contract digest and separately authorized owner-port activation.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "NURTURE_PROTECTED_CONTENT_KEY": {
       "default": null,

@@ -1,0 +1,998 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.parent-context-presenter",
+    "version": "1.0.0",
+    "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+  },
+  "fixture_contract": {
+    "positive_per_operation": true,
+    "negative_per_operation": true,
+    "expected_invalid_structural_fixtures": true,
+    "required_negative_scenarios": [
+      "scope_loss",
+      "revoked",
+      "stale_context_ref",
+      "ambiguous_enrollment",
+      "protected_display_denial",
+      "non_retryable_refresh"
+    ],
+    "private_response_headers": {
+      "cache-control": "private, no-store",
+      "pragma": "no-cache"
+    }
+  },
+  "fixtures": [
+    {
+      "fixture_id": "w2-day-ready",
+      "operation": "day_query",
+      "polarity": "positive",
+      "scenario": "ready",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-day-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0001",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:day:family-a-child-a:2026-08-13:v7",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0001",
+          "scope_version": 7,
+          "operation": "day_query",
+          "query_key": "2026-08-13",
+          "expires_at": "2026-08-13T04:05:00.000Z"
+        },
+        "generated_at": "2026-08-13T04:00:00.000Z",
+        "day": {
+          "selected_date": "2026-08-13",
+          "selected_date_label": "Today",
+          "previous_date": "2026-08-12",
+          "next_date": null,
+          "calendar": {
+            "earliest_date": "2026-08-11",
+            "latest_date": "2026-08-13",
+            "date_options": [
+              {
+                "date": "2026-08-11",
+                "label": "Tuesday, August 11",
+                "short_label": "Tue 11",
+                "is_today": false,
+                "available": true
+              },
+              {
+                "date": "2026-08-12",
+                "label": "Wednesday, August 12",
+                "short_label": "Wed 12",
+                "is_today": false,
+                "available": true
+              },
+              {
+                "date": "2026-08-13",
+                "label": "Today",
+                "short_label": "Thu 13",
+                "is_today": true,
+                "available": true
+              }
+            ]
+          }
+        },
+        "activities": [
+          {
+            "activity_ref": "activity:outdoor-play:01",
+            "title_display": "Outdoor play",
+            "occurred_at": "2026-08-13T02:30:00.000Z",
+            "media_state": "protected"
+          }
+        ]
+      },
+      "expected": {
+        "response_status": "ready",
+        "client_rule": "replace_exact_partition"
+      }
+    },
+    {
+      "fixture_id": "w2-day-scope-loss",
+      "operation": "day_query",
+      "polarity": "negative",
+      "scenario": "scope_loss",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-day-scope-loss",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v7",
+        "masked_at": "2026-08-13T04:01:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "access_changed",
+        "client_rule": "purge_before_navigation"
+      }
+    },
+    {
+      "fixture_id": "w2-day-stale-context-ref",
+      "operation": "day_query",
+      "polarity": "negative",
+      "scenario": "stale_context_ref",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-day-context-drift",
+        "context_ref": "context:parent-a-child-a:v6",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v6",
+        "masked_at": "2026-08-13T04:01:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "context_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "context_changed",
+        "client_rule": "purge_and_resolve_context_again"
+      }
+    },
+    {
+      "fixture_id": "w2-daily-care-partial-ready",
+      "operation": "daily_care_cards_query",
+      "polarity": "positive",
+      "scenario": "ready_partial_values",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-care-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0002",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:02:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:care:family-a-child-a:2026-08-13:v7",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0002",
+          "scope_version": 7,
+          "operation": "daily_care_cards_query",
+          "query_key": "2026-08-13",
+          "expires_at": "2026-08-13T04:07:00.000Z"
+        },
+        "generated_at": "2026-08-13T04:02:00.000Z",
+        "local_date": "2026-08-13",
+        "cards": [
+          {
+            "card_ref": "care-card:arrival:01",
+            "label": "Arrival",
+            "value_state": "provided",
+            "value_display": "08:12",
+            "note_display": "Settled in calmly",
+            "recorded_at": "2026-08-13T00:12:00.000Z"
+          },
+          {
+            "card_ref": "care-card:nap:01",
+            "label": "Nap",
+            "value_state": "missing"
+          },
+          {
+            "card_ref": "care-card:meal:01",
+            "label": "Meal",
+            "value_state": "provided",
+            "value_display": "Most offered food",
+            "recorded_at": "2026-08-13T03:30:00.000Z"
+          }
+        ]
+      },
+      "expected": {
+        "response_status": "ready",
+        "client_rule": "preserve_each_missing_value"
+      }
+    },
+    {
+      "fixture_id": "w2-daily-care-revoked",
+      "operation": "daily_care_cards_query",
+      "polarity": "negative",
+      "scenario": "revoked",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-care-revoked",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v7",
+        "masked_at": "2026-08-13T04:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "access_changed",
+        "client_rule": "remove_cards_synchronously"
+      }
+    },
+    {
+      "fixture_id": "w2-activity-protected-media-ready",
+      "operation": "activity_detail_query",
+      "polarity": "positive",
+      "scenario": "ready_protected_media",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-activity-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13",
+        "activity_ref": "activity:outdoor-play:01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0003",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:04:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:activity:outdoor-play:01:v7",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0003",
+          "scope_version": 7,
+          "operation": "activity_detail_query",
+          "query_key": "activity:outdoor-play:01",
+          "expires_at": "2026-08-13T04:09:00.000Z"
+        },
+        "generated_at": "2026-08-13T04:04:00.000Z",
+        "activity": {
+          "activity_ref": "activity:outdoor-play:01",
+          "local_date": "2026-08-13",
+          "title_display": "Outdoor play",
+          "time_display": "10:15",
+          "summary_display": "The group explored the shaded play area.",
+          "occurred_at": "2026-08-13T02:15:00.000Z",
+          "media_state": "protected",
+          "media": [
+            {
+              "status": "protected_available",
+              "media_ref": "media:opaque:01",
+              "access_ref": "media-access:actor-context-expiry:01",
+              "access_expires_at": "2026-08-13T04:06:00.000Z",
+              "delivery_mode": "owner_stream",
+              "content_type": "image/jpeg",
+              "alt_text": "Children exploring an outdoor play area",
+              "width_px": 1600,
+              "height_px": 1200
+            }
+          ]
+        }
+      },
+      "expected": {
+        "response_status": "ready",
+        "client_rule": "stream_current_access_ref_without_url_cache"
+      }
+    },
+    {
+      "fixture_id": "w2-activity-protected-display-denial",
+      "operation": "activity_detail_query",
+      "polarity": "negative",
+      "scenario": "protected_display_denial",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-activity-denied",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13",
+        "activity_ref": "activity:outdoor-play:01"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v7",
+        "masked_at": "2026-08-13T04:05:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "protected_display_denied",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "protected_display_denied",
+        "client_rule": "close_detail_and_remove_media_access"
+      }
+    },
+    {
+      "fixture_id": "w2-activity-stale-context-ref",
+      "operation": "activity_detail_query",
+      "polarity": "negative",
+      "scenario": "stale_context_ref",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-activity-old-context",
+        "context_ref": "context:parent-a-child-a:v6",
+        "local_date": "2026-08-13",
+        "activity_ref": "activity:outdoor-play:01"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v6",
+        "masked_at": "2026-08-13T04:05:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "context_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "context_changed",
+        "client_rule": "reject_old_link_reuse"
+      }
+    },
+    {
+      "fixture_id": "w2-notice-list-ready",
+      "operation": "notice_list_and_confirmation",
+      "polarity": "positive",
+      "scenario": "ready_list",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-notice-list-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "kind": "list",
+        "page_size": 10
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0004",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:06:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:notices:family-a-child-a:v7:page-1",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0004",
+          "scope_version": 7,
+          "operation": "notice_list_and_confirmation",
+          "query_key": "notices:page-1:size-10",
+          "expires_at": "2026-08-13T04:11:00.000Z"
+        },
+        "generated_at": "2026-08-13T04:06:00.000Z",
+        "notices": [
+          {
+            "notice_ref": "notice:event:01",
+            "notice_version": 3,
+            "title_display": "Family activity day",
+            "summary_display": "Please confirm whether you have seen the schedule.",
+            "display_status": "action_required",
+            "published_at": "2026-08-12T01:00:00.000Z",
+            "expires_at": "2026-08-20T00:00:00.000Z",
+            "action": {
+              "action_ref": "notice-action:confirm-read:01",
+              "action_version": 1,
+              "label": "Confirm",
+              "confirmation_title": "Confirm this notice",
+              "confirmation_body": "Confirm that you have seen the activity-day schedule.",
+              "action_semantics": "confirm_notice"
+            }
+          },
+          {
+            "notice_ref": "notice:meal-plan:01",
+            "notice_version": 1,
+            "title_display": "Weekly meal plan",
+            "display_status": "read",
+            "published_at": "2026-08-11T01:00:00.000Z"
+          }
+        ],
+        "page_info": {
+          "has_more": false
+        }
+      },
+      "expected": {
+        "response_status": "ready",
+        "client_rule": "render_closed_notice_vocabulary"
+      }
+    },
+    {
+      "fixture_id": "w2-notice-prepare-ready",
+      "operation": "notice_list_and_confirmation",
+      "polarity": "positive",
+      "scenario": "confirmation_prepared",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-notice-prepare-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "kind": "prepare_confirmation",
+        "notice_ref": "notice:event:01",
+        "action_ref": "notice-action:confirm-read:01",
+        "action_version": 1,
+        "expected_notice_version": 3
+      },
+      "response": {
+        "status": "ready_to_confirm",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0005",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:06:30.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:notices:family-a-child-a:v7:notice-event-01",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0005",
+          "scope_version": 7,
+          "operation": "notice_list_and_confirmation",
+          "query_key": "notice:event:01",
+          "expires_at": "2026-08-13T04:11:30.000Z"
+        },
+        "notice_ref": "notice:event:01",
+        "notice_version": 3,
+        "action_ref": "notice-action:confirm-read:01",
+        "action_version": 1,
+        "preview": {
+          "effect": "confirm_notice",
+          "title": "Confirm this notice",
+          "body": "Confirm that you have seen the activity-day schedule."
+        },
+        "prepared_preview_digest": "sha256:cbec5162950f68262fbbec0ed74b707747f6164aae32fa8b2674ff90dcee7226",
+        "confirmation_ref": "confirm_notice_actor_context_prepare_0001",
+        "expires_at": "2026-08-13T04:11:30.000Z",
+        "command_request_id": "command-notice-confirm-01"
+      },
+      "expected": {
+        "response_status": "ready_to_confirm",
+        "client_rule": "show_explicit_confirmation_without_committing"
+      }
+    },
+    {
+      "fixture_id": "w2-notice-confirm-committed",
+      "operation": "notice_list_and_confirmation",
+      "polarity": "positive",
+      "scenario": "confirmation_committed",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-notice-confirm-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "kind": "confirm",
+        "invocation_request_id": "invocation-notice-confirm-01",
+        "command_request_id": "command-notice-confirm-01",
+        "confirmation_ref": "confirm_notice_actor_context_prepare_0001",
+        "action_ref": "notice-action:confirm-read:01",
+        "action_version": 1,
+        "prepared_preview_digest": "sha256:cbec5162950f68262fbbec0ed74b707747f6164aae32fa8b2674ff90dcee7226"
+      },
+      "response": {
+        "status": "committed",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0005",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:07:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:notices:family-a-child-a:v7:page-1",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0005",
+          "scope_version": 7,
+          "operation": "notice_list_and_confirmation",
+          "query_key": "notice:event:01",
+          "expires_at": "2026-08-13T04:12:00.000Z"
+        },
+        "execution_disposition": "executed",
+        "business_outcome": "applied",
+        "committed_result": {
+          "notice_ref": "notice:event:01",
+          "display_status": "read",
+          "confirmed_at": "2026-08-13T04:07:00.000Z"
+        }
+      },
+      "expected": {
+        "response_status": "committed",
+        "client_rule": "invalidate_exact_notice_partition"
+      }
+    },
+    {
+      "fixture_id": "w2-notice-ambiguous-enrollment",
+      "operation": "notice_list_and_confirmation",
+      "polarity": "negative",
+      "scenario": "ambiguous_enrollment",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-notice-ambiguous",
+        "context_ref": "context:parent-a-child-a:v7",
+        "kind": "list"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v7",
+        "masked_at": "2026-08-13T04:08:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "ambiguous_context",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "ambiguous_context",
+        "client_rule": "never_select_first_enrollment"
+      }
+    },
+    {
+      "fixture_id": "w2-notice-confirmation-replayed",
+      "operation": "notice_list_and_confirmation",
+      "polarity": "negative",
+      "scenario": "confirmation_replayed_without_matching_commit",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-notice-replayed",
+        "context_ref": "context:parent-a-child-a:v7",
+        "kind": "confirm",
+        "invocation_request_id": "invocation-notice-confirm-02",
+        "command_request_id": "command-notice-confirm-01",
+        "confirmation_ref": "confirm_notice_actor_context_prepare_0001",
+        "action_ref": "notice-action:confirm-read:01",
+        "action_version": 1,
+        "prepared_preview_digest": "sha256:cbec5162950f68262fbbec0ed74b707747f6164aae32fa8b2674ff90dcee7226"
+      },
+      "response": {
+        "status": "not_committed",
+        "reason_code": "confirmation_replayed",
+        "recovery": "refresh"
+      },
+      "expected": {
+        "response_status": "not_committed",
+        "safe_reason_code": "confirmation_replayed",
+        "client_rule": "do_not_report_success"
+      }
+    },
+    {
+      "fixture_id": "w2-notice-late-completion",
+      "operation": "notice_list_and_confirmation",
+      "polarity": "negative",
+      "scenario": "late_completion",
+      "boundary_input": {
+        "response_generation": 7,
+        "active_generation": 8,
+        "active_context_ref": "context:parent-b-child-b:v2"
+      },
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-notice-late",
+        "context_ref": "context:parent-a-child-a:v7",
+        "kind": "confirm",
+        "invocation_request_id": "invocation-notice-confirm-03",
+        "command_request_id": "command-notice-confirm-01",
+        "confirmation_ref": "confirm_notice_actor_context_prepare_0001",
+        "action_ref": "notice-action:confirm-read:01",
+        "action_version": 1,
+        "prepared_preview_digest": "sha256:cbec5162950f68262fbbec0ed74b707747f6164aae32fa8b2674ff90dcee7226"
+      },
+      "response": {
+        "status": "committed",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0006",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:09:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:notices:family-a-child-a:v7:page-1",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0006",
+          "scope_version": 7,
+          "operation": "notice_list_and_confirmation",
+          "query_key": "notice:event:01",
+          "expires_at": "2026-08-13T04:14:00.000Z"
+        },
+        "execution_disposition": "executed",
+        "business_outcome": "applied",
+        "committed_result": {
+          "notice_ref": "notice:event:01",
+          "display_status": "read",
+          "confirmed_at": "2026-08-13T04:09:00.000Z"
+        }
+      },
+      "expected": {
+        "response_status": "committed",
+        "client_rule": "drop_superseded_generation_without_render_or_cache_write"
+      }
+    },
+    {
+      "fixture_id": "w2-freshness-attendance-ready",
+      "operation": "freshness_attendance_projection",
+      "polarity": "positive",
+      "scenario": "ready_fresh_present",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-freshness-01",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:parent-context:0007",
+          "presentation_role": "parent",
+          "scope_kind": "parent_context",
+          "scope_ref": "scope:parent-context:family-a-child-a",
+          "context_ref": "context:parent-a-child-a:v7",
+          "scope_version": 7,
+          "resolved_at": "2026-08-13T04:10:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:freshness:family-a-child-a:2026-08-13:v7",
+          "interface_key": "nurture.parent-context-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "presentation_role": "parent",
+          "context_ref": "context:parent-a-child-a:v7",
+          "resolution_ref": "resolution:parent-context:0007",
+          "scope_version": 7,
+          "operation": "freshness_attendance_projection",
+          "query_key": "2026-08-13",
+          "expires_at": "2026-08-13T04:15:00.000Z"
+        },
+        "generated_at": "2026-08-13T04:10:00.000Z",
+        "local_date": "2026-08-13",
+        "freshness": {
+          "state": "fresh",
+          "data_as_of": "2026-08-13T04:09:45.000Z",
+          "stale_at": "2026-08-13T04:14:45.000Z",
+          "last_successful_refresh_at": "2026-08-13T04:10:00.000Z",
+          "read_only": false
+        },
+        "attendance": {
+          "display_state": "present",
+          "message": "Attendance has been recorded for this day.",
+          "source_display": "Institution attendance",
+          "observed_at": "2026-08-13T01:00:00.000Z"
+        }
+      },
+      "expected": {
+        "response_status": "ready",
+        "client_rule": "display_present_as_projection_only"
+      }
+    },
+    {
+      "fixture_id": "w2-freshness-non-retryable-refresh",
+      "operation": "freshness_attendance_projection",
+      "polarity": "negative",
+      "scenario": "non_retryable_refresh",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-context-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-freshness-nonretryable",
+        "context_ref": "context:parent-a-child-a:v7",
+        "local_date": "2026-08-13"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent-a-child-a:v7",
+        "masked_at": "2026-08-13T04:11:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "refresh_not_retryable",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      },
+      "expected": {
+        "response_status": "masked",
+        "safe_reason_code": "refresh_not_retryable",
+        "client_rule": "mask_old_rows_without_blind_retry"
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w2-invalid-caller-participant-injection",
+      "operation": "day_query",
+      "source_fixture_id": "w2-day-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "participant_id"
+        ],
+        "value": "forged-participant"
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-day-missing-activity-source",
+      "operation": "day_query",
+      "source_fixture_id": "w2-day-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "activities"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-media-none-with-protected-ref",
+      "operation": "activity_detail_query",
+      "source_fixture_id": "w2-activity-protected-media-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "activity",
+          "media_state"
+        ],
+        "value": "none"
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-list-action-without-version",
+      "operation": "notice_list_and_confirmation",
+      "source_fixture_id": "w2-notice-list-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "notices",
+          0,
+          "action",
+          "action_version"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-prepare-without-action-version",
+      "operation": "notice_list_and_confirmation",
+      "source_fixture_id": "w2-notice-prepare-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "action_version"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-confirm-without-preview-digest",
+      "operation": "notice_list_and_confirmation",
+      "source_fixture_id": "w2-notice-confirm-committed",
+      "target": "request",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "prepared_preview_digest"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-has-more-without-cursor",
+      "operation": "notice_list_and_confirmation",
+      "source_fixture_id": "w2-notice-list-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "page_info",
+          "has_more"
+        ],
+        "value": true
+      }
+    },
+    {
+      "fixture_id": "w2-invalid-foreign-response-field",
+      "operation": "freshness_attendance_projection",
+      "source_fixture_id": "w2-freshness-attendance-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "unexpected_owner_field"
+        ],
+        "value": "forbidden"
+      }
+    }
+  ]
+}

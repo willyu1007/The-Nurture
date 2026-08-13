@@ -27,12 +27,16 @@
     "@nestjs/platform-express": "^11.1.28",
     "@the-nurture/db": "workspace:*",
     "@the-nurture/scenario": "workspace:*",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@my-chat/scenario-integrations": "0.1.0",
+    "@nestjs/testing": "11.1.19",
     "@types/node": "^20.12.0",
+    "light-my-request": "6.6.0",
     "tsx": "^4.19.0",
     "typescript": "^5.4.0",
     "vitest": "^2.1.0"

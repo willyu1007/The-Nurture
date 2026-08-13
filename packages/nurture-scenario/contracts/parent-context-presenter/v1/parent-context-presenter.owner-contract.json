@@ -1,0 +1,2108 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.parent-context-presenter",
+    "version": "1.0.0",
+    "kind": "private_owner_presenter"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "digest": "sha256:35d6340f60aa2d81523b0c8af977c8c5bb8f01a05a84d1a73b5baffbe8654273",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": {
+      "mode": "service_bearer",
+      "credential_contract": "NURTURE_INTERNAL_SERVICE_TOKEN",
+      "host_actor_fields": [
+        "workspace_id",
+        "my_chat_user_id"
+      ],
+      "fallback": "forbidden"
+    },
+    "response_headers": {
+      "cache-control": "private, no-store",
+      "pragma": "no-cache"
+    },
+    "paths": {
+      "day_query": "/internal/nurture/parent-context-presenter/v1/day",
+      "daily_care_cards_query": "/internal/nurture/parent-context-presenter/v1/daily-care",
+      "activity_detail_query": "/internal/nurture/parent-context-presenter/v1/activity-detail",
+      "notice_list_and_confirmation": "/internal/nurture/parent-context-presenter/v1/notices",
+      "freshness_attendance_projection": "/internal/nurture/parent-context-presenter/v1/freshness-attendance"
+    },
+    "response_rule": [
+      "Every success, denial, validation error, authentication error and unavailable response carries the declared private no-store headers.",
+      "A masked or unavailable response contains no operation payload, protected label, media access ref or action ref.",
+      "Foreign request and response fields are rejected recursively before composition or display.",
+      "A late response is displayable only when its request generation and full protected-cache partition still match the active consumer state.",
+      "Transport failure and device offline state are consumer boundary states and are never reported as owner facts."
+    ]
+  },
+  "owner_resolution": {
+    "frequency": "every_call_and_every_notice_subexchange",
+    "accepted_caller_context": [
+      "interface_contract",
+      "workspace_id",
+      "my_chat_user_id",
+      "host_request_id",
+      "context_ref"
+    ],
+    "forbidden_caller_authority_fields": [
+      "participant_id",
+      "participant_ref",
+      "role",
+      "role_assignment_id",
+      "role_assignment_ref",
+      "scope_id",
+      "scope_ref",
+      "family_id",
+      "child_id",
+      "enrollment_id",
+      "grant_id",
+      "care_group_id",
+      "institution_id"
+    ],
+    "current_owner_facts": [
+      "active Participant bound from the authenticated My-Chat user",
+      "current Guardian role assignment",
+      "exact family and child-care-process association selected by context_ref",
+      "one current Enrollment and its exact CareGroup",
+      "current child-link Grant, visibility, purpose and protected-display policy"
+    ],
+    "ambiguous_enrollment_rule": "Zero or multiple current Enrollment candidates fail closed as ambiguous_context; Nurture never picks the first candidate.",
+    "safe_projection": "Responses expose only parent presenter role/scope metadata and opaque refs; no Participant, RoleAssignment, Enrollment, Grant, CareGroup or raw identity is returned.",
+    "context_ref_rule": "context_ref is routing input and a cache dimension, never authorization; drift returns a mask signal before any prior payload can render."
+  },
+  "enum_policy": {
+    "wire_enums": "Only presenter display, transport and safe-recovery vocabularies declared in this artifact may cross the boundary.",
+    "owner_business_enums": "forbidden",
+    "mapping_rule": "The future owner adapter maps current domain and persistence facts into this vocabulary and never serializes Prisma or domain enum names directly."
+  },
+  "safe_reason_codes": [
+    {
+      "code": "access_changed",
+      "meaning": "Current participant, role, association, enrollment, grant or scope authority no longer permits this presentation.",
+      "retryable": false,
+      "mask_required": true,
+      "recovery": "leave_private_surface"
+    },
+    {
+      "code": "context_changed",
+      "meaning": "The supplied context_ref or its current owner binding no longer names the active presentation context.",
+      "retryable": false,
+      "mask_required": true,
+      "recovery": "resolve_context_again"
+    },
+    {
+      "code": "ambiguous_context",
+      "meaning": "Current owner facts do not resolve exactly one eligible enrollment context.",
+      "retryable": false,
+      "mask_required": true,
+      "recovery": "select_context_again"
+    },
+    {
+      "code": "protected_display_denied",
+      "meaning": "Current owner policy does not permit protected content to display.",
+      "retryable": false,
+      "mask_required": true,
+      "recovery": "none"
+    },
+    {
+      "code": "refresh_not_retryable",
+      "meaning": "Refresh failed with a contract, authority or policy condition that blind retry cannot repair.",
+      "retryable": false,
+      "mask_required": true,
+      "recovery": "resolve_context_again"
+    },
+    {
+      "code": "content_unavailable",
+      "meaning": "The requested owner projection is not currently available without disclosing whether a protected source exists.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "none"
+    },
+    {
+      "code": "temporarily_unavailable",
+      "meaning": "A transient owner read failed before a response payload was composed.",
+      "retryable": true,
+      "mask_required": false,
+      "recovery": "retry_read"
+    },
+    {
+      "code": "request_invalid",
+      "meaning": "The request did not satisfy the closed schema or exact-pin admission rule.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "fix_request"
+    },
+    {
+      "code": "media_unavailable",
+      "meaning": "A currently visible activity has no currently issuable protected-media access ref.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "none"
+    },
+    {
+      "code": "confirmation_expired",
+      "meaning": "The actor-bound notice confirmation expired before commit.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "reprepare"
+    },
+    {
+      "code": "confirmation_replayed",
+      "meaning": "The confirmation was consumed without a provable matching committed result.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "refresh"
+    },
+    {
+      "code": "invalid_confirmation",
+      "meaning": "The notice confirmation is malformed or is not bound to this actor and interface.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "none"
+    },
+    {
+      "code": "stale_confirmation",
+      "meaning": "The notice, action eligibility or reviewed owner heads changed after prepare.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "reprepare"
+    },
+    {
+      "code": "confirmation_outcome_unknown",
+      "meaning": "The confirm request may have crossed the durability boundary and only the same command may be reconciled.",
+      "retryable": false,
+      "mask_required": false,
+      "recovery": "reconcile_same_command"
+    }
+  ],
+  "protected_cache": {
+    "boundary_contract": {
+      "key": "my-chat.mobile.async-boundary",
+      "version": "1.0.0",
+      "source": "My-Chat T-036 cross-role-async-boundary-contract-v1",
+      "required_scenarios": [
+        "ASYNC-01",
+        "ASYNC-02",
+        "ASYNC-03",
+        "ASYNC-04",
+        "ASYNC-05",
+        "ASYNC-06",
+        "ASYNC-07",
+        "ASYNC-08",
+        "ASYNC-09",
+        "ASYNC-10",
+        "ASYNC-11",
+        "ASYNC-12"
+      ]
+    },
+    "partition_dimensions": [
+      "interface key",
+      "interface version",
+      "exact contract digest",
+      "workspace_id",
+      "my_chat_user_id",
+      "presentation role",
+      "context_ref",
+      "owner resolution_ref",
+      "owner scope_version",
+      "operation",
+      "operation query_key"
+    ],
+    "rules": [
+      "A cache entry belongs to exactly one full dimension tuple; no prefix, role, context or contract fallback is permitted.",
+      "Scope replacement, access_changed, context_changed or ambiguous_context synchronously purges the affected Nurture parent-context partition before navigation or replacement render.",
+      "Protected display denial removes content itself, action refs and media access refs; disabling controls alone is insufficient.",
+      "Offline may display only an unexpired, privacy-valid snapshot as read-only; owner-backed writes and media access refresh stay disabled.",
+      "Stale display requires an explicit current response permission and never authorizes a notice action or media access refresh.",
+      "Starting a refresh does not extend snapshot or media expiry, and a failed refresh never overwrites a valid entry.",
+      "Non-retryable refresh failure masks old rows; a newer request generation always defeats a late completion.",
+      "Notice outcome_unknown preserves only protected same-command correlation and cannot create a substitute command."
+    ]
+  },
+  "compatibility": {
+    "adoption": "exact_key_version_digest",
+    "version_ranges": "forbidden",
+    "floating_aliases": "forbidden",
+    "additive_change": "New optional fields or operations require a new additive minor and a new digest; consumers continue to use their exact prior pin.",
+    "breaking_change": "Removed, renamed, narrowed or reinterpreted fields, enum members, reason codes or semantics require a new major and parallel consumer migration.",
+    "deprecation": "A version remains available only under an explicit bilateral retirement record; mounting its fail-closed routes neither activates nor retires the interface.",
+    "surface_policy": "This standalone artifact does not advance or mutate nurture.surface-contract@1.20.0."
+  },
+  "operation_order": [
+    "day_query",
+    "daily_care_cards_query",
+    "activity_detail_query",
+    "notice_list_and_confirmation",
+    "freshness_attendance_projection"
+  ],
+  "operations": {
+    "day_query": {
+      "t039_row": "P-O01",
+      "path": "/internal/nurture/parent-context-presenter/v1/day",
+      "request_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/day_query_request",
+      "response_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/day_query_response",
+      "semantic_rules": [
+        "The future date is never selectable; previous_date and next_date are null at their owner-defined bounds.",
+        "available_dates is an owner-confirmed display window, not evidence that attendance or content exists on a date.",
+        "The ready day response includes at most 20 activity summaries with opaque activity_ref, bounded title, occurred_at and media_state so Mobile can render cards and request the retained detail operation.",
+        "Every date selection triggers a new owner resolution and cannot reuse a previous context partition."
+      ]
+    },
+    "daily_care_cards_query": {
+      "t039_row": "P-O02",
+      "path": "/internal/nurture/parent-context-presenter/v1/daily-care",
+      "request_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/daily_care_cards_query_request",
+      "response_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/daily_care_cards_query_response",
+      "semantic_rules": [
+        "Each card independently reports provided or missing; missing never means zero, normal or absent.",
+        "Protected-display denial masks the complete card collection rather than returning empty protected labels.",
+        "meal, nap, activity, mood and health source payloads are reduced to bounded display strings and their owner enums never cross the boundary."
+      ]
+    },
+    "activity_detail_query": {
+      "t039_row": "P-O03",
+      "path": "/internal/nurture/parent-context-presenter/v1/activity-detail",
+      "request_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/activity_detail_query_request",
+      "response_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/activity_detail_query_response",
+      "semantic_rules": [
+        "Activity detail closes and its partition purges on scope, context or revocation drift.",
+        "The requested activity_ref must be one of the summaries returned for the same context_ref and selected local_date.",
+        "A protected media item carries only an opaque owner-stream access_ref with a bounded expiry; no storage ref, signed URL or reusable link crosses this contract.",
+        "The consumer never reuses an expired or prior-partition access_ref and never caches media bytes under the presentation cache."
+      ]
+    },
+    "notice_list_and_confirmation": {
+      "t039_row": "P-O04",
+      "path": "/internal/nurture/parent-context-presenter/v1/notices",
+      "request_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/notice_operation_request",
+      "response_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/notice_operation_response",
+      "exchange_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/notice_operation_exchange",
+      "semantic_rules": [
+        "list, prepare_confirmation and confirm are closed sub-exchanges of this one owner operation.",
+        "The list action_ref and action_version identify exact confirmation copy; prepare returns the same identity and byte-equivalent preview copy, confirmation_ref and command_request_id, and confirm echoes that complete five-field identity tuple.",
+        "Prepare issues a five-minute-or-shorter actor/context/action-bound confirmation; confirm reruns owner resolution and revalidates notice version and eligibility before any effect.",
+        "A duplicate with provable matching committed evidence returns committed with execution_disposition replayed; otherwise it returns confirmation_replayed.",
+        "Offline, stale, masked and refresh-failed states never submit a confirmation; outcome_unknown permits only reconciliation of the same command.",
+        "A late response cannot update a replaced, revoked or newer request generation."
+      ]
+    },
+    "freshness_attendance_projection": {
+      "t039_row": "P-O05",
+      "path": "/internal/nurture/parent-context-presenter/v1/freshness-attendance",
+      "request_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/freshness_attendance_request",
+      "response_schema_ref": "urn:nurture:parent-context-presenter:1#/$defs/freshness_attendance_response",
+      "semantic_rules": [
+        "present, no_attendance, closed and unknown are presenter display states only and never become a second canonical attendance claim.",
+        "fresh and stale are owner response states; offline is produced only by the My-Chat async boundary when no response is available.",
+        "Stale responses are read-only, and refresh_not_retryable masks all prior Nurture parent-context rows."
+      ]
+    }
+  },
+  "schemas": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:nurture:parent-context-presenter:1",
+    "$defs": {
+      "opaque_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2048,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._~:/+@=-]{0,2047}$"
+      },
+      "digest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "instant": {
+        "type": "string",
+        "format": "date-time",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+      },
+      "local_date": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$"
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.parent-context-presenter"
+          },
+          "version": {
+            "const": "1.0.0"
+          },
+          "digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "presentation_role": {
+            "const": "parent"
+          },
+          "scope_kind": {
+            "const": "parent_context"
+          },
+          "scope_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "interface_key": {
+            "const": "nurture.parent-context-presenter"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "contract_digest": {
+            "$ref": "#/$defs/digest"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "presentation_role": {
+            "const": "parent"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "operation": {
+            "enum": [
+              "day_query",
+              "daily_care_cards_query",
+              "activity_detail_query",
+              "notice_list_and_confirmation",
+              "freshness_attendance_projection"
+            ]
+          },
+          "query_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "reason_code",
+          "purge_partition",
+          "content_masked",
+          "actions_disabled",
+          "media_access_invalidated"
+        ],
+        "properties": {
+          "kind": {
+            "const": "mask"
+          },
+          "reason_code": {
+            "enum": [
+              "access_changed",
+              "context_changed",
+              "ambiguous_context",
+              "protected_display_denied",
+              "refresh_not_retryable"
+            ]
+          },
+          "purge_partition": {
+            "const": true
+          },
+          "content_masked": {
+            "const": true
+          },
+          "actions_disabled": {
+            "const": true
+          },
+          "media_access_invalidated": {
+            "const": true
+          }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "masked_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "mask_signal": {
+            "$ref": "#/$defs/mask_signal"
+          }
+        }
+      },
+      "unavailable_response": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "context_ref",
+              "failed_at",
+              "reason_code",
+              "retryable"
+            ],
+            "properties": {
+              "status": {
+                "const": "unavailable"
+              },
+              "context_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "failed_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "reason_code": {
+                "const": "temporarily_unavailable"
+              },
+              "retryable": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "context_ref",
+              "failed_at",
+              "reason_code",
+              "retryable"
+            ],
+            "properties": {
+              "status": {
+                "const": "unavailable"
+              },
+              "context_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "failed_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "reason_code": {
+                "enum": [
+                  "content_unavailable",
+                  "request_invalid"
+                ]
+              },
+              "retryable": {
+                "const": false
+              }
+            }
+          }
+        ]
+      },
+      "day_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          }
+        }
+      },
+      "date_option": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date",
+          "label",
+          "short_label",
+          "is_today",
+          "available"
+        ],
+        "properties": {
+          "date": {
+            "$ref": "#/$defs/local_date"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "short_label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "is_today": {
+            "type": "boolean"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        }
+      },
+      "activity_summary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "activity_ref",
+          "title_display",
+          "occurred_at",
+          "media_state"
+        ],
+        "properties": {
+          "activity_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "title_display": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "occurred_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "media_state": {
+            "enum": [
+              "none",
+              "protected",
+              "unavailable"
+            ]
+          }
+        }
+      },
+      "day_query_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "day",
+          "activities"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "day": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "selected_date",
+              "selected_date_label",
+              "previous_date",
+              "next_date",
+              "calendar"
+            ],
+            "properties": {
+              "selected_date": {
+                "$ref": "#/$defs/local_date"
+              },
+              "selected_date_label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "previous_date": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/local_date"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "next_date": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/local_date"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "calendar": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "earliest_date",
+                  "latest_date",
+                  "date_options"
+                ],
+                "properties": {
+                  "earliest_date": {
+                    "$ref": "#/$defs/local_date"
+                  },
+                  "latest_date": {
+                    "$ref": "#/$defs/local_date"
+                  },
+                  "date_options": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 62,
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/$defs/date_option"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "activities": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/$defs/activity_summary"
+            }
+          }
+        }
+      },
+      "day_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/day_query_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "daily_care_cards_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          }
+        }
+      },
+      "daily_care_card": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "card_ref",
+              "label",
+              "value_state",
+              "value_display",
+              "recorded_at"
+            ],
+            "properties": {
+              "card_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "value_state": {
+                "const": "provided"
+              },
+              "value_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "note_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "recorded_at": {
+                "$ref": "#/$defs/instant"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "card_ref",
+              "label",
+              "value_state"
+            ],
+            "properties": {
+              "card_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "value_state": {
+                "const": "missing"
+              }
+            }
+          }
+        ]
+      },
+      "daily_care_cards_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "local_date",
+          "cards"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          },
+          "cards": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "$ref": "#/$defs/daily_care_card"
+            }
+          }
+        }
+      },
+      "daily_care_cards_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/daily_care_cards_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "activity_detail_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "local_date",
+          "activity_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          },
+          "activity_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "protected_media_item": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "media_ref",
+              "access_ref",
+              "access_expires_at",
+              "delivery_mode",
+              "content_type",
+              "alt_text"
+            ],
+            "properties": {
+              "status": {
+                "const": "protected_available"
+              },
+              "media_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "access_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "access_expires_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "delivery_mode": {
+                "const": "owner_stream"
+              },
+              "content_type": {
+                "enum": [
+                  "image/jpeg",
+                  "image/png",
+                  "image/webp",
+                  "video/mp4"
+                ]
+              },
+              "alt_text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "width_px": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16384
+              },
+              "height_px": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16384
+              },
+              "duration_ms": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 600000
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "media_ref",
+              "reason_code"
+            ],
+            "properties": {
+              "status": {
+                "const": "unavailable"
+              },
+              "media_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "reason_code": {
+                "const": "media_unavailable"
+              }
+            }
+          }
+        ]
+      },
+      "activity_detail_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "activity"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "activity": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "activity_ref",
+              "local_date",
+              "title_display",
+              "time_display",
+              "occurred_at",
+              "media_state",
+              "media"
+            ],
+            "properties": {
+              "activity_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "local_date": {
+                "$ref": "#/$defs/local_date"
+              },
+              "title_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "time_display": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "summary_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "occurred_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "media_state": {
+                "enum": [
+                  "none",
+                  "protected",
+                  "unavailable"
+                ]
+              },
+              "media": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/$defs/protected_media_item"
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "media_state": {
+                      "const": "none"
+                    }
+                  },
+                  "required": [
+                    "media_state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "media": {
+                      "type": "array",
+                      "maxItems": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "media_state": {
+                      "const": "protected"
+                    }
+                  },
+                  "required": [
+                    "media_state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "media": {
+                      "type": "array",
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "activity_detail_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/activity_detail_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "notice_list_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "kind"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "const": "list"
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "cursor": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "notice_prepare_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "kind",
+          "notice_ref",
+          "action_ref",
+          "action_version",
+          "expected_notice_version"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "const": "prepare_confirmation"
+          },
+          "notice_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "action_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "action_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "expected_notice_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "notice_confirm_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "kind",
+          "invocation_request_id",
+          "command_request_id",
+          "confirmation_ref",
+          "action_ref",
+          "action_version",
+          "prepared_preview_digest"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "const": "confirm"
+          },
+          "invocation_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "confirmation_ref": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "action_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "action_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "prepared_preview_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      },
+      "notice_operation_request": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/notice_list_request"
+          },
+          {
+            "$ref": "#/$defs/notice_prepare_request"
+          },
+          {
+            "$ref": "#/$defs/notice_confirm_request"
+          }
+        ]
+      },
+      "notice_operation_exchange": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "request",
+              "response"
+            ],
+            "properties": {
+              "request": {
+                "$ref": "#/$defs/notice_list_request"
+              },
+              "response": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/notice_list_ready"
+                  },
+                  {
+                    "$ref": "#/$defs/masked_response"
+                  },
+                  {
+                    "$ref": "#/$defs/unavailable_response"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "request",
+              "response"
+            ],
+            "properties": {
+              "request": {
+                "$ref": "#/$defs/notice_prepare_request"
+              },
+              "response": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/notice_ready_to_confirm"
+                  },
+                  {
+                    "$ref": "#/$defs/masked_response"
+                  },
+                  {
+                    "$ref": "#/$defs/unavailable_response"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "request",
+              "response"
+            ],
+            "properties": {
+              "request": {
+                "$ref": "#/$defs/notice_confirm_request"
+              },
+              "response": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/notice_committed"
+                  },
+                  {
+                    "$ref": "#/$defs/notice_not_committed"
+                  },
+                  {
+                    "$ref": "#/$defs/notice_outcome_unknown"
+                  },
+                  {
+                    "$ref": "#/$defs/masked_response"
+                  },
+                  {
+                    "$ref": "#/$defs/unavailable_response"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "notice_action": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_ref",
+          "action_version",
+          "label",
+          "confirmation_title",
+          "confirmation_body",
+          "action_semantics"
+        ],
+        "properties": {
+          "action_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "action_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "confirmation_title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "confirmation_body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "action_semantics": {
+            "const": "confirm_notice"
+          }
+        }
+      },
+      "notice_item": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "notice_ref",
+              "notice_version",
+              "title_display",
+              "display_status",
+              "published_at"
+            ],
+            "properties": {
+              "notice_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "notice_version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "title_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "summary_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "display_status": {
+                "enum": [
+                  "unread",
+                  "read",
+                  "expired"
+                ]
+              },
+              "published_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "expires_at": {
+                "$ref": "#/$defs/instant"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "notice_ref",
+              "notice_version",
+              "title_display",
+              "display_status",
+              "published_at",
+              "action"
+            ],
+            "properties": {
+              "notice_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "notice_version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "title_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "summary_display": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "display_status": {
+                "const": "action_required"
+              },
+              "published_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "expires_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "action": {
+                "$ref": "#/$defs/notice_action"
+              }
+            }
+          }
+        ]
+      },
+      "notice_list_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "notices",
+          "page_info"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "notices": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/$defs/notice_item"
+            }
+          },
+          "page_info": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "has_more"
+                ],
+                "properties": {
+                  "has_more": {
+                    "const": false
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "has_more",
+                  "next_cursor"
+                ],
+                "properties": {
+                  "has_more": {
+                    "const": true
+                  },
+                  "next_cursor": {
+                    "$ref": "#/$defs/opaque_ref"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "notice_ready_to_confirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "notice_ref",
+          "notice_version",
+          "action_ref",
+          "action_version",
+          "preview",
+          "prepared_preview_digest",
+          "confirmation_ref",
+          "expires_at",
+          "command_request_id"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready_to_confirm"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "notice_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "notice_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "action_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "preview": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "effect",
+              "title",
+              "body"
+            ],
+            "properties": {
+              "effect": {
+                "const": "confirm_notice"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          },
+          "prepared_preview_digest": {
+            "$ref": "#/$defs/digest"
+          },
+          "confirmation_ref": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          }
+        }
+      },
+      "notice_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "execution_disposition",
+          "business_outcome",
+          "committed_result"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "execution_disposition": {
+            "enum": [
+              "executed",
+              "replayed"
+            ]
+          },
+          "business_outcome": {
+            "enum": [
+              "applied",
+              "already_satisfied"
+            ]
+          },
+          "committed_result": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "notice_ref",
+              "display_status",
+              "confirmed_at"
+            ],
+            "properties": {
+              "notice_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "display_status": {
+                "const": "read"
+              },
+              "confirmed_at": {
+                "$ref": "#/$defs/instant"
+              }
+            }
+          }
+        }
+      },
+      "notice_not_committed": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason_code",
+              "recovery"
+            ],
+            "properties": {
+              "status": {
+                "const": "not_committed"
+              },
+              "reason_code": {
+                "const": "confirmation_expired"
+              },
+              "recovery": {
+                "const": "reprepare"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason_code",
+              "recovery"
+            ],
+            "properties": {
+              "status": {
+                "const": "not_committed"
+              },
+              "reason_code": {
+                "const": "confirmation_replayed"
+              },
+              "recovery": {
+                "const": "refresh"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason_code",
+              "recovery"
+            ],
+            "properties": {
+              "status": {
+                "const": "not_committed"
+              },
+              "reason_code": {
+                "const": "invalid_confirmation"
+              },
+              "recovery": {
+                "const": "none"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason_code",
+              "recovery"
+            ],
+            "properties": {
+              "status": {
+                "const": "not_committed"
+              },
+              "reason_code": {
+                "const": "stale_confirmation"
+              },
+              "recovery": {
+                "const": "reprepare"
+              }
+            }
+          }
+        ]
+      },
+      "notice_outcome_unknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "reason_code",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "outcome_unknown"
+          },
+          "reason_code": {
+            "const": "confirmation_outcome_unknown"
+          },
+          "recovery": {
+            "const": "reconcile_same_command"
+          }
+        }
+      },
+      "notice_operation_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/notice_list_ready"
+          },
+          {
+            "$ref": "#/$defs/notice_ready_to_confirm"
+          },
+          {
+            "$ref": "#/$defs/notice_committed"
+          },
+          {
+            "$ref": "#/$defs/notice_not_committed"
+          },
+          {
+            "$ref": "#/$defs/notice_outcome_unknown"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "freshness_attendance_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/opaque_id"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          }
+        }
+      },
+      "fresh_freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state",
+          "data_as_of",
+          "stale_at",
+          "last_successful_refresh_at",
+          "read_only"
+        ],
+        "properties": {
+          "state": {
+            "const": "fresh"
+          },
+          "data_as_of": {
+            "$ref": "#/$defs/instant"
+          },
+          "stale_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "last_successful_refresh_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "read_only": {
+            "const": false
+          }
+        }
+      },
+      "stale_freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state",
+          "data_as_of",
+          "stale_at",
+          "last_successful_refresh_at",
+          "read_only",
+          "stale_display_allowed"
+        ],
+        "properties": {
+          "state": {
+            "const": "stale"
+          },
+          "data_as_of": {
+            "$ref": "#/$defs/instant"
+          },
+          "stale_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "last_successful_refresh_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "read_only": {
+            "const": true
+          },
+          "stale_display_allowed": {
+            "const": true
+          }
+        }
+      },
+      "attendance_display": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "display_state",
+          "message",
+          "source_display"
+        ],
+        "properties": {
+          "display_state": {
+            "enum": [
+              "present",
+              "no_attendance",
+              "closed",
+              "unknown"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "source_display": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "observed_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "freshness_attendance_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "local_date",
+          "freshness",
+          "attendance"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          },
+          "freshness": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/fresh_freshness"
+              },
+              {
+                "$ref": "#/$defs/stale_freshness"
+              }
+            ]
+          },
+          "attendance": {
+            "$ref": "#/$defs/attendance_display"
+          }
+        }
+      },
+      "freshness_attendance_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/freshness_attendance_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      }
+    }
+  }
+}

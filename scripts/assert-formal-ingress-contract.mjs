@@ -31,6 +31,18 @@ const teacherReleaseOwnerPaths = {
   TEACHER_RELEASE_OWNER_CONFIRM_PATH:
     "/internal/nurture/teacher-release-owner/v3/confirm",
 };
+const parentContextPresenterPaths = {
+  PARENT_CONTEXT_PRESENTER_DAY_PATH:
+    "/internal/nurture/parent-context-presenter/v1/day",
+  PARENT_CONTEXT_PRESENTER_DAILY_CARE_PATH:
+    "/internal/nurture/parent-context-presenter/v1/daily-care",
+  PARENT_CONTEXT_PRESENTER_ACTIVITY_DETAIL_PATH:
+    "/internal/nurture/parent-context-presenter/v1/activity-detail",
+  PARENT_CONTEXT_PRESENTER_NOTICES_PATH:
+    "/internal/nurture/parent-context-presenter/v1/notices",
+  PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH:
+    "/internal/nurture/parent-context-presenter/v1/freshness-attendance",
+};
 const expectedPaths = [
   healthPath,
   ownerPath,
@@ -55,6 +67,11 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/teacher-release-owner.controller.ts:POST:TEACHER_RELEASE_OWNER_PREPARE_PATH`,
   `apps/scenario-service/src/teacher-release-owner.controller.ts:POST:TEACHER_RELEASE_OWNER_QUERY_PATH`,
   `apps/scenario-service/src/teacher-release-owner.controller.ts:POST:TEACHER_RELEASE_OWNER_TARGETS_PATH`,
+  `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_ACTIVITY_DETAIL_PATH`,
+  `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_DAILY_CARE_PATH`,
+  `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_DAY_PATH`,
+  `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH`,
+  `apps/scenario-service/src/parent-context-presenter.controller.ts:POST:PARENT_CONTEXT_PRESENTER_NOTICES_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -62,10 +79,12 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/harness.controller.ts#HarnessController",
   "apps/scenario-service/src/family-growth-rendition.controller.ts#FamilyGrowthRenditionController",
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",
+  "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",
+  "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -493,6 +512,194 @@ for (const route of [
     `${route.handler} remains default-off`);
 }
 
+const parentContextPresenterControllerSource = read(
+  "apps/scenario-service/src/parent-context-presenter.controller.ts",
+);
+const parentContextPresenterHttpSource = read(
+  "apps/scenario-service/src/parent-context-presenter-http.ts",
+);
+const parentContextPresenterRuntimeSource = read(
+  "apps/scenario-service/src/parent-context-presenter-runtime.ts",
+);
+const parentContextPresenterCompositionSource = read(
+  "apps/scenario-service/src/parent-context-presenter-composition.ts",
+);
+const parentContextPresenterResponseValidatorSource = read(
+  "apps/scenario-service/src/parent-context-presenter-response-validator.ts",
+);
+const parentContextPresenterContractSource = read(
+  "packages/nurture-scenario/src/parent-context-presenter-contract.ts",
+);
+const parentContextPresenterArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/parent-context-presenter/v1/parent-context-presenter.owner-contract.json",
+  ),
+);
+
+assertIncludes(
+  parentContextPresenterControllerSource,
+  "@Controller()\n@UseFilters(PrivateResponseExceptionFilter)\n@UseGuards(ParentContextPresenterServiceAuthGuard)",
+  "parent-context routes use the private response filter and service-bearer guard",
+);
+assertIncludes(
+  parentContextPresenterControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "parent-context guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  parentContextPresenterControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "parent-context guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.parent-context-presenter"',
+  'version: "1.0.0"',
+  "sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+]) {
+  assertIncludes(
+    parentContextPresenterContractSource,
+    fragment,
+    `parent-context exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  parentContextPresenterArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "parent-context artifact mounted route posture",
+);
+assertEqual(
+  parentContextPresenterArtifact.publication_posture?.runtime_adapter,
+  "owner_ports_required_default_off",
+  "parent-context artifact owner-port posture",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED",
+  "parent-context has an explicit runtime gate",
+);
+assertIncludes(
+  parentContextPresenterRuntimeSource,
+  "|| !binding.asyncBoundary",
+  "parent-context composition requires the active consumer boundary",
+);
+for (const fragment of [
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+  "|| !binding.asyncBoundary",
+]) {
+  assertIncludes(
+    parentContextPresenterRuntimeSource,
+    fragment,
+    `parent-context complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  parentContextPresenterResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "parent-context runtime compiles the published schema artifact",
+);
+assertIncludes(
+  parentContextPresenterResponseValidatorSource,
+  "digest !== PARENT_CONTEXT_PRESENTER_INTERFACE.digest",
+  "parent-context runtime hard-checks the compiled artifact pin",
+);
+assertIncludes(
+  parentContextPresenterCompositionSource,
+  "assertPublishedParentContextPresenterResponse(operation, response)",
+  "parent-context composition enforces the published response schema",
+);
+assertIncludes(
+  parentContextPresenterCompositionSource,
+  "noticeStatusMatchesKind(request.kind, response.status)",
+  "parent-context composition enforces the notice kind/status matrix",
+);
+assertIncludes(
+  parentContextPresenterCompositionSource,
+  "lateResultMayApply({",
+  "parent-context composition owns ASYNC-12 result rejection",
+);
+assertEqual(
+  parentContextPresenterArtifact.operations?.notice_list_and_confirmation
+    ?.exchange_schema_ref,
+  "urn:nurture:parent-context-presenter:1#/$defs/notice_operation_exchange",
+  "parent-context notice exchange matrix schema pin",
+);
+for (const route of [
+  {
+    constant: "PARENT_CONTEXT_PRESENTER_DAY_PATH",
+    handler: "day",
+    parser: "parseParentContextPresenterDayRequestV1",
+  },
+  {
+    constant: "PARENT_CONTEXT_PRESENTER_DAILY_CARE_PATH",
+    handler: "dailyCare",
+    parser: "parseParentContextPresenterDailyCareRequestV1",
+  },
+  {
+    constant: "PARENT_CONTEXT_PRESENTER_ACTIVITY_DETAIL_PATH",
+    handler: "activityDetail",
+    parser: "parseParentContextPresenterActivityDetailRequestV1",
+  },
+  {
+    constant: "PARENT_CONTEXT_PRESENTER_NOTICES_PATH",
+    handler: "notices",
+    parser: "parseParentContextPresenterNoticeRequestV1",
+  },
+  {
+    constant: "PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH",
+    handler: "freshnessAttendance",
+    parser: "parseParentContextPresenterFreshnessAttendanceRequestV1",
+  },
+]) {
+  const expectedPath = parentContextPresenterPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    parentContextPresenterContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    parentContextPresenterControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(
+    block,
+    '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`,
+  );
+  assertIncludes(
+    block,
+    '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`,
+  );
+  assertIncludes(
+    block,
+    `${route.parser}(`,
+    `${route.handler} exact pinned request parser`,
+  );
+  assertIncludes(
+    block,
+    `this.composition().${route.handler}(`,
+    `${route.handler} Q6 owner composition`,
+  );
+  assertIncludes(
+    parentContextPresenterHttpSource,
+    "body.interface_contract.digest !== PARENT_CONTEXT_PRESENTER_INTERFACE.digest",
+    `${route.handler} exact interface digest admission`,
+  );
+  assertIncludes(
+    parentContextPresenterRuntimeSource,
+    "!input.enabled",
+    `${route.handler} remains default-off`,
+  );
+}
+
 const familySharingControllerSource = read(
   "apps/scenario-service/src/family-sharing-private.controller.ts",
 );
@@ -806,7 +1013,7 @@ assertArrayEqual(
 
 process.stdout.write(
   `[ok] formal ingress contract formal-routes=7 controller-routes=${expectedControllerRoutes.length} ` +
-    `teacher-release-routes=4 signed-family-sharing-routes=1 owner-fields=8 ` +
+    `teacher-release-routes=4 parent-context-routes=5 signed-family-sharing-routes=1 owner-fields=8 ` +
     `harness-actions=${routedActionVersions.size} ` +
     `harness-queries=${routedQueryVersions.size} registered=${registeredVersions.size} ` +
     `unrouted=${expectedUnroutedCapabilityKeys.length} versions=per-capability ` +

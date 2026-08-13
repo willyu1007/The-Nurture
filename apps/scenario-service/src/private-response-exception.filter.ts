@@ -2,6 +2,7 @@ import {
   type ArgumentsHost,
   Catch,
   type ExceptionFilter,
+  Inject,
   Injectable,
 } from "@nestjs/common";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
@@ -14,7 +15,10 @@ type PrivateResponse = {
 @Catch()
 @Injectable()
 export class PrivateResponseExceptionFilter implements ExceptionFilter {
-  constructor(private readonly safeExceptionFilter: SafeExceptionFilter) {}
+  constructor(
+    @Inject(SafeExceptionFilter)
+    private readonly safeExceptionFilter: SafeExceptionFilter,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<PrivateResponse>();
