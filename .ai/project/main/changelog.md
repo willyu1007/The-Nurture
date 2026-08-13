@@ -130,3 +130,4 @@ Project: `main`
 - 2026-08-13 task_id=T-011 event=scope-expansion id=W5 result=audit-defect-hardening-adopted source=codex-gpt-5.6-sol-audit p1=6-open p2=4-open closed=N4 requirements=R-003,R-004 f005=reopened-in-progress activation=unchanged
 - 2026-08-13 task_id=T-011 event=fix-batch id=W5-N2-N5-N6-N8 result=implemented-reviewed-repaired-confirmed reviews=2-adversarial-rounds repairs=NR1-NR5 unit=1052/1052 routing_census=181 apply=none activation=unchanged
 - 2026-08-13 task_id=T-002 event=pin-reseal id=C30 result=content-reseal my_chat=b90cce2 x5_joint_api=d430b5d1 self_pin=7b7f40c1 reason=t042-authorization-hardening-and-w5-fix-batch wave4=unchanged contract_parity=unchanged activation=unchanged
+- 2026-08-13 task_id=T-002 event=lock-rotation id=C30-I3 result=owner-adoption-lock-rotated source=170edd4 aggregate=fbbc34c6 reason=t042-content-reseal-and-w5-guard-comments content_profiles=c30-unchanged activation=unchanged

@@ -77,3 +77,22 @@ T-008 and all activation gates remain separately closed.
   `nurture_c30_manifest_foundation_v1` profile.
 - The 2026-08-12 requalification evidence above remains authoritative; no
   content requalification was required for this reseal.
+
+## 2026-08-13 T-042 content reseal addendum
+
+- My-Chat pin head: `b90cce2e11e17dec238854b39954b4dae31e14db` (T-042
+  authorization-hardening batch: family-authorization fingerprint,
+  notification recipient validation and push-claim recheck).
+- `x5_joint_api` rotated to
+  `d430b5d15423b5a75792a9d5dc2624718c12203a4435659a23a93551a905e556`
+  (worker/notification/scenario-integration sources changed); the shared
+  workflow contract (`85cf56e2…`) and `wave4_binding_host` (`65d6b0a0…`)
+  remain byte-identical.
+- Nurture self-pin rotated to `7b7f40c1…` by the T-011 W5 settlement
+  hardening batch; lock source `170edd481b2d38a277ef872e5170dca770fb18d7`;
+  owner aggregate
+  `fbbc34c67b321fdd702d7cbe394a69b1cf02d18e6af61535da6aef136236bc51`.
+- The C30 Host runtime profiles are unchanged; the 2026-08-12
+  requalification evidence remains authoritative for runtime behavior.
+  Both repos' fix batches carry their own two-round adversarial review
+  records.
