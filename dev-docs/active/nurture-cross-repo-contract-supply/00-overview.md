@@ -4,11 +4,12 @@
 
 - State: in-progress
 - Updated: 2026-08-13
-- Next step: W1 design draft is written
-  (`artifacts/w1-guardian-decision-callback-design-draft.md`, additive
-  `family_growth_transport@1.1.0` push callback with a collapsed two-value
-  decision vocabulary); next is the My-Chat joint review and sign-off of its
-  six open items, then freezing the joint design record. W2 scope draft is
+- Next step: W1 is FROZEN (2026-08-13):
+  `artifacts/w1-guardian-decision-callback-design-draft.md` is the frozen
+  joint design record for the additive `family_growth_transport@1.1.0`
+  push callback, closed through a four-round owner-delegated adversarial
+  review gate. Implementation waits for the W5 settlement-surface rule
+  and its own batch. Next is W2 field-level schema authoring. W2 scope draft is
   written (`artifacts/w2-parent-context-presenter-scope-draft.md`, proposed
   `nurture.parent-context-presenter@1.0.0` mapped to P-O01..P-O05 with
   IR-C01-shaped publication requirements); next is field-level schema
@@ -76,9 +77,12 @@ conformance fixtures, all default-off.
 
 ## Acceptance criteria
 
-- [ ] W1: a frozen joint design record exists with My-Chat sign-off, a
-  versioned callback contract delta and a defined resolution path for the
-  teacher queue `pending` state; no runtime activation.
+- [x] W1: the joint design record is frozen (2026-08-13) after the
+  fourth-round independent adversarial review reported zero unresolved
+  REQUIRED items, with a versioned callback contract delta
+  (`family_growth_transport@1.1.0`) and a defined resolution path for the
+  teacher queue `pending` state (bounded expiry plus reconciliation); no
+  runtime activation.
 - [ ] W2: parent-context presenter v1 is registered as a versioned owner DTO
   with adapter and conformance fixtures, and My-Chat T-039 can start IR-C01
   adoption against an exact pin.

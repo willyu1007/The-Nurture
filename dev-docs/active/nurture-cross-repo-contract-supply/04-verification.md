@@ -31,3 +31,11 @@
 - `git diff --check` — passed.
 - Per explicit scope, `pnpm lint`, pin verification, schema/migration operations
   and build commands were not run.
+
+## 2026-08-13 — W1 callback design draft v2
+
+- `node .ai/scripts/lint-docs.mjs --strict --path
+  dev-docs/active/nurture-cross-repo-contract-supply` — passed; 6/6 Markdown
+  files, zero errors and zero warnings.
+- No code, schema, migration, runtime or build verification was required for
+  this documentation-only revision.

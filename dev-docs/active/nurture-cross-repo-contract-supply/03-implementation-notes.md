@@ -42,3 +42,18 @@
   that real PostgreSQL locking/rollback evidence is deferred to the T-011 N3
   disposable-target qualification run.
 - No schema, migration, configuration, activation or default change was made.
+
+## 2026-08-13 — W1 callback design draft v2
+
+- Replaced the first callback draft with the owner-delegated v2 design after
+  the independent adversarial review returned six REQUIRED findings.
+- Froze exact event and receipt keys, RFC 8785 canonical-byte digest and replay
+  rules, full receipt correlation, and complete frozen section-3 settlement
+  parity.
+- Added a one-terminal-outcome admission state machine, pre-receipt staging,
+  lifecycle precedence, explicit coarsened teacher disclosure, and removal of
+  `decision_time` from the wire.
+- Required finite My-Chat expiry with a 30-day default and atomic closure plus
+  outbox emission. Added bilateral gates, validator-first token sequencing,
+  successor teacher DTO deployment and scoped golden-byte gates.
+- No schema, route, token, deployment, activation or runtime change was made.
