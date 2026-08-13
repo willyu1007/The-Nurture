@@ -32,6 +32,9 @@ import {
   FamilySharingPrivateServiceAuthGuard,
   type FamilySharingPrivateConfig,
 } from "./family-sharing-private.controller.js";
+import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
+import { SafeExceptionFilter } from "./safe-exception.filter.js";
+import { ScenarioStructuredLogger } from "./structured-logger.js";
 
 @Module({
   controllers: [
@@ -45,6 +48,7 @@ import {
 })
 export class AppModule {
   static register(input: {
+    logger: ScenarioStructuredLogger;
     bindingOwner: BindingOwnerGuardConfig;
     harness: HarnessGuardConfig;
     familyGrowthRendition: FamilyGrowthRenditionRuntime;
@@ -54,6 +58,12 @@ export class AppModule {
     return {
       module: AppModule,
       providers: [
+        {
+          provide: ScenarioStructuredLogger,
+          useValue: input.logger,
+        },
+        SafeExceptionFilter,
+        PrivateResponseExceptionFilter,
         {
           provide: FAMILY_GROWTH_RENDITION_RUNTIME,
           useValue: input.familyGrowthRendition,

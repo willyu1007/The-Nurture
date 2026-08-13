@@ -1,6 +1,9 @@
 import { generateKeyPairSync, sign, verify } from "node:crypto";
-import { describe, expect, it } from "vitest";
-import type { ScenarioPrivateInvocationV1 } from "@my-chat/workflow-contracts";
+import { describe, expect, it, vi } from "vitest";
+import {
+  assertScenarioPrivateInvocationV1,
+  type ScenarioPrivateInvocationV1,
+} from "@my-chat/workflow-contracts";
 import {
   InMemoryAtomicNurtureScenarioNonceStore,
   NurtureCanonicalJsonError,
@@ -131,11 +134,14 @@ describe("C30 Nurture trusted invocation", () => {
       const value = invocation({
         principal: { ...invocation().principal, principal_origin: principalOrigin },
       });
-      await expect(verifyRequest({ value })).resolves.toMatchObject({
+      const store = new InMemoryAtomicNurtureScenarioNonceStore();
+      const consumeOnce = vi.spyOn(store, "consumeOnce");
+      await expect(verifyRequest({ value, store })).resolves.toMatchObject({
         declaration,
         trust_policy_revision: 7,
         credential_subject: "my-chat-workload",
       });
+      expect(consumeOnce).toHaveBeenCalledOnce();
     },
   );
 
@@ -217,6 +223,25 @@ describe("C30 Nurture trusted invocation", () => {
   it("rejects an expired request before nonce consumption", async () => {
     await expect(verifyRequest({ verificationNow: new Date("2026-08-06T08:00:25.000Z") }))
       .rejects.toMatchObject({ code: "clock_invalid" });
+  });
+
+  it("rejects an upstream-valid 60-second invocation expired by the local clock before nonce consumption", async () => {
+    const value = invocation({
+      request: {
+        ...invocation().request,
+        issued_at: "2026-08-06T07:59:00.000Z",
+        expires_at: "2026-08-06T08:00:00.000Z",
+      },
+    });
+    expect(() => assertScenarioPrivateInvocationV1(value)).not.toThrow();
+    const store = new InMemoryAtomicNurtureScenarioNonceStore();
+    const consumeOnce = vi.spyOn(store, "consumeOnce");
+
+    await expect(verifyRequest({ value, store })).rejects.toMatchObject({
+      code: "clock_invalid",
+      phase: "clock",
+    });
+    expect(consumeOnce).not.toHaveBeenCalled();
   });
 
   it("allows exactly one concurrent nonce consumer", async () => {

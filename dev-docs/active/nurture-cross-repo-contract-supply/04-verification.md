@@ -1,5 +1,70 @@
 # Verification
 
+## 2026-08-13 — W5 N9 adversarial review repair
+
+- `node scripts/assert-formal-ingress-contract.mjs` — passed; AST census found
+  all 14 routes across every scenario-service `.ts` file, exact six-controller
+  static/dynamic module registration, the only service bootstrap call, both scoped
+  private-filter registrations and both dynamic-module filter providers. Its
+  alias, namespace and non-standard-filename negative self-checks passed.
+- Focused trusted-invocation suite — 1/1 file, 24/24 tests passed, including the
+  upstream-valid/local-expired 60-second request, zero nonce consumption on
+  local expiry and exactly one nonce consumption on accepted invocation.
+- Focused private exception-filter unit suite — 1/1 file, 3/3 tests passed.
+- Focused teacher-release and family-sharing controller E2E suites were run
+  after the final filter wiring. Nest application creation and filter DI
+  completed, then the managed sandbox denied `127.0.0.1` binding with
+  `listen EPERM`; 13 HTTP tests did not reach assertions, while the five
+  non-listening tests passed. The existing 401/503 cases now assert both
+  `Cache-Control` and `Pragma`, but no passing HTTP-E2E claim is recorded.
+- `pnpm exec tsc --noEmit -p tsconfig.json --rootDir ../..` from
+  `apps/scenario-service` — passed for service source and non-DB tests. The
+  explicit root override avoids the package config's pre-existing shared
+  Vitest-config `rootDir` mismatch without invoking a build.
+- `pnpm --filter @the-nurture/scenario typecheck` — passed; generated manifest
+  is current.
+- `pnpm test:unit` — 97/97 files, 1083/1083 tests passed.
+- `pnpm verify:test-routing` — passed; 181 files routed as unit 97,
+  production-db 51, dev-host 11, scenario-service 17 and x5-joint 5.
+- Strict task-document lint — passed, 9/9 Markdown files with zero errors or
+  warnings; project-governance lint also passed.
+- `git diff --check` — passed.
+- Per explicit scope, no build, commit, push, deployment or activation was
+  performed.
+
+## 2026-08-13 — W5 N7/N9/N10/N11 closure
+
+- `pnpm --filter @the-nurture/db typecheck` — passed.
+- `pnpm --filter @the-nurture/scenario typecheck` — passed; generated manifest
+  is current.
+- Focused scenario suites (`family-growth/jcs`, `c30/trusted-invocation`) — 2/2
+  files, 60/60 tests passed.
+- An initial package-filtered JCS command used a package-relative path against
+  the workspace-root Vitest include and found no files; it executed no test.
+  The corrected repository-root command is the passing focused result above.
+- Focused mocked DB production-shape suite
+  (`t010-family-sharing-c4.production-shape`) — 1/1 file, 7/7 tests passed,
+  including the corrupt cleanup-ledger timestamp row.
+- Existing scenario-service family-sharing and teacher-release controller E2E
+  suites were attempted directly. This managed sandbox denied loopback binding
+  (`listen EPERM: operation not permitted 127.0.0.1`), so 13 HTTP tests did not
+  reach assertions; 2 non-listening tests passed. No behavioral failure or
+  passing HTTP-E2E claim is recorded.
+- `pnpm test:unit` — 97/97 files, 1083/1083 tests passed.
+- `pnpm verify:test-routing` — passed; 181 files routed as unit 97,
+  production-db 51, dev-host 11, scenario-service 17, x5-joint 5.
+- `node scripts/assert-family-sharing-invariants.mjs` — passed; parsed additive
+  allowlist, 8 table-bound CHECKs, 2 partial uniques, 4 target uniques and 8
+  complete composite FKs pinned.
+- `node scripts/assert-family-growth-outbox-invariants.mjs` — passed.
+- `node scripts/assert-formal-ingress-contract.mjs` — passed; 7 formal document
+  routes and all 14 controller routes censused, including 4 teacher-release and
+  1 signed family-sharing route.
+- `git diff --check` — passed.
+- Strict task-doc lint — passed, 8/8 Markdown files with zero errors/warnings.
+- Per explicit scope, `pnpm lint`, build, commit, push, schema/migration work,
+  pin rotation, durable apply, deployment and activation were not run.
+
 ## 2026-08-13 — W5 N3 disposable qualification
 
 - Approved loopback disposable target:

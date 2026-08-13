@@ -374,6 +374,8 @@ function assertCurrentWindow(
     || maximumClockSkewMs > 60_000
     || !Number.isFinite(issuedAt)
     || !Number.isFinite(expiresAt)
+    || expiresAt <= issuedAt
+    || expiresAt - issuedAt > 60_000
     || issuedAt > now.getTime() + maximumClockSkewMs
     || expiresAt <= now.getTime()
   ) {

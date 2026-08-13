@@ -57,7 +57,7 @@ features:
     milestone_id: M-003
   - id: F-005
     title: "Family-sharing eligibility owner"
-    status: in-progress
+    status: done
     description: "Resolve exact pair/category/purpose Nurture eligibility from current role, dedicated authority, release/receiving policy and lifecycle facts; expose it through a default-off private boundary and own withdrawal cleanup for Nurture-derived data."
     milestone_id: M-004
 
@@ -74,12 +74,12 @@ requirements:
     feature_id: F-003
   - id: R-003
     title: "Provider delivery-path hardening"
-    status: in-progress
+    status: done
     description: "Close the 2026-08-13 audit defects in the family-growth release/outbox/receipt path (release-commit staleness, stale-worker CAS, tenant-scoped FKs, receipt coordinate binding, conflicting-replay evidence) forward-only with negative tests, before or with the W1 callback implementation."
     feature_id: F-004
   - id: R-004
     title: "Family-sharing validator and ledger hardening"
-    status: in-progress
+    status: done
     description: "Make the family-sharing invariant validator prove what it claims (owning-table CHECKs, full FK targets/actions, CI wiring) and parse corrupt cleanup-ledger timestamps fail-closed."
     feature_id: F-005
 

@@ -26,36 +26,7 @@ implements NurtureFamilySharingCleanupLedgerV1 {
     workspace_id: string;
     cleanup_command_ref: string;
   }): Promise<NurtureFamilySharingCleanupReceiptV1 | null> {
-    const row = await this.prisma.nurtureCommandExecution.findUnique({
-      where: {
-        workspaceId_commandRequestIdHash: {
-          workspaceId: input.workspace_id,
-          commandRequestIdHash: hash(input.cleanup_command_ref),
-        },
-      },
-      select: {
-        commandKey: true,
-        commandScope: true,
-        commandContractVersion: true,
-        payloadHash: true,
-        resultSchemaVersion: true,
-        committedResultPayload: true,
-      },
-    });
-    if (!row) return null;
-    if (
-      row.commandKey !== COMMAND_KEY ||
-      row.commandScope !== COMMAND_SCOPE ||
-      row.commandContractVersion !== 1 ||
-      row.resultSchemaVersion !== 1
-    ) {
-      throw new Error("Cleanup command identity conflicts with another command.");
-    }
-    const receipt = parseReceipt(row.committedResultPayload);
-    if (!receipt || receipt.request_fingerprint !== row.payloadHash) {
-      throw new Error("Stored cleanup receipt is invalid.");
-    }
-    return receipt;
+    return findReceipt(this.prisma, input);
   }
 
   async executeExclusive(input: {
@@ -200,6 +171,9 @@ function advisoryKey(workspaceId: string, cleanupCommandRef: string): bigint {
 
 function parseReceipt(value: unknown): NurtureFamilySharingCleanupReceiptV1 | null {
   if (!isRecord(value)) return null;
+  const completedAt = typeof value.completed_at === "string"
+    ? new Date(value.completed_at)
+    : null;
   const expected = [
     "categories",
     "cleanup_command_ref",
@@ -236,8 +210,9 @@ function parseReceipt(value: unknown): NurtureFamilySharingCleanupReceiptV1 | nu
         (receipt.disposition === "purged" ||
           receipt.disposition === "already_absent"),
     ) ||
-    typeof value.completed_at !== "string" ||
-    new Date(value.completed_at).toISOString() !== value.completed_at
+    completedAt === null ||
+    !Number.isFinite(completedAt.getTime()) ||
+    completedAt.toISOString() !== value.completed_at
   ) return null;
   return value as unknown as NurtureFamilySharingCleanupReceiptV1;
 }

@@ -265,6 +265,7 @@ jobs:
           pnpm typecheck
           pnpm verify:test-routing
           pnpm verify:family-growth-outbox-invariants
+          pnpm verify:family-sharing-invariants
           pnpm verify:persistence-boundaries
 
       - name: Run unit population

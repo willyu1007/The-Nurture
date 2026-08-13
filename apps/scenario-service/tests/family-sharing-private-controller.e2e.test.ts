@@ -325,11 +325,14 @@ describe("family-sharing C3 private transport", () => {
     const disabledResponse = await post(disabled, invocation());
     expect(disabledResponse.status).toBe(503);
     expect(disabledResponse.headers.get("cache-control")).toBe("private, no-store");
+    expect(disabledResponse.headers.get("pragma")).toBe("no-cache");
 
     const exactResolver = resolver();
     const enabled = await start({ localPairResolver: exactResolver });
     const denied = await post(enabled, invocation(), { token: "wrong-token" });
     expect(denied.status).toBe(401);
+    expect(denied.headers.get("cache-control")).toBe("private, no-store");
+    expect(denied.headers.get("pragma")).toBe("no-cache");
     expect(exactResolver.resolveExact).not.toHaveBeenCalled();
   });
 

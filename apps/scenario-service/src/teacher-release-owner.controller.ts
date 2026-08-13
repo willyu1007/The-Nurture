@@ -13,6 +13,7 @@ import {
   Post,
   ServiceUnavailableException,
   UnauthorizedException,
+  UseFilters,
   UseGuards,
 } from "@nestjs/common";
 import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
@@ -37,6 +38,7 @@ import {
   TEACHER_RELEASE_OWNER_TARGETS_PATH,
   TeacherReleaseOwnerRequestParseError,
 } from "./teacher-release-owner-http.js";
+import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
 
 export const TEACHER_RELEASE_OWNER_CONFIG = Symbol(
   "TEACHER_RELEASE_OWNER_CONFIG",
@@ -71,6 +73,7 @@ export class TeacherReleaseOwnerServiceAuthGuard implements CanActivate {
 }
 
 @Controller()
+@UseFilters(PrivateResponseExceptionFilter)
 @UseGuards(TeacherReleaseOwnerServiceAuthGuard)
 export class TeacherReleaseOwnerController {
   constructor(

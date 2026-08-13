@@ -131,6 +131,33 @@ describe("T-010 I4-C4 qualification vehicle safety", () => {
     expect(operation).not.toHaveBeenCalled();
   });
 
+  it("fails closed on a corrupt cleanup-ledger timestamp without throwing RangeError", async () => {
+    const stored = {
+      ...storedCleanupReceipt("a".repeat(64)),
+      completed_at: "not-an-instant",
+    };
+    const database = {
+      nurtureCommandExecution: {
+        findUnique: vi.fn(async () => ({
+          commandKey: "cleanup_family_sharing_withdrawal",
+          commandScope: "family_sharing_cleanup",
+          commandContractVersion: 1,
+          payloadHash: stored.request_fingerprint,
+          resultSchemaVersion: 1,
+          committedResultPayload: stored,
+        })),
+      },
+    };
+    const ledger = new PrismaNurtureFamilySharingCleanupLedger(
+      database as unknown as PrismaClient,
+    );
+
+    await expect(ledger.find({
+      workspace_id: "workspace-1",
+      cleanup_command_ref: stored.cleanup_command_ref,
+    })).rejects.toThrow("Stored cleanup receipt is invalid.");
+  });
+
   it("does not write a receipt when the locked purge callback fails closed", async () => {
     const create = vi.fn();
     const transaction = {

@@ -305,6 +305,8 @@ describe("teacher release owner formal ingress", () => {
       },
     );
     expect(disabled.status).toBe(503);
+    expect(disabled.headers.get("cache-control")).toBe("private, no-store");
+    expect(disabled.headers.get("pragma")).toBe("no-cache");
     await expect(disabled.json()).resolves.toEqual({
       error: "teacher_release_owner_disabled",
     });
@@ -328,6 +330,8 @@ describe("teacher release owner formal ingress", () => {
       },
     );
     expect(unauthorized.status).toBe(401);
+    expect(unauthorized.headers.get("cache-control")).toBe("private, no-store");
+    expect(unauthorized.headers.get("pragma")).toBe("no-cache");
 
     const foreign = await fetch(
       `${activeUrl}${TEACHER_RELEASE_OWNER_QUERY_PATH}`,

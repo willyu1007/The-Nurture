@@ -84,6 +84,7 @@ export async function createScenarioServiceApplication(input?: {
     });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
+      logger,
       bindingOwner: {
         runtime: bindingOwnerRuntime,
         serviceAuth: bindingOwnerServiceAuth,

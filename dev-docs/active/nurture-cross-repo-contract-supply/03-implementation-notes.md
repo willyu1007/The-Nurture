@@ -1,5 +1,64 @@
 # Implementation notes
 
+## 2026-08-13 — W5 N9 adversarial review repair
+
+- Replaced the formal-ingress filename/decorator regex with a TypeScript AST
+  census over every `.ts` file below `apps/scenario-service/src`. The census
+  resolves all `@nestjs/common` named imports, named aliases, namespace imports
+  and default namespace-style references before recognizing route decorators.
+  Inline fail-closed self-checks cover an aliased `Post`, namespace-qualified
+  `Nest.Post`, and a controller route declared in a non-standard filename.
+- Parsed the real `@Module({ controllers: [...] })` metadata and the
+  complete scenario-service `NestFactory.create` call inventory. Static and
+  dynamic controller registrations are combined and pinned to the exact
+  source/export inventory, so a registered controller cannot evade the route
+  census by filename, decorator spelling or a dynamic-module controller list.
+  The dynamic module's two exception-filter providers are pinned as well.
+- Added `PrivateResponseExceptionFilter` as a controller-scoped filter on the
+  teacher-release and family-sharing private controllers. It writes
+  `Cache-Control: private, no-store` and `Pragma: no-cache` before delegating to
+  the existing safe error serializer, so guard-thrown 401/503 responses receive
+  the same privacy posture as successes. The family-sharing guard's duplicate
+  header mutation was removed, making the filter the single error-path owner.
+- Added 401/503 header assertions to both existing controller E2E suites and a
+  non-listening filter unit test. The trusted-invocation suite now proves an
+  exactly 60-second request passes upstream validation but fails the local
+  expired-window branch before nonce consumption; accepted invocations spy on
+  the nonce store and prove exactly one consumption per invocation.
+- No route, schema, migration, workflow pin, runtime default, deployment or
+  activation change was made.
+
+## 2026-08-13 — W5 N7/N9/N10/N11 closure
+
+- N7: the family-sharing invariant guard now strips SQL comments, parses
+  statements, requires each full normalized CHECK against its owning table,
+  requires the complete composite-FK target columns/table and `ON DELETE` / `ON
+  UPDATE` actions, and rejects non-additive or unanchored statement shapes. Its
+  self-checks cover comment-only SQL, a wrong owning table, and a trailing
+  destructive FK clause. CI runs it next to the family-growth outbox guard.
+- N9: the formal-ingress guard recursively censuses every controller route in
+  `apps/scenario-service/src` and compares all 14 method/decorator declarations
+  to an explicit allowlist. The signed family-sharing endpoint is bound to its
+  service bearer, error/success no-store headers, exact route/operation/schema/
+  interface pins, disabled default, trusted declarations, Ed25519 verifier,
+  60-second invocation lifetime and Prisma nonce store. Each teacher-release
+  v3 route is bound to the class service-bearer guard, per-route no-store
+  headers, exact path/interface/dependency pins, parser/handler and default-off
+  composition.
+- N10: `c30/canonical-json.ts` is the sole RFC 8785 serializer; the family-growth
+  module is a compatibility wrapper over that core. Valid JSON continues to use
+  the same `JSON.stringify` primitive bytes, array order and UTF-16 key sorting,
+  so existing valid persisted digest semantics are unchanged. Non-plain values,
+  undefined, sparse/extended arrays, cycles, non-finite numbers and unpaired
+  surrogates now fail closed. Tests include the RFC 8785 primitive, Unicode
+  ordering and Appendix B number vectors plus lone-surrogate negatives.
+- N11: cleanup-ledger receipt lookup has one shared implementation. The parser
+  constructs `completed_at` once, checks `Number.isFinite(getTime())` before
+  `toISOString()`, and returns `null` for corrupt values; the repository then
+  reports its stable invalid-receipt error rather than leaking `RangeError`.
+- No schema, migration, pin JSON, capability gate, runtime default, deployment
+  or traffic change was made.
+
 ## 2026-08-13 — W5 N1/N3 hardening
 
 - N1: prepared family-growth emissions now carry the exact workspace/local

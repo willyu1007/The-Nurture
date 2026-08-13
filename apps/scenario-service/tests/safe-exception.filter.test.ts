@@ -1,5 +1,6 @@
 import type { ArgumentsHost } from "@nestjs/common";
 import { describe, expect, it, vi } from "vitest";
+import { PrivateResponseExceptionFilter } from "../src/private-response-exception.filter.js";
 import { SafeExceptionFilter } from "../src/safe-exception.filter.js";
 import {
   ScenarioStructuredLogger,
@@ -33,6 +34,19 @@ describe("SafeExceptionFilter", () => {
     });
     expect(records).toHaveLength(0);
   });
+
+  it("adds private no-store headers before serializing private-controller errors", () => {
+    const { filter: safeFilter, response, host } = harness();
+    const filter = new PrivateResponseExceptionFilter(safeFilter);
+
+    filter.catch({ status: 503 }, host);
+
+    expect(response.setHeader).toHaveBeenCalledWith(
+      "Cache-Control",
+      "private, no-store",
+    );
+    expect(response.setHeader).toHaveBeenCalledWith("Pragma", "no-cache");
+  });
 });
 
 function harness() {
@@ -42,6 +56,7 @@ function harness() {
   );
   const response = {
     headersSent: false,
+    setHeader: vi.fn(),
     status: vi.fn(),
     json: vi.fn(),
   };
@@ -51,7 +66,7 @@ function harness() {
       getRequest: () => ({}),
       getResponse: () => response,
     }),
-  } as ArgumentsHost;
+  } as unknown as ArgumentsHost;
 
   return {
     filter: new SafeExceptionFilter(logger),

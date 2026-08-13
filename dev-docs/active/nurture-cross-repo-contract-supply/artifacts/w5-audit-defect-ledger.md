@@ -51,7 +51,7 @@ records are not rewritten; fixes are forward-only.
   `packages/nurture-db/src/repositories/family-growth-outbox.transaction.ts:177,187,206`.
   Fix: inspect insert count; on duplicate compare canonical payload;
   re-settle only exact replay; differing content is a conflict.
-- [ ] N7 Family-sharing invariant validator overstates coverage (CHECKs
+- [x] N7 Family-sharing invariant validator overstates coverage (CHECKs
   not bound to owning table; FK targets/actions unverified) and is not in
   CI. File: `scripts/assert-family-sharing-invariants.mjs:47,99,142`.
   Fix: compare normalized full statements or inspect `pg_constraint` on a
@@ -65,14 +65,19 @@ Closed during the audit session: N4 guard/pin disagreement — fixed by
 - [x] N8 Binding reader orders historical associations by `updatedAt`
   instead of selecting the current row
   (`packages/nurture-db/src/repositories/family-growth-binding.read.ts:41,54`).
-- [ ] N9 Formal-ingress guard censuses seven legacy routes only; the
+- [x] N9 Formal-ingress guard censuses seven legacy routes only; the
   family-sharing signed endpoint and teacher-release v3's four endpoints
   are unguarded (`scripts/assert-formal-ingress-contract.mjs:13,424`).
-- [ ] N10 Two JCS implementations accept different non-JCS inputs; lone
+  Adversarial repair: the guard now resolves Nest route-decorator imports over
+  every scenario-service `.ts` file, pins the exact module/bootstrap controller
+  inventory, and pins the controller-scoped privacy exception filter plus its
+  providers. Aliased, namespace-qualified and non-standard-filename negatives
+  are self-checked; private 401/503 cases assert no-store and no-cache headers.
+- [x] N10 Two JCS implementations accept different non-JCS inputs; lone
   surrogates accepted against RFC 8785
   (`packages/nurture-scenario/src/domain/family-growth/jcs.ts:19`,
   `packages/nurture-scenario/src/c30/canonical-json.ts:22`).
-- [ ] N11 Corrupt cleanup-ledger timestamps throw instead of parsing
+- [x] N11 Corrupt cleanup-ledger timestamps throw instead of parsing
   fail-closed
   (`packages/nurture-db/src/repositories/family-sharing-cleanup-ledger.repository.ts:201,240`).
 

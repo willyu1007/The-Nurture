@@ -27,7 +27,12 @@
   `t011_n3_disposable_20260813b` passed phase A replay from empty, phase B1
   populated upgrade validation, and phase B2 FK-caused pass-by-abort; final
   emptiness was proven and the disposable containers were destroyed. N7, N9,
-  N10 and N11 remain.
+  N10 and N11 are implemented and W5 is closed: both invariant guards are in
+  CI, the ingress census resolves Nest decorator imports across every service
+  TypeScript file and pins all 14 routes plus the exact six-controller module
+  inventory, private controller errors receive no-store headers from a scoped
+  exception filter, canonical JSON has one strict RFC 8785 core, and corrupt
+  cleanup receipts parse fail-closed.
 
 ## Goal
 
@@ -96,7 +101,7 @@ conformance fixtures, all default-off.
 - [ ] W3: parent-communication owner contracts are registered with
   negative-path fixtures.
 - [ ] W4: the director presenter contract is registered after W2/W3.
-- [ ] W5: every open ledger item is fixed forward-only with its negative
+- [x] W5: every open ledger item is fixed forward-only with its negative
   test; N3's additive migration passes disposable-target qualification;
   N2/N5/N6/N8 land before or with the W1 callback implementation.
 - [ ] Everything remains default-off; no durable apply, activation,

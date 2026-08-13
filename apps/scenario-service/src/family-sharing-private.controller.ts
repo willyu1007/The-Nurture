@@ -14,6 +14,7 @@ import {
   ConflictException,
   Req,
   Res,
+  UseFilters,
 } from "@nestjs/common";
 import {
   NURTURE_FAMILY_SHARING_PRIVATE_PATH,
@@ -28,6 +29,7 @@ import {
   FamilySharingPrivateContractError,
   type FamilySharingPrivateRuntime,
 } from "./family-sharing-private-runtime.js";
+import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
 
 export const FAMILY_SHARING_PRIVATE_CONFIG = Symbol("FAMILY_SHARING_PRIVATE_CONFIG");
 
@@ -50,9 +52,6 @@ export class FamilySharingPrivateServiceAuthGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const response = context.switchToHttp().getResponse<PrivateResponse>();
-    response.setHeader("Cache-Control", "private, no-store");
-    response.setHeader("Pragma", "no-cache");
     if (!this.config.runtime.engine || !this.config.serviceAuth.configured) {
       throw new ServiceUnavailableException({
         error: "family_sharing_private_disabled",
@@ -67,6 +66,7 @@ export class FamilySharingPrivateServiceAuthGuard implements CanActivate {
 }
 
 @Controller()
+@UseFilters(PrivateResponseExceptionFilter)
 export class FamilySharingPrivateController {
   constructor(
     @Inject(FAMILY_SHARING_PRIVATE_CONFIG)
