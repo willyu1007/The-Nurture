@@ -42,9 +42,7 @@ import {
 const NURTURE_DATABASE_URL = process.env.X5_NURTURE_DATABASE_URL;
 const MY_CHAT_DATABASE_URL = process.env.X5_MY_CHAT_DATABASE_URL;
 if (!NURTURE_DATABASE_URL || !MY_CHAT_DATABASE_URL) {
-  throw new Error(
-    "X5_NURTURE_DATABASE_URL and X5_MY_CHAT_DATABASE_URL are required for the T-010 joint suite.",
-  );
+  throw new Error("X5_NURTURE_DATABASE_URL and X5_MY_CHAT_DATABASE_URL are required for the T-010 joint suite.");
 }
 
 const nurture = createNurturePrismaClient(NURTURE_DATABASE_URL);
@@ -75,9 +73,7 @@ let nurtureFixture: T010FamilySharingFixture;
 let myChatFixture: MyChatFixture;
 
 beforeEach(async () => {
-  nurtureFixture = await nurture.$transaction((transaction) =>
-    seedT010FamilySharingFixture(transaction, "t010-joint"),
-  );
+  nurtureFixture = await nurture.$transaction((transaction) => seedT010FamilySharingFixture(transaction, "t010-joint"));
   myChatFixture = await seedMyChatFixture();
 });
 
@@ -96,11 +92,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
     const service = createService(transport);
     const prepared = await prepareMedia(service, "t010-joint-grant");
 
-    const confirmed = await service.confirm(
-      context(),
-      confirmRequest(prepared, "t010-joint-grant"),
-      CONFIRM_NOW,
-    );
+    const confirmed = await service.confirm(context(), confirmRequest(prepared, "t010-joint-grant"), () => CONFIRM_NOW);
     expect(confirmed).toMatchObject({
       status: "committed",
       execution_disposition: "executed",
@@ -113,7 +105,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
       service.confirm(
         context(),
         confirmRequest(prepared, "t010-joint-grant"),
-        new Date(COMMAND_NOW.getTime() + 10 * 60_000),
+        () => new Date(COMMAND_NOW.getTime() + 10 * 60_000),
       ),
     ).resolves.toMatchObject({
       status: "committed",
@@ -142,11 +134,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
     });
 
     await expect(
-      service.confirm(
-        context(),
-        confirmRequest(prepared, "t010-joint-stale-authority"),
-        CONFIRM_NOW,
-      ),
+      service.confirm(context(), confirmRequest(prepared, "t010-joint-stale-authority"), () => CONFIRM_NOW),
     ).resolves.toEqual({
       contract_version: 1,
       status: "not_committed",
@@ -167,11 +155,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
     transport.available = false;
 
     await expect(
-      service.confirm(
-        context(),
-        confirmRequest(prepared, "t010-joint-owner-outage"),
-        CONFIRM_NOW,
-      ),
+      service.confirm(context(), confirmRequest(prepared, "t010-joint-owner-outage"), () => CONFIRM_NOW),
     ).resolves.toEqual({
       contract_version: 1,
       status: "not_committed",
@@ -188,19 +172,16 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
   it("reconciles a lost commit response from outcome-unknown to exact replay", async () => {
     const transport = new JointEligibilityTransport(nurtureFixture, myChatFixture);
     const realRepository = new PrismaFamilyNurtureAuthorizationRepository(myChat);
-    const service = createService(
-      transport,
-      new LoseFirstCommitResponseRepository(realRepository),
-    );
+    const service = createService(transport, new LoseFirstCommitResponseRepository(realRepository));
     const prepared = await prepareMedia(service, "t010-joint-response-loss");
     const request = confirmRequest(prepared, "t010-joint-response-loss");
 
-    await expect(service.confirm(context(), request, CONFIRM_NOW)).resolves.toEqual({
+    await expect(service.confirm(context(), request, () => CONFIRM_NOW)).resolves.toEqual({
       contract_version: 1,
       status: "outcome_unknown",
       recovery: "reconcile_same_command",
     });
-    await expect(service.confirm(context(), request, CONFIRM_NOW)).resolves.toMatchObject({
+    await expect(service.confirm(context(), request, () => CONFIRM_NOW)).resolves.toMatchObject({
       status: "committed",
       execution_disposition: "replayed",
       business_outcome: "shared",
@@ -224,11 +205,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
     const transport = new JointEligibilityTransport(nurtureFixture, myChatFixture);
     const service = createService(transport);
     const grant = await prepareMedia(service, "t010-joint-withdraw-grant");
-    await service.confirm(
-      context(),
-      confirmRequest(grant, "t010-joint-withdraw-grant"),
-      CONFIRM_NOW,
-    );
+    await service.confirm(context(), confirmRequest(grant, "t010-joint-withdraw-grant"), () => CONFIRM_NOW);
 
     const presentation = await service.query(context(), scopeRequest());
     const media = requireMediaChange(presentation);
@@ -246,7 +223,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
         intent_ref: media.intent_ref,
         client_command_id: "t010-joint-withdraw",
       },
-      COMMAND_NOW,
+      () => COMMAND_NOW,
     );
     expect(prepared.status).toBe("ready_to_confirm");
     if (prepared.status !== "ready_to_confirm") return;
@@ -261,7 +238,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
         },
         "t010-joint-withdraw",
       ),
-      CONFIRM_NOW,
+      () => CONFIRM_NOW,
     );
     expect(withdrawn).toMatchObject({
       status: "committed",
@@ -274,8 +251,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
     const event = await myChat.outboxEvent.findFirstOrThrow({
       where: {
         workspaceId: nurtureFixture.workspaceId,
-        eventType:
-          "family_growth.nurture_authorization.withdrawal_cleanup_requested",
+        eventType: "family_growth.nurture_authorization.withdrawal_cleanup_requested",
       },
     });
     const cleanupEvent = parseCleanupEvent(event.payload);
@@ -296,11 +272,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
       [{ store_ref: "t010.joint.derived-store", purge }],
       () => CONFIRM_NOW,
     );
-    const cleanupRequest = t010CleanupRequest(
-      nurtureFixture,
-      event.idempotencyKey,
-      [cleanupEvent.category],
-    );
+    const cleanupRequest = t010CleanupRequest(nurtureFixture, event.idempotencyKey, [cleanupEvent.category]);
 
     // Deliberately discard the first response to model worker response loss.
     await cleanupOwner.cleanup({
@@ -334,7 +306,9 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
       Promise.all([
         nurture.nurtureChild.count({ where: { id: nurtureFixture.childId } }),
         nurture.nurtureFamily.count({ where: { id: nurtureFixture.familyId } }),
-        nurture.nurtureEnrollment.count({ where: { id: nurtureFixture.enrollmentId } }),
+        nurture.nurtureEnrollment.count({
+          where: { id: nurtureFixture.enrollmentId },
+        }),
       ]),
     ).resolves.toEqual([1, 1, 1]);
   });
@@ -349,9 +323,7 @@ class JointEligibilityTransport {
     private readonly hostFixture: MyChatFixture,
   ) {}
 
-  async resolveCurrentEligibility(
-    request: NurtureFamilySharingEligibilityPrivateRequestV1,
-  ): Promise<unknown> {
+  async resolveCurrentEligibility(request: NurtureFamilySharingEligibilityPrivateRequestV1): Promise<unknown> {
     this.calls += 1;
     if (!this.available) throw new Error("qualification provider outage");
     if (
@@ -359,12 +331,9 @@ class JointEligibilityTransport {
       request.my_chat_user_id !== this.fixture.myChatUserId ||
       request.parent_context_ref !== this.hostFixture.membershipId ||
       request.purpose !== NURTURE_FAMILY_SHARING_ELIGIBILITY_PURPOSE ||
-      request.interface_contract.key !==
-        NURTURE_FAMILY_SHARING_ELIGIBILITY_CONTRACT.key ||
-      request.interface_contract.version !==
-        NURTURE_FAMILY_SHARING_ELIGIBILITY_CONTRACT.version ||
-      request.interface_contract.digest !==
-        NURTURE_FAMILY_SHARING_ELIGIBILITY_CONTRACT.digest
+      request.interface_contract.key !== NURTURE_FAMILY_SHARING_ELIGIBILITY_CONTRACT.key ||
+      request.interface_contract.version !== NURTURE_FAMILY_SHARING_ELIGIBILITY_CONTRACT.version ||
+      request.interface_contract.digest !== NURTURE_FAMILY_SHARING_ELIGIBILITY_CONTRACT.digest
     ) {
       throw new Error("qualification transport invariant mismatch");
     }
@@ -379,18 +348,14 @@ class JointEligibilityTransport {
   }
 }
 
-class LoseFirstCommitResponseRepository
-  implements FamilyNurtureAuthorizationRepository
-{
+class LoseFirstCommitResponseRepository implements FamilyNurtureAuthorizationRepository {
   private loseNextResponse = true;
 
   constructor(private readonly delegate: FamilyNurtureAuthorizationRepository) {}
 
-  readCurrent: FamilyNurtureAuthorizationRepository["readCurrent"] = (input) =>
-    this.delegate.readCurrent(input);
+  readCurrent: FamilyNurtureAuthorizationRepository["readCurrent"] = (input) => this.delegate.readCurrent(input);
 
-  findCommitted: FamilyNurtureAuthorizationRepository["findCommitted"] = (input) =>
-    this.delegate.findCommitted(input);
+  findCommitted: FamilyNurtureAuthorizationRepository["findCommitted"] = (input) => this.delegate.findCommitted(input);
 
   async commit(input: CommitFamilyNurtureAuthorizationInput) {
     const result = await this.delegate.commit(input);
@@ -404,8 +369,7 @@ class LoseFirstCommitResponseRepository
 
 function createService(
   transport: JointEligibilityTransport,
-  repository: FamilyNurtureAuthorizationRepository =
-    new PrismaFamilyNurtureAuthorizationRepository(myChat),
+  repository: FamilyNurtureAuthorizationRepository = new PrismaFamilyNurtureAuthorizationRepository(myChat),
 ): FamilyNurtureAuthorizationService {
   return new FamilyNurtureAuthorizationService(
     new PrismaFamilyGrowthParentContextRepository(myChat),
@@ -434,7 +398,7 @@ async function prepareMedia(
       intent_ref: media.intent_ref,
       client_command_id: clientCommandId,
     },
-    COMMAND_NOW,
+    () => COMMAND_NOW,
   );
   expect(prepared.status).toBe("ready_to_confirm");
   if (prepared.status !== "ready_to_confirm") {
@@ -447,10 +411,7 @@ async function prepareMedia(
   };
 }
 
-function confirmRequest(
-  prepared: PreparedAuthorization,
-  clientCommandId: string,
-) {
+function confirmRequest(prepared: PreparedAuthorization, clientCommandId: string) {
   return {
     ...scopeRequest(),
     contract_version: 1 as const,
@@ -462,21 +423,15 @@ function confirmRequest(
   };
 }
 
-function requireMediaChange(
-  presentation: Awaited<ReturnType<FamilyNurtureAuthorizationService["query"]>>,
-) {
-  const media = presentation.categories.find(
-    (category) => category.category_key === "media",
-  );
+function requireMediaChange(presentation: Awaited<ReturnType<FamilyNurtureAuthorizationService["query"]>>) {
+  const media = presentation.categories.find((category) => category.category_key === "media");
   if (!media || media.change.kind !== "available") {
     throw new Error("qualification media change is unavailable");
   }
   return media.change;
 }
 
-function eligibilityRequest(
-  input: NurtureFamilySharingCurrentAuthorityReadInputV1,
-) {
+function eligibilityRequest(input: NurtureFamilySharingCurrentAuthorityReadInputV1) {
   return {
     interface_contract: NURTURE_FAMILY_SHARING_ELIGIBILITY_INTERFACE,
     purpose: NURTURE_FAMILY_SHARING_ELIGIBILITY_PURPOSE,
@@ -520,9 +475,7 @@ function scopeRequest() {
 }
 
 async function contextVersion(): Promise<string> {
-  const scope = await new PrismaFamilyGrowthParentContextRepository(
-    myChat,
-  ).resolveCurrentCommandScope({
+  const scope = await new PrismaFamilyGrowthParentContextRepository(myChat).resolveCurrentCommandScope({
     viewerActorId: myChatFixture.actorId,
     familyId: myChatFixture.familyId,
     childId: myChatFixture.childId,
@@ -582,10 +535,7 @@ async function seedMyChatFixture(): Promise<MyChatFixture> {
   return fixture;
 }
 
-async function cleanupMyChatFixture(
-  fixture: MyChatFixture,
-  workspaceId: string,
-): Promise<void> {
+async function cleanupMyChatFixture(fixture: MyChatFixture, workspaceId: string): Promise<void> {
   await myChat.outboxEvent.deleteMany({ where: { workspaceId } });
   const authorizations = await myChat.familyNurtureAuthorization.findMany({
     where: { familyId: fixture.familyId },
@@ -623,13 +573,13 @@ function parseCleanupEvent(value: unknown): Readonly<{
   }
   const record = value as Record<string, unknown>;
   if (
-    (record.category !== "media" &&
-      record.category !== "focus_collaboration") ||
+    (record.category !== "media" && record.category !== "focus_collaboration") ||
     record.decision !== "withdrawn" ||
     record.effective_state !== "not_shared" ||
     !Array.isArray(record.cleanup_targets) ||
     record.cleanup_targets.some((item: unknown) => typeof item !== "string")
-  ) throw new Error("withdrawal cleanup outbox payload is invalid");
+  )
+    throw new Error("withdrawal cleanup outbox payload is invalid");
   return {
     category: record.category,
     decision: record.decision,

@@ -1,5 +1,13 @@
 # T-010 verification
 
+## 2026-08-13 maintenance requalification
+
+- Updated the archived joint fixture to pass the maintained authorization
+  service `Clock` port instead of a captured `Date`. This removes test-only
+  type drift without changing the frozen owner contract or runtime behavior.
+- `pnpm typecheck` and the complete 97-file / 1083-test unit lane passed after
+  both Prisma clients were regenerated.
+
 ## Automated checks
 
 ### I4-C0
