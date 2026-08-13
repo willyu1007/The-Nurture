@@ -127,3 +127,4 @@ Project: `main`
 - 2026-08-13 task_id=T-008 event=phase-start id=G5-0 result=readiness-inventory-started profile=nurture.six-surface-beta-profile@0.1.0 drift_ledger=5-entries census=seeded candidate_identity=none activation=unchanged
 - 2026-08-13 task_id=T-008 slug=nurture-store-beta-readiness event=status from=planned to=in-progress
 - 2026-08-13 task_id=T-002 event=lock-rotation id=C30-I3 result=owner-adoption-lock-rotated source=a78e7dd aggregate=ec5198ac reason=guard-head-reseal content=unchanged activation=unchanged
+- 2026-08-13 task_id=T-011 event=scope-expansion id=W5 result=audit-defect-hardening-adopted source=codex-gpt-5.6-sol-audit p1=6-open p2=4-open closed=N4 requirements=R-003,R-004 f005=reopened-in-progress activation=unchanged

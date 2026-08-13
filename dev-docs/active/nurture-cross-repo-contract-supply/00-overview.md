@@ -42,6 +42,12 @@ conformance fixtures, all default-off.
   negative-path fixtures.
 - W4 director presenter: the director lens owner contract (D-O01..D-O14
   equivalents); starts only after W2/W3.
+- W5 audit-defect hardening: fix the 2026-08-13 Codex audit findings in
+  the provider delivery/receipt path and the family-sharing validators
+  (`artifacts/w5-audit-defect-ledger.md`). These defects originate in
+  F-004/F-005 code (mapped through R-003/R-004); they execute here
+  because the W1 callback implementation lands on the same settlement
+  surface, and channel hardening precedes the second delivery leg.
 
 ## Non-goals
 
@@ -75,5 +81,8 @@ conformance fixtures, all default-off.
 - [ ] W3: parent-communication owner contracts are registered with
   negative-path fixtures.
 - [ ] W4: the director presenter contract is registered after W2/W3.
+- [ ] W5: every open ledger item is fixed forward-only with its negative
+  test; N3's additive migration passes disposable-target qualification;
+  N2/N5/N6/N8 land before or with the W1 callback implementation.
 - [ ] Everything remains default-off; no durable apply, activation,
   deployment or traffic results from this task.
