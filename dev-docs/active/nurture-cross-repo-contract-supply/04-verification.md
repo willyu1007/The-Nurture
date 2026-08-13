@@ -1,5 +1,51 @@
 # Verification
 
+## 2026-08-13 — W2 P0 quality closure
+
+- `pnpm typecheck` passed after the command regenerated both Prisma clients;
+  no generated-client drift or TypeScript error remains.
+- `pnpm test:unit` passed 97/97 files and 1083/1083 tests. The four repaired
+  historical fixtures are type-safe and the ordinary unit lane remains green.
+- `pnpm --filter @the-nurture/frontend lint` passed ESLint and stylelint.
+- The exact pin verifier passed from repository-external detached worktrees at
+  My-Workflow-Base `536638a204865ebdc43bca70992388352789a36f` and My-Chat
+  `1f306cb5807ff87a4edc0495fd44e5f3882450bf`. It confirmed Base/My-Chat
+  workflow parity, the My-Chat W2-inclusive `x5_joint_api` source hash
+  `561614f0e8b85e2cd6e5047cd9ab5d45606898daf59d43be038ef5ffa2b83ca6`,
+  the unchanged binding-host pin and the current Nurture scenario hash
+  `976cd876b65615499905d80b7b46777ea53fc0d5d88ea242af8162d115d51c81`.
+- The top-level `pnpm lint` remains intentionally fail-closed when run against
+  the developer's advanced My-Workflow-Base checkout (`8649e0e…`), because it
+  is not the recorded pin. Direct frontend lint plus the isolated exact-pin
+  verifier provide the valid evidence; no local-HEAD bypass or floating pin was
+  added.
+- The obsolete scope draft was deleted and no active reference to it remains.
+  The accepted digest pin is the sole W2 handoff. No database apply, deployment,
+  activation or traffic occurred.
+
+Verdict: `W2_P0_QUALITY_PASS / SINGLE_TRACK / EXACT_PIN / DEFAULT_OFF /
+LIVE_QUALIFICATION_PENDING`.
+
+## 2026-08-13 — W2 My-Chat P0 joint consumer evidence
+
+- Provider contract validation passed at the exact digest with five operations,
+  16 fixtures, eight invalid fixtures, 11 consistency probes and 10 strict
+  probes.
+- `pnpm --dir apps/scenario-service exec vitest run -c vitest.config.ts
+  tests/parent-context-presenter-controller.e2e.test.ts` passed 1/1 file and
+  12/12 tests through the mounted private ingress.
+- My-Chat's focused command passed 5/5 files and 65/65 tests over the private
+  source, API validation/service mapping, strict client and Mobile garden model.
+  Exact-pin drift, recursive foreign fields, operation-specific notice states,
+  caller authority leakage, request/response ref/date/action rebinding, public
+  media-handle stripping and mixed owner scope versions fail closed.
+- Both project-governance linters, both strict task-doc linters and both
+  `git diff --check` runs passed after the cross-repo status update. No database
+  write, deployment, activation, traffic or device run occurred.
+
+Verdict: `W2_P0_CONSUMER_ADOPTION_PASS / DEFAULT_OFF /
+LIVE_QUALIFICATION_PENDING`.
+
 ## 2026-08-13 — W2 second adoption-review repair
 
 - `node --import tsx packages/nurture-scenario/contracts/parent-context-presenter/v1/validate-contract.mjs`

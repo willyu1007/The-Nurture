@@ -56,15 +56,18 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **My-Chat IR-C01 adoption** of `nurture.parent-context-presenter@1.0.0`
-   (`sha256:3ac0906c…`) in T-039, and the W5-hardened settlement surface as
-   the base for the W1 callback implementation batch (both default-off).
-2. **Operator package** (user action): synthetic-user token, parent/teacher
-   closure alignment, Q3 live qualification prerequisite, dual-platform
-   devices — the remaining inputs before any G5-A scheduling decision.
+1. **W3 parent-communication supply** after My-Chat T-039 completed W2 P0
+   consumer adoption of `nurture.parent-context-presenter@1.0.0`
+   (`sha256:3ac0906c…`); use the W5-hardened settlement surface as the base for
+   the separate W1 callback implementation batch (all default-off).
+2. **Candidate shared-input closure** with the completed W2 adoption, then schedule the
+   separately authorized G5-A Freeze without dragging the later device window
+   into its prerequisites.
 3. **G5-A Candidate Freeze** stays strictly serial and separately
    authorized; W1 frozen design and profile v1.0.0 satisfy its design
-   preconditions. **Continue T-002 only from C31** after a G5-A Freeze.
+   preconditions. Synthetic token, Q3 live qualification and dual-platform
+   devices belong to G5-D; Q3 live only gates scoped internal-test enablement.
+   **Continue T-002 only from C31** after a G5-A Freeze.
    No result authorizes durable apply, activation, deployment or traffic.
 
 ## Notes (manual)

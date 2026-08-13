@@ -406,11 +406,12 @@ Project: `main`
   fixtures × 2 attempts = 30 unique invocation ids. Pre-V2 evidence
   is invalid/non-current. `live_qualified=false` remains the activation gate;
   recorded/synthetic transport is never live evidence. G-09 is closed.
-  2026-08-13: T-008 G5-0 is separately authorized and starts after the T-011
-  W1/W2 supply steps; T-011 owns the guardian-decision callback joint design
-  (must conclude before any G5-A Candidate Freeze) and the presenter supply
-  order (parent-context presenter, IR-C01 parent-communication gates,
-  director presenter). Candidate Freeze, durable apply, deployment,
+  2026-08-13: T-008 G5-0 is complete. T-011 W1 is frozen and W2 is published;
+  My-Chat T-039 completed exact-pin P0 consumer adoption, so the W2 input is
+  ready for Candidate shared-input closure. T-011 continues the supply order with IR-C01
+  parent-communication gates and then the director presenter. Q3 live
+  qualification gates G5-D scoped internal-test enablement, not G5-A Freeze.
+  Candidate Freeze, durable apply, deployment,
   activation and external traffic remain closed.
 
 ### F-004 Family growth material provider

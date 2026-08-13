@@ -8,22 +8,28 @@
   `artifacts/w1-guardian-decision-callback-design-draft.md` is the frozen
   joint design record for the additive `family_growth_transport@1.1.0`
   push callback, closed through a four-round owner-delegated adversarial
-  review gate. Implementation waits for the W5 settlement-surface rule
-  and its own batch. W2 is now authored as the standalone, default-off
+  review gate. W5 has closed the settlement-surface hardening prerequisite;
+  W1 runtime implementation remains a separate default-off batch. W2 is
+  published and adoption-ready as the standalone, default-off
   `nurture.parent-context-presenter@1.0.0` artifact at digest
   `sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196`,
   with five closed schema pairs, a discriminated notice-exchange matrix, 16
   owner fixtures, eight executed-invalid mutations, a hard-pinned validator,
   runtime response-schema enforcement and a 12-case real-route e2e suite. All
-  six first-round and four second-round W2 review findings are repaired; next
-  is the adoption-readiness
-  rereview against
-  `artifacts/w2-parent-context-presenter-v1-digest-pin.md`; do not mark W2
-  accepted until that review judges the exact pin and fixture environment
-  ready for My-Chat T-039. The supply order decided 2026-08-11 is
-  fixed: parent-context presenter, then IR-C01 parent-communication gates,
-  then the director presenter. W1 must conclude before any T-008 G5-A
-  Candidate Freeze. W5 findings N2, N5, N6 and N8 plus their five review
+  six first-round, four second-round and final publication review findings are
+  repaired; `artifacts/w2-parent-context-presenter-v1-digest-pin.md` is the
+  accepted exact-pin handoff for My-Chat T-039. My-Chat completed the W2 P0
+  exact-pin consumer adoption on 2026-08-13 across its default-off private
+  source, public API/client and production Mobile controller; joint negative
+  conformance passes with no activation. The next supply work is W3,
+  the IR-C01 parent-communication owner contracts, followed by W4 director
+  presenter. My-Chat owns the separate W2 consumer adoption and must preserve
+  default-off behavior. The closing quality pass removed the obsolete W2 scope
+  draft, made the accepted digest pin the only active handoff, repaired
+  generated-client typecheck drift and passed the repository unit/typecheck,
+  direct frontend lint and exact-revision cross-repo pin gates. W1's design
+  precondition for T-008 G5-A is satisfied.
+  W5 findings N2, N5, N6 and N8 plus their five review
   repairs are implemented; package typechecks, focused mocked suites, unit tests
   and routing verification pass. N1 and N3 are now implemented: release commit
   binds the prepared tuple to the loaded target and revalidates/SHARE-locks the
@@ -102,10 +108,11 @@ conformance fixtures, all default-off.
   (`family_growth_transport@1.1.0`) and a defined resolution path for the
   teacher queue `pending` state (bounded expiry plus reconciliation); no
   runtime activation.
-- [ ] W2: the authored standalone parent-context presenter v1 exact pin,
+- [x] W2: the published standalone parent-context presenter v1 exact pin,
   strict DTO schemas, safe-code policy, protected-cache semantics and joint
-  conformance environment pass adoption-readiness review; only then may
-  My-Chat T-039 start dormant IR-C01 adapter adoption. The five Nurture routes
+  conformance environment passed adoption-readiness review on 2026-08-13.
+  My-Chat T-039 adopted the dormant consumer against the exact pin on
+  2026-08-13 and passed joint conformance. The five Nurture routes
   remain mounted default-off and require the explicit gate, service auth,
   complete Q6 owner ports and the active consumer-generation boundary port;
   their presence is not activation.

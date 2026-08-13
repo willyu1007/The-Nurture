@@ -2,7 +2,7 @@
 
 ## Exact publication
 
-The authored private owner interface is ready for review at this exact pin:
+The private owner interface is published and accepted at this exact pin:
 
 | Field | Value |
 | --- | --- |
@@ -133,13 +133,16 @@ DTO decoder/state adapter, and assert the fixture `client_rule`. In particular,
 the joint lane MUST retain the fixture labels for scope loss, revoke, stale
 `context_ref`, ambiguous Enrollment, protected-display denial, non-retryable
 refresh, confirmation replay and ASYNC-12 late completion. This is executable
-contract evidence only; owner integration and adoption readiness remain review
-gates.
+contract evidence. My-Chat completed the default-off P0 consumer adoption and
+joint negative conformance on 2026-08-13; deployed owner integration and live
+qualification remain separate gates.
 
 ## Review boundary
 
-This record publishes a repaired candidate and does not tick W2 acceptance.
-Review must judge field semantics, safe-code coarsening, fixture sufficiency and
-My-Chat dormant-adapter readiness against the exact digest. No pin JSON,
-database, deployment or activation change is authorized here; mounted routes
-remain unavailable without explicit configuration and complete owner ports.
+This record is the accepted W2 exact-pin handoff. Provider publication and
+My-Chat P0 consumer adoption have passed their respective strict and joint
+negative conformance gates. The W2 owner digest and surface pin are unchanged;
+the repository integration self-hash was refreshed separately after the root
+typecheck workflow began regenerating both Prisma clients. No database,
+deployment or activation change is authorized here; mounted routes remain
+unavailable without explicit configuration and complete owner ports.

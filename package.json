@@ -11,7 +11,7 @@
   "scripts": {
     "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm build:pinned-workflow-contracts",
     "build:pinned-workflow-contracts": "pnpm exec tsc -p ../My-Chat/packages/workflow-contracts/tsconfig.json --typeRoots ./node_modules/@types",
-    "build": "pnpm prepare:pinned-source && pnpm db:generate:all && pnpm typecheck && pnpm build:scenario-service && pnpm --filter @the-nurture/frontend build",
+    "build": "pnpm prepare:pinned-source && pnpm typecheck && pnpm build:scenario-service && pnpm --filter @the-nurture/frontend build",
     "dev": "pnpm build:binding-owner-runtime && node scripts/run-with-local-env.mjs pnpm --filter @the-nurture/backend dev",
     "dev:frontend": "pnpm --filter @the-nurture/frontend dev",
     "lint": "pnpm prepare:pinned-source && pnpm --filter @the-nurture/frontend lint",
@@ -33,7 +33,7 @@
     "build:binding-owner-runtime": "pnpm --filter @the-nurture/scenario build && pnpm --filter @the-nurture/db build",
     "build:surface-contract": "node scripts/surface-contract/build-surface-contract.mjs",
     "smoke:scenario-service": "node scripts/smoke-scenario-service.mjs",
-    "typecheck": "pnpm build:pinned-workflow-contracts && tsc --noEmit",
+    "typecheck": "pnpm build:pinned-workflow-contracts && pnpm db:generate:all && tsc --noEmit",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:generate": "node scripts/run-with-local-env.mjs pnpm exec prisma generate --schema prisma/schema.prisma",

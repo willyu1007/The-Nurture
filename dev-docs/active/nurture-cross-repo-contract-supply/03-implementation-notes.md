@@ -1,5 +1,41 @@
 # Implementation notes
 
+## 2026-08-13 — W2 P0 quality and single-track closure
+
+- Deleted the superseded W2 scope draft. The published contract directory,
+  strict validator and accepted digest-pin record are the only active owner
+  contract/handoff lane; historical review evolution remains in Git.
+- Updated the Nurture scenario self-hash after the maintained root typecheck
+  began regenerating both Prisma clients. `typecheck` now owns generation and
+  `build` no longer repeats it, preventing stale generated clients and duplicate
+  work from producing contradictory evidence.
+- Repaired historical T-009/T-010/T-011 test fixtures that the current generated
+  types correctly rejected: current owner-evidence expiry and guardian-role
+  identity are explicit, authorization clocks use the maintained port, and the
+  raw-query mock implements the exact Prisma transaction-client method shape.
+- Verified the upstream workflow/base pins in repository-external detached
+  worktrees at the exact recorded revisions. The current developer Base
+  checkout may advance independently; no floating revision or local-HEAD
+  exception was introduced.
+
+## 2026-08-13 — W2 My-Chat P0 consumer adoption handoff
+
+- My-Chat T-039 adopted the exact W2 pin across a private HTTP source, strict
+  public Dashboard DTO/API client and production Mobile parent-garden
+  controller. The provider gate remains false by default and there is no
+  fixture fallback.
+- The consumer supplies only Workspace/user/request identity plus opaque
+  `context_ref`; it does not send Participant, role, child or family authority.
+  It strips owner resolution/cache fields and protected media access refs from
+  its public/mobile boundary.
+- Joint verification passed the provider validator and 12-case mounted route
+  suite plus 65 My-Chat focused tests. My-Chat also fails closed when the four
+  composed read operations return different owner scope versions or when a
+  structurally valid response belongs to another ref/date/action request.
+- This completes W2 P0 adoption but does not qualify deployment, active owner
+  ports, media resolution, native devices, activation or traffic. W3 remains
+  the next supply item.
+
 ## 2026-08-13 — W2 second adoption-review repair
 
 - Bound every confirm fixture to the prepared five-field identity tuple:
@@ -91,7 +127,9 @@
 - Computed the canonical source digest with the repository's strict RFC 8785
   implementation and recorded the exact pin plus all five IR-C01 properties in
   `artifacts/w2-parent-context-presenter-v1-digest-pin.md`. No pin JSON was
-  changed. W2 acceptance remains unticked pending adoption-readiness review.
+  changed. The final publication review accepted the exact pin, fixtures and
+  listener-free conformance environment; W2 is adoption-ready and My-Chat
+  T-039 owns the separate dormant consumer adoption.
 
 ## 2026-08-13 — W5 N9 adversarial review repair
 

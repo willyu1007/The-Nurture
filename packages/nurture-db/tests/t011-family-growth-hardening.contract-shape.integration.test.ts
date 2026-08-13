@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { assembleReleaseEventV1 } from "@the-nurture/scenario/family-growth";
+import { Prisma } from "@prisma/client";
 import type { NurturePrismaClient } from "../src/client.js";
 import { PrismaFamilyGrowthBindingReadPort } from "../src/repositories/family-growth-binding.read.js";
 import {
@@ -55,7 +56,11 @@ const releaseEnvelope = () =>
       committed_at: "2026-08-13T01:58:00.000Z",
     },
     target: { child_id: "child-1", family_id: "family-1" },
-    admission: { mode: "direct_family_release", policy_ref: "policy-1", policy_version: 1 },
+    admission: {
+      mode: "direct_family_release",
+      policy_ref: "policy-1",
+      policy_version: 1,
+    },
     material: {
       occurredAt: "2026-08-13T01:00:00.000Z",
       displaySnapshot: { title: "Growth", source_label: "Class A" },
@@ -78,9 +83,7 @@ const releaseEnvelope = () =>
     retentionMode: "family_retained",
   });
 
-const receiptInput = (
-  overrides: Partial<FamilyGrowthReceiptRecordInputV1> = {},
-): FamilyGrowthReceiptRecordInputV1 => {
+const receiptInput = (overrides: Partial<FamilyGrowthReceiptRecordInputV1> = {}): FamilyGrowthReceiptRecordInputV1 => {
   const base = {
     workspaceId: "ws-1",
     outboxEventId: "evt-1",
@@ -156,14 +159,20 @@ const outboxHarness = (input?: {
     receiptReads += 1;
     if (input?.hideFirstReceiptRead && receiptReads === 1) return null;
     const identity = where.workspaceId_outboxEventId_receiptId as
-      | Readonly<{ workspaceId: string; outboxEventId: string; receiptId: string }>
+      | Readonly<{
+          workspaceId: string;
+          outboxEventId: string;
+          receiptId: string;
+        }>
       | undefined;
-    return receipts.find(
-      (row) =>
-        row.workspaceId === identity?.workspaceId
-        && row.outboxEventId === identity.outboxEventId
-        && row.receiptId === identity.receiptId,
-    ) ?? null;
+    return (
+      receipts.find(
+        (row) =>
+          row.workspaceId === identity?.workspaceId &&
+          row.outboxEventId === identity.outboxEventId &&
+          row.receiptId === identity.receiptId,
+      ) ?? null
+    );
   };
 
   const updateMany = async (args: {
@@ -172,10 +181,10 @@ const outboxHarness = (input?: {
   }) => {
     settlementWhere.push(args.where);
     if (
-      args.where.id !== outbox.id
-      || args.where.workspaceId !== outbox.workspaceId
-      || args.where.deliveryState !== outbox.deliveryState
-      || args.where.attemptCount !== outbox.attemptCount
+      args.where.id !== outbox.id ||
+      args.where.workspaceId !== outbox.workspaceId ||
+      args.where.deliveryState !== outbox.deliveryState ||
+      args.where.attemptCount !== outbox.attemptCount
     ) {
       return { count: 0 };
     }
@@ -193,16 +202,15 @@ const outboxHarness = (input?: {
 
   const tx = {
     nurtureFamilyGrowthAdmissionReceipt: {
-      findUnique: async (args: { where: Readonly<Record<string, unknown>> }) =>
-        receiptFor(args.where),
+      findUnique: async (args: { where: Readonly<Record<string, unknown>> }) => receiptFor(args.where),
       createMany: async (args: { data: ReceiptRow[] }) => {
         const candidate = args.data[0]!;
         if (
           receipts.some(
             (row) =>
-              row.workspaceId === candidate.workspaceId
-              && row.outboxEventId === candidate.outboxEventId
-              && row.receiptId === candidate.receiptId,
+              row.workspaceId === candidate.workspaceId &&
+              row.outboxEventId === candidate.outboxEventId &&
+              row.receiptId === candidate.receiptId,
           )
         ) {
           return { count: 0 };
@@ -250,7 +258,10 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
   it("makes a stale-success completion a no-op after lease reclaim", async () => {
     const harness = outboxHarness({ attemptCount: 2 });
     expect(await harness.port.recordReceipt(receiptInput({ attemptCount: 1 }))).toBe("stale");
-    expect(harness.outbox()).toMatchObject({ deliveryState: "delivering", attemptCount: 2 });
+    expect(harness.outbox()).toMatchObject({
+      deliveryState: "delivering",
+      attemptCount: 2,
+    });
     expect(harness.receipts()).toEqual([]);
     expect(harness.settlementWhere[0]).toMatchObject({
       id: "evt-1",
@@ -287,7 +298,10 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
   it("does not label a same-attempt terminal state without matching evidence as stale", async () => {
     const harness = outboxHarness({ deliveryState: "delivered" });
     expect(await harness.port.recordReceipt(receiptInput())).toBe("not_settled");
-    expect(harness.outbox()).toMatchObject({ deliveryState: "delivered", attemptCount: 1 });
+    expect(harness.outbox()).toMatchObject({
+      deliveryState: "delivered",
+      attemptCount: 1,
+    });
     expect(harness.receipts()).toEqual([]);
   });
 
@@ -303,12 +317,13 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
     const reorderedPayload = Object.fromEntries(
       Object.entries(input.receiptPayload as Record<string, unknown>).reverse(),
     );
-    const second = await harness.port.recordReceipt(
-      receiptInput({ receiptPayload: reorderedPayload }),
-    );
+    const second = await harness.port.recordReceipt(receiptInput({ receiptPayload: reorderedPayload }));
     expect(first).toBe("settled");
     expect(second).toBe("replayed");
-    expect(harness.outbox()).toMatchObject({ deliveryState: "delivered", attemptCount: 1 });
+    expect(harness.outbox()).toMatchObject({
+      deliveryState: "delivered",
+      attemptCount: 1,
+    });
     expect(harness.receipts()).toHaveLength(1);
   });
 
@@ -324,7 +339,10 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
         hideFirstReceiptRead: true,
       });
       expect(await harness.port.recordReceipt(changed)).toBe("receipt_conflict");
-      expect(harness.outbox()).toMatchObject({ deliveryState: "delivering", deliveredAt: null });
+      expect(harness.outbox()).toMatchObject({
+        deliveryState: "delivering",
+        deliveredAt: null,
+      });
       expect(harness.receipts()).toEqual([storedReceipt(original)]);
     }
   });
@@ -332,10 +350,16 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
   it("treats unknown raw receipt field changes as a conflict", async () => {
     const basePayload = receiptInput().receiptPayload as Record<string, unknown>;
     const first = receiptInput({
-      receiptPayload: { ...basePayload, consumer_extension: { trace: "raw-1" } },
+      receiptPayload: {
+        ...basePayload,
+        consumer_extension: { trace: "raw-1" },
+      },
     });
     const changed = receiptInput({
-      receiptPayload: { ...basePayload, consumer_extension: { trace: "raw-2" } },
+      receiptPayload: {
+        ...basePayload,
+        consumer_extension: { trace: "raw-2" },
+      },
     });
     const harness = outboxHarness();
     expect(await harness.port.recordReceipt(first)).toBe("settled");
@@ -353,7 +377,10 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
     ]) {
       const harness = outboxHarness();
       expect(await harness.port.recordReceipt(mismatched)).toBe("receipt_coordinate_mismatch");
-      expect(harness.outbox()).toMatchObject({ deliveryState: "delivering", deliveredAt: null });
+      expect(harness.outbox()).toMatchObject({
+        deliveryState: "delivering",
+        deliveredAt: null,
+      });
       expect(harness.receipts()).toEqual([]);
       expect(harness.settlementWhere).toEqual([]);
     }
@@ -377,7 +404,10 @@ describe("T-011 family-growth claim-race contract shape", () => {
       },
     } as unknown as NurturePrismaClient;
 
-    const claimed = await new PrismaFamilyGrowthOutboxPort(prisma).claimDue({ now, limit: 1 });
+    const claimed = await new PrismaFamilyGrowthOutboxPort(prisma).claimDue({
+      now,
+      limit: 1,
+    });
     expect(claimed).toEqual([]);
     expect(updates).toEqual([
       {
@@ -405,8 +435,16 @@ describe("T-011 N8 family-growth current binding read", () => {
       status: "active",
       currentKey: "current",
       aggregateVersion: 4,
-      childAnchor: { id: childAnchorId, status: "associated", aggregateVersion: 1 },
-      familyAnchor: { id: familyAnchorId, status: "associated", aggregateVersion: 2 },
+      childAnchor: {
+        id: childAnchorId,
+        status: "associated",
+        aggregateVersion: 1,
+      },
+      familyAnchor: {
+        id: familyAnchorId,
+        status: "associated",
+        aggregateVersion: 2,
+      },
     };
     const touchedHistorical = {
       ...current,
@@ -422,28 +460,29 @@ describe("T-011 N8 family-growth current binding read", () => {
       nurtureFamilyAnchorAssociation: {
         findMany: async (args: { where: Readonly<Record<string, unknown>> }) => {
           familyReads.push(args.where);
-          return args.where.currentKey === "current"
-            ? [current]
-            : [touchedHistorical, current];
+          return args.where.currentKey === "current" ? [current] : [touchedHistorical, current];
         },
       },
       nurtureChildAnchorAssociation: {
         findMany: async (args: { where: Readonly<Record<string, unknown>> }) => {
           childReads.push(args.where);
-          return args.where.id === childAssociationId
-            && args.where.currentKey === "current"
-            ? [{
-                id: childAssociationId,
-                aggregateVersion: 3,
-                status: "active",
-                currentKey: "current",
-              }]
-            : [{
-                id: "child-association-historical",
-                aggregateVersion: 8,
-                status: "revoked",
-                currentKey: null,
-              }];
+          return args.where.id === childAssociationId && args.where.currentKey === "current"
+            ? [
+                {
+                  id: childAssociationId,
+                  aggregateVersion: 3,
+                  status: "active",
+                  currentKey: "current",
+                },
+              ]
+            : [
+                {
+                  id: "child-association-historical",
+                  aggregateVersion: 8,
+                  status: "revoked",
+                  currentKey: null,
+                },
+              ];
         },
       },
       nurtureScenarioBindingAuthorization: {
@@ -452,9 +491,10 @@ describe("T-011 N8 family-growth current binding read", () => {
           aggregateVersion: 5,
           status: "active",
           expiresAt: new Date("2026-08-14T00:00:00.000Z"),
-          ownerRef: args.where.subjectType === "child"
-            ? `nurture_child_binding_anchor_v1:${childAnchorId}`
-            : `nurture_family_binding_anchor_v1:${familyAnchorId}`,
+          ownerRef:
+            args.where.subjectType === "child"
+              ? `nurture_child_binding_anchor_v1:${childAnchorId}`
+              : `nurture_family_binding_anchor_v1:${familyAnchorId}`,
           ownerVersion: args.where.subjectType === "child" ? 1 : 2,
           purpose: "scenario_binding_write",
           authorizationSourceRef: "nurture-care-role:guardian-role-1",
@@ -508,8 +548,14 @@ describe("T-011 N1 prepared binding-head commit guard", () => {
     childCareProcessId: "process-1",
     childAnchor: { anchorId: "child-anchor-1", aggregateVersion: 1 },
     familyAnchor: { anchorId: "family-anchor-1", aggregateVersion: 2 },
-    childAssociation: { associationId: "child-association-1", aggregateVersion: 3 },
-    familyAssociation: { associationId: "family-association-1", aggregateVersion: 4 },
+    childAssociation: {
+      associationId: "child-association-1",
+      aggregateVersion: 3,
+    },
+    familyAssociation: {
+      associationId: "family-association-1",
+      aggregateVersion: 4,
+    },
     childAuthorization: {
       authorizationId: "child-authorization-1",
       aggregateVersion: 5,
@@ -564,19 +610,12 @@ describe("T-011 N1 prepared binding-head commit guard", () => {
   it("uses one locking statement and accepts exactly one unchanged head tuple", async () => {
     let reads = 0;
     let sql = "";
-    const transaction = {
-      $queryRaw: async (statement: { strings: readonly string[] }) => {
-        reads += 1;
-        sql = statement.strings.join("?").replace(/\s+/gu, " ");
-        return [{ matched: 1 }];
-      },
-    };
+    const transaction = bindingHeadReader([{ matched: 1 }], (statement) => {
+      reads += 1;
+      sql = statement.strings.join("?").replace(/\s+/gu, " ");
+    });
     expect(
-      await familyGrowthPreparedBindingHeadsAreCurrent(
-        transaction,
-        heads(),
-        new Date("2026-08-13T08:00:00.000Z"),
-      ),
+      await familyGrowthPreparedBindingHeadsAreCurrent(transaction, heads(), new Date("2026-08-13T08:00:00.000Z")),
     ).toBe(true);
     expect(reads).toBe(1);
     expect(sql).toContain("FOR SHARE OF authorization");
@@ -588,24 +627,16 @@ describe("T-011 N1 prepared binding-head commit guard", () => {
   });
 
   it("fails closed when revocation changes the prepared authorization head", async () => {
-    const transaction = { $queryRaw: async () => [] };
+    const transaction = bindingHeadReader([]);
     expect(
-      await familyGrowthPreparedBindingHeadsAreCurrent(
-        transaction,
-        heads(),
-        new Date("2026-08-13T08:00:00.000Z"),
-      ),
+      await familyGrowthPreparedBindingHeadsAreCurrent(transaction, heads(), new Date("2026-08-13T08:00:00.000Z")),
     ).toBe(false);
   });
 
   it("fails closed when rebind changes the prepared association head", async () => {
-    const transaction = { $queryRaw: async () => [] };
+    const transaction = bindingHeadReader([]);
     expect(
-      await familyGrowthPreparedBindingHeadsAreCurrent(
-        transaction,
-        heads(),
-        new Date("2026-08-13T08:00:00.000Z"),
-      ),
+      await familyGrowthPreparedBindingHeadsAreCurrent(transaction, heads(), new Date("2026-08-13T08:00:00.000Z")),
     ).toBe(false);
   });
 
@@ -617,19 +648,31 @@ describe("T-011 N1 prepared binding-head commit guard", () => {
     expect(
       familyGrowthPreparedHeadsMatchReleaseTarget(
         { workspace_id: "ws-1", family_growth },
-        { workspaceId: "ws-1", childCareProcessId: "process-1", familyRefKey: "ws-1:family-1" },
+        {
+          workspaceId: "ws-1",
+          childCareProcessId: "process-1",
+          familyRefKey: "ws-1:family-1",
+        },
       ),
     ).toBe(true);
     expect(
       familyGrowthPreparedHeadsMatchReleaseTarget(
         { workspace_id: "ws-1", family_growth },
-        { workspaceId: "ws-1", childCareProcessId: "process-other", familyRefKey: "ws-1:family-1" },
+        {
+          workspaceId: "ws-1",
+          childCareProcessId: "process-other",
+          familyRefKey: "ws-1:family-1",
+        },
       ),
     ).toBe(false);
     expect(
       familyGrowthPreparedHeadsMatchReleaseTarget(
         { workspace_id: "ws-1", family_growth },
-        { workspaceId: "ws-1", childCareProcessId: "process-1", familyRefKey: "ws-1:family-other" },
+        {
+          workspaceId: "ws-1",
+          childCareProcessId: "process-1",
+          familyRefKey: "ws-1:family-other",
+        },
       ),
     ).toBe(false);
     expect(
@@ -638,33 +681,45 @@ describe("T-011 N1 prepared binding-head commit guard", () => {
           workspace_id: "ws-1",
           family_growth: {
             ...family_growth,
-            target: { child_id: "mc-child-other", family_id: "mc-family-other" },
+            target: {
+              child_id: "mc-child-other",
+              family_id: "mc-family-other",
+            },
           },
         },
-        { workspaceId: "ws-1", childCareProcessId: "process-1", familyRefKey: "ws-1:family-1" },
+        {
+          workspaceId: "ws-1",
+          childCareProcessId: "process-1",
+          familyRefKey: "ws-1:family-1",
+        },
       ),
     ).toBe(false);
   });
 
   it("rejects expired owner evidence without issuing a database read", async () => {
     let reads = 0;
-    const transaction = {
-      $queryRaw: async () => {
-        reads += 1;
-        return [{ matched: 1 }];
-      },
-    };
+    const transaction = bindingHeadReader([{ matched: 1 }], () => {
+      reads += 1;
+    });
     const expired = {
       ...heads(),
       canonicalOwnerEvidenceExpiresAt: "2026-08-13T08:00:00.000Z",
     };
     expect(
-      await familyGrowthPreparedBindingHeadsAreCurrent(
-        transaction,
-        expired,
-        new Date("2026-08-13T08:00:00.000Z"),
-      ),
+      await familyGrowthPreparedBindingHeadsAreCurrent(transaction, expired, new Date("2026-08-13T08:00:00.000Z")),
     ).toBe(false);
     expect(reads).toBe(0);
   });
 });
+
+function bindingHeadReader(
+  rows: readonly Readonly<{ matched: number }>[],
+  onRead?: (statement: Prisma.Sql) => void,
+): Pick<Prisma.TransactionClient, "$queryRaw"> {
+  return {
+    $queryRaw: <T = unknown>(statement: Prisma.Sql): Promise<T> => {
+      onRead?.(statement);
+      return Promise.resolve(structuredClone(rows) as unknown as T);
+    },
+  } as unknown as Pick<Prisma.TransactionClient, "$queryRaw">;
+}
