@@ -11,9 +11,13 @@
   [`07-g5-0-readiness-inventory.md`](./07-g5-0-readiness-inventory.md)，
   profile v1.0.0 已确认冻结（[`08-beta-profile-v1.md`](./08-beta-profile-v1.md)，
   `CONFIRMED_G5_INPUT`，无必选集变更）。T-011 W1 已冻结、W2 已发布，
-  G5-A 的设计前置全部满足。G5-A Freeze 仍是严格串行门，需要单独授权，
-  且等待 operator 包（synthetic token、closure 对齐、Q3 live 前置、
-  真机）。不分配 Candidate identity、不实现 release-control runtime。
+  G5-A 的设计前置全部满足。G5-A Freeze 仍是严格串行门，需要单独授权；
+  My-Chat 已完成会改变 Candidate shared inputs 的 W2 P0 consumer adoption；
+  W2 closing quality gate 已清除生成客户端漂移和旧 scope-draft 双轨，精确
+  revision pin 验证通过。Freeze 前仅剩 closure 对齐，避免立即生成 successor Candidate。Synthetic token 与双平台真机
+  属于后续 G5-D operator package；Q3 live qualification 是 G5-D 内部测试
+  enablement 的前置，不是 G5-A Freeze 前置。不分配 Candidate identity、不实现
+  release-control runtime。
 
 ## Goal
 
@@ -90,7 +94,8 @@ D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建�
 
 G5-0 已于 2026-08-13 完成：profile v1.0.0（`CONFIRMED_G5_INPUT`）取代 v0，
 inventory/census 收口于 `07-g5-0-readiness-inventory.md`。下一个门是
-G5-A Candidate Freeze——严格串行、需单独授权，且等待 operator 包
-（synthetic token、closure 对齐、Q3 live 前置、双平台真机）与 My-Chat
-IR-C01 对 W2 exact pin 的采纳进度。不提前分配 Candidate identity，
+G5-A Candidate Freeze——严格串行、需单独授权；My-Chat 对 W2 exact pin 的
+P0 采纳已完成，Freeze 前收口 Candidate shared-input closure，避免冻结后立刻失效。
+Synthetic token、Q3 live qualification 与双平台真机留在 G5-D operator/device
+窗口，其中 Q3 live 只前置内部测试 enablement。不提前分配 Candidate identity，
 不实现 release-control runtime。

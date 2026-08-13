@@ -33,6 +33,7 @@ hold the full values and remain authoritative.
 | D4 | T-010 family-sharing eligibility owner qualified default-off; My-Chat adopted at one exact digest | Not part of the v0 required six-surface set; classify during census (candidate `g5_shared` for the authorization surfaces P-S06/P-R01..R04 consumed by the My-Chat companion) |
 | D5 | T-002 pin resealed 2026-08-13 to My-Chat `1db3f03` (revision-only, zero content drift) | Record 26 remains the authoritative requalification; no evidence invalidated |
 | D6 | Same-day follow-up reseals: My-Chat `b90cce2` (T-042 authorization hardening rotated `x5_joint_api`) and Nurture self-pin rotations through the W5 hardening and W2 publication batches | Record 26 addenda + changelog `pin-reseal`/`fix-batch` entries; C30 Host profiles unchanged; W1 frozen design and W2 publication close the D3/D4 dispositions |
+| D7 | W2 P0 closing audit removed the superseded scope draft, regenerated both Prisma clients before root typecheck, pinned the landed My-Chat consumer at `1f306cb…` / `x5_joint_api=561614f0…`, and rotated the Nurture scenario self-hash to `976cd876…` | Exact Base `536638a…` / My-Chat `1f306cb…` detached-worktree verification passed; owner contract digest and default-off posture are unchanged; no successor Candidate is required |
 
 ## 3. Pilot carry-forward census (read-only, categories fixed)
 
@@ -73,8 +74,11 @@ Ledger:
 3. DONE 2026-08-13 — census complete, ledgered above.
 4. SATISFIED 2026-08-13 — T-011 W1 is frozen, so the G5-A precondition is
    met. G5-A itself remains strictly serial, unauthorized and outside this
-   phase; scheduling it now also waits on the operator package (synthetic
-   token, closure alignment, Q3 live prerequisite, devices).
+   phase. W2 P0 consumer adoption closed in My-Chat T-039 on 2026-08-13;
+   scheduling should now close the resulting Candidate shared-input alignment.
+   Synthetic token, Q3 live qualification
+   and devices belong to the later G5-D operator/device window; Q3 live is a
+   prerequisite for the scoped internal-test enablement, not for G5-A Freeze.
 
 ## Boundaries
 
