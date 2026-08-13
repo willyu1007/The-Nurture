@@ -3,6 +3,15 @@
 Evidence accumulates per increment (see `01-plan.md` DoD lines). Empty until
 the first increment lands.
 
+## 2026-08-13 maintenance requalification
+
+- The repository-wide current typecheck exposed two archived T-009 fixtures
+  that no longer supplied the now-required current owner-evidence expiry and
+  guardian-role identity. Both fixtures were repaired without changing
+  production semantics.
+- `pnpm typecheck` and the complete 97-file / 1083-test unit lane passed after
+  both Prisma clients were regenerated.
+
 | Increment | Gate | Evidence | Result |
 | --- | --- | --- | --- |
 | I1 | `pnpm test:unit` incl. JCS vectors + schema-shaped envelope fixtures | 55 files / 603 tests green (24 new across jcs/assembler/receipt suites); digest parity test replicates the consumer verifier algorithm; `tsc --noEmit` adds zero new errors (one pre-existing live-sibling drift error, see notes) | PASS |

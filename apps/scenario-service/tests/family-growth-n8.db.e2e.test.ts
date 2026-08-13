@@ -79,10 +79,7 @@ class ConsumerDouble {
       const chunks: Buffer[] = [];
       request.on("data", (chunk: Buffer) => chunks.push(chunk));
       request.on("end", () => {
-        const answer = this.answer(
-          request.headers.authorization,
-          Buffer.concat(chunks).toString("utf8"),
-        );
+        const answer = this.answer(request.headers.authorization, Buffer.concat(chunks).toString("utf8"));
         response.statusCode = answer.status;
         response.setHeader("content-type", "application/json");
         response.end(JSON.stringify(answer.body ?? {}));
@@ -97,10 +94,7 @@ class ConsumerDouble {
     await new Promise<void>((resolve) => this.server?.close(() => resolve()));
   }
 
-  private answer(
-    authorization: string | undefined,
-    raw: string,
-  ): { status: number; body?: unknown } {
+  private answer(authorization: string | undefined, raw: string): { status: number; body?: unknown } {
     if (authorization !== `Bearer ${EVENTS_TOKEN}`) {
       return { status: 401, body: { error: "service_unauthorized" } };
     }
@@ -134,16 +128,15 @@ class ConsumerDouble {
     };
   }
 
-  private remember(
-    eventId: string,
-    digest: string,
-    receipt: DoubleReceipt,
-  ): { status: number; body: unknown } {
+  private remember(eventId: string, digest: string, receipt: DoubleReceipt): { status: number; body: unknown } {
     this.ledger.set(eventId, { digest, receipt });
     return { status: 200, body: receipt };
   }
 
-  private answerRelease(envelope: Record<string, unknown>): { status: number; body?: unknown } {
+  private answerRelease(envelope: Record<string, unknown>): {
+    status: number;
+    body?: unknown;
+  } {
     const failures = validateReleaseEventV1(envelope);
     if (failures.length > 0) {
       this.violations.push(...failures.map((f) => `release ${f.path}: ${f.message}`));
@@ -211,7 +204,10 @@ class ConsumerDouble {
     });
   }
 
-  private answerLifecycle(envelope: Record<string, unknown>): { status: number; body?: unknown } {
+  private answerLifecycle(envelope: Record<string, unknown>): {
+    status: number;
+    body?: unknown;
+  } {
     const failures = validateLifecycleEventV1(envelope);
     if (failures.length > 0) {
       this.violations.push(...failures.map((f) => `lifecycle ${f.path}: ${f.message}`));
@@ -247,10 +243,7 @@ class ConsumerDouble {
     });
   }
 
-  private conflict(
-    envelope: Record<string, unknown>,
-    reason: string,
-  ): { status: number; body: unknown } {
+  private conflict(envelope: Record<string, unknown>, reason: string): { status: number; body: unknown } {
     return {
       status: 200,
       body: {
@@ -277,7 +270,11 @@ const seedWorld = async (
   const [teacher, guardian] = await Promise.all(
     ["teacher", "guardian"].map((tag) =>
       prisma.nurtureParticipant.create({
-        data: { workspaceId, myChatUserId: `${tag}:${workspaceId}`, status: "active" },
+        data: {
+          workspaceId,
+          myChatUserId: `${tag}:${workspaceId}`,
+          status: "active",
+        },
       }),
     ),
   );
@@ -285,7 +282,12 @@ const seedWorld = async (
     data: { workspaceId, displayName: "Care Center", status: "active" },
   });
   const group = await prisma.nurtureCareGroup.create({
-    data: { workspaceId, institutionId: institution.id, name: "向日葵班", status: "active" },
+    data: {
+      workspaceId,
+      institutionId: institution.id,
+      name: "向日葵班",
+      status: "active",
+    },
   });
   const teacherRole = await prisma.nurtureCareRoleAssignment.create({
     data: {
@@ -410,8 +412,7 @@ const seedWorld = async (
           contentMimeType: "image/jpeg",
         },
       }));
-    const attributeThisChild =
-      !options.sharedAssetSoloChild || seededChildren.length === 0;
+    const attributeThisChild = !options.sharedAssetSoloChild || seededChildren.length === 0;
     if (attributeThisChild) {
       await prisma.nurtureChildMediaAttribution.create({
         data: {
@@ -442,10 +443,16 @@ const seedWorld = async (
     const bindingKind = spec.binding ?? "current";
     if (bindingKind !== "missing") {
       const childAnchor = await prisma.nurtureChildBindingAnchor.create({
-        data: { reservationKeyHash: hash(`child:${workspaceId}:${spec.tag}`), status: "associated" },
+        data: {
+          reservationKeyHash: hash(`child:${workspaceId}:${spec.tag}`),
+          status: "associated",
+        },
       });
       const familyAnchor = await prisma.nurtureFamilyBindingAnchor.create({
-        data: { reservationKeyHash: hash(`family:${workspaceId}:${spec.tag}`), status: "associated" },
+        data: {
+          reservationKeyHash: hash(`family:${workspaceId}:${spec.tag}`),
+          status: "associated",
+        },
       });
       const childAssociation = await prisma.nurtureChildAnchorAssociation.create({
         data: {
@@ -478,9 +485,7 @@ const seedWorld = async (
           data: {
             workspaceId,
             subjectType,
-            ...(subjectType === "child"
-              ? { childAnchorId: anchorId }
-              : { familyAnchorId: anchorId }),
+            ...(subjectType === "child" ? { childAnchorId: anchorId } : { familyAnchorId: anchorId }),
             ownerRef: `nurture_${subjectType}_binding_anchor_v1:${anchorId}`,
             ownerVersion: 1,
             idempotencyKeyHash: hash(`auth:${subjectType}:${workspaceId}:${spec.tag}`),
@@ -494,9 +499,7 @@ const seedWorld = async (
             status: "active",
             verifiedAt: new Date("2026-08-05T08:00:00.000Z"),
             expiresAt:
-              bindingKind === "expired"
-                ? new Date("2026-08-06T00:00:00.000Z")
-                : new Date("2099-01-01T00:00:00.000Z"),
+              bindingKind === "expired" ? new Date("2026-08-06T00:00:00.000Z") : new Date("2099-01-01T00:00:00.000Z"),
           },
         });
       }
@@ -519,9 +522,10 @@ const seedWorld = async (
       organizerInputRevision: "organizer:1",
       titleProtectionPayload: protectedContent.seal("户外写生活动") as never,
       mediaCompositionPayload: {
-        media: [
-          ...new Set(seededChildren.map((entry) => entry.assetId)),
-        ].map((assetId) => ({ mediaAssetId: assetId, mediaRevision: 1 })),
+        media: [...new Set(seededChildren.map((entry) => entry.assetId))].map((assetId) => ({
+          mediaAssetId: assetId,
+          mediaRevision: 1,
+        })),
       },
     },
   });
@@ -530,7 +534,14 @@ const seedWorld = async (
     data: { currentRevisionId: revision.id },
   });
 
-  return { workspaceId, teacher: teacher!, teacherRole, process, revision, children: seededChildren };
+  return {
+    workspaceId,
+    teacher: teacher!,
+    teacherRole,
+    process,
+    revision,
+    children: seededChildren,
+  };
 };
 
 // --- harnessed provider chain ----------------------------------------------
@@ -540,6 +551,7 @@ const exchange: FamilyGrowthCanonicalExchangePort = {
     status: "exchanged",
     childId: `mc-child-${hash(input.childOwnerRef).slice(0, 8)}`,
     familyId: `mc-family-${hash(input.familyOwnerRef).slice(0, 8)}`,
+    ownerEvidenceExpiresAt: "2099-01-01T00:00:00.000Z",
   }),
 };
 
@@ -616,7 +628,10 @@ describe("T-009 I7: N8 conformance fixtures", () => {
   };
   const receipts = (status?: string) =>
     prisma.nurtureFamilyGrowthAdmissionReceipt.findMany({
-      where: { workspaceId: activeWorkspace, ...(status ? { status: status as never } : {}) },
+      where: {
+        workspaceId: activeWorkspace,
+        ...(status ? { status: status as never } : {}),
+      },
       orderBy: { createdAt: "asc" },
     });
   const outboxRows = () =>
@@ -659,7 +674,9 @@ describe("T-009 I7: N8 conformance fixtures", () => {
     double.familyPolicy.set(prep.emission.target.family_id, "pending");
     await tick();
     const stored = await receipts();
-    expect(stored[0]).toMatchObject({ status: "pending_guardian_confirmation" });
+    expect(stored[0]).toMatchObject({
+      status: "pending_guardian_confirmation",
+    });
     expect(stored[0]!.materialRef).toBeNull();
     const [row] = await outboxRows();
     expect(row!.deliveryState).toBe("delivered");
@@ -705,39 +722,41 @@ describe("T-009 I7: N8 conformance fixtures", () => {
     forged.event_id = randomUUID();
     forged.material.display_snapshot.title = "被篡改的标题";
     forged.payload_digest = releasePayloadDigestV1(forged);
-    await prisma.nurtureFamilyGrowthOutboxEvent.create({
-      data: {
-        id: forged.event_id,
-        workspaceId: world.workspaceId,
-        kind: "released",
-        // A second released row needs its own release: reuse is blocked by
-        // the partial unique index, so this rides as a lifecycle-free clone
-        // on a synthetic release row.
-        publicationReleaseId: (
-          await prisma.nurturePublicationRelease.findFirstOrThrow({
-            where: { workspaceId: world.workspaceId },
-          })
-        ).id,
-        visibilityEventId: null,
-        payloadDigest: forged.payload_digest,
-        envelopePayload: forged as never,
-        deliveryState: "pending",
-      },
-    }).catch(async () => {
-      // Partial unique index forbids a second released event per release —
-      // which is itself conformant. Exercise the conflict over the wire
-      // instead, straight through the transport.
-      const transport = createFamilyGrowthHttpTransport({
-        config: { baseUrl: double.baseUrl, token: EVENTS_TOKEN },
+    await prisma.nurtureFamilyGrowthOutboxEvent
+      .create({
+        data: {
+          id: forged.event_id,
+          workspaceId: world.workspaceId,
+          kind: "released",
+          // A second released row needs its own release: reuse is blocked by
+          // the partial unique index, so this rides as a lifecycle-free clone
+          // on a synthetic release row.
+          publicationReleaseId: (
+            await prisma.nurturePublicationRelease.findFirstOrThrow({
+              where: { workspaceId: world.workspaceId },
+            })
+          ).id,
+          visibilityEventId: null,
+          payloadDigest: forged.payload_digest,
+          envelopePayload: forged as never,
+          deliveryState: "pending",
+        },
+      })
+      .catch(async () => {
+        // Partial unique index forbids a second released event per release —
+        // which is itself conformant. Exercise the conflict over the wire
+        // instead, straight through the transport.
+        const transport = createFamilyGrowthHttpTransport({
+          config: { baseUrl: double.baseUrl, token: EVENTS_TOKEN },
+        });
+        const result = await transport(forged);
+        expect(result).toMatchObject({ kind: "response", status: 200 });
+        if (result.kind !== "response") return;
+        expect(result.body).toMatchObject({
+          status: "conflict",
+          reason_code: "source_digest_conflict",
+        });
       });
-      const result = await transport(forged);
-      expect(result).toMatchObject({ kind: "response", status: 200 });
-      if (result.kind !== "response") return;
-      expect(result.body).toMatchObject({
-        status: "conflict",
-        reason_code: "source_digest_conflict",
-      });
-    });
   });
 
   it("N8-5/6/7: correction, target removal and redaction deliver in order", async () => {
@@ -771,11 +790,7 @@ describe("T-009 I7: N8 conformance fixtures", () => {
     }
 
     const safety = new PrismaPublicationSafetyTransaction(prisma);
-    const append = (
-      kind: "correction" | "target_removal" | "redaction",
-      executionId: string,
-      text?: string,
-    ) =>
+    const append = (kind: "correction" | "target_removal" | "redaction", executionId: string, text?: string) =>
       safety.appendPublicationVisibilityEvents({
         workspace_id: world.workspaceId,
         participant_id: world.teacher.id,
@@ -800,11 +815,7 @@ describe("T-009 I7: N8 conformance fixtures", () => {
     const outcome = await tick();
     expect(outcome.settled).toBe(3);
     const lifecycleRows = (await outboxRows()).filter((row) => row.kind !== "released");
-    expect(lifecycleRows.map((row) => row.deliveryState)).toEqual([
-      "delivered",
-      "delivered",
-      "delivered",
-    ]);
+    expect(lifecycleRows.map((row) => row.deliveryState)).toEqual(["delivered", "delivered", "delivered"]);
     const stored = await receipts("applied");
     // Release + three lifecycle receipts all applied with the material refs.
     expect(stored.length).toBeGreaterThanOrEqual(4);
@@ -903,7 +914,9 @@ describe("T-009 I7: N8 conformance fixtures", () => {
   });
 
   it("N8-10: an unauthorized second child in the photo rejects the release", async () => {
-    const world = await seedWorld([{ tag: "A" }, { tag: "B" }], { sharedAsset: true });
+    const world = await seedWorld([{ tag: "A" }, { tag: "B" }], {
+      sharedAsset: true,
+    });
     useWorld(world);
     // Child B is clearly visible (confirmed attribution) but the target-A
     // exposure only allows child A: fail closed, never a degraded original.
@@ -927,7 +940,10 @@ describe("T-009 I7: N8 conformance fixtures", () => {
       child_care_process_id: expired.children[0]!.careProcessId,
       revision: 1,
     });
-    expect(prepExpired).toEqual({ status: "denied", reason: "authorization_expired" });
+    expect(prepExpired).toEqual({
+      status: "denied",
+      reason: "authorization_expired",
+    });
 
     const missing = await seedWorld([{ tag: "A", binding: "missing" }]);
     const prepMissing = await preparer().prepare({
@@ -937,7 +953,10 @@ describe("T-009 I7: N8 conformance fixtures", () => {
       child_care_process_id: missing.children[0]!.careProcessId,
       revision: 1,
     });
-    expect(prepMissing).toEqual({ status: "denied", reason: "binding_missing" });
+    expect(prepMissing).toEqual({
+      status: "denied",
+      reason: "binding_missing",
+    });
     expect(
       await prisma.nurtureFamilyGrowthOutboxEvent.count({
         where: { workspaceId: missing.workspaceId },

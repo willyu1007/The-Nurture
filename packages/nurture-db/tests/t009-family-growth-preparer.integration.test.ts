@@ -57,7 +57,11 @@ const seedWorld = async (options: SeedOptions = {}) => {
   const [teacher, guardian] = await Promise.all(
     ["teacher", "guardian"].map((tag) =>
       prisma.nurtureParticipant.create({
-        data: { workspaceId, myChatUserId: `${tag}:${workspaceId}`, status: "active" },
+        data: {
+          workspaceId,
+          myChatUserId: `${tag}:${workspaceId}`,
+          status: "active",
+        },
       }),
     ),
   );
@@ -65,7 +69,12 @@ const seedWorld = async (options: SeedOptions = {}) => {
     data: { workspaceId, displayName: "Care Center", status: "active" },
   });
   const group = await prisma.nurtureCareGroup.create({
-    data: { workspaceId, institutionId: institution.id, name: "向日葵班", status: "active" },
+    data: {
+      workspaceId,
+      institutionId: institution.id,
+      name: "向日葵班",
+      status: "active",
+    },
   });
   const teacherRole = await prisma.nurtureCareRoleAssignment.create({
     data: {
@@ -194,7 +203,9 @@ const seedWorld = async (options: SeedOptions = {}) => {
       contentDigest: HEX_DIGEST,
       organizerInputRevision: "organizer:1",
       ...(options.sealedTitle !== false
-        ? { titleProtectionPayload: protectedContent.seal("户外写生活动") as never }
+        ? {
+            titleProtectionPayload: protectedContent.seal("户外写生活动") as never,
+          }
         : {}),
       mediaCompositionPayload: options.emptyComposition
         ? { media: [] }
@@ -231,10 +242,16 @@ const seedWorld = async (options: SeedOptions = {}) => {
     | undefined;
   if (options.binding !== false) {
     const childAnchor = await prisma.nurtureChildBindingAnchor.create({
-      data: { reservationKeyHash: hash(`child:${workspaceId}`), status: "associated" },
+      data: {
+        reservationKeyHash: hash(`child:${workspaceId}`),
+        status: "associated",
+      },
     });
     const familyAnchor = await prisma.nurtureFamilyBindingAnchor.create({
-      data: { reservationKeyHash: hash(`family:${workspaceId}`), status: "associated" },
+      data: {
+        reservationKeyHash: hash(`family:${workspaceId}`),
+        status: "associated",
+      },
     });
     const childAssociation = await prisma.nurtureChildAnchorAssociation.create({
       data: {
@@ -264,9 +281,7 @@ const seedWorld = async (options: SeedOptions = {}) => {
         data: {
           workspaceId,
           subjectType,
-          ...(subjectType === "child"
-            ? { childAnchorId: anchorId }
-            : { familyAnchorId: anchorId }),
+          ...(subjectType === "child" ? { childAnchorId: anchorId } : { familyAnchorId: anchorId }),
           ownerRef: `nurture_${subjectType}_binding_anchor_v1:${anchorId}`,
           ownerVersion: 1,
           idempotencyKeyHash: hash(`auth:${subjectType}:${workspaceId}`),
@@ -299,6 +314,7 @@ const seedWorld = async (options: SeedOptions = {}) => {
   return {
     workspaceId,
     teacher: teacher!,
+    guardianRole,
     process,
     revision,
     target,
@@ -352,10 +368,14 @@ const commitPrepared = (
 
 const expectNoReleaseWrites = async (world: Awaited<ReturnType<typeof seedWorld>>) => {
   expect(
-    await prisma.nurturePublicationRelease.count({ where: { workspaceId: world.workspaceId } }),
+    await prisma.nurturePublicationRelease.count({
+      where: { workspaceId: world.workspaceId },
+    }),
   ).toBe(0);
   expect(
-    await prisma.nurtureChildLinkReceipt.count({ where: { workspaceId: world.workspaceId } }),
+    await prisma.nurtureChildLinkReceipt.count({
+      where: { workspaceId: world.workspaceId },
+    }),
   ).toBe(0);
   expect(
     await prisma.nurtureFamilyGrowthOutboxEvent.count({
@@ -415,7 +435,9 @@ describe("T-009 I3c: fact preparer over real canonical rows", () => {
     if (result.status !== "prepared") return;
 
     await prisma.nurtureScenarioBindingAuthorization.update({
-      where: { id: result.emission.localBindingHeads.familyAuthorization.authorizationId },
+      where: {
+        id: result.emission.localBindingHeads.familyAuthorization.authorizationId,
+      },
       data: {
         status: "revoked",
         revokedAt: new Date(),
@@ -480,8 +502,8 @@ describe("T-009 I3c: fact preparer over real canonical rows", () => {
           userEvidenceHash: hash("user"),
           actorEvidenceHash: hash("actor"),
           purpose: "scenario_binding_write",
-          authorizationSourceRef: `nurture-care-role:${guardianRole.id}`,
-          authorizationSourceVersion: guardianRole.aggregateVersion,
+          authorizationSourceRef: `nurture-care-role:${world.guardianRole.id}`,
+          authorizationSourceVersion: world.guardianRole.aggregateVersion,
           status: "active",
           verifiedAt: new Date("2026-08-06T08:00:00.000Z"),
           expiresAt: FUTURE,
@@ -569,7 +591,9 @@ describe("T-009 I3c: fact preparer over real canonical rows", () => {
     let revocationSettled = false;
     const revocation = revoker.nurtureScenarioBindingAuthorization
       .update({
-        where: { id: prepared.emission.localBindingHeads.familyAuthorization.authorizationId },
+        where: {
+          id: prepared.emission.localBindingHeads.familyAuthorization.authorizationId,
+        },
         data: {
           status: "revoked",
           revokedAt: new Date(),
@@ -579,10 +603,7 @@ describe("T-009 I3c: fact preparer over real canonical rows", () => {
       .then(() => {
         revocationSettled = true;
       });
-    await Promise.race([
-      revocation,
-      new Promise<void>((resolve) => setTimeout(resolve, 100)),
-    ]);
+    await Promise.race([revocation, new Promise<void>((resolve) => setTimeout(resolve, 100))]);
     expect(revocationSettled).toBe(false);
 
     finishReleaseGuard();
@@ -593,7 +614,10 @@ describe("T-009 I3c: fact preparer over real canonical rows", () => {
 
   it("denies with the resolution reason when the binding chain is absent", async () => {
     const world = await seedWorld({ binding: false });
-    expect(await prepare(world)).toEqual({ status: "denied", reason: "binding_missing" });
+    expect(await prepare(world)).toEqual({
+      status: "denied",
+      reason: "binding_missing",
+    });
   });
 
   it("denies when the process carries no resolved schedule policy identity", async () => {
