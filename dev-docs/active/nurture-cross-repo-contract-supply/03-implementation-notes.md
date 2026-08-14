@@ -1,5 +1,18 @@
 # Implementation notes
 
+## 2026-08-14 — W7-4 teacher organization-owner registration closes
+
+- Registered the W7 conformance fixtures in the service-candidate
+  standalone-fixture list (`scripts/service-candidate/candidate-core.mjs`),
+  so the next candidate freeze seals them alongside the W3-W6 contracts;
+  the frozen G5-A Candidate itself is untouched and
+  `verify-service-candidate` continues to report expected post-freeze input
+  drift between candidates.
+- The remaining W7-4 surface had already landed with W7-2: env contract
+  5-file set (SSOT yaml, regenerated example/docs/context JSON, registry
+  checksum), ingress and test-routing censuses, safe-code allowlist.
+  Governance sync/lint re-ran clean with no derived-view drift.
+
 ## 2026-08-14 — W7-3 teacher organization-owner real owner ports
 
 - Added the DB-free domain service

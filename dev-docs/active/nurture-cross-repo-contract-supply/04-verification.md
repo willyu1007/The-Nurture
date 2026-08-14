@@ -1,5 +1,17 @@
 # Verification
 
+## 2026-08-14 — W7-4 organization-owner registration
+
+- `candidate-core.test.mjs` green after the fixture-list addition;
+  project-governance `sync --apply --changelog` + `lint` and strict doc lint
+  all green; no derived-view drift.
+- Registration census recap: gate variable in the env 5-file set (W7-2),
+  six routes + controller in the ingress census (W7-2), scenario-service=22
+  and production-db=54 in test routing (W7-2/W7-3), W7 fixtures in the
+  candidate standalone list (this step).
+
+Verdict: `W7_4_REGISTERED / CANDIDATE_LIST_EXTENDED / G5A_FREEZE_UNTOUCHED`.
+
 ## 2026-08-14 — W7-3 organization-owner real owner ports
 
 - Unit lane: 9-case service suite over fake ports (foreign-ref masking,
