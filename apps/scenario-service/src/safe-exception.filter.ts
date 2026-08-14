@@ -27,6 +27,7 @@ const allowedErrors = new Set([
   "institution_business_communication_read_disabled",
   "teacher_release_owner_disabled",
   "parent_context_presenter_disabled",
+  "parent_communication_owner_disabled",
   "director_presenter_disabled",
   "teacher_class_stream_presenter_disabled",
   "family_sharing_private_disabled",
@@ -106,7 +107,13 @@ export class SafeExceptionFilter implements ExceptionFilter {
       error !== "teacher_release_owner_disabled" &&
       error !== "parent_context_presenter_disabled" &&
       error !== "director_presenter_disabled" &&
-      error !== "teacher_class_stream_presenter_disabled"
+      error !== "teacher_class_stream_presenter_disabled" &&
+      error !== "parent_communication_owner_disabled" &&
+      error !== "teacher_organization_owner_disabled" &&
+      error !== "teacher_communication_owner_disabled" &&
+      error !== "teacher_media_association_owner_disabled" &&
+      error !== "teacher_assistant_query_owner_disabled" &&
+      error !== "parent_communication_extension_disabled"
     ) {
       this.logger.unhandledException(requestContext);
     }

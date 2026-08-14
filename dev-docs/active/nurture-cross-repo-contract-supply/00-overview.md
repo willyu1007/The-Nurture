@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- Updated: 2026-08-14
+- Updated: 2026-08-15
 - Supply extension (2026-08-14): the owner directed the main effort to the
   teacher-side contract gaps. The batch schedule W6-W11 is frozen in
   `artifacts/w6-teacher-supply-schedule.md` and summarized in `01-plan.md`.
@@ -63,11 +63,15 @@
   (three v1.1 routes, controller-routes 52), W11-3 real owner ports over
   the frozen v1 resolver/reads and the G4-C redaction spec (unit 7, W11 DB
   lane 5, full battery 58/499), W11-4 registration and the W11-5
-  digest-pin artifact. The next executable step is the W11-5 My-Chat
-  dormant consumer adoption (P-H05, P-H06), then the user-directed
-  end-of-schedule deep quality and closure review. All batches remain
-  default-off contract supply with no activation, durable apply,
-  deployment or traffic.
+  digest-pin artifact; My-Chat adopted the dormant strict consumer at
+  `df5af9d` (P-H05/P-H06 contract-ready, axis recount 64/2/22/17) and the
+  cross-repo pins resealed to green CI on both heads (`9e41764` /
+  `df5af9d`). W11 is closed end to end and the W6-W11 schedule is
+  COMPLETE. The end-of-schedule deep review (three adversarial lanes) ran
+  and all ten confirmed findings are repaired with regression coverage —
+  see `03-implementation-notes.md` / `04-verification.md` (2026-08-15
+  deep-review entries). All batches remain default-off contract supply
+  with no activation, durable apply, deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
@@ -255,6 +259,6 @@ conformance fixtures, all default-off.
   media ingress exists).
 - [x] W10: teacher assistant queries (missing-record handoff, weekly draft)
   with agent-generated labelling and no direct provider calls.
-- [ ] W11: `nurture.parent-communication-owner@1.1.0` additive extensions
+- [x] W11: `nurture.parent-communication-owner@1.1.0` additive extensions
   for redaction prepare and delivery receipts; the frozen 1.0.0 artifact is
   not mutated.

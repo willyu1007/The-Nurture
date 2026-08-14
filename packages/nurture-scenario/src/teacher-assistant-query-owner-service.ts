@@ -1,9 +1,11 @@
 import { createHash, createHmac } from "node:crypto";
 import { nurtureCanonicalJson } from "./c30/canonical-json.js";
-import type {
-  NurtureCommandInput,
-  NurtureCommandResult,
-  NurtureCommandSpec,
+import {
+  isNurtureCommandRetryable,
+  NurtureDeterministicRollback,
+  type NurtureCommandInput,
+  type NurtureCommandResult,
+  type NurtureCommandSpec,
 } from "./domain/commands/command-kernel.js";
 import type { NurtureWeeklyDraftFacts } from "./domain/institution/teacher-assistant-transaction.js";
 import { issueBoardOpaqueRef } from "./harness/board-projection.js";
@@ -410,12 +412,25 @@ export const createTeacherAssistantQueryOwnerService = (
     return output;
   };
 
+  // Defensive identity hygiene: a duplicated child id would trip the
+  // uniqueness bindings downstream, so reads never trust the port on it.
+  const dedupeChildren = (
+    children: readonly TeacherAssistantClassChildV1[],
+  ): TeacherAssistantClassChildV1[] => {
+    const seen = new Set<string>();
+    return children.filter((child) => {
+      if (seen.has(child.child_care_process_id)) return false;
+      seen.add(child.child_care_process_id);
+      return true;
+    });
+  };
+
   const weeklyChildrenOf = async (
     request: BaseRequestV1,
     careGroupId: string,
     window: Readonly<{ week_start: string; week_end: string }>,
   ) => {
-    const [children, facts] = await Promise.all([
+    const [rawChildren, facts] = await Promise.all([
       deps.assistantReads.listClassChildren({
         workspace_id: request.workspace_id,
         care_group_id: careGroupId,
@@ -427,10 +442,14 @@ export const createTeacherAssistantQueryOwnerService = (
         week_end: window.week_end,
       }),
     ]);
+    const children = dedupeChildren(rawChildren);
+    // The frozen page is the whole answer: a class the schema cannot
+    // represent must refuse, never silently truncate.
+    if (children.length > MAX_CHILDREN) return null;
     const factsByChild = new Map(
       facts.map((entry) => [entry.child_care_process_id, entry] as const),
     );
-    return children.slice(0, MAX_CHILDREN).map((child) => {
+    return children.map((child) => {
       const fact = factsByChild.get(child.child_care_process_id);
       return {
         child_care_process_id: child.child_care_process_id,
@@ -467,6 +486,12 @@ export const createTeacherAssistantQueryOwnerService = (
           participant_id: membership.context.participant_id,
         }),
       ]);
+      const classChildren = dedupeChildren(children);
+      if (classChildren.length > MAX_CHILDREN) {
+        // The frozen page is the whole answer: refuse, never truncate a
+        // class into a silently partial missing-record report.
+        return unavailable(request.context_ref, "content_unavailable");
+      }
       const recordedByChild = new Map(
         recorded.map((entry) => [entry.child_care_process_id, entry.kinds] as const),
       );
@@ -474,7 +499,7 @@ export const createTeacherAssistantQueryOwnerService = (
         eligibility.children.map((child) => child.child_care_process_id),
       );
       let missingTotal = 0;
-      const rows = children.slice(0, MAX_CHILDREN).map((child) => {
+      const rows = classChildren.map((child) => {
         const kinds = new Set(recordedByChild.get(child.child_care_process_id) ?? []);
         const present = TEACHER_ASSISTANT_CARE_KINDS.filter((kind) => kinds.has(kind));
         const missing = TEACHER_ASSISTANT_CARE_KINDS.filter((kind) => !kinds.has(kind));
@@ -510,7 +535,7 @@ export const createTeacherAssistantQueryOwnerService = (
           `${request.class_ref}|${request.local_date}`,
         ),
         local_date: request.local_date,
-        missing_count: Math.min(missingTotal, 400),
+        missing_count: missingTotal,
         children: rows,
       };
     },
@@ -521,6 +546,7 @@ export const createTeacherAssistantQueryOwnerService = (
       const careGroupId = membership.entry.care_group_id;
       const window = teacherAssistantWeekOf(request.local_date);
       const children = await weeklyChildrenOf(request, careGroupId, window);
+      if (!children) return unavailable(request.context_ref, "content_unavailable");
       const totals = children.reduce(
         (sums, child) => ({
           records:
@@ -533,6 +559,12 @@ export const createTeacherAssistantQueryOwnerService = (
         }),
         { records: 0, media: 0 },
       );
+      if (totals.records > TOTAL_CAP || totals.media > TOTAL_CAP) {
+        // The schema caps class totals and the runtime validator recomputes
+        // them from the children, so a clamped total is unservable — refuse
+        // a week the contract cannot represent.
+        return unavailable(request.context_ref, "content_unavailable");
+      }
       const draftProcessId = await deps.assistantReads.findWeeklyDraftProcessId({
         workspace_id: request.workspace_id,
         process_key: teacherAssistantWeeklyProcessKey(careGroupId, window.week_start),
@@ -552,8 +584,8 @@ export const createTeacherAssistantQueryOwnerService = (
           care_counts: child.care_counts,
           confirmed_media_count: child.confirmed_media_count,
         })),
-        class_total_records: Math.min(totals.records, TOTAL_CAP),
-        class_total_confirmed_media: Math.min(totals.media, TOTAL_CAP),
+        class_total_records: totals.records,
+        class_total_confirmed_media: totals.media,
         ...(draftProcessId
           ? { draft_process_ref: processRefOf(request.workspace_id, draftProcessId) }
           : {}),
@@ -571,7 +603,7 @@ export const createTeacherAssistantQueryOwnerService = (
         window.week_start,
       );
       const children = await weeklyChildrenOf(request, careGroupId, window);
-      const totalRecords = children.reduce(
+      const totalRecords = (children ?? []).reduce(
         (sum, child) =>
           sum
           + TEACHER_ASSISTANT_CARE_KINDS.reduce(
@@ -581,36 +613,47 @@ export const createTeacherAssistantQueryOwnerService = (
           + child.confirmed_media_count,
         0,
       );
-      if (totalRecords === 0) {
-        // Nothing to summarize — but never mask a replay or a duplicate:
-        // when the (class, week) draft already exists the command runs so
-        // the ledger or the domain answers it (the W7 lesson).
+      if (!children || totalRecords === 0) {
+        // Unrepresentable class or nothing to summarize — but never mask a
+        // replay or a duplicate: when the (class, week) draft already
+        // exists the command runs so the ledger or the domain answers it
+        // (the W7 lesson).
         const existing = await deps.assistantReads.findWeeklyDraftProcessId({
           workspace_id: request.workspace_id,
           process_key: processKey,
         });
-        if (!existing) return notCommitted(request, "no_weekly_facts");
+        if (!existing) {
+          return children
+            ? notCommitted(request, "no_weekly_facts")
+            : unavailable(request.context_ref, "content_unavailable");
+        }
       }
 
       // The deterministic weekly-facts document: safe labels and counts
-      // only — no refs, no ids, no generated prose.
-      const document = {
-        schema_version: 1,
-        kind: "weekly_care_summary_facts",
-        week_start: window.week_start,
-        week_end: window.week_end,
-        children: children.map((child) => ({
-          child_safe_label: child.child_safe_label,
-          care_counts: child.care_counts,
-          confirmed_media_count: child.confirmed_media_count,
-        })),
-      };
-      const contentDigest = digestOf(document);
+      // only — no refs, no ids, no generated prose. Absent when the class
+      // is unrepresentable; apply then refuses deterministically while
+      // replays and duplicates still answer through the ledger/domain.
+      const document = children
+        ? {
+            schema_version: 1,
+            kind: "weekly_care_summary_facts",
+            week_start: window.week_start,
+            week_end: window.week_end,
+            children: children.map((child) => ({
+              child_safe_label: child.child_safe_label,
+              care_counts: child.care_counts,
+              confirmed_media_count: child.confirmed_media_count,
+            })),
+          }
+        : undefined;
+      const contentDigest = document ? digestOf(document) : "sha256:unrepresentable";
       const organizerInputRevision = `weekly:${window.week_start}@${contentDigest}`;
-      const titleEnvelope = deps.protectedContent.seal(
-        `每周成长小结 ${window.week_start}`,
-      );
-      const bodyEnvelope = deps.protectedContent.seal(JSON.stringify(document));
+      const titleEnvelope = document
+        ? deps.protectedContent.seal(`每周成长小结 ${window.week_start}`)
+        : undefined;
+      const bodyEnvelope = document
+        ? deps.protectedContent.seal(JSON.stringify(document))
+        : undefined;
       const committedAt = now().toISOString();
 
       let facts: NurtureWeeklyDraftFacts | undefined;
@@ -668,6 +711,15 @@ export const createTeacherAssistantQueryOwnerService = (
           return { status: "ready" };
         },
         apply: async (transaction) => {
+          if (!document || !titleEnvelope || !bodyEnvelope) {
+            // The class is unrepresentable and no draft existed when the
+            // command was assembled; refuse deterministically inside the
+            // transaction rather than sealing a partial document.
+            throw new NurtureDeterministicRollback(
+              "weekly_source_unrepresentable",
+              "blocked",
+            );
+          }
           if (!facts?.safety_policy || !transaction.teacherAssistant) {
             throw new Error("teacher assistant apply facts unavailable");
           }
@@ -786,7 +838,10 @@ export const createTeacherAssistantQueryOwnerService = (
       ) {
         return notCommitted(request, result.reason_code);
       }
-      if (result.decision === "command_busy") {
+      if (isNurtureCommandRetryable(result)) {
+        // Rolled-back write conflicts and busy locks are safe to retry with
+        // the same command; a retry finds the winner and answers
+        // replayed/already_satisfied instead of failing terminally.
         return unavailable(request.context_ref, "temporarily_unavailable");
       }
       return unavailable(request.context_ref, "content_unavailable");

@@ -199,7 +199,9 @@ const identity = (
     interface_contract: TEACHER_COMMUNICATION_OWNER_INTERFACE,
     workspace_id: requiredString(body.workspace_id, 1, 256),
     my_chat_user_id: requiredString(body.my_chat_user_id, 1, 256),
-    host_request_id: requiredString(body.host_request_id, 1, 256),
+    // The command kernel rejects invocation ids outside its pattern, so a
+    // malformed one must die here as invalid, not later as unavailable.
+    host_request_id: invocationRequestId(body.host_request_id),
     context_ref: opaqueRef(body.context_ref),
   });
 
@@ -253,6 +255,14 @@ const requiredString = (
     throw invalidRequest();
   }
   return value;
+};
+
+const invocationRequestId = (value: unknown): string => {
+  const candidate = requiredString(value, 1, 200);
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(candidate)) {
+    throw invalidRequest();
+  }
+  return candidate;
 };
 
 const opaqueRef = (value: unknown): string => requiredString(value, 8, 512);

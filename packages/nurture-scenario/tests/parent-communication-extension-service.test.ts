@@ -334,7 +334,9 @@ describe("W11 parent-communication extension owner service", () => {
       disposition: "applied",
       command_request_id: "command-unit-0005",
       message_ref: previewRequest.message_ref,
-      cascade: { scope: "source_question", affected_count: 1 },
+      // Exactly the count the preview promised — never the internal
+      // cascade fan-out.
+      cascade: { scope: "source_question", affected_count: 2 },
     });
     expect(typeof committed.redacted_at).toBe("string");
     const payload = world.calls[0]?.payload as Record<string, unknown>;
@@ -385,12 +387,29 @@ describe("W11 parent-communication extension owner service", () => {
       recovery: "re_prepare",
     });
 
-    clock += 6 * 60_000;
-    const expired = (await world.binding.owner.redact({
+    // The refusal must not have burned the confirmation: the exact same
+    // prepared commit still succeeds afterwards.
+    const recovered = (await world.binding.owner.redact({
       request: {
         ...previewRequest,
         confirmation_ref: String(preview.confirmation_ref),
         prepared_preview_digest: String(preview.prepared_preview_digest),
+      },
+      authority: {} as never,
+    })) as Record<string, unknown>;
+    expect(recovered).toMatchObject({ status: "committed", disposition: "applied" });
+
+    const second = (await world.binding.owner.redactionPreview({
+      request: { ...previewRequest, command_request_id: "command-unit-0008" },
+      authority: {} as never,
+    })) as Record<string, unknown>;
+    clock += 6 * 60_000;
+    const expired = (await world.binding.owner.redact({
+      request: {
+        ...previewRequest,
+        command_request_id: "command-unit-0008",
+        confirmation_ref: String(second.confirmation_ref),
+        prepared_preview_digest: String(second.prepared_preview_digest),
       },
       authority: {} as never,
     })) as Record<string, unknown>;
@@ -400,6 +419,91 @@ describe("W11 parent-communication extension owner service", () => {
       recovery: "re_prepare",
     });
     clock -= 6 * 60_000;
+  });
+
+  it("refuses a replayed command that names a different message", async () => {
+    const { binding } = worldOf({
+        commands: {
+          execute: async () => ({
+            status: "ok",
+            disposition: "replayed",
+            business_outcome: "applied",
+            execution_ref: {
+              schema_version: 1,
+              namespace: "nurture",
+              object_type: "command_execution",
+              object_id: "execution-unit",
+              version: 1,
+            },
+            output_refs: [],
+            handoff_request_snapshots: [],
+            committed_result: {
+              redactedAt: "2026-08-15T08:00:00.000Z",
+              cascadeScope: "source_question",
+              affectedCount: 2,
+              extensionMessageRef: "another-message-ref-recorded-earlier",
+            },
+          }),
+        },
+      });
+    const previewRequest = {
+      ...identity("host-redact-6"),
+      message_ref: messageRef(identity("host-redact-6")),
+      presentation_version: currentPresentation(),
+      command_request_id: "command-unit-0009",
+    };
+    const preview = (await binding.owner.redactionPreview({
+      request: previewRequest,
+      authority: {} as never,
+    })) as Record<string, unknown>;
+    const divergent = (await binding.owner.redact({
+      request: {
+        ...previewRequest,
+        confirmation_ref: String(preview.confirmation_ref),
+        prepared_preview_digest: String(preview.prepared_preview_digest),
+      },
+      authority: {} as never,
+    })) as Record<string, unknown>;
+    expect(divergent).toMatchObject({
+      status: "not_committed",
+      reason_code: "command_payload_conflict",
+      recovery: "new_command",
+    });
+  });
+
+  it("reports retryable ledger conflicts as temporarily unavailable", async () => {
+    const { binding } = worldOf({
+      commands: {
+        execute: async () => ({
+          status: "not_committed",
+          decision: "conflict",
+          reason_code: "command_write_conflict",
+        }),
+      },
+    });
+    const previewRequest = {
+      ...identity("host-redact-7"),
+      message_ref: messageRef(identity("host-redact-7")),
+      presentation_version: currentPresentation(),
+      command_request_id: "command-unit-0011",
+    };
+    const preview = (await binding.owner.redactionPreview({
+      request: previewRequest,
+      authority: {} as never,
+    })) as Record<string, unknown>;
+    const busy = (await binding.owner.redact({
+      request: {
+        ...previewRequest,
+        confirmation_ref: String(preview.confirmation_ref),
+        prepared_preview_digest: String(preview.prepared_preview_digest),
+      },
+      authority: {} as never,
+    })) as Record<string, unknown>;
+    expect(busy).toMatchObject({
+      status: "unavailable",
+      reason_code: "temporarily_unavailable",
+      retryable: true,
+    });
   });
 
   it("answers already_satisfied without fabricating apply evidence", async () => {

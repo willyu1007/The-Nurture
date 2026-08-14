@@ -38,7 +38,7 @@ import { PrismaEnrollmentTrialLifecycleRepository } from "./enrollment-trial-lif
 import { PrismaEnrollmentFormalizationRepository } from "./enrollment-formalization.repository.js";
 import { PrismaInstitutionKnowledgeRepository } from "./institution-knowledge.repository.js";
 import { PrismaInstitutionKnowledgeConflictCandidateRepository } from "./institution-knowledge-conflict-candidate.repository.js";
-import { isPrismaSerializationAbort } from "./prisma-error.js";
+import { isPrismaWriteConflict } from "./prisma-error.js";
 import { nurtureCommandAdvisoryKey } from "./nurture-command-advisory-key.js";
 import { PrismaNurtureWorkflowRunSettlementTransaction } from "./workflow-run-settlement.repository.js";
 
@@ -382,7 +382,7 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
     decision: "conflict";
     reason_code: "command_write_conflict";
   } | null {
-    return isPrismaSerializationAbort(error)
+    return isPrismaWriteConflict(error)
       ? { decision: "conflict", reason_code: "command_write_conflict" }
       : null;
   }

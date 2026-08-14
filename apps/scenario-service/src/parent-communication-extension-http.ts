@@ -110,7 +110,9 @@ const identity = (
     interface_contract: PARENT_COMMUNICATION_EXTENSION_INTERFACE,
     workspace_id: requiredString(body.workspace_id, 1, 200),
     my_chat_user_id: requiredString(body.my_chat_user_id, 1, 200),
-    host_request_id: requiredString(body.host_request_id, 1, 200),
+    // The command kernel rejects invocation ids outside its pattern, so a
+    // malformed one must die here as invalid, not later as unavailable.
+    host_request_id: commandRequestId(body.host_request_id),
     context_ref: longRef(body.context_ref),
   });
 

@@ -256,7 +256,9 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
       disposition: "applied",
       command_request_id: commandRequestId,
       message_ref: world.messageRef,
-      cascade: { scope: "source_question" },
+      // Exactly what the preview promised (zero replies) — never the
+      // internal cascade fan-out.
+      cascade: { scope: "source_question", affected_count: 0 },
     });
     expect(typeof committed.redacted_at).toBe("string");
     const message = await prisma.nurtureFamilyCareMessage.findFirstOrThrow({

@@ -1,5 +1,68 @@
 # Implementation notes
 
+## 2026-08-15 — End-of-schedule deep review repairs (W7-W11)
+
+Three adversarial review lanes (W10 stack, W11 stack, cross-batch closure
+audit) ran after the schedule closed; every confirmed finding is repaired:
+
+- W10 weekly-source/missing-records now REFUSE what the frozen schema
+  cannot represent instead of clamping or truncating: class totals above
+  9999 and classes above 80 children answer `unavailable /
+  content_unavailable` (a clamped total was unservable — the runtime
+  validator recomputes it from the children, so it was a guaranteed 500);
+  the weekly draft keeps the W7 replay lesson (an existing (class, week)
+  draft still answers through the ledger/domain, via a deterministic
+  in-transaction refusal when a fresh draft would be unrepresentable).
+  Reads dedupe duplicated child identities defensively (service and
+  Prisma), and the weekly-draft target set fans a family out once per
+  child.
+- W10 confirmed-media counts now reduce the append-only attribution
+  history to the CURRENT fact per (asset, child) — max live revision,
+  `deletedAt: null` — so corrected/superseded confirmations no longer
+  count and one photo can no longer count twice.
+- Retryable ledger outcomes are honest across W10 and W11: results the
+  kernel itself calls retryable (`isNurtureCommandRetryable` — busy locks,
+  rolled-back write conflicts) map to `temporarily_unavailable`, and the
+  repository's rollback classifier now recognizes unique-constraint aborts
+  (P2002) as `command_write_conflict` — the (class, week) first-command
+  race retries into `already_satisfied` instead of failing terminally.
+- W11 replay honesty: the recorded result now carries the exact redacted
+  message identity (`extensionMessageRef`); a retry naming a different
+  message answers `command_payload_conflict` instead of confirming the
+  wrong message. `cascade.affected_count` now reports exactly the reply
+  count the preview promised (carried in the prepared state) — never the
+  internal cascade fan-out, which leaked the receipt/recipient shape. The
+  confirmation is consumed only AFTER the frozen preconditions accept, so
+  a refused commit leaves it valid for the re-prepare.
+- `host_request_id` is now constrained to the command kernel's id pattern
+  in all five command-carrying parsers (W7-W11) — a malformed id dies as
+  400 `invalid_*_request` instead of surfacing later as
+  `content_unavailable`.
+- Runtime hygiene from the closure audit: the five W7-W11 default-off
+  codes plus `parent_communication_owner_disabled` no longer log spurious
+  unhandled exceptions; `parent_communication_owner_disabled` is finally
+  in the safe-code allowlist so the frozen v1 owner answers its own
+  documented code (the v1 e2e had codified the degraded generic answer);
+  unit/db population floors raised to the measured 1133/499.
+- Recorded, not repaired (frozen artifacts): `safe_reason_codes` means
+  transport codes in W8-W11 artifacts but domain degradation vocabulary in
+  W6/W7 (the W2-W4 precedent). The digests are frozen and adopted, so the
+  divergence stands as documented vocabulary; the forward rule is that new
+  contracts declare transport codes under `transport`-scoped keys and keep
+  `safe_reason_codes` for the domain vocabulary.
+
+## 2026-08-15 — W11-4/W11-5 parent-communication extension registration and closure
+
+- W11-4: registered the W11 fixtures in the service-candidate
+  standalone-fixture list (now 9 entries); governance sync/lint clean.
+- W11-5: sealed the digest-pin handoff
+  (`artifacts/w11-parent-communication-extension-v1-1-digest-pin.md`);
+  My-Chat adopted the dormant strict consumer at `df5af9d` (P-H05/P-H06
+  `contract-ready`, axis recount 64/2/22/17) with the sanitized snapshot
+  re-pinned to `6485afe`; the cross-repo pins resealed at
+  `3a8e49e`→`9e41764` (see `04-verification.md`). W11 is closed end to
+  end; the W6-W11 schedule is complete.
+
 ## 2026-08-15 — W11-3 parent-communication extension real owner ports
 
 - Added the DB-free extension service

@@ -1,5 +1,36 @@
 # Verification
 
+## 2026-08-15 — End-of-schedule deep review
+
+- Three adversarial review lanes ran over the delivered schedule: the W10
+  stack, the W11 stack, and a cross-batch functional-closure audit. They
+  confirmed 10 repairable findings (all repaired — see the matching
+  implementation note) and verified clean: composition/e2e bindings,
+  response privacy (irreversible truncated HMAC refs everywhere), replay
+  and cross-actor discipline, the wrapped-spec finalize forwarding, all
+  nine contract digests against artifacts/constants/gates, all six env
+  gates end to end, the 9/9 sanitized snapshot sha256s, and the
+  contract-axis recount (64/2/22/17) matching the readiness claim.
+- Regression coverage added with the repairs: W10 unit lane grew to 11
+  cases (unrepresentable class/week refusals that still answer an existing
+  draft through the domain, duplicate-identity dedupe, retryable-conflict
+  mapping); W11 unit lane grew to 9 (post-refusal confirmation recovery,
+  divergent-replay refusal, retryable-conflict mapping, preview-promised
+  cascade count); the W11 DB case pins `affected_count` to the previewed
+  reply count; the v1 e2e now asserts the owner's own disabled code.
+- Full battery after repairs: root typecheck green; unit 104 files / 1137
+  tests; scenario-service 23 files / 187 tests; production-DB 58 files /
+  499 tests; ingress census 52; routing census 104/58/26; population
+  floors enforced at 1133/499.
+- CI closure: Nurture `9e41764` success, My-Chat `df5af9d` success (the
+  W10/W11 supply had moved pinned tooling paths; the reseal pair
+  `3a8e49e`/`969960e` restored the pin, with `RESEAL_MY_CHAT_ROOT` added
+  so reseals verify against a clean secondary worktree while the shared
+  sibling checkout carries another session's WIP).
+
+Verdict: `SCHEDULE_W6_W11_CLOSED_BOTH_REPOS / DEEP_REVIEW_10_FINDINGS_REPAIRED /
+FULL_BATTERY_GREEN / DEFAULT_OFF_EVERYWHERE`.
+
 ## 2026-08-15 — W11-3 parent-communication extension real owner ports
 
 - Unit lane: new 7-case service suite over fake ports and the REAL frozen

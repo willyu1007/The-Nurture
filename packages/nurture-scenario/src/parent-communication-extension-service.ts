@@ -5,6 +5,7 @@ import type {
   NurtureCommandResult,
   NurtureCommandSpec,
 } from "./domain/commands/command-kernel.js";
+import { isNurtureCommandRetryable } from "./domain/commands/command-kernel.js";
 import {
   classifyInteractionContextRow,
   hashScenarioToken,
@@ -172,6 +173,8 @@ type PreparedRedactionState = Readonly<{
   expected_message_version: number;
   cascade_audit_id: string;
   cascade_scope: "source_question" | "reply_local";
+  /** The reply count the preview promised; the commit reports exactly it. */
+  affected_reply_count: number;
 }>;
 
 const parsePreparedRedactionState = (
@@ -191,6 +194,7 @@ const parsePreparedRedactionState = (
     || typeof value.cascade_audit_id !== "string"
     || (value.cascade_scope !== "source_question"
       && value.cascade_scope !== "reply_local")
+    || !Number.isSafeInteger(value.affected_reply_count)
   ) {
     return null;
   }
@@ -485,6 +489,7 @@ export const createParentCommunicationExtensionService = (
           expected_message_version: facts.message_version ?? 0,
           cascade_audit_id: (deps.create_cascade_audit_id ?? randomUUID)(),
           cascade_scope: preview.cascade_scope,
+          affected_reply_count: preview.affected_reply_count,
         } satisfies PreparedRedactionState,
         ttl_ms: CONFIRMATION_TTL_MS,
       });
@@ -583,6 +588,25 @@ export const createParentCommunicationExtensionService = (
           ) {
             return { status: "conflict", reason_code: "stale_confirmation" };
           }
+          // The frozen preconditions run BEFORE the consume: a refusal must
+          // leave the guardian's confirmation intact for its re-prepare.
+          const decision = await base.checkPreconditions(
+            transaction,
+            commandOf(state),
+            context,
+          );
+          if (decision.status === "already_satisfied") {
+            return {
+              ...decision,
+              committed_result: {
+                ...(isRecord(decision.committed_result)
+                  ? decision.committed_result
+                  : {}),
+                extensionMessageRef: publicRef(request, "message", state.message_id),
+              },
+            };
+          }
+          if (decision.status !== "ready") return decision;
           const consumed = await transaction.interactionContexts.consume({
             workspace_id: request.workspace_id,
             context_id: classified.context.id,
@@ -592,12 +616,6 @@ export const createParentCommunicationExtensionService = (
           if (!consumed) {
             return { status: "blocked", reason_code: "confirmation_foreign" };
           }
-          const decision = await base.checkPreconditions(
-            transaction,
-            commandOf(state),
-            context,
-          );
-          if (decision.status !== "ready") return decision;
           prepared = state;
           return { status: "ready" };
         },
@@ -611,18 +629,21 @@ export const createParentCommunicationExtensionService = (
           }
           const command = commandOf(prepared);
           const effect = await base.apply(transaction, command, context);
-          const finalization = effect.finalization_payload;
-          const affected = isRecord(finalization)
-            && Array.isArray(finalization.affected_refs)
-            ? finalization.affected_refs.length
-            : 0;
           return {
             ...effect,
             committed_result: {
               ...(isRecord(effect.committed_result) ? effect.committed_result : {}),
               redactedAt,
               cascadeScope: prepared.cascade_scope,
-              affectedCount: Math.min(affected, REPLY_CAP),
+              // The count the preview promised — never the internal cascade
+              // fan-out, which would leak the recipient/receipt shape.
+              affectedCount: Math.min(
+                Math.max(prepared.affected_reply_count, 0),
+                REPLY_CAP,
+              ),
+              // The recorded message identity: an exact replay must answer
+              // the message it redacted, whatever ref a retry names.
+              extensionMessageRef: publicRef(request, "message", prepared.message_id),
             },
           };
         },
@@ -658,6 +679,18 @@ export const createParentCommunicationExtensionService = (
         const committed = isRecord(result.committed_result)
           ? result.committed_result
           : undefined;
+        // The ledger replays by command identity alone; the recorded result
+        // names the message the command actually touched. A retry naming a
+        // different message must be refused, never confirmed against it.
+        if (
+          typeof committed?.extensionMessageRef === "string"
+          && committed.extensionMessageRef !== request.message_ref
+        ) {
+          return notCommitted(
+            request.command_request_id,
+            "command_payload_conflict",
+          );
+        }
         if (result.business_outcome === "already_satisfied") {
           return {
             status: "committed",
@@ -704,7 +737,9 @@ export const createParentCommunicationExtensionService = (
       if (result.reason_code === "not_authorized") {
         return masked(request.context_ref, "access_changed");
       }
-      if (result.decision === "command_busy") {
+      if (isNurtureCommandRetryable(result)) {
+        // Rolled-back write conflicts and busy locks left the confirmation
+        // unconsumed; the same command is safe to retry.
         return unavailable(request.context_ref, "temporarily_unavailable");
       }
       return unavailable(request.context_ref, "content_unavailable");

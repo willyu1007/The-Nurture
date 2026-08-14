@@ -17,3 +17,13 @@ export const hasPrismaErrorCode = (
 
 export const isPrismaSerializationAbort = (error: unknown): boolean =>
   hasPrismaErrorCode(error, "P2034", "40001");
+
+/**
+ * Write conflicts that certainly rolled the surrounding transaction back
+ * and are safe to retry with the same command identity: serialization
+ * aborts, plus unique-constraint violations (P2002) — a concurrent writer
+ * landed the same natural key first, so a retry re-reads and answers the
+ * replay/already-satisfied path instead of failing terminally.
+ */
+export const isPrismaWriteConflict = (error: unknown): boolean =>
+  isPrismaSerializationAbort(error) || hasPrismaErrorCode(error, "P2002");

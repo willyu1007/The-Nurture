@@ -107,10 +107,17 @@ implements TeacherAssistantQueryReadPortV1 {
         { childCareProcessId: "asc" },
       ],
     });
-    return enrollments.map((row) => ({
-      child_care_process_id: row.childCareProcessId,
-      display_label: row.childCareProcess.child.displayName ?? "",
-    }));
+    const seen = new Set<string>();
+    return enrollments.flatMap((row) =>
+      seen.has(row.childCareProcessId)
+        ? []
+        : (seen.add(row.childCareProcessId),
+          [
+            {
+              child_care_process_id: row.childCareProcessId,
+              display_label: row.childCareProcess.child.displayName ?? "",
+            },
+          ]));
   }
 
   async listRecordedDayKinds(input: {
@@ -153,7 +160,7 @@ implements TeacherAssistantQueryReadPortV1 {
     week_end: string;
   }): Promise<readonly TeacherAssistantWeeklyChildFactsV1[]> {
     const window = utcWeekWindow(input.week_start, input.week_end);
-    const [logs, confirmed] = await Promise.all([
+    const [logs, attributionHistory] = await Promise.all([
       this.prisma.nurtureDailyCareLog.findMany({
         where: {
           workspaceId: input.workspace_id,
@@ -164,12 +171,15 @@ implements TeacherAssistantQueryReadPortV1 {
         },
         select: KIND_SELECT,
       }),
-      // The observation chain the W9 association supplies: confirmed
-      // attributions of assets captured inside the exact week.
+      // The observation chain the W9 association supplies: attribution
+      // history of assets captured inside the exact week. The table is
+      // append-only, so the CURRENT fact per (asset, child) is the highest
+      // live revision — earlier confirmed rows a correction superseded must
+      // not count.
       this.prisma.nurtureChildMediaAttribution.findMany({
         where: {
           workspaceId: input.workspace_id,
-          state: "confirmed",
+          deletedAt: null,
           mediaAssetRef: {
             workspaceId: input.workspace_id,
             careGroupId: input.care_group_id,
@@ -177,7 +187,12 @@ implements TeacherAssistantQueryReadPortV1 {
             deletedAt: null,
           },
         },
-        select: { childCareProcessId: true },
+        select: {
+          mediaAssetRefId: true,
+          childCareProcessId: true,
+          state: true,
+          attributionRevision: true,
+        },
       }),
     ]);
     const countsByChild = new Map<
@@ -197,8 +212,20 @@ implements TeacherAssistantQueryReadPortV1 {
       for (const kind of kindsOf(log)) counts[kind] += 1;
       countsByChild.set(log.childCareProcessId, counts);
     }
+    const currentByPair = new Map<
+      string,
+      { state: string; attributionRevision: number; childCareProcessId: string }
+    >();
+    for (const row of attributionHistory) {
+      const key = `${row.mediaAssetRefId}\0${row.childCareProcessId}`;
+      const current = currentByPair.get(key);
+      if (!current || row.attributionRevision > current.attributionRevision) {
+        currentByPair.set(key, row);
+      }
+    }
     const mediaByChild = new Map<string, number>();
-    for (const row of confirmed) {
+    for (const row of currentByPair.values()) {
+      if (row.state !== "confirmed") continue;
       mediaByChild.set(
         row.childCareProcessId,
         (mediaByChild.get(row.childCareProcessId) ?? 0) + 1,
@@ -348,19 +375,26 @@ implements NurtureTeacherAssistantTransaction {
             },
           }
         : {}),
-      targets: enrollments.flatMap((enrollment) => {
-        const family = familyByProcess.get(enrollment.childCareProcessId);
-        const grant = grantByEnrollment.get(enrollment.id);
-        if (!family || !grant) return [];
-        return [
-          {
-            child_care_process_id: enrollment.childCareProcessId,
-            enrollment_id: enrollment.id,
-            family_id: family.id,
-            grant_id: grant.id,
-          },
-        ];
-      }),
+      targets: (() => {
+        // One target per child: a duplicated enrollment row must not fan a
+        // family out twice for the same weekly summary.
+        const targeted = new Set<string>();
+        return enrollments.flatMap((enrollment) => {
+          const family = familyByProcess.get(enrollment.childCareProcessId);
+          const grant = grantByEnrollment.get(enrollment.id);
+          if (!family || !grant) return [];
+          if (targeted.has(enrollment.childCareProcessId)) return [];
+          targeted.add(enrollment.childCareProcessId);
+          return [
+            {
+              child_care_process_id: enrollment.childCareProcessId,
+              enrollment_id: enrollment.id,
+              family_id: family.id,
+              grant_id: grant.id,
+            },
+          ];
+        });
+      })(),
     };
   }
 

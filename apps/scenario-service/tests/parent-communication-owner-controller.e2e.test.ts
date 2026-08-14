@@ -241,7 +241,9 @@ describe("parent-communication owner formal ingress", () => {
     expect(disabled.statusCode).toBe(503);
     expect(disabled.headers["cache-control"]).toBe("private, no-store");
     expect(disabled.headers.pragma).toBe("no-cache");
-    expect(disabled.json()).toEqual({ error: "service_unavailable" });
+    // The controller's own documented code: it was previously missing from
+    // the safe-code allowlist and degraded to the generic service_unavailable.
+    expect(disabled.json()).toEqual({ error: "parent_communication_owner_disabled" });
 
     const runtime = fixtureComposition(["summary-ready-minimized"]);
     const application = await start(runtime.composition);

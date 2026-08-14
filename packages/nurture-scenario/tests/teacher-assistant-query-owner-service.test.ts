@@ -462,6 +462,128 @@ describe("W10 teacher assistant-query owner service", () => {
     });
   });
 
+  it("refuses classes and weeks the schema cannot represent", async () => {
+    const bigClass = Array.from({ length: 81 }, (_, index) => ({
+      child_care_process_id: `child-process-big-${index}`,
+      display_label: `孩子${index}`,
+    }));
+    const oversize = createTeacherAssistantQueryOwnerService(
+      deps({
+        assistantReads: {
+          ...deps().assistantReads,
+          listClassChildren: async () => bigClass,
+        },
+      }),
+    );
+    const missing = (await oversize.owner.missingRecords({
+      request: baseRequest(),
+      authority: await authorityFor(oversize, "missing_records_query"),
+    })) as Record<string, unknown>;
+    expect(missing).toMatchObject({
+      status: "unavailable",
+      reason_code: "content_unavailable",
+      retryable: false,
+    });
+    const weekly = (await oversize.owner.weeklySource({
+      request: baseRequest(),
+      authority: await authorityFor(oversize, "weekly_source_query"),
+    })) as Record<string, unknown>;
+    expect(weekly).toMatchObject({ status: "unavailable" });
+
+    // An unrepresentable class with NO existing draft refuses the draft
+    // too — but an existing (class, week) draft still answers through the
+    // domain (the W7 replay lesson).
+    const draftRefusal = (await oversize.owner.weeklyDraft({
+      request: { ...baseRequest(), command_request_id: "command-unit-0010" },
+      authority: await authorityFor(oversize, "weekly_draft_exchange"),
+    })) as Record<string, unknown>;
+    expect(draftRefusal).toMatchObject({ status: "unavailable" });
+    const teacherAssistant: NurtureTeacherAssistantTransaction = {
+      loadWeeklyDraftFacts: async () => ({
+        ...DRAFT_FACTS,
+        existing: { process_id: PROCESS_ID, state: "draft" },
+      }),
+      applyWeeklyDraftProcess: async () => {
+        throw new Error("unreachable");
+      },
+    };
+    const oversizeWithDraft = createTeacherAssistantQueryOwnerService(
+      deps({
+        assistantReads: {
+          ...deps().assistantReads,
+          listClassChildren: async () => bigClass,
+          findWeeklyDraftProcessId: async () => PROCESS_ID,
+        },
+        commands: { execute: specExecutor({ teacherAssistant }).execute },
+      }),
+    );
+    const satisfied = (await oversizeWithDraft.owner.weeklyDraft({
+      request: { ...baseRequest(), command_request_id: "command-unit-0010" },
+      authority: await authorityFor(oversizeWithDraft, "weekly_draft_exchange"),
+    })) as Record<string, unknown>;
+    expect(satisfied).toMatchObject({
+      status: "committed",
+      disposition: "already_satisfied",
+    });
+
+    const overflowFacts = [CHILD_A, CHILD_B, "child-process-unit-03"].map(
+      (id) => ({
+        child_care_process_id: id,
+        care_counts: {
+          meal: 999,
+          nap: 999,
+          mood: 999,
+          activity: 999,
+          health_observation: 999,
+        },
+        confirmed_media_count: 999,
+      }),
+    );
+    const overflow = createTeacherAssistantQueryOwnerService(
+      deps({
+        assistantReads: {
+          ...deps().assistantReads,
+          listClassChildren: async () => [
+            { child_care_process_id: CHILD_A, display_label: "小明" },
+            { child_care_process_id: CHILD_B, display_label: "小红" },
+            { child_care_process_id: "child-process-unit-03", display_label: "小刚" },
+          ],
+          loadWeeklyCareFacts: async () => overflowFacts,
+        },
+      }),
+    );
+    const overflowWeekly = (await overflow.owner.weeklySource({
+      request: baseRequest(),
+      authority: await authorityFor(overflow, "weekly_source_query"),
+    })) as Record<string, unknown>;
+    expect(overflowWeekly).toMatchObject({
+      status: "unavailable",
+      reason_code: "content_unavailable",
+    });
+  });
+
+  it("dedupes duplicated child identities from the read port", async () => {
+    const binding = createTeacherAssistantQueryOwnerService(
+      deps({
+        assistantReads: {
+          ...deps().assistantReads,
+          listClassChildren: async () => [
+            { child_care_process_id: CHILD_A, display_label: "小明" },
+            { child_care_process_id: CHILD_A, display_label: "小明" },
+            { child_care_process_id: CHILD_B, display_label: "小红" },
+          ],
+        },
+      }),
+    );
+    const response = (await binding.owner.missingRecords({
+      request: baseRequest(),
+      authority: await authorityFor(binding, "missing_records_query"),
+    })) as Record<string, unknown>;
+    const children = response.children as Array<Record<string, unknown>>;
+    expect(children).toHaveLength(2);
+    expect(new Set(children.map((child) => child.child_ref)).size).toBe(2);
+  });
+
   it("maps ledger refusals to the frozen reason codes", async () => {
     const request = { ...baseRequest(), command_request_id: "command-unit-0004" };
     const resultOf = async (result: NurtureCommandResult) => {
@@ -504,6 +626,17 @@ describe("W10 teacher assistant-query owner service", () => {
         reason_code: "not_authorized",
       }),
     ).toMatchObject({ status: "masked" });
+    expect(
+      await resultOf({
+        status: "not_committed",
+        decision: "conflict",
+        reason_code: "command_write_conflict",
+      }),
+    ).toMatchObject({
+      status: "unavailable",
+      reason_code: "temporarily_unavailable",
+      retryable: true,
+    });
     expect(
       await resultOf({ status: "outcome_unknown", reason_code: "commit_ambiguous" }),
     ).toMatchObject({
