@@ -17,11 +17,19 @@
   full DB lane 53/472; observations/focus sections stay honestly
   `unavailable` pending W9/W10 sources). W6-4/W6-5 are complete — governance
   sync, the digest-pin handoff artifact and the My-Chat dormant strict
-  consumer with snapshot refresh all landed; W6 is closed end to end. The
-  next executable step is the W7
-  `nurture.teacher-organization-owner@1.0.0` scope freeze. All batches
-  remain default-off contract supply with no activation, durable apply,
-  deployment or traffic.
+  consumer with snapshot refresh all landed; W6 is closed end to end.
+  W7 (`nurture.teacher-organization-owner@1.0.0`) is also closed end to
+  end: scope freeze, W7-1 contract artifact (digest `sha256:b0d4602f…`,
+  17 fixtures / 14 invalid probes / 18-scenario census), W7-2 default-off
+  runtime (six mounted routes), W7-3 real owner ports on the generic
+  command ledger (unit 9, W7 DB lane 6, full DB battery 54/479), W7-4
+  registration and the W7-5 digest-pin handoff with the My-Chat dormant
+  strict consumer (`33686a8`; matrix rows
+  T-F02/T-F05/T-F08/T-F09/T-F10/T-F11/T-F15 contract-ready, axis
+  51/14/23/17). The next executable step is the W8
+  teacher-communication-owner scope freeze. All batches remain default-off
+  contract supply with no activation, durable apply, deployment or
+  traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,

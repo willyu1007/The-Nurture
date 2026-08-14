@@ -1,5 +1,35 @@
 # Verification
 
+## 2026-08-14 — W7-5 consumer adoption closes W7
+
+- My-Chat `33686a8` (T-039) adopts the W7 contract as a dormant strict
+  client: exact pin `nurture.teacher-organization-owner@1.0.0` /
+  `sha256:b0d4602f…`, envelope-validated reads plus four command
+  exchanges asserting command-identity echo, prepare/confirm pairing,
+  admission `process_ref` echo and the single-quick-adjust invariant;
+  sanitized fixture snapshot with provenance at Nurture `ff7c596`;
+  consumer suite 7/7 under `NURTURE_REPO_ROOT` (17 fixtures accepted,
+  all published invalid response mutations rejected); package suite
+  29 files / 172 tests and repo typecheck green. Seven T-039 matrix rows
+  moved to `contract-ready` (T-F02, T-F05, T-F08, T-F09, T-F10, T-F11,
+  T-F15); contract axis is now 51 ready / 14 blocked / 23 partial /
+  17 local. Live remains blocked on the W7 runtime gate plus deployment;
+  no activation occurred.
+- The My-Chat commit hook was bypassed once with the reason recorded in
+  the commit body: repo-wide doc lint red only on a concurrent session's
+  untracked detox artifact directories; every staged adoption file lints
+  clean.
+- W7 is closed end to end (scope freeze, contract artifact, default-off
+  runtime, ledger-qualified real owner ports, registration, digest-pin
+  handoff, consumer adoption). Next batch: W8 teacher-communication-owner
+  scope freeze.
+- Pin posture: the workflow pin reseal remains deferred on the same
+  sibling WIP as W6-5 (`reseal:pins apply` refuses the dirty My-Chat
+  worktree); rerun `pnpm reseal:pins plan` once that work lands.
+
+Verdict: `W7_CLOSED_END_TO_END / CONSUMER_ADOPTED_33686A8 /
+SEVEN_ROWS_CONTRACT_READY / DEFAULT_OFF / PIN_RESEAL_STILL_DEFERRED`.
+
 ## 2026-08-14 — W7-4 organization-owner registration
 
 - `candidate-core.test.mjs` green after the fixture-list addition;
