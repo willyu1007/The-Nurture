@@ -3,7 +3,7 @@
   "interface_contract": {
     "key": "nurture.director-presenter",
     "version": "1.0.0",
-    "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+    "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
   },
   "required_negative_scenarios": [
     "scope_loss",
@@ -25,7 +25,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -48,7 +48,7 @@
           "partition_key": "partition:director:overview:maple:2026-08-14:v4",
           "interface_key": "nurture.director-presenter",
           "interface_version": "1.0.0",
-          "contract_digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+          "contract_digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9",
           "workspace_id": "workspace-director-01",
           "my_chat_user_id": "user-director-01",
           "presentation_role": "institution_director",
@@ -214,7 +214,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -237,7 +237,7 @@
           "partition_key": "partition:director:drilldown:activity:v4",
           "interface_key": "nurture.director-presenter",
           "interface_version": "1.0.0",
-          "contract_digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+          "contract_digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9",
           "workspace_id": "workspace-director-01",
           "my_chat_user_id": "user-director-01",
           "presentation_role": "institution_director",
@@ -279,7 +279,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -302,7 +302,7 @@
           "partition_key": "partition:director:materials:aster:v2",
           "interface_key": "nurture.director-presenter",
           "interface_version": "1.0.0",
-          "contract_digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+          "contract_digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9",
           "workspace_id": "workspace-director-01",
           "my_chat_user_id": "user-director-01",
           "presentation_role": "institution_director",
@@ -315,6 +315,7 @@
         },
         "generated_at": "2026-08-14T02:02:00.000Z",
         "collection_ref": "materials:aster:2026-08-14:v2",
+        "request_cursor": null,
         "items": [
           {
             "material_ref": "material:activity:aster:0001",
@@ -334,6 +335,57 @@
       }
     },
     {
+      "fixture_id": "w4-material-ready-page-2",
+      "operation": "material_query",
+      "polarity": "positive",
+      "scenario": "cursor_bound_empty_page",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-material-02",
+        "context_ref": "context:institution:maple:v4",
+        "collection_ref": "materials:aster:2026-08-14:v2",
+        "cursor": "cursor:materials:aster:page-2"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:director:maple:v4:page-2",
+          "presentation_role": "institution_director",
+          "scope_kind": "institution",
+          "scope_ref": "scope:institution:maple:v4",
+          "context_ref": "context:institution:maple:v4",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T02:02:30.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:director:materials:aster:v2:page-2",
+          "interface_key": "nurture.director-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9",
+          "workspace_id": "workspace-director-01",
+          "my_chat_user_id": "user-director-01",
+          "presentation_role": "institution_director",
+          "context_ref": "context:institution:maple:v4",
+          "resolution_ref": "resolution:director:maple:v4:page-2",
+          "scope_version": 4,
+          "operation": "material_query",
+          "query_key": "materials:aster:2026-08-14:v2",
+          "expires_at": "2026-08-14T02:04:30.000Z"
+        },
+        "generated_at": "2026-08-14T02:02:30.000Z",
+        "collection_ref": "materials:aster:2026-08-14:v2",
+        "request_cursor": "cursor:materials:aster:page-2",
+        "items": [],
+        "next_cursor": null
+      }
+    },
+    {
       "fixture_id": "w4-overview-scope-loss",
       "operation": "overview_query",
       "polarity": "negative",
@@ -342,7 +394,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -372,7 +424,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -402,7 +454,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -432,7 +484,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -462,7 +514,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -492,7 +544,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -522,7 +574,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -552,7 +604,7 @@
         "interface_contract": {
           "key": "nurture.director-presenter",
           "version": "1.0.0",
-          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+          "digest": "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
         },
         "workspace_id": "workspace-director-01",
         "my_chat_user_id": "user-director-01",
@@ -628,6 +680,42 @@
       }
     },
     {
+      "fixture_id": "w4-invalid-response-unavailable-metric",
+      "operation": "overview_query",
+      "source_fixture_id": "w4-overview-ready-partial",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "sections",
+          4,
+          "metric"
+        ],
+        "value": {
+          "primary_value": 1,
+          "unit": "count",
+          "definition": "Forbidden hidden value.",
+          "time_window_label": "Current"
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-ratio-overflow",
+      "operation": "overview_query",
+      "source_fixture_id": "w4-overview-ready-partial",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "sections",
+          0,
+          "metric",
+          "primary_value"
+        ],
+        "value": 41
+      }
+    },
+    {
       "fixture_id": "w4-invalid-response-foreign-context",
       "operation": "drilldown_query",
       "source_fixture_id": "w4-drilldown-ready",
@@ -654,6 +742,47 @@
           "url"
         ],
         "value": "https://example.invalid/protected"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-photo-alt-text-missing",
+      "operation": "material_query",
+      "source_fixture_id": "w4-material-ready-protected",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "items",
+          0,
+          "alt_text"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-cursor-drift",
+      "operation": "material_query",
+      "source_fixture_id": "w4-material-ready-page-2",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "request_cursor"
+        ],
+        "value": "cursor:materials:aster:wrong-page"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-expired-before-generated",
+      "operation": "material_query",
+      "source_fixture_id": "w4-material-ready-protected",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "cache_partition",
+          "expires_at"
+        ],
+        "value": "2026-08-14T02:01:59.000Z"
       }
     }
   ]

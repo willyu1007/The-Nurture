@@ -154,6 +154,38 @@ function hasReadOnlyPresenterSemantics(
   if (collectKeys(response).some((key) => forbiddenResponseFields.has(key))) {
     return false;
   }
+  if (isRecord(response) && response.status === "ready") {
+    const owner = response.owner_resolution;
+    const cache = response.cache_partition;
+    if (
+      !isRecord(owner)
+      || !isRecord(cache)
+      || !orderedReadyLifetime(
+        owner.resolved_at,
+        response.generated_at,
+        cache.expires_at,
+      )
+    ) {
+      return false;
+    }
+    if (
+      operation === "material_query"
+      && (
+        !Array.isArray(response.items)
+        || response.items.some((item) =>
+          isRecord(item)
+          && isRecord(item.access)
+          && item.access.status === "protected_available"
+          && !withinReadyLifetime(
+            item.access.access_expires_at,
+            response.generated_at,
+            cache.expires_at,
+          ))
+      )
+    ) {
+      return false;
+    }
+  }
   if (
     operation !== "overview_query"
     || !isRecord(response)
@@ -162,6 +194,33 @@ function hasReadOnlyPresenterSemantics(
     return true;
   }
   if (!Array.isArray(response.sections)) return false;
+  if (
+    response.sections.some((section) => {
+      if (!isRecord(section) || !isRecord(section.metric)) return false;
+      const metric = section.metric;
+      return metric.unit === "ratio"
+        && (
+          typeof metric.primary_value !== "number"
+          || typeof metric.secondary_value !== "number"
+          || metric.primary_value > metric.secondary_value
+        );
+    })
+  ) {
+    return false;
+  }
+  if (
+    response.sections.some((section) =>
+      isRecord(section)
+      && section.status !== "ready"
+      && [
+        "metric",
+        "trend",
+        "drilldown_ref",
+        "material_collection_ref",
+      ].some((key) => Object.hasOwn(section, key)))
+  ) {
+    return false;
+  }
   const keys = response.sections.flatMap((section) =>
     isRecord(section) && typeof section.section_key === "string"
       ? [section.section_key]
@@ -180,6 +239,42 @@ function hasReadOnlyPresenterSemantics(
   return isRecord(operationEntry)
     && operationEntry.status === "unavailable"
     && operationEntry.availability === "web_workbench_required";
+}
+
+function orderedReadyLifetime(
+  resolvedAt: unknown,
+  generatedAt: unknown,
+  expiresAt: unknown,
+): boolean {
+  const resolved = instantMillis(resolvedAt);
+  const generated = instantMillis(generatedAt);
+  const expires = instantMillis(expiresAt);
+  return resolved !== null
+    && generated !== null
+    && expires !== null
+    && resolved <= generated
+    && generated < expires;
+}
+
+function withinReadyLifetime(
+  accessExpiresAt: unknown,
+  generatedAt: unknown,
+  cacheExpiresAt: unknown,
+): boolean {
+  const accessExpires = instantMillis(accessExpiresAt);
+  const generated = instantMillis(generatedAt);
+  const cacheExpires = instantMillis(cacheExpiresAt);
+  return accessExpires !== null
+    && generated !== null
+    && cacheExpires !== null
+    && generated < accessExpires
+    && accessExpires <= cacheExpires;
+}
+
+function instantMillis(value: unknown): number | null {
+  if (typeof value !== "string") return null;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function collectKeys(value: unknown, output: string[] = []): string[] {

@@ -135,7 +135,7 @@ const assertRequestBinding = (
     || cache.interface_key !== "nurture.director-presenter"
     || cache.interface_version !== "1.0.0"
     || cache.contract_digest
-      !== "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+      !== "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9"
     || cache.context_ref !== request.context_ref
     || cache.workspace_id !== request.workspace_id
     || cache.my_chat_user_id !== request.my_chat_user_id
@@ -149,6 +149,13 @@ const assertRequestBinding = (
       ? (request as DirectorPresenterDrilldownRequestV1).drilldown_ref
       : (request as DirectorPresenterMaterialRequestV1).collection_ref;
   if (cache.query_key !== queryKey) {
+    throw new Error("director_presenter_binding_violation");
+  }
+  if (
+    operation === "material_query"
+    && response.request_cursor
+      !== ((request as DirectorPresenterMaterialRequestV1).cursor ?? null)
+  ) {
     throw new Error("director_presenter_binding_violation");
   }
 };

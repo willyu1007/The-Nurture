@@ -393,7 +393,7 @@
 ## 2026-08-14 — W4 read-only director presenter supply
 
 - Published `nurture.director-presenter@1.0.0` at exact digest
-  `sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1`
+  `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`
   with overview, bounded drilldown and protected-material query operations.
 - Reconciled D-O13 with the current product authority: Institution Mobile is
   action-free, so W4 returns only `web_workbench_required`. The artifact and
@@ -403,7 +403,7 @@
   binding, service bearer authentication, private/no-store responses and one
   default-false provider gate. The runtime is unavailable unless every owner
   port and service-auth dependency is explicitly supplied.
-- Added 11 positive conformance fixtures, six invalid probes, response-shape
+- Added 12 conformance fixtures and eleven invalid probes, response-shape
   enforcement and three controller routes. The W4 validator is a maintained
   top-level command and is chained into formal-ingress verification.
 - My-Chat T-039 adopted only the exact private consumer: it sends host routing
@@ -412,3 +412,25 @@
   remain outside this batch.
 - No real Prisma owner port, schema/migration, database operation, deployment,
   activation, traffic, native-device or accessibility work was performed.
+
+## 2026-08-14 — W4 final quality closure
+
+- Closed a page-replay gap by requiring every ready material response to echo
+  the exact request cursor, including `null` for the first page. Provider
+  composition and the My-Chat consumer both compare that value before use.
+- Added ordered lifetime checks from current owner resolution through response
+  generation, cache expiry and protected owner-stream access. Expired 2xx
+  payloads now fail closed at the consumer instead of entering a retry loop.
+- Empty and unavailable overview sections can no longer carry metrics, trends,
+  drilldown refs or material refs. Ratio values require a valid denominator and
+  cannot exceed it; photo presentations require alternative text.
+- Hardened the private My-Chat source to accept only an HTTP(S) service origin
+  and a control-free service token. Invalid 2xx payloads and 401/403/404
+  responses become non-retryable `content_unavailable`; network and 5xx
+  failures remain the only transport-retry path.
+- Removed obsolete Mobile drawer-axis code after the shell moved to the native
+  edge-aware drawer. Bottom-aligned interaction and selection sheets retain one
+  vertical dismiss substrate; no duplicate gesture implementation remains.
+- No owner business port, public API/Mobile composition, schema/migration,
+  database operation, deployment, activation, traffic, Candidate identity or
+  device claim was added.

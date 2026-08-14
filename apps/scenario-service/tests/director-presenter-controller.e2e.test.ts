@@ -116,7 +116,7 @@ describe("director presenter formal ingress", () => {
     expect(runtime.owner.materials).not.toHaveBeenCalled();
   });
 
-  it("rejects foreign authority, pin drift and owner binding drift", async () => {
+  it("rejects foreign authority, pin drift, hidden data and owner binding drift", async () => {
     const selected = fixture("w4-overview-ready-partial");
     const runtime = fixtureComposition([selected]);
     const application = await start(runtime.composition);
@@ -162,6 +162,54 @@ describe("director presenter formal ingress", () => {
           actionApplication,
           DIRECTOR_PRESENTER_OVERVIEW_PATH,
           selected.request,
+        )
+      ).statusCode,
+    ).toBe(500);
+
+    const hiddenDataResponse = structuredClone(selected.response) as Record<
+      string,
+      unknown
+    >;
+    const hiddenDataSections = hiddenDataResponse.sections as Array<
+      Record<string, unknown>
+    >;
+    hiddenDataSections[4] = {
+      ...hiddenDataSections[4],
+      metric: {
+        primary_value: 1,
+        unit: "count",
+        definition: "Forbidden hidden value.",
+        time_window_label: "Current",
+      },
+    };
+    const hiddenDataApplication = await start(
+      fixtureComposition([selected], hiddenDataResponse).composition,
+    );
+    expect(
+      (
+        await post(
+          hiddenDataApplication,
+          DIRECTOR_PRESENTER_OVERVIEW_PATH,
+          selected.request,
+        )
+      ).statusCode,
+    ).toBe(500);
+
+    const selectedPage = fixture("w4-material-ready-page-2");
+    const cursorDriftResponse = structuredClone(selectedPage.response) as Record<
+      string,
+      unknown
+    >;
+    cursorDriftResponse.request_cursor = "cursor:materials:aster:wrong-page";
+    const cursorDriftApplication = await start(
+      fixtureComposition([selectedPage], cursorDriftResponse).composition,
+    );
+    expect(
+      (
+        await post(
+          cursorDriftApplication,
+          DIRECTOR_PRESENTER_MATERIALS_PATH,
+          selectedPage.request,
         )
       ).statusCode,
     ).toBe(500);

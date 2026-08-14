@@ -13,7 +13,7 @@ const directory = path.dirname(fileURLToPath(import.meta.url));
 const artifactPath = path.join(directory, "director-presenter.owner-contract.json");
 const fixturesPath = path.join(directory, "conformance-fixtures.json");
 const publishedDigest =
-  "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1";
+  "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9";
 
 const operations = ["overview_query", "drilldown_query", "material_query"];
 const rows = [
@@ -155,6 +155,13 @@ const validateReadyBinding = (fixture) => {
       && response.cache_partition.contract_digest === publishedDigest,
     `${fixture.fixture_id} cache operation or digest drifted`,
   );
+  const resolvedAt = Date.parse(response.owner_resolution.resolved_at);
+  const generatedAt = Date.parse(response.generated_at);
+  const expiresAt = Date.parse(response.cache_partition.expires_at);
+  assert(
+    resolvedAt <= generatedAt && generatedAt < expiresAt,
+    `${fixture.fixture_id} ready response lifetime is invalid`,
+  );
   if (operation === "overview_query") {
     assert(
       response.organization.local_date === request.local_date
@@ -175,6 +182,25 @@ const validateReadyBinding = (fixture) => {
         && operationEntry.availability === "web_workbench_required",
       `${fixture.fixture_id} exposed a Mobile operation entry`,
     );
+    assert(
+      response.sections.every(
+        (section) => section.status === "ready"
+          || (
+            section.metric === undefined
+            && section.trend === undefined
+            && section.drilldown_ref === undefined
+            && section.material_collection_ref === undefined
+          ),
+      ),
+      `${fixture.fixture_id} exposed hidden data from an empty or unavailable section`,
+    );
+    assert(
+      response.sections.every(
+        (section) => section.metric?.unit !== "ratio"
+          || section.metric.primary_value <= section.metric.secondary_value,
+      ),
+      `${fixture.fixture_id} ratio numerator exceeds its denominator`,
+    );
   }
   if (operation === "drilldown_query") {
     assert(
@@ -186,8 +212,19 @@ const validateReadyBinding = (fixture) => {
   if (operation === "material_query") {
     assert(
       response.collection_ref === request.collection_ref
-        && response.cache_partition.query_key === request.collection_ref,
-      `${fixture.fixture_id} material collection drifted`,
+        && response.cache_partition.query_key === request.collection_ref
+        && response.request_cursor === (request.cursor ?? null),
+      `${fixture.fixture_id} material page binding drifted`,
+    );
+    assert(
+      response.items.every(
+        (item) => item.access.status !== "protected_available"
+          || (
+            Date.parse(item.access.access_expires_at) > generatedAt
+            && Date.parse(item.access.access_expires_at) <= expiresAt
+          ),
+      ),
+      `${fixture.fixture_id} material access lifetime is invalid`,
     );
   }
 };

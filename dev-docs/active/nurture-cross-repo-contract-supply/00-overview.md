@@ -50,12 +50,16 @@
   conformance passes with no activation. W3 now has the P0 contract/runtime
   boundary and exact consumer adoption described above. W4 is published as
   `nurture.director-presenter@1.0.0` at digest
-  `sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1`;
+  `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`;
   its three default-off read operations cover D-O01 through D-O14, and the
   current Institution Mobile action-free rule makes D-O13 explicitly
   `web_workbench_required` with no action/confirmation/command refs. My-Chat
   owns consumer adoption and has exact-pinned the strict private source without
-  composing a public API or Mobile controller. The closing quality pass removed the obsolete W2 scope
+  composing a public API or Mobile controller. The W4 quality closure now
+  binds every material page to its exact request cursor, orders resolution /
+  generation / cache / protected-access lifetimes, rejects hidden payloads in
+  empty or unavailable sections, and closes malformed ratio/photo cases. The
+  closing quality pass removed the obsolete W2 scope
   draft, made the accepted digest pin the only active handoff, repaired
   generated-client typecheck drift and passed the repository unit/typecheck,
   direct frontend lint and exact-revision cross-repo pin gates. W1's design

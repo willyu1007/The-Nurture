@@ -919,7 +919,7 @@ assertIncludes(
 for (const fragment of [
   'key: "nurture.director-presenter"',
   'version: "1.0.0"',
-  "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+  "sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9",
   'authentication: "service_bearer"',
   'cache_control: "private, no-store"',
   "default_off: true",

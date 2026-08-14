@@ -442,7 +442,7 @@ CURRENT_AUTHORITY_REREAD / EXACT_REPLAY / DEFAULT_OFF / W3_2_NOT_AUTHORIZED`.
 ## 2026-08-14 — W4 read-only director presenter qualification
 
 - `pnpm verify:formal-ingress-contract` passed both maintained owner-artifact
-  validators. W4 matched the exact digest, 11 positive fixtures and six invalid
+  validators. W4 matched the exact digest, 12 fixtures and eleven invalid
   probes; the route census passed with 26 controller routes and all three W4
   private paths.
 - `node .ai/tests/run.mjs --suite environment` passed after adding optional,
@@ -452,7 +452,7 @@ CURRENT_AUTHORITY_REREAD / EXACT_REPLAY / DEFAULT_OFF / W3_2_NOT_AUTHORIZED`.
   unit lane passed 98 files / 1086 tests; the complete scenario-service lane
   passed 17 files / 135 tests, including five W4 controller cases.
 - The My-Chat scenario-integrations package typecheck and focused exact-pin
-  consumer suite passed: one file / four tests against all provider fixtures,
+  consumer suite passed: one file / five tests against all provider fixtures,
   malformed-response probes, exact paths/body minimization and forbidden
   action-field rejection.
 - My-Chat's complete typecheck passed all 17 participating workspaces; its unit
@@ -464,3 +464,30 @@ CURRENT_AUTHORITY_REREAD / EXACT_REPLAY / DEFAULT_OFF / W3_2_NOT_AUTHORIZED`.
 
 Verdict: `W4_SOURCE_SUPPLY_PASS / EXACT_PIN / READ_ONLY /
 DEFAULT_OFF / CANDIDATE_NOT_FROZEN / LIVE_OWNER_AND_MOBILE_PENDING`.
+
+## 2026-08-14 — W4 final quality and cleanup verification
+
+- `pnpm verify:director-presenter-contract` passed at
+  `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`:
+  12 fixtures and 11 executed invalid probes, including cursor drift, hidden
+  unavailable metrics, ratio overflow, missing photo alt text and invalid
+  lifetime ordering.
+- Direct scenario-service Vitest passed 17 files / 135 tests; the W4 controller
+  suite remains 5/5 and now rejects hidden-data and cursor-binding drift.
+- `pnpm test:unit` passed 98 files / 1086 tests. Direct scenario and
+  scenario-service TypeScript checks passed without invoking a production
+  build.
+- `pnpm verify:formal-ingress-contract`, `pnpm verify:g2-exit-contract`,
+  `pnpm verify:test-routing` and the environment suite passed. Routing now
+  classifies 186 files: unit 98, production DB 52, dev-host 11,
+  scenario-service 20 and X5 joint 5.
+- My-Chat passed the focused exact-pin suite at 5/5, all 173 unit files / 1199
+  tests, all 17 workspace typechecks and repository ESLint.
+- Generated `packages/nurture-scenario/dist`, `packages/nurture-db/dist` and
+  My-Chat `packages/workflow-contracts/dist` directories created/refreshed by
+  checks were removed. No retained test, alternate route or obsolete drawer
+  gesture branch remains.
+
+Verdict: `W4_QUALITY_CLOSED / PAGE_AND_LIFETIME_BOUND /
+FAIL_CLOSED_NON_RETRYABLE_DRIFT / GENERATED_ARTIFACTS_CLEANED /
+DEFAULT_OFF / CANDIDATE_NOT_FROZEN`.

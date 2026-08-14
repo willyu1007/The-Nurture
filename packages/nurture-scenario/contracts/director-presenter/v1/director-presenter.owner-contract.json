@@ -151,6 +151,7 @@
       "response_schema_ref": "urn:nurture:director-presenter:1#/$defs/material_query_response",
       "rules": [
         "The owner-issued collection_ref is presentation routing only and each open rereads purpose.",
+        "A ready page echoes the exact request cursor, including null for the first page, so pages cannot be replayed across requests.",
         "At most 20 entries are returned; protected media uses expiring owner-stream access refs only.",
         "No storage ref, signed URL, download or share capability crosses the contract."
       ]
@@ -288,7 +289,7 @@
             ]
           },
           "query_key": {
-            "$ref": "#/$defs/non_empty_string"
+            "$ref": "#/$defs/opaque_ref"
           },
           "expires_at": {
             "type": "string",
@@ -426,6 +427,54 @@
       "metric": {
         "type": "object",
         "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "unit"
+              ],
+              "properties": {
+                "unit": {
+                  "enum": [
+                    "ratio",
+                    "flow"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "secondary_value"
+              ],
+              "properties": {
+                "secondary_value": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "unit"
+              ],
+              "properties": {
+                "unit": {
+                  "const": "ratio"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "secondary_value": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        ],
         "required": [
           "primary_value",
           "unit",
@@ -481,6 +530,31 @@
       "overview_section": {
         "type": "object",
         "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "enum": [
+                    "empty",
+                    "unavailable"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "metric": false,
+                "trend": false,
+                "drilldown_ref": false,
+                "material_collection_ref": false
+              }
+            }
+          }
+        ],
         "required": [
           "section_key",
           "status",
@@ -857,6 +931,30 @@
       "material_item": {
         "type": "object",
         "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "kind"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "photo"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "alt_text"
+              ],
+              "properties": {
+                "alt_text": {
+                  "$ref": "#/$defs/non_empty_string"
+                }
+              }
+            }
+          }
+        ],
         "required": [
           "material_ref",
           "kind",
@@ -898,6 +996,7 @@
           "cache_partition",
           "generated_at",
           "collection_ref",
+          "request_cursor",
           "items",
           "next_cursor"
         ],
@@ -917,6 +1016,14 @@
           },
           "collection_ref": {
             "$ref": "#/$defs/opaque_ref"
+          },
+          "request_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 8,
+            "maxLength": 512
           },
           "items": {
             "type": "array",
