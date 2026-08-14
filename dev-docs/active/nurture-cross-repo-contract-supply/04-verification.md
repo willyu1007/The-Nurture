@@ -1,5 +1,28 @@
 # Verification
 
+## 2026-08-14 — W7-3 organization-owner real owner ports
+
+- Unit lane: 9-case service suite over fake ports (foreign-ref masking,
+  retryable resolver failure, excerpt bounds, ledger-free
+  nothing_to_organize, actor-bound canonical payloads, head-drift /
+  payload-divergence mapping, lane + admission preview, admission and note
+  commit mapping); nurture-scenario suite 1104/1104.
+- Production-DB lane: new 6-case W7 integration file green on the local
+  Postgres — note commit + exact replay + divergent-payload and
+  cross-actor denial, feed and organization reads over the live batch
+  (excerpt unsealed from the real AES port, trigger preview `available`),
+  manual organize cut committed and replayed from the ledger with the
+  batch row landing `organized`, supplement prepare/confirm with single-use
+  confirmation and replayed commit, queue admission
+  quick-adjust-waiting -> queued -> replayed -> already_satisfied with the
+  process row landing `pending_release`; full `test:db` battery 54 files /
+  479 tests green.
+- Repo typecheck, `assert-test-routing` (unit=100, production-db=54),
+  `verify:formal-ingress-contract` chain and both doc lints green.
+
+Verdict: `W7_3_REAL_PORTS_QUALIFIED / LEDGER_EXCHANGES_PROVEN /
+DB_LANE_54_FILES_GREEN / DEFAULT_OFF_UNCHANGED`.
+
 ## 2026-08-14 — W7-2 organization-owner default-off runtime
 
 - scenario-service suite 151/151 (22 files) including the new 7-case W7 e2e

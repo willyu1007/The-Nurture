@@ -133,4 +133,5 @@ export * from "./enrollment-journey-owners.composition.js";
 export * from "./parent-communication-owner.composition.js";
 export * from "./repositories/parent-communication-owner.repository.js";
 export * from "./teacher-class-stream.composition.js";
+export * from "./teacher-organization-owner.composition.js";
 export * from "./repositories/teacher-class-stream.repository.js";

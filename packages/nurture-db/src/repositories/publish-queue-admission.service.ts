@@ -20,7 +20,7 @@ const domainRef = (objectType: string, objectId: string, version: number) => ({
   version,
 });
 
-class PrismaPublishQueueAdmissionTransaction
+export class PrismaPublishQueueAdmissionTransaction
   implements NurturePublishQueueAdmissionTransaction
 {
   constructor(private readonly prisma: BoardPrisma) {}

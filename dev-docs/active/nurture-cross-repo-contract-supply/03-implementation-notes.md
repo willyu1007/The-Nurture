@@ -1,5 +1,52 @@
 # Implementation notes
 
+## 2026-08-14 — W7-3 teacher organization-owner real owner ports
+
+- Added the DB-free domain service
+  (`src/teacher-organization-owner-service.ts`): W6-discipline authority and
+  read envelopes (workspace-bound opaque refs by candidate matching,
+  `query_key === class_ref`), trigger preview through the frozen
+  `evaluateOrganizeTrigger`, per-card admission preview through
+  `evaluatePublishQueueAdmission` over live facts (quick-adjust and
+  edit-hold windows derived from the same facts), and the four exchanges on
+  the generic Nurture command ledger. Every canonical payload folds in an
+  actor HMAC (workspace + participant), so cross-actor or divergent reuse
+  of a `command_request_id` lands `command_payload_conflict` and an exact
+  same-command replay answers the recorded result with
+  `executed: replayed`. `command_actor_mismatch` stays a reserved schema
+  code — the ledger cannot attribute which payload field diverged.
+- Organize rides the existing `createOrganizeCareCaptureBatchSpec` with two
+  W7 decisions: command identity excludes the volatile batch head (the
+  spec's expected-heads check still gates the cut, and a replay after the
+  batch left `collecting` must still reach the ledger), and a no-cut
+  evaluation answers `committed / nothing_to_organize` without entering the
+  ledger, so it always reports `executed: executed`.
+- Supplement is the only prepare/confirm: prepare rereads eligibility,
+  seals nothing, and issues a single-use five-minute confirmation whose
+  state carries the exact typed command and preview digest; confirm
+  consumes the token and re-evaluates current authority in-transaction
+  before `applyCaregiverDailyCareRecord` (prepared heads are a preview
+  fact, not a stale-write license).
+- New owner writes: `applyClassNoteCapture` on the care-capture transaction
+  (stable text capture appended to — or opening — the collecting batch;
+  intake holds the plaintext, so the deterministic safety pass records the
+  honest empty marker list, distinct from NULL "never derived") and the
+  in-transaction `publishQueueAdmission` port on the command transaction so
+  `admitPublishProcessToQueue` freezes the schedule inside the same ledger
+  command (`already_satisfied` maps to a committed disposition, waiting and
+  blocked reasons roll back deterministically into the frozen enum).
+- Prisma side: `PrismaTeacherOrganizationBatchReadPort` (newest
+  non-cancelled batch + owner-ordered lane with safe child labels) and
+  `createPrismaTeacherOrganizationBinding({ prisma, integrityKey,
+  protectedContent, now })` assembling context/capture/admission/
+  eligibility reads, the interaction-context service and the command
+  runner. No schema change was needed.
+- World prerequisites surfaced by the DB lane (recorded for W7-4 e2e):
+  organize needs the institution `policyConfigPayload` content-safety
+  identity, an active family per child-care process and an org-to-family
+  grant covering `daily_care_log`; enrollment rows need
+  `participation_phase` under the G4-D check constraint.
+
 ## 2026-08-14 — W7-2 teacher organization-owner default-off runtime
 
 - Mounted the six W7 routes in `apps/scenario-service` behind

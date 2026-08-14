@@ -146,6 +146,11 @@ export type NurtureOrganizeCutApplied = {
  * first revision and its target rows together: a cut that organized the batch
  * but lost its candidate would strand the captures invisibly.
  */
+export type NurtureClassNoteCaptureApplied =
+  | { status: "applied"; capture_id: string; batch_id: string }
+  | { status: "not_authorized" }
+  | { status: "batch_unavailable" };
+
 export type NurtureCareCaptureTransaction = {
   loadOrganizeCutFacts(input: {
     workspace_id: string;
@@ -155,4 +160,19 @@ export type NurtureCareCaptureTransaction = {
   }): Promise<NurtureOrganizeCutFacts | null>;
 
   applyOrganizeCut(input: NurtureOrganizeCutApplyInput): Promise<NurtureOrganizeCutApplied>;
+
+  /**
+   * W7 single-step class note: a stable text capture appended to the class's
+   * collecting batch (opening one when none is collecting). Class-internal —
+   * no publication candidate, release or family-visibility claim is produced.
+   * Optional so pre-W7 adapters keep compiling; the W7 command fails closed
+   * when it is absent.
+   */
+  applyClassNoteCapture?(input: {
+    workspace_id: string;
+    participant_id: string;
+    care_group_id: string;
+    body_envelope: unknown;
+    occurred_at: string;
+  }): Promise<NurtureClassNoteCaptureApplied>;
 };

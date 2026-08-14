@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import {
   type NurtureCareCaptureTransaction,
+  type NurtureClassNoteCaptureApplied,
   type NurtureOrganizeCaptureRow,
   type NurtureOrganizeCutFacts,
   type NurtureOrganizeCutApplyInput,
@@ -352,6 +353,91 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       ),
       ...(processRef ? { process_ref: processRef, process_revision: 1 } : {}),
     };
+  }
+
+  /**
+   * W7 class note: append one stable text capture to the class's collecting
+   * batch, opening a fresh collecting batch when none exists. The caregiver
+   * authority is re-read in the same transaction; nothing here creates a
+   * publication candidate or any family-visible fact.
+   */
+  async applyClassNoteCapture(input: {
+    workspace_id: string;
+    participant_id: string;
+    care_group_id: string;
+    body_envelope: unknown;
+    occurred_at: string;
+  }): Promise<NurtureClassNoteCaptureApplied> {
+    const at = new Date(input.occurred_at);
+    const role = await this.prisma.nurtureCareRoleAssignment.findFirst({
+      where: {
+        workspaceId: input.workspace_id,
+        participantId: input.participant_id,
+        role: { in: [...CAREGIVER_ROLES] },
+        scopeType: "care_group",
+        scopeId: input.care_group_id,
+        ...activeRoleWindow(at),
+      },
+      orderBy: { id: "asc" },
+    });
+    if (!role) return { status: "not_authorized" };
+    const group = await this.prisma.nurtureCareGroup.findFirst({
+      where: {
+        id: input.care_group_id,
+        workspaceId: input.workspace_id,
+        status: "active",
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+    if (!group) return { status: "batch_unavailable" };
+    const existing = await this.prisma.nurtureCareCaptureBatch.findFirst({
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: input.care_group_id,
+        state: "collecting",
+      },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { id: true },
+    });
+    const batchId = existing
+      ? existing.id
+      : (
+          await this.prisma.nurtureCareCaptureBatch.create({
+            data: {
+              workspaceId: input.workspace_id,
+              careGroupId: input.care_group_id,
+              state: "collecting",
+            },
+            select: { id: true },
+          })
+        ).id;
+    const head = await this.prisma.nurtureCareCapture.findFirst({
+      where: { workspaceId: input.workspace_id, captureBatchId: batchId },
+      orderBy: { sourceSequence: "desc" },
+      select: { sourceSequence: true },
+    });
+    const capture = await this.prisma.nurtureCareCapture.create({
+      data: {
+        workspaceId: input.workspace_id,
+        careGroupId: input.care_group_id,
+        captureBatchId: batchId,
+        capturedByRoleAssignmentId: role.id,
+        kind: "text",
+        sourceSequence: (head?.sourceSequence ?? 0) + 1,
+        stable: true,
+        bodyProtectionPayload: asJson(input.body_envelope),
+        // The intake path holds the plaintext here and runs the deterministic
+        // rule pass; the in-owner deterministic vocabulary raises no text rule
+        // keys today, so "derived, nothing raised" is the honest empty list —
+        // distinct from NULL ("never derived"), which would fail every
+        // organize route closed.
+        safetyMarkersPayload: asJson([]),
+        occurredAt: at,
+      },
+      select: { id: true },
+    });
+    return { status: "applied", capture_id: capture.id, batch_id: batchId };
   }
 
   private groupIdByBatch = new Map<string, string>();
