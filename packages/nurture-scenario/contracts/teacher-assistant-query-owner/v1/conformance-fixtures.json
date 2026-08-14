@@ -1,0 +1,650 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.teacher-assistant-query-owner",
+    "version": "1.0.0",
+    "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+  },
+  "required_negative_scenarios": [
+    "not_authorized_admin",
+    "not_authorized_other_class",
+    "not_authorized_guardian",
+    "revoked_mid_window",
+    "stale_context_ref",
+    "cross_scope_class_ref",
+    "invalid_local_date",
+    "disabled_gate",
+    "service_auth_missing",
+    "forbidden_request_field",
+    "hidden_payload_rejected",
+    "cross_actor_replay_denied",
+    "divergent_command_payload_conflict",
+    "outcome_unknown_same_command_recovery",
+    "duplicate_week_already_satisfied_same_process",
+    "handoff_never_executable",
+    "week_boundary_tampering_rejected"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "w10-missing-records-ready",
+      "operation": "missing_records_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-missing-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:assistant:missing-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:assistant:missing-01",
+          "interface_key": "nurture.teacher-assistant-query-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:assistant:missing-01",
+          "scope_version": 4,
+          "operation": "missing_records_query",
+          "query_key": "class:ref:sunflower-01|2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "local_date": "2026-08-14",
+        "missing_count": 3,
+        "children": [
+          {
+            "child_ref": "child:ref:mingming-01",
+            "child_safe_label": "小明",
+            "present_kinds": [
+              "meal",
+              "nap"
+            ],
+            "missing_kinds": [
+              "mood",
+              "activity",
+              "health_observation"
+            ],
+            "handoff": {
+              "interface_key": "nurture.teacher-organization-owner",
+              "interface_version": "1.0.0",
+              "operation": "supplement_exchange",
+              "child_ref": "child:ref:mingming-01",
+              "availability": "available"
+            }
+          },
+          {
+            "child_ref": "child:ref:xiaohong-01",
+            "child_safe_label": "小红",
+            "present_kinds": [
+              "meal",
+              "nap",
+              "mood",
+              "activity",
+              "health_observation"
+            ],
+            "missing_kinds": []
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w10-missing-records-ready-empty",
+      "operation": "missing_records_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-missing-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:assistant:missing-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 3,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:assistant:missing-02",
+          "interface_key": "nurture.teacher-assistant-query-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:assistant:missing-02",
+          "scope_version": 3,
+          "operation": "missing_records_query",
+          "query_key": "class:ref:sunflower-01|2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "local_date": "2026-08-14",
+        "missing_count": 0,
+        "children": []
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-source-ready",
+      "operation": "weekly_source_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-weekly-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:assistant:weekly-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:assistant:weekly-01",
+          "interface_key": "nurture.teacher-assistant-query-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:assistant:weekly-01",
+          "scope_version": 4,
+          "operation": "weekly_source_query",
+          "query_key": "class:ref:sunflower-01|2026-08-10",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "week_start": "2026-08-10",
+        "week_end": "2026-08-16",
+        "children": [
+          {
+            "child_ref": "child:ref:mingming-01",
+            "child_safe_label": "小明",
+            "care_counts": {
+              "meal": 5,
+              "nap": 5,
+              "mood": 3,
+              "activity": 4,
+              "health_observation": 1
+            },
+            "confirmed_media_count": 2
+          },
+          {
+            "child_ref": "child:ref:xiaohong-01",
+            "child_safe_label": "小红",
+            "care_counts": {
+              "meal": 5,
+              "nap": 4,
+              "mood": 2,
+              "activity": 3,
+              "health_observation": 0
+            },
+            "confirmed_media_count": 1
+          }
+        ],
+        "class_total_records": 32,
+        "class_total_confirmed_media": 3
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-source-ready-with-draft",
+      "operation": "weekly_source_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-weekly-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:assistant:weekly-02",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:assistant:weekly-02",
+          "interface_key": "nurture.teacher-assistant-query-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:assistant:weekly-02",
+          "scope_version": 4,
+          "operation": "weekly_source_query",
+          "query_key": "class:ref:sunflower-01|2026-08-10",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "week_start": "2026-08-10",
+        "week_end": "2026-08-16",
+        "children": [],
+        "class_total_records": 0,
+        "class_total_confirmed_media": 0,
+        "draft_process_ref": "process:ref:weekly-0001"
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-draft-committed-created",
+      "operation": "weekly_draft_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-draft-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14",
+        "command_request_id": "command-w10-draft-0001"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w10-draft-0001",
+        "executed": "executed",
+        "disposition": "created",
+        "process_ref": "process:ref:weekly-0001",
+        "week_start": "2026-08-10",
+        "state": "draft"
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-draft-replayed",
+      "operation": "weekly_draft_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-draft-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14",
+        "command_request_id": "command-w10-draft-0001"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w10-draft-0001",
+        "executed": "replayed",
+        "disposition": "created",
+        "process_ref": "process:ref:weekly-0001",
+        "week_start": "2026-08-10",
+        "state": "draft"
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-draft-already-satisfied",
+      "operation": "weekly_draft_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-draft-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14",
+        "command_request_id": "command-w10-draft-0002"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w10-draft-0002",
+        "executed": "executed",
+        "disposition": "already_satisfied",
+        "process_ref": "process:ref:weekly-0001",
+        "week_start": "2026-08-10",
+        "state": "draft"
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-draft-not-committed-empty",
+      "operation": "weekly_draft_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-draft-04",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14",
+        "command_request_id": "command-w10-draft-0003"
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w10-draft-0003",
+        "reason_code": "no_weekly_facts"
+      }
+    },
+    {
+      "fixture_id": "w10-weekly-draft-outcome-unknown",
+      "operation": "weekly_draft_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-draft-05",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14",
+        "command_request_id": "command-w10-draft-0004"
+      },
+      "response": {
+        "status": "outcome_unknown",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w10-draft-0004",
+        "recovery": "reconcile_same_command"
+      }
+    },
+    {
+      "fixture_id": "w10-masked-access-changed",
+      "operation": "missing_records_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-missing-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:willow-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:teacher:sunflower:v3",
+        "masked_at": "2026-08-14T09:00:01.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w10-unavailable-temporarily",
+      "operation": "weekly_source_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-assistant-query-owner",
+          "version": "1.0.0",
+          "digest": "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-weekly-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:teacher:sunflower:v3",
+        "failed_at": "2026-08-14T09:00:01.000Z",
+        "reason_code": "temporarily_unavailable",
+        "retryable": true
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w10-invalid-request-digest-malformed",
+      "operation": "missing_records_query",
+      "source_fixture_id": "w10-missing-records-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "interface_contract",
+          "digest"
+        ],
+        "value": "sha256:not-a-hex-digest"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-request-authority-claim",
+      "operation": "weekly_source_query",
+      "source_fixture_id": "w10-weekly-source-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "participant_id"
+        ],
+        "value": "participant-raw-01"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-request-week-claim",
+      "operation": "weekly_draft_exchange",
+      "source_fixture_id": "w10-weekly-draft-committed-created",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "week_start"
+        ],
+        "value": "2026-08-10"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-request-missing-date",
+      "operation": "missing_records_query",
+      "source_fixture_id": "w10-missing-records-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "local_date"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-missing-handoff",
+      "operation": "missing_records_query",
+      "source_fixture_id": "w10-missing-records-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "children",
+          0,
+          "handoff"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-executable-handoff",
+      "operation": "missing_records_query",
+      "source_fixture_id": "w10-missing-records-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "children",
+          0,
+          "handoff",
+          "action_ref"
+        ],
+        "value": "action:executable-0001"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-care-kind-open",
+      "operation": "missing_records_query",
+      "source_fixture_id": "w10-missing-records-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "children",
+          0,
+          "missing_kinds",
+          0
+        ],
+        "value": "snack"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-count-over-cap",
+      "operation": "weekly_source_query",
+      "source_fixture_id": "w10-weekly-source-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "children",
+          0,
+          "confirmed_media_count"
+        ],
+        "value": 1000
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-missing-week-end",
+      "operation": "weekly_source_query",
+      "source_fixture_id": "w10-weekly-source-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "week_end"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-draft-state-open",
+      "operation": "weekly_draft_exchange",
+      "source_fixture_id": "w10-weekly-draft-committed-created",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "state"
+        ],
+        "value": "pending_release"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-executed-open",
+      "operation": "weekly_draft_exchange",
+      "source_fixture_id": "w10-weekly-draft-committed-created",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "executed"
+        ],
+        "value": "twice"
+      }
+    },
+    {
+      "fixture_id": "w10-invalid-response-reason-open",
+      "operation": "weekly_draft_exchange",
+      "source_fixture_id": "w10-weekly-draft-not-committed-empty",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "reason_code"
+        ],
+        "value": "mystery_reason"
+      }
+    }
+  ]
+}

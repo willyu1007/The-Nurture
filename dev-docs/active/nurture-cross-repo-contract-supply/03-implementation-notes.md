@@ -1,5 +1,31 @@
 # Implementation notes
 
+## 2026-08-14 — W10-1 assistant-query contract artifact
+
+- Published `contracts/teacher-assistant-query-owner/v1/`: owner-contract
+  JSON (digest `sha256:d4010661…`), 11 fixtures + 12 executed invalid
+  probes, Ajv-strict validator chained into
+  `verify:formal-ingress-contract`, README, and the frozen TS constants
+  (`src/teacher-assistant-query-owner-contract.ts`).
+- Contract shape follows the freeze exactly: the missing-records child
+  partitions the five daily-care kinds into present/missing and carries a
+  typed supplement handoff (const-pinned to
+  `teacher-organization-owner@1.0.0` / `supplement_exchange`) required
+  precisely when a kind is missing; weekly-source answers the
+  owner-computed Monday-Sunday window with per-kind counts and W9-chain
+  confirmed-media counts; the weekly-draft exchange answers
+  `created | already_satisfied` with `process_ref` and the W7 lane state.
+  Requests never accept week boundaries (`unevaluatedProperties: false`
+  plus a request-side forbidden-field census including
+  `week_start`/`week_end`).
+- Validator adds W10-specific bindings beyond the W9 template: query keys
+  `class_ref|local_date` and `class_ref|week_start` (the latter derived
+  from the answered week), `missing_count` = Σ per-child missing kinds,
+  kind-partition and handoff-presence checks, seven-day window arithmetic
+  with the requested date inside it, class totals = Σ per-child facts, and
+  the cross-fixture rule that every `already_satisfied` names a
+  `process_ref` some created draft answered.
+
 ## 2026-08-14 — W10 assistant-query scope freeze
 
 - Froze `nurture.teacher-assistant-query-owner@1.0.0`

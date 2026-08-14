@@ -1,0 +1,881 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.teacher-assistant-query-owner",
+    "version": "1.0.0",
+    "kind": "private_owner_exchange"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "digest": "sha256:35d6340f60aa2d81523b0c8af977c8c5bb8f01a05a84d1a73b5baffbe8654273",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "capability_dependencies": [
+    {
+      "key": "record_caregiver_daily_care",
+      "version": "1.0.0",
+      "use": "handoff vocabulary only"
+    },
+    {
+      "key": "organize_care_capture_batch",
+      "version": "1.0.0",
+      "use": "lane vocabulary only"
+    }
+  ],
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "mobile_posture": {
+    "mode": "read_and_command",
+    "forbidden_response_fields": [
+      "action_ref",
+      "participant_id",
+      "role_assignment_id",
+      "institution_id",
+      "family_id",
+      "child_id",
+      "care_group_id",
+      "enrollment_id",
+      "grant_id",
+      "storage_ref",
+      "signed_url",
+      "url"
+    ],
+    "rules": [
+      "The supplement handoff is a typed descriptor, never an executable reference; the handoff target rereads current authority and this owner writes nothing on reads.",
+      "The weekly draft is agent-labelled owner content and requires review before any sharing; it enters the existing organization lane and never sends.",
+      "The generation boundary is engine-ready: the owner assembles deterministic facts only and never calls a model provider; no generated prose exists in this contract.",
+      "Week identity is owner-computed under the publication-policy timezone; requests never carry week boundaries."
+    ]
+  },
+  "command_model": {
+    "idempotency": "The exchange binds an actor-scoped identity (workspace + current participant + command_request_id); another authorized actor replaying the same command_request_id is denied, never served the first actor's result.",
+    "replay": "An exact same-command replay returns the recorded result with executed: replayed and mutates nothing.",
+    "outcome_unknown": "Recovery is exact same-command replay; a new command is never the recovery path.",
+    "confirmation": "No two-step confirm exists: the weekly draft is a class-internal single-step command (family visibility starts only at the separate release confirm). The draft is additionally domain-idempotent per (class, week) — an existing draft answers already_satisfied with the same process_ref.",
+    "no_auto_send": "Nothing here releases, schedules or auto-sends."
+  },
+  "safe_reason_codes": [
+    "teacher_assistant_query_owner_disabled",
+    "invalid_teacher_assistant_query_request",
+    "teacher_assistant_query_contract_mismatch"
+  ],
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "missing_records_query": "/internal/nurture/teacher-assistant-query-owner/v1/missing-records",
+      "weekly_source_query": "/internal/nurture/teacher-assistant-query-owner/v1/weekly-source",
+      "weekly_draft_exchange": "/internal/nurture/teacher-assistant-query-owner/v1/weekly-draft"
+    }
+  },
+  "operation_order": [
+    "missing_records_query",
+    "weekly_source_query",
+    "weekly_draft_exchange"
+  ],
+  "operations": {
+    "missing_records_query": {
+      "path": "/internal/nurture/teacher-assistant-query-owner/v1/missing-records",
+      "t039_rows": [
+        "T-H02"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-assistant-query-owner:1#/$defs/missing_records_query_request",
+      "response_schema_ref": "urn:nurture:teacher-assistant-query-owner:1#/$defs/missing_records_query_response"
+    },
+    "weekly_source_query": {
+      "path": "/internal/nurture/teacher-assistant-query-owner/v1/weekly-source",
+      "t039_rows": [
+        "T-H04"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-assistant-query-owner:1#/$defs/weekly_source_query_request",
+      "response_schema_ref": "urn:nurture:teacher-assistant-query-owner:1#/$defs/weekly_source_query_response"
+    },
+    "weekly_draft_exchange": {
+      "path": "/internal/nurture/teacher-assistant-query-owner/v1/weekly-draft",
+      "t039_rows": [
+        "T-H04"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-assistant-query-owner:1#/$defs/weekly_draft_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-assistant-query-owner:1#/$defs/weekly_draft_exchange_response"
+    }
+  },
+  "schemas": {
+    "$id": "urn:nurture:teacher-assistant-query-owner:1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 512
+      },
+      "instant": {
+        "type": "string",
+        "format": "date-time",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+      },
+      "local_date": {
+        "type": "string",
+        "format": "date"
+      },
+      "command_request_id": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "safe_label": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "care_kind": {
+        "enum": [
+          "meal",
+          "nap",
+          "mood",
+          "activity",
+          "health_observation"
+        ]
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.teacher-assistant-query-owner"
+          },
+          "version": {
+            "const": "1.0.0"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "scope_kind": {
+            "const": "care_group"
+          },
+          "scope_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "interface_key": {
+            "const": "nurture.teacher-assistant-query-owner"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "operation": {
+            "enum": [
+              "missing_records_query",
+              "weekly_source_query"
+            ]
+          },
+          "query_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolved_at",
+          "source"
+        ],
+        "properties": {
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "source": {
+            "const": "current_owner_read"
+          }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "reason_code",
+          "purge_partition",
+          "content_masked"
+        ],
+        "properties": {
+          "kind": {
+            "const": "mask"
+          },
+          "reason_code": {
+            "enum": [
+              "access_changed",
+              "context_changed",
+              "refresh_not_retryable"
+            ]
+          },
+          "purge_partition": {
+            "const": true
+          },
+          "content_masked": {
+            "const": true
+          }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "masked_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "mask_signal": {
+            "$ref": "#/$defs/mask_signal"
+          }
+        }
+      },
+      "unavailable_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "failed_at",
+          "reason_code",
+          "retryable"
+        ],
+        "properties": {
+          "status": {
+            "const": "unavailable"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "failed_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "reason_code": {
+            "enum": [
+              "content_unavailable",
+              "temporarily_unavailable",
+              "request_invalid"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "outcome_unknown_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "outcome_unknown"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "recovery": {
+            "const": "reconcile_same_command"
+          }
+        }
+      },
+      "executed_kind": {
+        "enum": [
+          "executed",
+          "replayed"
+        ]
+      },
+      "identity_request": {
+        "type": "object",
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "missing_records_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "local_date"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          }
+        }
+      },
+      "weekly_source_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "local_date"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          }
+        }
+      },
+      "weekly_draft_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "local_date",
+          "command_request_id"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          }
+        }
+      },
+      "supplement_handoff": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_key",
+          "interface_version",
+          "operation",
+          "child_ref",
+          "availability"
+        ],
+        "properties": {
+          "interface_key": {
+            "const": "nurture.teacher-organization-owner"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "operation": {
+            "const": "supplement_exchange"
+          },
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "availability": {
+            "enum": [
+              "available",
+              "unavailable"
+            ]
+          }
+        }
+      },
+      "missing_record_child": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "missing_kinds": {
+                  "type": "array",
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "missing_kinds"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "handoff"
+              ],
+              "properties": {
+                "handoff": true
+              }
+            }
+          }
+        ],
+        "required": [
+          "child_ref",
+          "child_safe_label",
+          "present_kinds",
+          "missing_kinds"
+        ],
+        "properties": {
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "child_safe_label": {
+            "$ref": "#/$defs/safe_label"
+          },
+          "present_kinds": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 5,
+            "items": {
+              "$ref": "#/$defs/care_kind"
+            },
+            "uniqueItems": true
+          },
+          "missing_kinds": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 5,
+            "items": {
+              "$ref": "#/$defs/care_kind"
+            },
+            "uniqueItems": true
+          },
+          "handoff": {
+            "$ref": "#/$defs/supplement_handoff"
+          }
+        }
+      },
+      "missing_records_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "local_date",
+          "missing_count",
+          "children"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "local_date": {
+            "$ref": "#/$defs/local_date"
+          },
+          "missing_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 400
+          },
+          "children": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 80,
+            "items": {
+              "$ref": "#/$defs/missing_record_child"
+            }
+          }
+        }
+      },
+      "missing_records_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/missing_records_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "weekly_child_source": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "child_ref",
+          "child_safe_label",
+          "care_counts",
+          "confirmed_media_count"
+        ],
+        "properties": {
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "child_safe_label": {
+            "$ref": "#/$defs/safe_label"
+          },
+          "care_counts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "meal",
+              "nap",
+              "mood",
+              "activity",
+              "health_observation"
+            ],
+            "properties": {
+              "meal": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "nap": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "mood": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "activity": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "health_observation": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              }
+            }
+          },
+          "confirmed_media_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          }
+        }
+      },
+      "weekly_source_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "week_start",
+          "week_end",
+          "children",
+          "class_total_records",
+          "class_total_confirmed_media"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "week_start": {
+            "$ref": "#/$defs/local_date"
+          },
+          "week_end": {
+            "$ref": "#/$defs/local_date"
+          },
+          "children": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 80,
+            "items": {
+              "$ref": "#/$defs/weekly_child_source"
+            }
+          },
+          "class_total_records": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          },
+          "class_total_confirmed_media": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          },
+          "draft_process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "weekly_source_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/weekly_source_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "weekly_draft_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "disposition",
+          "process_ref",
+          "week_start",
+          "state"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "disposition": {
+            "enum": [
+              "created",
+              "already_satisfied"
+            ]
+          },
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "week_start": {
+            "$ref": "#/$defs/local_date"
+          },
+          "state": {
+            "enum": [
+              "draft",
+              "needs_review"
+            ]
+          }
+        }
+      },
+      "weekly_draft_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "no_weekly_facts",
+              "no_eligible_target",
+              "safety_route_unavailable",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "weekly_draft_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/weekly_draft_committed"
+          },
+          {
+            "$ref": "#/$defs/weekly_draft_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      }
+    }
+  }
+}

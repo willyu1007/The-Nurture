@@ -1,5 +1,21 @@
 # Verification
 
+## 2026-08-14 — W10-1 assistant-query contract artifact
+
+- `verify:teacher-assistant-query-owner-contract` green (digest recompute,
+  posture/row/path censuses, 17-scenario negative census, 11 fixtures with
+  read/exchange bindings, 12 invalid probes all rejected — Ajv strict
+  compiled first run); full `verify:formal-ingress-contract` chain green
+  (controller-routes still 46: routes mount with W10-2).
+- Root typecheck green; unit lane 102 files / 1117 tests green. The
+  per-package `@the-nurture/scenario typecheck` script carries a
+  pre-existing W6-era `rootDir` complaint (unit test importing the
+  scenario-service response validator) — not a CI gate, logged for the
+  end-of-schedule review.
+
+Verdict: `W10_1_PUBLISHED / DIGEST_SHA256_D4010661 / VALIDATOR_CHAINED /
+RUNTIME_STILL_ABSENT_BY_DESIGN`.
+
 ## 2026-08-14 — W9-5 consumer adoption closes W9
 
 - My-Chat `e092613` (T-039) adopts the W9 contract as a dormant strict
