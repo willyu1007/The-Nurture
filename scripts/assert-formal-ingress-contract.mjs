@@ -71,6 +71,16 @@ const teacherClassStreamPaths = {
   TEACHER_CLASS_STREAM_SCHEDULE_PATH:
     "/internal/nurture/teacher-class-stream/v1/schedule",
 };
+const teacherMediaAssociationOwnerPaths = {
+  TEACHER_MEDIA_ASSOCIATION_OWNER_UNASSOCIATED_PATH:
+    "/internal/nurture/teacher-media-association-owner/v1/unassociated",
+  TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATION_PATH:
+    "/internal/nurture/teacher-media-association-owner/v1/association",
+  TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATE_PATH:
+    "/internal/nurture/teacher-media-association-owner/v1/associate",
+  TEACHER_MEDIA_ASSOCIATION_OWNER_DISCARD_PATH:
+    "/internal/nurture/teacher-media-association-owner/v1/discard",
+};
 const teacherCommunicationOwnerPaths = {
   TEACHER_COMMUNICATION_OWNER_TARGETS_PATH:
     "/internal/nurture/teacher-communication-owner/v1/targets",
@@ -151,6 +161,10 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_SEND_TEXT_PATH`,
   `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_WITHDRAW_STAGED_PATH`,
   `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_MARK_READ_PATH`,
+  `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_UNASSOCIATED_PATH`,
+  `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATION_PATH`,
+  `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATE_PATH`,
+  `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_DISCARD_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -164,6 +178,7 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
   "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
   "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
+  "apps/scenario-service/src/teacher-media-association-owner.controller.ts#TeacherMediaAssociationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
@@ -174,6 +189,7 @@ const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
   "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
   "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
+  "apps/scenario-service/src/teacher-media-association-owner.controller.ts#TeacherMediaAssociationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -1569,6 +1585,156 @@ for (const route of [
   assertIncludes(
     teacherCommunicationHttpSource,
     "contract.digest !== TEACHER_COMMUNICATION_OWNER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const teacherMediaAssociationControllerSource = read(
+  "apps/scenario-service/src/teacher-media-association-owner.controller.ts",
+);
+const teacherMediaAssociationHttpSource = read(
+  "apps/scenario-service/src/teacher-media-association-owner-http.ts",
+);
+const teacherMediaAssociationRuntimeSource = read(
+  "apps/scenario-service/src/teacher-media-association-owner-runtime.ts",
+);
+const teacherMediaAssociationCompositionSource = read(
+  "apps/scenario-service/src/teacher-media-association-owner-composition.ts",
+);
+const teacherMediaAssociationResponseValidatorSource = read(
+  "apps/scenario-service/src/teacher-media-association-owner-response-validator.ts",
+);
+const teacherMediaAssociationContractSource = read(
+  "packages/nurture-scenario/src/teacher-media-association-owner-contract.ts",
+);
+const teacherMediaAssociationArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/teacher-media-association-owner/v1/teacher-media-association-owner.owner-contract.json",
+  ),
+);
+assertIncludes(
+  teacherMediaAssociationControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "teacher media-association guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  teacherMediaAssociationControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "teacher media-association guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.teacher-media-association-owner"',
+  'version: "1.0.0"',
+  "sha256:528e50c8170a8b2fa41679cd7fc8d20f5fb344278a6d8e3a6294adc405dd96b4",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'mobile_mode: "read_and_command"',
+]) {
+  assertIncludes(
+    teacherMediaAssociationContractSource,
+    fragment,
+    `teacher media-association exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  teacherMediaAssociationArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "teacher media-association mounted route posture",
+);
+assertIncludes(
+  String(teacherMediaAssociationArtifact.command_model?.outcome_unknown ?? ""),
+  "exact same-command replay",
+  "teacher media-association outcome_unknown recovery stays same-command replay",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED",
+  "teacher media-association has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    teacherMediaAssociationRuntimeSource,
+    fragment,
+    `teacher media-association complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  teacherMediaAssociationResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "teacher media-association runtime compiles the published schema artifact",
+);
+assertIncludes(
+  teacherMediaAssociationResponseValidatorSource,
+  "digest !== TEACHER_MEDIA_ASSOCIATION_OWNER_INTERFACE.digest",
+  "teacher media-association runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  teacherMediaAssociationCompositionSource,
+  "assertPublishedTeacherMediaAssociationResponse(operation, response)",
+  "teacher media-association composition enforces published responses",
+);
+assertIncludes(
+  teacherMediaAssociationCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "teacher media-association rereads current authority for every operation",
+);
+assertIncludes(
+  teacherMediaAssociationCompositionSource,
+  "response.command_request_id !== commandRequestId",
+  "teacher media-association exchanges echo the exact command identity",
+);
+for (const route of [
+  {
+    constant: "TEACHER_MEDIA_ASSOCIATION_OWNER_UNASSOCIATED_PATH",
+    handler: "unassociated",
+    parser: "parseTeacherMediaAssociationUnassociatedRequestV1",
+  },
+  {
+    constant: "TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATION_PATH",
+    handler: "association",
+    parser: "parseTeacherMediaAssociationAssociationRequestV1",
+  },
+  {
+    constant: "TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATE_PATH",
+    handler: "associate",
+    parser: "parseTeacherMediaAssociationAssociateRequestV1",
+  },
+  {
+    constant: "TEACHER_MEDIA_ASSOCIATION_OWNER_DISCARD_PATH",
+    handler: "discard",
+    parser: "parseTeacherMediaAssociationDiscardRequestV1",
+  },
+]) {
+  const expectedPath = teacherMediaAssociationOwnerPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    teacherMediaAssociationContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    teacherMediaAssociationControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    teacherMediaAssociationHttpSource,
+    "contract.digest !== TEACHER_MEDIA_ASSOCIATION_OWNER_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

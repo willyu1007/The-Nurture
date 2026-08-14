@@ -69,6 +69,12 @@ import {
   type TeacherCommunicationOwnerConfig,
   TeacherCommunicationOwnerServiceAuthGuard,
 } from "./teacher-communication-owner.controller.js";
+import {
+  TEACHER_MEDIA_ASSOCIATION_OWNER_CONFIG,
+  TeacherMediaAssociationOwnerController,
+  type TeacherMediaAssociationOwnerConfig,
+  TeacherMediaAssociationOwnerServiceAuthGuard,
+} from "./teacher-media-association-owner.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
 
@@ -85,6 +91,7 @@ import { ScenarioStructuredLogger } from "./structured-logger.js";
     TeacherClassStreamController,
     TeacherOrganizationOwnerController,
     TeacherCommunicationOwnerController,
+    TeacherMediaAssociationOwnerController,
     FamilySharingPrivateController,
   ],
 })
@@ -101,6 +108,7 @@ export class AppModule {
     teacherClassStream?: TeacherClassStreamConfig;
     teacherOrganizationOwner?: TeacherOrganizationOwnerConfig;
     teacherCommunicationOwner?: TeacherCommunicationOwnerConfig;
+    teacherMediaAssociationOwner?: TeacherMediaAssociationOwnerConfig;
     familySharingPrivate: FamilySharingPrivateConfig;
   }): DynamicModule {
     return {
@@ -190,6 +198,15 @@ export class AppModule {
           }),
         },
         TeacherCommunicationOwnerServiceAuthGuard,
+        {
+          provide: TEACHER_MEDIA_ASSOCIATION_OWNER_CONFIG,
+          useValue: Object.freeze({
+            ...(input.teacherMediaAssociationOwner ?? {
+              serviceAuth: input.parentContextPresenter.serviceAuth,
+            }),
+          }),
+        },
+        TeacherMediaAssociationOwnerServiceAuthGuard,
         {
           provide: FAMILY_SHARING_PRIVATE_CONFIG,
           useValue: Object.freeze({ ...input.familySharingPrivate }),

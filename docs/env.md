@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-14T14:33:39Z`
+Generated at (UTC): `2026-08-14T15:13:05Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -30,6 +30,7 @@ Generated at (UTC): `2026-08-14T14:33:39Z`
 | `NURTURE_PROTECTED_CONTENT_KEY` | `active` | `string` | no | yes | `` | `nurture_protected_content_key` | `*` | `` | `` | `` | AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext. |
 | `NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the read-only teacher class-stream presenter v1 composition; true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval, and admits no class-stream write path. |
 | `NURTURE_TEACHER_COMMUNICATION_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the teacher communication-owner v1 exchange composition; true requires the exact adopted contract digest, complete caregiver authority/owner/protected-content ports and separate activation approval; class-group send stays reserved and nothing schedules or auto-sends. |
+| `NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the teacher media-association owner v1 exchange composition (association-only); true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval; no bytes, thumbnails or previews exist until the reserved media ingress ships. |
 | `NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the teacher organization-owner v1 exchange composition; true requires the exact adopted contract digest, complete caregiver authority/owner/protected-content ports and separate activation approval, and never authorizes release or auto-send. |
 | `NURTURE_TEACHER_RELEASE_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation. |
 | `PORT` | `active` | `int` | yes | no | `8000` | `` | `*` | `` | `` | `` | Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately. |

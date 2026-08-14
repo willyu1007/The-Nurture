@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-14T14:33:39Z",
+  "generated_at_utc": "2026-08-14T15:13:05Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -323,6 +323,23 @@
       "default": false,
       "deprecate_after": null,
       "description": "Default-off gate for the teacher communication-owner v1 exchange composition; true requires the exact adopted contract digest, complete caregiver authority/owner/protected-content ports and separate activation approval; class-group send stays reserved and nothing schedules or auto-sends.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
+    },
+    "NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the teacher media-association owner v1 exchange composition (association-only); true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval; no bytes, thumbnails or previews exist until the reserved media ingress ships.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null

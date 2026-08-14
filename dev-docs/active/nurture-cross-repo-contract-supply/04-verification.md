@@ -1,5 +1,21 @@
 # Verification
 
+## 2026-08-14 — W9-2 media-association default-off runtime
+
+- scenario-service suite 169/169 including the new 7-case W9 e2e and the
+  config gate cases; repo typecheck green.
+- `assert-formal-ingress-contract` green with the W9 census
+  (controller-routes 46, four media-association routes pinned end to end);
+  `assert-test-routing` green at scenario-service=24; full
+  `verify:formal-ingress-contract` chain green; env-contractctl
+  generate+validate and `ctl-context verify --strict` green.
+- Default-off proven at the HTTP boundary: 503
+  `teacher_media_association_owner_disabled` with private headers; wrong
+  bearer 401; masked authority short-circuits without owner port calls.
+
+Verdict: `W9_2_RUNTIME_MOUNTED_DEFAULT_OFF / FOUR_ROUTES_CENSUSED /
+DECISION_PAIRING_ENFORCED / NO_OWNER_PORTS_YET`.
+
 ## 2026-08-14 — W9-1 media-association contract artifact
 
 - `pnpm verify:teacher-media-association-owner-contract`: digest

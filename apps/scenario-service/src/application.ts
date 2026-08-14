@@ -65,6 +65,11 @@ import {
   createTeacherCommunicationOwnerComposition,
   type TeacherCommunicationOwnerBindingV1,
 } from "./teacher-communication-owner-runtime.js";
+import type { TeacherMediaAssociationOwnerComposition } from "./teacher-media-association-owner-composition.js";
+import {
+  createTeacherMediaAssociationOwnerComposition,
+  type TeacherMediaAssociationOwnerBindingV1,
+} from "./teacher-media-association-owner-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -94,6 +99,8 @@ export async function createScenarioServiceApplication(input?: {
   teacherOrganizationOwnerBinding?: TeacherOrganizationOwnerBindingV1;
   teacherCommunicationOwnerComposition?: TeacherCommunicationOwnerComposition;
   teacherCommunicationOwnerBinding?: TeacherCommunicationOwnerBindingV1;
+  teacherMediaAssociationOwnerComposition?: TeacherMediaAssociationOwnerComposition;
+  teacherMediaAssociationOwnerBinding?: TeacherMediaAssociationOwnerBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -178,6 +185,15 @@ export async function createScenarioServiceApplication(input?: {
         ? { ownerBinding: input.teacherCommunicationOwnerBinding }
         : {}),
     });
+  const teacherMediaAssociationOwnerComposition =
+    input?.teacherMediaAssociationOwnerComposition
+    ?? createTeacherMediaAssociationOwnerComposition({
+      enabled: config.teacherMediaAssociationOwnerEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.teacherMediaAssociationOwnerBinding
+        ? { ownerBinding: input.teacherMediaAssociationOwnerBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -216,6 +232,10 @@ export async function createScenarioServiceApplication(input?: {
       },
       teacherCommunicationOwner: {
         composition: teacherCommunicationOwnerComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      teacherMediaAssociationOwner: {
+        composition: teacherMediaAssociationOwnerComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

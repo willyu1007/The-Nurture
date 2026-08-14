@@ -1,5 +1,21 @@
 # Implementation notes
 
+## 2026-08-14 — W9-2 teacher media-association default-off runtime
+
+- Mounted the four W9 routes in `apps/scenario-service` behind
+  `NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED` with the established
+  五件套 shape (exact-shape parsers with the decision enum and revision
+  bounds, current-authority composition, Ajv-pinned response validator,
+  fail-closed factory, guarded controller); safe codes allowlisted.
+- Binding asserts: read `query_key` = `class_ref` / `media_ref`, associate
+  media+child echo with decision→state pairing, discard media echo, and the
+  queue-wide count-vs-page consistency on the unassociated read.
+- e2e (7 cases, 33 tests with config) green on the first full run; ingress
+  census pins the four routes and the W9 assertion block (controller-routes
+  42 -> 46); test-routing scenario-service 23 -> 24; env contract 5-file
+  set gained the gate with registry checksum refresh.
+- Real Prisma owner ports and DB lanes are W9-3; no schema change.
+
 ## 2026-08-14 — W9-1 teacher media-association contract artifact
 
 - Published the W9 contract package at
