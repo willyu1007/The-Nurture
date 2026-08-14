@@ -1,5 +1,21 @@
 # Verification
 
+## 2026-08-14 — W7-1 organization-owner contract artifact
+
+- `pnpm verify:teacher-organization-owner-contract`: digest
+  `sha256:b0d4602f…` recomputed over the artifact, schemas compiled under
+  Ajv 2020 strict, 17 fixtures accepted, 14 invalid probes rejected,
+  operation/row/negative censuses exact
+  (6 operations; T-F02/T-F05/T-F08/T-F09/T-F10/T-F11/T-F15; 18 scenarios).
+- Full `pnpm verify:formal-ingress-contract` chain green (all four contract
+  validators + ingress assert; formal route population unchanged at 7).
+- Repo `pnpm typecheck` green; nurture-scenario suite green from the repo
+  root (a `--filter` run from the package cwd shows 4 pre-existing G4-E
+  path-relative failures that pass from the root, unrelated to W7).
+
+Verdict: `W7_1_CONTRACT_PUBLISHED / DIGEST_B0D4602F / STRICT_COMPILE_PROVEN /
+DEFAULT_OFF / NO_RUNTIME_YET`.
+
 ## 2026-08-14 — W6-5 consumer adoption closes W6
 
 - My-Chat `5babf85` (T-039) adopts the W6 contract as a dormant strict

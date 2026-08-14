@@ -1,0 +1,866 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.teacher-organization-owner",
+    "version": "1.0.0",
+    "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+  },
+  "required_negative_scenarios": [
+    "not_authorized_admin",
+    "not_authorized_other_class",
+    "not_authorized_guardian",
+    "revoked_mid_window",
+    "stale_context_ref",
+    "cross_scope_class_ref",
+    "cross_class_child_ref",
+    "cross_scope_process_ref",
+    "disabled_gate",
+    "service_auth_missing",
+    "forbidden_request_field",
+    "hidden_payload_rejected",
+    "cross_actor_replay_denied",
+    "divergent_command_payload_conflict",
+    "confirmation_expired",
+    "confirmation_single_use",
+    "outcome_unknown_same_command_recovery",
+    "voice_note_rejected"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "w7-feed-ready",
+      "operation": "feed_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-feed-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:org:feed-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:org:feed-01",
+          "interface_key": "nurture.teacher-organization-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:org:feed-01",
+          "scope_version": 4,
+          "operation": "feed_query",
+          "query_key": "class:ref:sunflower-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "batch_state": "collecting",
+        "captures": [
+          {
+            "capture_ref": "capture:ref:note-01",
+            "kind": "text",
+            "occurred_at": "2026-08-14T01:20:00.000Z",
+            "stability": "stable",
+            "failure": "none",
+            "has_media": false,
+            "text_excerpt": "户外写生：大部分孩子完成了树叶拓印"
+          },
+          {
+            "capture_ref": "capture:ref:media-02",
+            "kind": "media",
+            "occurred_at": "2026-08-14T01:25:00.000Z",
+            "stability": "processing",
+            "failure": "none",
+            "has_media": true
+          },
+          {
+            "capture_ref": "capture:ref:media-03",
+            "kind": "media",
+            "occurred_at": "2026-08-14T01:30:00.000Z",
+            "stability": "stable",
+            "failure": "upload_failed",
+            "has_media": true
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w7-feed-ready-empty",
+      "operation": "feed_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-feed-02",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:org:feed-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:willow-01",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:org:feed-02",
+          "interface_key": "nurture.teacher-organization-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:org:feed-02",
+          "scope_version": 1,
+          "operation": "feed_query",
+          "query_key": "class:ref:willow-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "batch_state": "none",
+        "captures": []
+      }
+    },
+    {
+      "fixture_id": "w7-organization-ready",
+      "operation": "organization_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-organization-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:org:query-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:org:query-01",
+          "interface_key": "nurture.teacher-organization-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:org:query-01",
+          "scope_version": 4,
+          "operation": "organization_query",
+          "query_key": "class:ref:sunflower-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "batch": {
+          "batch_ref": "batch:ref:0814-01",
+          "state": "collecting",
+          "capture_count": 6,
+          "stable_capture_count": 5,
+          "watermark_sequence": 14,
+          "fallback_due_at": "2026-08-14T09:30:00.000Z",
+          "trigger": {
+            "availability": "available"
+          }
+        },
+        "lane": [
+          {
+            "process_ref": "process:ref:0814-01",
+            "origin": "agent_organized",
+            "data_class": "daily_care_log",
+            "purpose_key": "class_daily_share",
+            "state": "draft",
+            "recipients": {
+              "count": 12,
+              "safe_labels": [
+                "向日葵班全体家庭"
+              ]
+            },
+            "quick_adjust_until": "2026-08-14T09:00:16.000Z",
+            "admission_preview": {
+              "status": "waiting",
+              "reason_code": "quick_adjust_active"
+            }
+          },
+          {
+            "process_ref": "process:ref:0814-02",
+            "origin": "manual",
+            "data_class": "child_growth_record",
+            "purpose_key": "child_growth_publication",
+            "state": "pending_release",
+            "recipients": {
+              "count": 1,
+              "safe_labels": [
+                "小雨家庭"
+              ]
+            },
+            "scheduled_at": "2026-08-14T09:00:00.000Z",
+            "admission_preview": {
+              "status": "already_satisfied"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w7-organization-ready-empty",
+      "operation": "organization_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-organization-02",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:org:query-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:willow-01",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:org:query-02",
+          "interface_key": "nurture.teacher-organization-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:org:query-02",
+          "scope_version": 1,
+          "operation": "organization_query",
+          "query_key": "class:ref:willow-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "batch": {
+          "state": "none",
+          "capture_count": 0,
+          "stable_capture_count": 0,
+          "watermark_sequence": 0,
+          "trigger": {
+            "availability": "waiting",
+            "reason_code": "empty_stable_batch"
+          }
+        },
+        "lane": []
+      }
+    },
+    {
+      "fixture_id": "w7-organize-committed-organized",
+      "operation": "organize_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-organize-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "command_request_id": "command:organize:0814-01",
+        "trigger": "manual"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:organize:0814-01",
+        "executed": "executed",
+        "outcome": "organized",
+        "batch_ref": "batch:ref:0814-01",
+        "watermark_sequence": 14,
+        "included_capture_count": 5,
+        "deferred_capture_count": 1,
+        "process_ref": "process:ref:0814-03"
+      }
+    },
+    {
+      "fixture_id": "w7-organize-replayed-nothing",
+      "operation": "organize_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-organize-02",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01",
+        "command_request_id": "command:organize:0814-02",
+        "trigger": "manual"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:willow:v1",
+        "command_request_id": "command:organize:0814-02",
+        "executed": "replayed",
+        "outcome": "nothing_to_organize",
+        "batch_ref": "batch:ref:0814-02",
+        "watermark_sequence": 0,
+        "included_capture_count": 0,
+        "deferred_capture_count": 0
+      }
+    },
+    {
+      "fixture_id": "w7-organize-not-committed-head-moved",
+      "operation": "organize_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-organize-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "command_request_id": "command:organize:0814-03",
+        "trigger": "manual"
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:organize:0814-03",
+        "reason_code": "batch_head_moved"
+      }
+    },
+    {
+      "fixture_id": "w7-supplement-prepare-ready",
+      "operation": "supplement_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-supplement-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "child_ref": "child:ref:rain-02",
+        "command_request_id": "command:supplement:0814-01",
+        "kind": "prepare",
+        "prepare": {
+          "local_date": "2026-08-14",
+          "care_kind": "nap",
+          "text": "午睡 1 小时 10 分，入睡平稳"
+        }
+      },
+      "response": {
+        "status": "ready_to_confirm",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:supplement:0814-01",
+        "confirmation_ref": "confirmation:ref:supp-01",
+        "prepared_preview_digest": "sha256:9b1c62d94132e05c8a7f1f7b6e6a4a1f0d3f5b9a7c2e8d4f6a0b1c2d3e4f5061",
+        "expires_at": "2026-08-14T09:05:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "w7-supplement-confirm-committed",
+      "operation": "supplement_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-supplement-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "child_ref": "child:ref:rain-02",
+        "command_request_id": "command:supplement:0814-01",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:supp-01",
+          "prepared_preview_digest": "sha256:9b1c62d94132e05c8a7f1f7b6e6a4a1f0d3f5b9a7c2e8d4f6a0b1c2d3e4f5061"
+        }
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:supplement:0814-01",
+        "executed": "executed",
+        "log_ref": "log:ref:supp-0814-01",
+        "source_head": 8
+      }
+    },
+    {
+      "fixture_id": "w7-supplement-not-committed-expired",
+      "operation": "supplement_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-supplement-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "child_ref": "child:ref:rain-02",
+        "command_request_id": "command:supplement:0814-02",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:supp-02",
+          "prepared_preview_digest": "sha256:9b1c62d94132e05c8a7f1f7b6e6a4a1f0d3f5b9a7c2e8d4f6a0b1c2d3e4f5061"
+        }
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:supplement:0814-02",
+        "reason_code": "confirmation_expired"
+      }
+    },
+    {
+      "fixture_id": "w7-supplement-outcome-unknown",
+      "operation": "supplement_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-supplement-04",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "child_ref": "child:ref:rain-02",
+        "command_request_id": "command:supplement:0814-03",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:supp-03",
+          "prepared_preview_digest": "sha256:9b1c62d94132e05c8a7f1f7b6e6a4a1f0d3f5b9a7c2e8d4f6a0b1c2d3e4f5061"
+        }
+      },
+      "response": {
+        "status": "outcome_unknown",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:supplement:0814-03",
+        "recovery": "reconcile_same_command"
+      }
+    },
+    {
+      "fixture_id": "w7-class-note-committed",
+      "operation": "class_note_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-note-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "command_request_id": "command:note:0814-01",
+        "text": "提醒：明天春游需要家长在今晚前确认接送方式"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:note:0814-01",
+        "executed": "executed",
+        "capture_ref": "capture:ref:note-04"
+      }
+    },
+    {
+      "fixture_id": "w7-admission-committed-queued",
+      "operation": "queue_admission_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-admission-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "process_ref": "process:ref:0814-01",
+        "command_request_id": "command:admission:0814-01"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:admission:0814-01",
+        "executed": "executed",
+        "disposition": "queued",
+        "process_ref": "process:ref:0814-01",
+        "scheduled_at": "2026-08-14T09:00:00.000Z",
+        "not_after": "2026-08-14T11:00:00.000Z",
+        "schedule_policy_ref": "nurture.institution-publication-policy@1.0.0",
+        "schedule_policy_head": 3
+      }
+    },
+    {
+      "fixture_id": "w7-admission-replayed-already-satisfied",
+      "operation": "queue_admission_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-admission-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "process_ref": "process:ref:0814-02",
+        "command_request_id": "command:admission:0814-02"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:admission:0814-02",
+        "executed": "replayed",
+        "disposition": "already_satisfied",
+        "process_ref": "process:ref:0814-02",
+        "scheduled_at": "2026-08-14T09:00:00.000Z",
+        "schedule_policy_ref": "nurture.institution-publication-policy@1.0.0",
+        "schedule_policy_head": 3
+      }
+    },
+    {
+      "fixture_id": "w7-admission-not-committed-quick-adjust",
+      "operation": "queue_admission_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-admission-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "process_ref": "process:ref:0814-03",
+        "command_request_id": "command:admission:0814-03"
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command:admission:0814-03",
+        "reason_code": "quick_adjust_active"
+      }
+    },
+    {
+      "fixture_id": "w7-masked-access-changed",
+      "operation": "feed_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-03",
+        "host_request_id": "request-feed-03",
+        "context_ref": "context:teacher:revoked:v2",
+        "class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:teacher:revoked:v2",
+        "masked_at": "2026-08-14T09:00:01.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w7-unavailable-temporarily",
+      "operation": "organization_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-organization-owner",
+          "version": "1.0.0",
+          "digest": "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-organization-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:teacher:sunflower:v3",
+        "failed_at": "2026-08-14T09:00:01.000Z",
+        "reason_code": "temporarily_unavailable",
+        "retryable": true
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w7-invalid-request-forbidden-care-group",
+      "operation": "feed_query",
+      "source_fixture_id": "w7-feed-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "care_group_id"
+        ],
+        "value": "care-group-raw-01"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-request-version-drift",
+      "operation": "organization_query",
+      "source_fixture_id": "w7-organization-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "interface_contract",
+          "version"
+        ],
+        "value": "1.0.1"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-request-voice-note",
+      "operation": "class_note_exchange",
+      "source_fixture_id": "w7-class-note-committed",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "voice_payload"
+        ],
+        "value": {
+          "duration_seconds": 12
+        }
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-request-note-too-long",
+      "operation": "class_note_exchange",
+      "source_fixture_id": "w7-class-note-committed",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "text"
+        ],
+        "value": "超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超超"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-excerpt-on-media",
+      "operation": "feed_query",
+      "source_fixture_id": "w7-feed-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "captures",
+          1,
+          "text_excerpt"
+        ],
+        "value": "偷渡的摘录"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-storage-ref",
+      "operation": "feed_query",
+      "source_fixture_id": "w7-feed-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "captures",
+          2,
+          "storage_ref"
+        ],
+        "value": "s3://bucket/leak"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-mask-no-purge",
+      "operation": "feed_query",
+      "source_fixture_id": "w7-masked-access-changed",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "mask_signal",
+          "purge_partition"
+        ],
+        "value": false
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-cache-interface-drift",
+      "operation": "organization_query",
+      "source_fixture_id": "w7-organization-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "cache_partition",
+          "interface_key"
+        ],
+        "value": "nurture.teacher-class-stream-presenter"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-lane-foreign-state",
+      "operation": "organization_query",
+      "source_fixture_id": "w7-organization-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "lane",
+          0,
+          "state"
+        ],
+        "value": "released"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-admission-open-reason",
+      "operation": "queue_admission_exchange",
+      "source_fixture_id": "w7-admission-not-committed-quick-adjust",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "reason_code"
+        ],
+        "value": "mystery_reason"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-organized-without-process",
+      "operation": "organize_exchange",
+      "source_fixture_id": "w7-organize-committed-organized",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "process_ref"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-unknown-recovery-drift",
+      "operation": "supplement_exchange",
+      "source_fixture_id": "w7-supplement-outcome-unknown",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "recovery"
+        ],
+        "value": "issue_new_command"
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-queued-without-schedule",
+      "operation": "queue_admission_exchange",
+      "source_fixture_id": "w7-admission-committed-queued",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "scheduled_at"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w7-invalid-response-confirmation-on-committed",
+      "operation": "supplement_exchange",
+      "source_fixture_id": "w7-supplement-confirm-committed",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "confirmation_ref"
+        ],
+        "value": "confirmation:ref:leak"
+      }
+    }
+  ]
+}

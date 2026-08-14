@@ -1,0 +1,1669 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.teacher-organization-owner",
+    "version": "1.0.0",
+    "kind": "private_owner_exchange"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "capability_dependencies": [
+    {
+      "key": "organize_care_capture_batch",
+      "version": "1.0.0"
+    },
+    {
+      "key": "record_caregiver_daily_care",
+      "version": "1.0.0"
+    },
+    {
+      "key": "query_teacher_publish_queue",
+      "version": "1.0.0"
+    }
+  ],
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "feed_query": "/internal/nurture/teacher-organization-owner/v1/feed",
+      "organization_query": "/internal/nurture/teacher-organization-owner/v1/organization",
+      "organize_exchange": "/internal/nurture/teacher-organization-owner/v1/organize",
+      "supplement_exchange": "/internal/nurture/teacher-organization-owner/v1/supplement",
+      "class_note_exchange": "/internal/nurture/teacher-organization-owner/v1/class-note",
+      "queue_admission_exchange": "/internal/nurture/teacher-organization-owner/v1/queue-admission"
+    }
+  },
+  "owner_resolution": {
+    "frequency": "every_call",
+    "accepted_caller_context": [
+      "interface_contract",
+      "workspace_id",
+      "my_chat_user_id",
+      "host_request_id",
+      "context_ref"
+    ],
+    "forbidden_caller_authority_fields": [
+      "participant_id",
+      "role",
+      "role_assignment_id",
+      "scope_id",
+      "institution_id",
+      "care_group_id",
+      "family_id",
+      "child_id",
+      "enrollment_id",
+      "grant_id",
+      "purpose"
+    ],
+    "current_owner_facts": [
+      "active Participant bound from the authenticated My-Chat user",
+      "current caregiver or lead_caregiver RoleAssignment for the exact CareGroup",
+      "current batch, process, capture and confirmation heads for every exchange",
+      "current per-fact caregiver visibility for every projected entry"
+    ],
+    "context_ref_rule": "context_ref is routing input and a cache dimension, never authorization",
+    "opaque_ref_rule": "class_ref, child_ref, process_ref and capture_ref are owner-issued, scope-bound refs; a ref from another scope, class or a revoked assignment fails closed without revealing whether the target exists",
+    "admissibility_rule": "Read previews never authorize execution; every exchange re-evaluates authority, heads and policy at execution time",
+    "safe_projection": "Responses contain owner-approved display values and opaque refs only"
+  },
+  "command_model": {
+    "idempotency": "Every exchange binds an actor-scoped identity (workspace + current participant + command_request_id); another authorized actor replaying the same command_request_id is denied, never served the first actor's result.",
+    "replay": "An exact same-command replay returns the recorded result with executed: replayed and mutates nothing.",
+    "outcome_unknown": "Recovery is exact same-command replay; a new command is never the recovery path.",
+    "confirmation": "supplement_exchange is the only two-step confirm; its confirmation_ref is single-use, five-minute, body-free, surface-bound and never extended or revived.",
+    "no_auto_send": "queue_admission_exchange freezes the owner schedule but never releases; release stays in the separate teacher-release-owner confirm."
+  },
+  "mobile_posture": {
+    "mode": "read_and_command",
+    "forbidden_response_fields": [
+      "action_ref",
+      "participant_id",
+      "role_assignment_id",
+      "institution_id",
+      "family_id",
+      "child_id",
+      "care_group_id",
+      "enrollment_id",
+      "grant_id",
+      "storage_ref",
+      "signed_url",
+      "url"
+    ],
+    "rules": [
+      "Feed and organization reads carry no media bytes; the private stream ingress stays reserved.",
+      "Text excerpts are bounded safe copies produced by the owner from protected bodies.",
+      "Lane order and quick-adjust windows are owner-persisted; a client timer is never the source of truth.",
+      "Voice input is excluded from every write in this version.",
+      "Organized cards keep their agent origin explicit and reviewable before any external delivery."
+    ]
+  },
+  "safe_reason_codes": [
+    "access_changed",
+    "context_changed",
+    "refresh_not_retryable",
+    "content_unavailable",
+    "temporarily_unavailable",
+    "request_invalid"
+  ],
+  "operation_order": [
+    "feed_query",
+    "organization_query",
+    "organize_exchange",
+    "supplement_exchange",
+    "class_note_exchange",
+    "queue_admission_exchange"
+  ],
+  "operations": {
+    "feed_query": {
+      "t039_rows": [
+        "T-F08"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/feed_query_request",
+      "response_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/feed_query_response",
+      "rules": [
+        "At most 50 captures from the current batch window, newest last, one bounded page.",
+        "Upload and processing failures are explicit states, never silently dropped rows.",
+        "A text excerpt appears only on stable text-family captures and never exceeds 120 characters."
+      ]
+    },
+    "organization_query": {
+      "t039_rows": [
+        "T-F09",
+        "T-F11",
+        "T-F10"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/organization_query_request",
+      "response_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/organization_query_response",
+      "rules": [
+        "The trigger preview comes from the frozen evaluator and is display truth, not execution authority.",
+        "Lane cards are ordered by owner-persisted admission order; at most one card reports an active quick-adjust window.",
+        "The admission preview uses the frozen closed reason set and never widens it."
+      ]
+    },
+    "organize_exchange": {
+      "t039_rows": [
+        "T-F02"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/organize_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/organize_exchange_response",
+      "rules": [
+        "Only the manual trigger crosses this contract; idle and fallback triggers stay host-timer internal.",
+        "Repeated taps replay the recorded result; they never cut a second batch.",
+        "A batch head that moved between read and cut lands not_committed batch_head_moved."
+      ]
+    },
+    "supplement_exchange": {
+      "t039_rows": [
+        "T-F05"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/supplement_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/supplement_exchange_response",
+      "rules": [
+        "Prepare rereads authority and returns a single-use five-minute confirmation_ref with a preview digest.",
+        "Confirm re-submits the typed input; a digest mismatch, expiry, reuse or foreign confirmation lands not_committed.",
+        "The committed effect is one daily-care record; outcome_unknown reconciles by exact same-command replay."
+      ]
+    },
+    "class_note_exchange": {
+      "t039_rows": [
+        "T-F15"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/class_note_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/class_note_exchange_response",
+      "rules": [
+        "A class note is a class-internal text capture into the collecting batch; no confirmation gesture is required.",
+        "Text is 1-500 characters; voice and media are rejected in this version.",
+        "The committed capture joins the feed and the next organize watermark like any other capture."
+      ]
+    },
+    "queue_admission_exchange": {
+      "t039_rows": [
+        "T-F10"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/queue_admission_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-organization-owner:1#/$defs/queue_admission_exchange_response",
+      "rules": [
+        "Admission applies the frozen owner rule and freezes the schedule in the same transaction.",
+        "already_satisfied is a committed idempotent outcome, not an error.",
+        "waiting and blocked reasons are the frozen closed set; admission never releases and never auto-sends."
+      ]
+    }
+  },
+  "schemas": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:nurture:teacher-organization-owner:1",
+    "$defs": {
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 512
+      },
+      "local_date": {
+        "type": "string",
+        "format": "date"
+      },
+      "instant": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "source_head": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "command_request_id": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.teacher-organization-owner"
+          },
+          "version": {
+            "const": "1.0.0"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "scope_kind": {
+            "const": "care_group"
+          },
+          "scope_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "interface_key": {
+            "const": "nurture.teacher-organization-owner"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "operation": {
+            "enum": [
+              "feed_query",
+              "organization_query"
+            ]
+          },
+          "query_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolved_at",
+          "source"
+        ],
+        "properties": {
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "source": {
+            "const": "current_owner_read"
+          }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "reason_code",
+          "purge_partition",
+          "content_masked"
+        ],
+        "properties": {
+          "kind": {
+            "const": "mask"
+          },
+          "reason_code": {
+            "enum": [
+              "access_changed",
+              "context_changed",
+              "refresh_not_retryable"
+            ]
+          },
+          "purge_partition": {
+            "const": true
+          },
+          "content_masked": {
+            "const": true
+          }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "masked_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "mask_signal": {
+            "$ref": "#/$defs/mask_signal"
+          }
+        }
+      },
+      "unavailable_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "failed_at",
+          "reason_code",
+          "retryable"
+        ],
+        "properties": {
+          "status": {
+            "const": "unavailable"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "failed_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "reason_code": {
+            "enum": [
+              "content_unavailable",
+              "temporarily_unavailable",
+              "request_invalid"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "executed_kind": {
+        "enum": [
+          "executed",
+          "replayed"
+        ]
+      },
+      "outcome_unknown_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "outcome_unknown"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "recovery": {
+            "const": "reconcile_same_command"
+          }
+        }
+      },
+      "identity_request": {
+        "type": "object",
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "feed_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "feed_capture": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "media"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "text_excerpt": false
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "stability": {
+                  "const": "processing"
+                }
+              },
+              "required": [
+                "stability"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "text_excerpt": false
+              }
+            }
+          }
+        ],
+        "required": [
+          "capture_ref",
+          "kind",
+          "occurred_at",
+          "stability",
+          "failure",
+          "has_media"
+        ],
+        "properties": {
+          "capture_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "enum": [
+              "text",
+              "voice_transcript",
+              "media"
+            ]
+          },
+          "occurred_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "stability": {
+            "enum": [
+              "stable",
+              "processing"
+            ]
+          },
+          "failure": {
+            "enum": [
+              "none",
+              "upload_failed",
+              "processing_failed"
+            ]
+          },
+          "has_media": {
+            "type": "boolean"
+          },
+          "text_excerpt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      },
+      "feed_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "batch_state",
+          "captures"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "batch_state": {
+            "enum": [
+              "collecting",
+              "cut",
+              "organized",
+              "none"
+            ]
+          },
+          "captures": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/$defs/feed_capture"
+            }
+          }
+        }
+      },
+      "feed_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/feed_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "organization_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "trigger_preview": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "availability": {
+                  "const": "available"
+                }
+              },
+              "required": [
+                "availability"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "reason_code": false
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "availability": {
+                  "enum": [
+                    "waiting",
+                    "unavailable"
+                  ]
+                }
+              },
+              "required": [
+                "availability"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "availability",
+                "reason_code"
+              ],
+              "properties": {
+                "availability": true,
+                "reason_code": true
+              }
+            }
+          }
+        ],
+        "required": [
+          "availability"
+        ],
+        "properties": {
+          "availability": {
+            "enum": [
+              "available",
+              "waiting",
+              "unavailable"
+            ]
+          },
+          "reason_code": {
+            "enum": [
+              "automatic_disabled",
+              "batch_not_collecting",
+              "empty_stable_batch",
+              "idle_not_reached",
+              "fallback_not_due",
+              "quiescence_gate",
+              "policy_unavailable"
+            ]
+          }
+        }
+      },
+      "admission_preview": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "ready",
+                    "already_satisfied"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "reason_code": false
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "waiting",
+                    "blocked"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "status",
+                "reason_code"
+              ],
+              "properties": {
+                "status": true,
+                "reason_code": true
+              }
+            }
+          }
+        ],
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "ready",
+              "already_satisfied",
+              "waiting",
+              "blocked"
+            ]
+          },
+          "reason_code": {
+            "$ref": "#/$defs/admission_reason"
+          }
+        }
+      },
+      "admission_reason": {
+        "enum": [
+          "quick_adjust_active",
+          "edit_hold_active",
+          "target_unavailable",
+          "needs_review",
+          "process_not_draft",
+          "unsaved_revision",
+          "authorizing_role_lapsed",
+          "publication_policy_unavailable"
+        ]
+      },
+      "lane_card": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "process_ref",
+          "origin",
+          "data_class",
+          "purpose_key",
+          "state",
+          "recipients",
+          "admission_preview"
+        ],
+        "properties": {
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "origin": {
+            "enum": [
+              "agent_organized",
+              "manual"
+            ]
+          },
+          "data_class": {
+            "enum": [
+              "daily_care_log",
+              "care_day_note",
+              "care_constraint_update",
+              "family_care_question",
+              "family_follow_up_request",
+              "direct_care_communication",
+              "child_growth_record"
+            ]
+          },
+          "purpose_key": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "state": {
+            "enum": [
+              "draft",
+              "needs_review",
+              "pending_release"
+            ]
+          },
+          "recipients": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "count",
+              "safe_labels"
+            ],
+            "properties": {
+              "count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "safe_labels": {
+                "type": "array",
+                "minItems": 0,
+                "maxItems": 6,
+                "items": {
+                  "$ref": "#/$defs/non_empty_string"
+                }
+              }
+            }
+          },
+          "quick_adjust_until": {
+            "$ref": "#/$defs/instant"
+          },
+          "edit_hold_until": {
+            "$ref": "#/$defs/instant"
+          },
+          "scheduled_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "admission_preview": {
+            "$ref": "#/$defs/admission_preview"
+          }
+        }
+      },
+      "organization_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "batch",
+          "lane"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "batch": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "state",
+              "capture_count",
+              "stable_capture_count",
+              "watermark_sequence",
+              "trigger"
+            ],
+            "properties": {
+              "batch_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "state": {
+                "enum": [
+                  "collecting",
+                  "cut",
+                  "organized",
+                  "none"
+                ]
+              },
+              "capture_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "stable_capture_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              },
+              "watermark_sequence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "fallback_due_at": {
+                "$ref": "#/$defs/instant"
+              },
+              "trigger": {
+                "$ref": "#/$defs/trigger_preview"
+              }
+            }
+          },
+          "lane": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 30,
+            "items": {
+              "$ref": "#/$defs/lane_card"
+            }
+          }
+        }
+      },
+      "organization_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/organization_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "organize_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "command_request_id",
+          "trigger"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "trigger": {
+            "const": "manual"
+          }
+        }
+      },
+      "organize_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "outcome": {
+                  "const": "organized"
+                }
+              },
+              "required": [
+                "outcome"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "outcome",
+                "process_ref"
+              ],
+              "properties": {
+                "outcome": true,
+                "process_ref": true
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "outcome": {
+                  "enum": [
+                    "nothing_to_organize",
+                    "needs_review",
+                    "direct_interaction_required"
+                  ]
+                }
+              },
+              "required": [
+                "outcome"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "process_ref": false
+              }
+            }
+          }
+        ],
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "outcome",
+          "batch_ref",
+          "watermark_sequence",
+          "included_capture_count",
+          "deferred_capture_count"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "outcome": {
+            "enum": [
+              "organized",
+              "nothing_to_organize",
+              "needs_review",
+              "direct_interaction_required"
+            ]
+          },
+          "batch_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "watermark_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "included_capture_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "deferred_capture_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "organize_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "batch_head_moved",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "organize_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/organize_committed"
+          },
+          {
+            "$ref": "#/$defs/organize_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "supplement_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "prepare"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "kind",
+                "prepare"
+              ],
+              "properties": {
+                "confirm": false,
+                "kind": true,
+                "prepare": true
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "confirm"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "kind",
+                "confirm"
+              ],
+              "properties": {
+                "prepare": false,
+                "kind": true,
+                "confirm": true
+              }
+            }
+          }
+        ],
+        "required": [
+          "class_ref",
+          "child_ref",
+          "command_request_id",
+          "kind"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "kind": {
+            "enum": [
+              "prepare",
+              "confirm"
+            ]
+          },
+          "prepare": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "local_date",
+              "care_kind",
+              "text"
+            ],
+            "properties": {
+              "local_date": {
+                "$ref": "#/$defs/local_date"
+              },
+              "care_kind": {
+                "enum": [
+                  "meal",
+                  "nap",
+                  "mood",
+                  "activity",
+                  "health_observation"
+                ]
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          },
+          "confirm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "confirmation_ref",
+              "prepared_preview_digest"
+            ],
+            "properties": {
+              "confirmation_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "prepared_preview_digest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      },
+      "supplement_ready_to_confirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "confirmation_ref",
+          "prepared_preview_digest",
+          "expires_at"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready_to_confirm"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "confirmation_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "prepared_preview_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "supplement_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "log_ref",
+          "source_head"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "log_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "source_head": {
+            "$ref": "#/$defs/source_head"
+          }
+        }
+      },
+      "supplement_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "confirmation_expired",
+              "confirmation_consumed",
+              "confirmation_foreign",
+              "preview_digest_mismatch",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "supplement_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/supplement_ready_to_confirm"
+          },
+          {
+            "$ref": "#/$defs/supplement_committed"
+          },
+          {
+            "$ref": "#/$defs/supplement_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "class_note_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "command_request_id",
+          "text"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        }
+      },
+      "class_note_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "capture_ref"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "capture_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "class_note_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "batch_unavailable",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "class_note_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/class_note_committed"
+          },
+          {
+            "$ref": "#/$defs/class_note_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "queue_admission_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "process_ref",
+          "command_request_id"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          }
+        }
+      },
+      "queue_admission_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "disposition",
+          "process_ref",
+          "scheduled_at",
+          "schedule_policy_ref",
+          "schedule_policy_head"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "disposition": {
+            "enum": [
+              "queued",
+              "already_satisfied"
+            ]
+          },
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scheduled_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "not_after": {
+            "$ref": "#/$defs/instant"
+          },
+          "schedule_policy_ref": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "schedule_policy_head": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "queue_admission_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/admission_reason"
+              },
+              {
+                "enum": [
+                  "command_actor_mismatch",
+                  "command_payload_conflict"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "queue_admission_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/queue_admission_committed"
+          },
+          {
+            "$ref": "#/$defs/queue_admission_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      }
+    }
+  }
+}

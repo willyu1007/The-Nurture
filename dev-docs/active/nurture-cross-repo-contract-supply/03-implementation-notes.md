@@ -1,5 +1,38 @@
 # Implementation notes
 
+## 2026-08-14 — W7-1 teacher organization-owner contract artifact
+
+- Published the W7 contract package at
+  `packages/nurture-scenario/contracts/teacher-organization-owner/v1/`:
+  owner-contract JSON with six operations (feed, organization, organize,
+  supplement, class-note, queue-admission), 17 conformance fixtures + 14
+  executed invalid probes + the 18-scenario negative census, hard-pinned
+  `validate-contract.mjs` and README. Digest
+  `sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161`
+  is minted with the shared RFC 8785 canonicalizer and asserted in the
+  validator, the TS interface constant and every fixture.
+- First write-path contract: the validator additionally checks exchange
+  invariants — command identity echo, supplement prepare/confirm status
+  pairing, admission answering only the requested `process_ref`, at most one
+  active quick-adjust window per lane, and per-batch coverage of `masked`,
+  `unavailable`, `outcome_unknown` and `executed: replayed` fixtures.
+- Ajv strict-mode composition lessons (recorded for W8+): a `$ref` with
+  sibling `required`/`properties` needs an explicit `type: "object"`
+  (strictTypes), and every `required` name must also appear in the same
+  subschema's `properties` (strictRequired) — satisfied by inert
+  `<name>: true` placeholders in if/then branches whose real definitions
+  live on the parent, and by not re-listing the identity fields already
+  required inside `identity_request`. Three digest re-mints during
+  stabilization; only the final digest is published.
+- Added `src/teacher-organization-owner-contract.ts` (six paths + frozen
+  interface + descriptor, `mobile_mode: "read_and_command"`), exported from
+  the package index, and chained
+  `verify:teacher-organization-owner-contract` into
+  `verify:formal-ingress-contract`.
+- Runtime routes, gate flag and e2e lanes are W7-2; real Prisma ports and DB
+  lanes are W7-3. The ingress census is intentionally untouched and still
+  reports the pre-W7 route population.
+
 ## 2026-08-14 — x5 joint repair round two: full lane green (37/37)
 
 - t010 authorization suite (5): completed the b514b68 clock alignment — the
