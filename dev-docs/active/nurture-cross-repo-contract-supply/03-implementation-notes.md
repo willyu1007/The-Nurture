@@ -1,5 +1,23 @@
 # Implementation notes
 
+## 2026-08-14 — W8 communication-owner scope freeze
+
+- Froze `nurture.teacher-communication-owner@1.0.0`
+  (`artifacts/w8-communication-owner-scope-freeze.md`): six operations —
+  targets rail (with the frozen-unavailable `class_group` entry and the
+  T-S04 unread summary), display-safe membership, cursored timeline with
+  cursor echo, the W3 prepare/confirm `send_text_exchange` re-run for the
+  teacher actor (outward business effect, so the W7 class-internal
+  exemption does not apply), single-step staged withdrawal over
+  `cancelPublishProcess`, and a single-step own-cursor `mark_read_exchange`
+  (reads never write, so badges need an explicit clear).
+- Design decisions recorded in the freeze: unread derives from the
+  teacher's own thread-participant cursor without fabricating rows on
+  read; media appears in timelines as presence descriptors only (W9 owns
+  bytes/access); sent-message withdrawal is a different lifecycle and
+  stays out; T-C05 closes over the W7 organization read plus this batch's
+  withdraw (no new DTO); T-C08 stays blocked on I-Q1.
+
 ## 2026-08-14 — W7-4 teacher organization-owner registration closes
 
 - Registered the W7 conformance fixtures in the service-candidate
