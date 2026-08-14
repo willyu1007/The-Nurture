@@ -17,7 +17,7 @@ point follow the append-only correction convention.
 - Base interface (declared, never re-published):
   `nurture.parent-communication-owner@1.0.0` at digest
   `sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f`
-- Artifact home: `contracts/parent-communication-owner/v1.1/` — a separate
+- Artifact home: `contracts/parent-communication-owner/v1-1/` — a separate
   digest input; the v1 directory stays byte-identical
 - Surface baseline: `nurture.surface-contract@1.20.0`, relationship
   `standalone_composition_no_surface_mutation`

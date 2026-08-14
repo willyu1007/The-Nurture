@@ -1,0 +1,589 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.parent-communication-owner",
+    "version": "1.1.0",
+    "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+  },
+  "base_interface_contract": {
+    "key": "nurture.parent-communication-owner",
+    "version": "1.0.0",
+    "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f"
+  },
+  "required_negative_scenarios": [
+    "guardian_only_author_redaction",
+    "teacher_authored_message_masked",
+    "stale_context_ref",
+    "cross_scope_message_ref",
+    "disabled_gate",
+    "service_auth_missing",
+    "forbidden_request_field",
+    "hidden_payload_rejected",
+    "confirmation_foreign_refused",
+    "confirmation_expired_refused",
+    "preview_digest_mismatch_refused",
+    "already_redacted_answers_already_satisfied",
+    "cross_actor_replay_denied",
+    "divergent_command_payload_conflict",
+    "outcome_unknown_same_command_recovery",
+    "receipt_identity_never_exposed"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "w11-redaction-preview-ready",
+      "operation": "redaction_preview_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-preview-01",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:question-0001",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0001"
+      },
+      "response": {
+        "status": "ready_to_confirm",
+        "command_request_id": "command-w11-redact-0001",
+        "confirmation_ref": "confirmation:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "prepared_preview_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "expires_at": "2026-08-14T09:05:00.000Z",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "preview": {
+          "message_ref": "message:ref:question-0001",
+          "cascade_scope": "source_question",
+          "affected_reply_count": 2,
+          "derived_record_present": true,
+          "effect": "redact_family_care_message_irreversibly"
+        },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.1.0",
+          "contract_digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5,
+          "operation": "redaction_preview_query",
+          "presentation_version": "presentation:v5:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-redaction-preview-ready-reply",
+      "operation": "redaction_preview_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-preview-02",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:reply-0002",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0002"
+      },
+      "response": {
+        "status": "ready_to_confirm",
+        "command_request_id": "command-w11-redact-0002",
+        "confirmation_ref": "confirmation:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "prepared_preview_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "expires_at": "2026-08-14T09:05:00.000Z",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "preview": {
+          "message_ref": "message:ref:reply-0002",
+          "cascade_scope": "reply_local",
+          "affected_reply_count": 0,
+          "derived_record_present": false,
+          "effect": "redact_family_care_message_irreversibly"
+        },
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.1.0",
+          "contract_digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5,
+          "operation": "redaction_preview_query",
+          "presentation_version": "presentation:v5:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-redact-committed-applied",
+      "operation": "redact_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-redact-01",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:question-0001",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0001",
+        "confirmation_ref": "confirmation:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "prepared_preview_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "response": {
+        "status": "committed",
+        "execution_disposition": "executed",
+        "disposition": "applied",
+        "command_request_id": "command-w11-redact-0001",
+        "message_ref": "message:ref:question-0001",
+        "redacted_at": "2026-08-14T09:01:30.000Z",
+        "cascade": {
+          "scope": "source_question",
+          "affected_count": 3
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-redact-replayed",
+      "operation": "redact_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-redact-02",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:question-0001",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0001",
+        "confirmation_ref": "confirmation:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "prepared_preview_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "response": {
+        "status": "committed",
+        "execution_disposition": "replayed",
+        "disposition": "applied",
+        "command_request_id": "command-w11-redact-0001",
+        "message_ref": "message:ref:question-0001",
+        "redacted_at": "2026-08-14T09:01:30.000Z",
+        "cascade": {
+          "scope": "source_question",
+          "affected_count": 3
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-redact-already-satisfied",
+      "operation": "redact_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-redact-03",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:question-0001",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0009",
+        "confirmation_ref": "confirmation:cccccccccccccccccccccccccccccccccccccccc",
+        "prepared_preview_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      "response": {
+        "status": "committed",
+        "execution_disposition": "executed",
+        "disposition": "already_satisfied",
+        "command_request_id": "command-w11-redact-0009",
+        "message_ref": "message:ref:question-0001"
+      }
+    },
+    {
+      "fixture_id": "w11-redact-not-committed-stale",
+      "operation": "redact_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-redact-04",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:reply-0002",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0004",
+        "confirmation_ref": "confirmation:dddddddddddddddddddddddddddddddddddddddd",
+        "prepared_preview_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      "response": {
+        "status": "not_committed",
+        "command_request_id": "command-w11-redact-0004",
+        "reason_code": "stale_confirmation",
+        "recovery": "re_prepare"
+      }
+    },
+    {
+      "fixture_id": "w11-redact-outcome-unknown",
+      "operation": "redact_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-redact-05",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:reply-0002",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0005",
+        "confirmation_ref": "confirmation:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "prepared_preview_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      "response": {
+        "status": "outcome_unknown",
+        "command_request_id": "command-w11-redact-0005",
+        "reason_code": "redact_outcome_unknown",
+        "recovery": "reconcile_same_command"
+      }
+    },
+    {
+      "fixture_id": "w11-delivery-receipt-ready-read",
+      "operation": "delivery_receipt_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-receipt-01",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:question-0001"
+      },
+      "response": {
+        "status": "ready",
+        "message_ref": "message:ref:question-0001",
+        "delivery": {
+          "delivery_state": "read",
+          "advanced_at": "2026-08-14T08:59:00.000Z"
+        },
+        "presentation_version": "presentation:v5:2026-08-14",
+        "refreshed_at": "2026-08-14T09:00:01.000Z",
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.1.0",
+          "contract_digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5,
+          "operation": "delivery_receipt_query",
+          "presentation_version": "presentation:v5:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-delivery-receipt-ready-sent",
+      "operation": "delivery_receipt_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-receipt-02",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:reply-0002"
+      },
+      "response": {
+        "status": "ready",
+        "message_ref": "message:ref:reply-0002",
+        "delivery": {
+          "delivery_state": "sent"
+        },
+        "presentation_version": "presentation:v5:2026-08-14",
+        "refreshed_at": "2026-08-14T09:00:01.000Z",
+        "owner_resolution": {
+          "presentation_role": "parent",
+          "scope_kind": "parent_communication",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5
+        },
+        "cache_partition": {
+          "interface_key": "nurture.parent-communication-owner",
+          "interface_version": "1.1.0",
+          "contract_digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1",
+          "workspace_id": "workspace-parent-01",
+          "my_chat_user_id": "user-parent-01",
+          "context_ref": "context:parent:mingming:v5",
+          "resolution_ref": "resolution:parent:mingming:v5",
+          "scope_version": 5,
+          "operation": "delivery_receipt_query",
+          "presentation_version": "presentation:v5:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-masked-foreign-message",
+      "operation": "redaction_preview_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-preview-03",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:teacher-0009",
+        "presentation_version": "presentation:v5:2026-08-14",
+        "command_request_id": "command-w11-redact-0006"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:parent:mingming:v5",
+        "masked_at": "2026-08-14T09:00:01.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "actions_disabled": true,
+          "media_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w11-unavailable-temporarily",
+      "operation": "delivery_receipt_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.parent-communication-owner",
+          "version": "1.1.0",
+          "digest": "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1"
+        },
+        "workspace_id": "workspace-parent-01",
+        "my_chat_user_id": "user-parent-01",
+        "host_request_id": "request-receipt-03",
+        "context_ref": "context:parent:mingming:v5",
+        "message_ref": "message:ref:question-0001"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:parent:mingming:v5",
+        "failed_at": "2026-08-14T09:00:01.000Z",
+        "reason_code": "temporarily_unavailable",
+        "retryable": true
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w11-invalid-request-digest-malformed",
+      "operation": "redaction_preview_query",
+      "source_fixture_id": "w11-redaction-preview-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "interface_contract",
+          "digest"
+        ],
+        "value": "sha256:not-a-hex-digest"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-request-authority-claim",
+      "operation": "delivery_receipt_query",
+      "source_fixture_id": "w11-delivery-receipt-ready-read",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "participant_id"
+        ],
+        "value": "participant-raw-01"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-request-missing-presentation",
+      "operation": "redaction_preview_query",
+      "source_fixture_id": "w11-redaction-preview-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "presentation_version"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-request-short-confirmation",
+      "operation": "redact_exchange",
+      "source_fixture_id": "w11-redact-committed-applied",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "confirmation_ref"
+        ],
+        "value": "short"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-effect-open",
+      "operation": "redaction_preview_query",
+      "source_fixture_id": "w11-redaction-preview-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "preview",
+          "effect"
+        ],
+        "value": "delete_message"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-reply-count-over-cap",
+      "operation": "redaction_preview_query",
+      "source_fixture_id": "w11-redaction-preview-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "preview",
+          "affected_reply_count"
+        ],
+        "value": 100
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-disposition-open",
+      "operation": "redact_exchange",
+      "source_fixture_id": "w11-redact-committed-applied",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "disposition"
+        ],
+        "value": "duplicated"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-applied-without-instant",
+      "operation": "redact_exchange",
+      "source_fixture_id": "w11-redact-committed-applied",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "redacted_at"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-reason-open",
+      "operation": "redact_exchange",
+      "source_fixture_id": "w11-redact-not-committed-stale",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "reason_code"
+        ],
+        "value": "mystery_reason"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-delivery-state-open",
+      "operation": "delivery_receipt_query",
+      "source_fixture_id": "w11-delivery-receipt-ready-read",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "delivery",
+          "delivery_state"
+        ],
+        "value": "bounced"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-advanced-at-malformed",
+      "operation": "delivery_receipt_query",
+      "source_fixture_id": "w11-delivery-receipt-ready-read",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "delivery",
+          "advanced_at"
+        ],
+        "value": "yesterday"
+      }
+    },
+    {
+      "fixture_id": "w11-invalid-response-cache-operation-open",
+      "operation": "delivery_receipt_query",
+      "source_fixture_id": "w11-delivery-receipt-ready-read",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "cache_partition",
+          "operation"
+        ],
+        "value": "redact_exchange"
+      }
+    }
+  ]
+}

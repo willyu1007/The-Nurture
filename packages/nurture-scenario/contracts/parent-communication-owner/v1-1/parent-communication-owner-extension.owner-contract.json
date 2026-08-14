@@ -1,0 +1,815 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.parent-communication-owner",
+    "version": "1.1.0",
+    "kind": "private_owner_query_and_command"
+  },
+  "base_interface": {
+    "key": "nurture.parent-communication-owner",
+    "version": "1.0.0",
+    "digest": "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+    "relationship": "additive_extension_no_base_mutation"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "digest": "sha256:35d6340f60aa2d81523b0c8af977c8c5bb8f01a05a84d1a73b5baffbe8654273",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "capability_dependencies": [
+    {
+      "key": "redact_family_care_message",
+      "version": "1.0.0",
+      "use": "author-actor redaction command, referenced not re-declared"
+    }
+  ],
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only",
+    "base_contract": "frozen_1_0_0_untouched"
+  },
+  "privacy_and_minimization": {
+    "rules": [
+      "The redaction preview is a typed impact summary only: bounded counts and a boolean, never message bodies, reply bodies or derived-record content.",
+      "Redaction is irreversible, author-actor only, and always audited through the frozen G4-C cascade; nothing here deletes rows.",
+      "The delivery answer is one aggregate state per message under the frozen v1 mapping; recipient identities, receipt ids and per-recipient counts never leave the owner.",
+      "Requests never carry participant, family, enrollment or receipt identifiers; the guardian is resolved from current authority on every operation."
+    ]
+  },
+  "command_semantics": {
+    "idempotency": "The exchange binds an actor-scoped identity (workspace + current participant + command_request_id); another authorized actor replaying the same command_request_id is denied, never served the first actor's result.",
+    "confirmation": "Two-step: redaction_preview_query issues the confirmation for the exact message head; redact_exchange consumes it once, compares the prepared preview digest, and refuses drift as stale_confirmation (re-prepare).",
+    "replay": "An exact same-command replay returns the recorded result with execution_disposition: replayed and mutates nothing.",
+    "already_satisfied": "A new command against an already-redacted message answers committed with disposition already_satisfied per the frozen G4-C spec — never a refusal.",
+    "outcome_unknown": "Recovery is exact same-command replay; a new command is never the recovery path."
+  },
+  "safe_reason_codes": [
+    "parent_communication_extension_disabled",
+    "invalid_parent_communication_extension_request",
+    "parent_communication_extension_contract_mismatch"
+  ],
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "redaction_preview_query": "/internal/nurture/parent-communication-owner/v1.1/redaction-preview",
+      "redact_exchange": "/internal/nurture/parent-communication-owner/v1.1/redact",
+      "delivery_receipt_query": "/internal/nurture/parent-communication-owner/v1.1/delivery-receipts"
+    }
+  },
+  "operation_order": [
+    "redaction_preview_query",
+    "redact_exchange",
+    "delivery_receipt_query"
+  ],
+  "operations": {
+    "redaction_preview_query": {
+      "path": "/internal/nurture/parent-communication-owner/v1.1/redaction-preview",
+      "t039_rows": [
+        "P-H05"
+      ],
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1.1#/$defs/redaction_preview_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1.1#/$defs/redaction_preview_response"
+    },
+    "redact_exchange": {
+      "path": "/internal/nurture/parent-communication-owner/v1.1/redact",
+      "t039_rows": [
+        "P-H05"
+      ],
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1.1#/$defs/redact_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1.1#/$defs/redact_response"
+    },
+    "delivery_receipt_query": {
+      "path": "/internal/nurture/parent-communication-owner/v1.1/delivery-receipts",
+      "t039_rows": [
+        "P-H06"
+      ],
+      "request_schema_ref": "urn:nurture:parent-communication-owner:1.1#/$defs/delivery_receipt_request",
+      "response_schema_ref": "urn:nurture:parent-communication-owner:1.1#/$defs/delivery_receipt_response"
+    }
+  },
+  "contract_schema": {
+    "$id": "urn:nurture:parent-communication-owner:1.1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.parent-communication-owner"
+          },
+          "version": {
+            "const": "1.1.0"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "presentation_role",
+          "scope_kind",
+          "context_ref",
+          "resolution_ref",
+          "scope_version"
+        ],
+        "properties": {
+          "presentation_role": {
+            "const": "parent"
+          },
+          "scope_kind": {
+            "const": "parent_communication"
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "resolution_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "presentation_version",
+          "expires_at"
+        ],
+        "properties": {
+          "interface_key": {
+            "const": "nurture.parent-communication-owner"
+          },
+          "interface_version": {
+            "const": "1.1.0"
+          },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "my_chat_user_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "resolution_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "operation": {
+            "enum": [
+              "redaction_preview_query",
+              "delivery_receipt_query"
+            ]
+          },
+          "presentation_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "masked": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "masked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mask_signal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "reason_code",
+              "purge_partition",
+              "content_masked",
+              "actions_disabled",
+              "media_access_invalidated"
+            ],
+            "properties": {
+              "kind": {
+                "const": "mask"
+              },
+              "reason_code": {
+                "enum": [
+                  "access_changed",
+                  "context_changed",
+                  "ambiguous_context",
+                  "protected_display_denied"
+                ]
+              },
+              "purge_partition": {
+                "const": true
+              },
+              "content_masked": {
+                "const": true
+              },
+              "actions_disabled": {
+                "const": true
+              },
+              "media_access_invalidated": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "unavailable": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "failed_at",
+          "reason_code",
+          "retryable"
+        ],
+        "properties": {
+          "status": {
+            "const": "unavailable"
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "failed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason_code": {
+            "enum": [
+              "content_unavailable",
+              "temporarily_unavailable"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "redaction_preview_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "message_ref",
+          "presentation_version",
+          "command_request_id"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "my_chat_user_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "host_request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "message_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "presentation_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "command_request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+          }
+        }
+      },
+      "redaction_preview_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "command_request_id",
+          "confirmation_ref",
+          "prepared_preview_digest",
+          "expires_at",
+          "presentation_version",
+          "preview",
+          "owner_resolution",
+          "cache_partition"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready_to_confirm"
+          },
+          "command_request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+          },
+          "confirmation_ref": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 256
+          },
+          "prepared_preview_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "presentation_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "preview": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "message_ref",
+              "cascade_scope",
+              "affected_reply_count",
+              "derived_record_present",
+              "effect"
+            ],
+            "properties": {
+              "message_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "cascade_scope": {
+                "enum": [
+                  "source_question",
+                  "reply_local"
+                ]
+              },
+              "affected_reply_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 99
+              },
+              "derived_record_present": {
+                "type": "boolean"
+              },
+              "effect": {
+                "const": "redact_family_care_message_irreversibly"
+              }
+            }
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          }
+        }
+      },
+      "redaction_preview_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/redaction_preview_ready"
+          },
+          {
+            "$ref": "#/$defs/masked"
+          },
+          {
+            "$ref": "#/$defs/unavailable"
+          }
+        ]
+      },
+      "redact_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "message_ref",
+          "presentation_version",
+          "command_request_id",
+          "confirmation_ref",
+          "prepared_preview_digest"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "my_chat_user_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "host_request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "message_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "presentation_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "command_request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+          },
+          "confirmation_ref": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 256
+          },
+          "prepared_preview_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "redact_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "disposition": {
+                  "const": "applied"
+                }
+              },
+              "required": [
+                "disposition"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "redacted_at",
+                "cascade"
+              ],
+              "properties": {
+                "redacted_at": true,
+                "cascade": true
+              }
+            }
+          }
+        ],
+        "required": [
+          "status",
+          "execution_disposition",
+          "disposition",
+          "command_request_id",
+          "message_ref"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "execution_disposition": {
+            "enum": [
+              "executed",
+              "replayed"
+            ]
+          },
+          "disposition": {
+            "enum": [
+              "applied",
+              "already_satisfied"
+            ]
+          },
+          "command_request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+          },
+          "message_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "redacted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cascade": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scope",
+              "affected_count"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "source_question",
+                  "reply_local"
+                ]
+              },
+              "affected_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 99
+              }
+            }
+          }
+        }
+      },
+      "redact_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "command_request_id",
+          "reason_code",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "command_request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+          },
+          "reason_code": {
+            "enum": [
+              "stale_confirmation",
+              "confirmation_expired",
+              "confirmation_foreign",
+              "preview_digest_mismatch",
+              "redaction_evidence_unavailable",
+              "command_payload_conflict"
+            ]
+          },
+          "recovery": {
+            "enum": [
+              "re_prepare",
+              "new_command",
+              "none"
+            ]
+          }
+        }
+      },
+      "redact_outcome_unknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "command_request_id",
+          "reason_code",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "outcome_unknown"
+          },
+          "command_request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+          },
+          "reason_code": {
+            "const": "redact_outcome_unknown"
+          },
+          "recovery": {
+            "const": "reconcile_same_command"
+          }
+        }
+      },
+      "redact_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/redact_committed"
+          },
+          {
+            "$ref": "#/$defs/redact_not_committed"
+          },
+          {
+            "$ref": "#/$defs/redact_outcome_unknown"
+          },
+          {
+            "$ref": "#/$defs/masked"
+          },
+          {
+            "$ref": "#/$defs/unavailable"
+          }
+        ]
+      },
+      "delivery_receipt_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "message_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "my_chat_user_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "host_request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "context_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "message_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        }
+      },
+      "delivery_receipt_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "message_ref",
+          "delivery",
+          "presentation_version",
+          "refreshed_at",
+          "owner_resolution",
+          "cache_partition"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "message_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "delivery": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "delivery_state"
+            ],
+            "properties": {
+              "delivery_state": {
+                "enum": [
+                  "sent",
+                  "delivered",
+                  "read",
+                  "not_applicable"
+                ]
+              },
+              "advanced_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "presentation_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "refreshed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          }
+        }
+      },
+      "delivery_receipt_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/delivery_receipt_ready"
+          },
+          {
+            "$ref": "#/$defs/masked"
+          },
+          {
+            "$ref": "#/$defs/unavailable"
+          }
+        ]
+      }
+    }
+  }
+}

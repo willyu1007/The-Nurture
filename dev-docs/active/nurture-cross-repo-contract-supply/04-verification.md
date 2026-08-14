@@ -1,5 +1,22 @@
 # Verification
 
+## 2026-08-15 — W11-1 parent-communication extension contract artifact
+
+- `verify:parent-communication-extension-contract` green first run
+  (digest recompute, frozen-v1-unmoved recompute, base-pin censuses,
+  16-scenario negative census, 11 fixtures with v1-style envelope
+  bindings incl. reason→recovery pairing and
+  applied-vs-already_satisfied evidence rules, 12 invalid probes all
+  rejected); full `verify:formal-ingress-contract` chain green
+  (controller-routes still 49: extension routes mount with W11-2).
+- Root typecheck green; unit lane 1126 green. W10 CI closure confirmed:
+  Nurture `d12cca5` success (the pin reseal repaired the
+  `verify:workflow-contract-pin` break introduced at `732df20`), My-Chat
+  `3693e8f` success.
+
+Verdict: `W11_1_PUBLISHED / DIGEST_SHA256_D705146E / BASE_V1_PROVEN_FROZEN /
+RUNTIME_STILL_ABSENT_BY_DESIGN`.
+
 ## 2026-08-15 — W10-5 consumer adoption and cross-repo pin reseal
 
 - My-Chat `3693e8f` (T-039) adopts the W10 contract as a dormant strict

@@ -1,5 +1,27 @@
 # Implementation notes
 
+## 2026-08-15 — W11-1 parent-communication extension contract artifact
+
+- Published `contracts/parent-communication-owner/v1-1/`: the extension
+  owner-contract JSON (digest `sha256:d705146e…`), 11 fixtures + 12
+  executed invalid probes, the
+  Ajv-strict validator chained into `verify:formal-ingress-contract`,
+  README and the frozen TS constants
+  (`src/parent-communication-extension-contract.ts`, base pin included).
+- The artifact follows the v1 house style (contract_schema,
+  presentation-version envelope, v1 masked/unavailable shapes) and
+  declares `base_interface` with
+  `relationship: additive_extension_no_base_mutation`; the validator
+  recomputes the FROZEN v1 digest (`sha256:b1dce3a7…`) on every run, so a
+  byte moved in the v1 directory fails this gate.
+- Freeze correction (append-only): the frozen G4-C spec answers an
+  already-redacted message with committed `already_satisfied` (never a
+  refusal), so the reserved not-committed reason is
+  `redaction_evidence_unavailable` instead of the freeze's
+  `message_already_redacted`; reason→recovery pairing is enforced by the
+  validator (`re_prepare` for confirmation drift, `new_command` for
+  payload conflict, `none` for missing evidence).
+
 ## 2026-08-15 — W11 parent-communication extension scope freeze
 
 - Froze `nurture.parent-communication-owner@1.1.0`
