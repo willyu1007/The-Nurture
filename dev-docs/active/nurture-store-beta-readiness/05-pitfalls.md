@@ -117,3 +117,51 @@
 ## Resolved Pitfalls
 
 当前尚未进入 candidate qualification。实际问题解决后按 symptom、root cause、attempts、fix、prevention 记录。
+
+### 2026-08-14 — Candidate identity cannot contain its own commit
+
+- Symptom: a one-commit Freeze would require the Candidate source revision to
+  identify a commit that already contains the Candidate manifest, creating a
+  circular and non-reproducible identity.
+- Root cause: source revision is a Candidate-defining input while the generated
+  Candidate manifest is intentionally not one of its own identity inputs.
+- What was considered: one commit containing tooling and manifest, or treating
+  the pre-Freeze repository head as sufficient without committed tooling.
+- Fix: use two commits. The first commits and verifies deterministic tooling;
+  that full commit is built and frozen. The second commits only the immutable
+  Candidate/evidence and project records.
+- Prevention: every successor Candidate must first land a clean green source
+  revision, then build and mint the append-only identity from that exact commit.
+
+### 2026-08-14 — Generated context drift must close before minting
+
+- Symptom: strict context verification failed after the first tooling commit
+  because the registry held stale checksums for the workflow and environment
+  contracts.
+- Root cause: the source contracts were current, but their generated context
+  registry metadata had not been refreshed; that registry also participates in
+  three protected C30 lock profiles.
+- What was considered: minting from the otherwise green tooling commit, or
+  refreshing only the registry without rotating its dependent lock.
+- Fix: refresh the registry, rerun strict context verification, requalify and
+  reseal all affected C30 profiles, commit that closed source, then mint the
+  Candidate from the successor revision.
+- Prevention: strict context and every dependent owner-lock check must pass on
+  the exact clean source revision before a Candidate digest is allocated.
+
+### 2026-08-14 — Candidate digest must seal the complete frozen manifest
+
+- Symptom: the first review draft hashed the Candidate identity inputs but did
+  not hash frozen metadata such as `frozen_on`; its canonical key ordering also
+  depended on locale-sensitive comparison.
+- Root cause: identity composition and manifest tamper evidence had been treated
+  as the same boundary even though the committed record promises whole-file
+  immutability across build environments.
+- What was considered: retaining the narrower digest because schema constants
+  already constrain most metadata.
+- Fix: hash every manifest field except `candidate_digest`, use deterministic
+  code-unit ordering for keys and inventory paths, and add a metadata-tamper
+  negative test before minting the final Candidate.
+- Prevention: future Candidate schemas must define both identity composition and
+  whole-record integrity explicitly; locale-sensitive sort functions are not
+  allowed in digest-producing code.

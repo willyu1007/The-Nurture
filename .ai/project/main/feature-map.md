@@ -420,11 +420,15 @@ Project: `main`
   public API/Mobile composition, deployment and device evidence remain later
   gates. W2/W3/W4 shared inputs and final green source revisions are reconciled
   at My-Chat `4db80c9…`, Nurture W4 `6947185…`, exact-pin source
-  `a577cb2…` and C30 lock `329e2ab…`, without activation. G5-A
-  Candidate Freeze remains a separate authorization. Q3 live
-  qualification gates G5-D scoped internal-test enablement, not G5-A Freeze.
-  Candidate Freeze, durable apply, deployment,
-  activation and external traffic remain closed.
+  `a577cb2…` and C30 lock `329e2ab…`. The final context integrity repair
+  resealed the C30 source lock at `f536a6d…` without semantic or runtime
+  widening. Candidate digest hardening then landed at `e6aba37…`. G5-A froze
+  `nurture.service-candidate@1.0.0` / `sha256:c739f929…` from that source,
+  executable
+  `sha256:74bb40c7…`; it remains default-off,
+  undeployed and unqualified. G5-B is the next separately authorized serial
+  gate. Q3 live qualification gates G5-D scoped internal-test enablement.
+  Durable apply, deployment, activation and external traffic remain closed.
 
 ### F-004 Family growth material provider
 

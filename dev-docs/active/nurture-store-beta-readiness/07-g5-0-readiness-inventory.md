@@ -97,3 +97,10 @@ Ledger:
 
 No Candidate identity, no release-control runtime, no durable apply, no
 activation, no deployment, no traffic.
+
+Post-phase handoff: G5-A was separately authorized and completed on 2026-08-14
+at `nurture.service-candidate@1.0.0` /
+`sha256:c739f9291dbed99b8c96dd27be57e88429dfaeb9f2a8946395b9f58ba244debb`
+from source `e6aba3792c3aec9b1b282ca665125fb416fae6f8`.
+The boundary above remains the exact G5-0 phase boundary; the later Freeze did
+not retroactively add deployment, qualification, activation or traffic effects.

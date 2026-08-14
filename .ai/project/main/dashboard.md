@@ -9,8 +9,8 @@ Project: `main`
 ### Current Focus
 
 - Active tasks: T-002 (institution-mode owner gates, holding after C30), T-008
-  (G5-0 and final shared-input revision reconciliation complete; G5-A awaits
-  separate authorization) and T-011
+  (G5-0, final shared-input revision reconciliation and G5-A Candidate Freeze
+  complete; G5-B awaits separate authorization) and T-011
   (cross-repo contract supply and guardian-decision callback). T-007
   and T-010 are archived with their exact default-off exits retained.
   2026-08-13 owner decision: authorizations and quota budgets released for the
@@ -56,27 +56,25 @@ Project: `main`
   This supply line and
   the guardian-decision callback joint design (transport 1.0.0 has none;
   teacher queue stops at `pending`) are now owned by T-011; the callback
-  design must conclude before any T-008 G5-A Candidate Freeze.
-- Boundaries: Candidate Freeze, persistent deployment, activation and external
-  traffic remain unauthorized; every capability stays default-off.
+  design is frozen and satisfied the G5-A precondition, while implementation
+  remains optional-absent/default-off.
+- Boundaries: G5-A Candidate Freeze is complete; persistent deployment,
+  qualification, activation, internal-test enablement and external traffic remain
+  unauthorized, and every capability stays default-off.
 - Semantic detail: see `feature-map.md` F-002 through F-005 briefs.
 
 ### Next Governance Checkpoint
 
-1. **Pre-Freeze source facts are closed** at My-Chat
-   `4db80c91a15859b51b193110efa45acaf019deb5` and Nurture W4
-   `69471858c86d3f1e5612cb4e52bd6ed30504f8af`; the exact-pin source is
-   `a577cb21c1ec425f57232e262ced931401b9c03f` and the C30 lock commit is
-   `329e2ab258eeb0575f43919d3938b77a821b96b6`. Keep
-   provider and consumer flags false; W3.2 requires separate authorization;
-   use the W5-hardened settlement surface as the base for the separate W1
-   callback implementation batch (all default-off).
-2. **G5-A Candidate Freeze** stays strictly serial and separately
-   authorized; W1 frozen design and profile v1.0.0 satisfy its design
-   preconditions. Synthetic token, Q3 live qualification and dual-platform
-   devices belong to G5-D; Q3 live only gates scoped internal-test enablement.
-   **Continue T-002 only from C31** after a G5-A Freeze.
-   No result authorizes durable apply, activation, deployment or traffic.
+1. **G5-A is frozen** at `nurture.service-candidate@1.0.0` /
+   `sha256:c739f929…`, source `e6aba37…`, executable `sha256:74bb40c7…`.
+   Keep every provider/consumer/config gate false; the Candidate is undeployed
+   and unqualified.
+2. **G5-B Deployment Binding & Local Qualification** is the next serial gate
+   and requires separate authorization. G5-C may prepare in parallel but cannot
+   issue its final handoff before readback-verified Binding. Synthetic token,
+   Q3 live qualification and dual-platform devices remain G5-D inputs.
+   **Continue T-002 only from C31** under its own authorization. No result
+   authorizes durable apply, activation, deployment or traffic.
 
 ## Notes (manual)
 

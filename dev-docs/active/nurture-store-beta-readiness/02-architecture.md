@@ -14,6 +14,14 @@
 
 T-008 owns Service Candidate identifier/digest、canonical bundle composition、freeze、qualification 与 rollback。它消费 T-004 已发布的 interface contract identity；不会把 Candidate ID 反向写入普通业务请求或 Nurture authorization。
 
+The first frozen instance is `nurture.service-candidate@1.0.0` /
+`sha256:c739f9291dbed99b8c96dd27be57e88429dfaeb9f2a8946395b9f58ba244debb`.
+Its source is `e6aba3792c3aec9b1b282ca665125fb416fae6f8`; its exact Node ESM
+dist-set digest is
+`sha256:74bb40c765776799f5cdccc89933767726c73dd9314d9c63e019e9146e34742b`.
+The manifest is an immutable release/qualification input, not a container image,
+Deployment Binding, qualification result or activation authority.
+
 ## Stage G5 Dependency and Evidence Flow
 
 ```text

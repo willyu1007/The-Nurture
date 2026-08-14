@@ -443,6 +443,13 @@ Binding/profile/suite 的 Nurture local qualification、iOS internal real-device
   versioned evidence index。
 - 确认 capability gates default-off。
 
+Result 2026-08-14: `G5_A_CANDIDATE_FROZEN_DEFAULT_OFF` at
+`nurture.service-candidate@1.0.0` /
+`sha256:c739f9291dbed99b8c96dd27be57e88429dfaeb9f2a8946395b9f58ba244debb`.
+Source `e6aba3792c3aec9b1b282ca665125fb416fae6f8` and executable
+`sha256:74bb40c765776799f5cdccc89933767726c73dd9314d9c63e019e9146e34742b`
+are frozen; qualification, Binding, deployment and enablement remain unstarted.
+
 ## Phase 2 — Local Qualification
 
 - 运行 lint/type/unit/integration/DB/context checks。

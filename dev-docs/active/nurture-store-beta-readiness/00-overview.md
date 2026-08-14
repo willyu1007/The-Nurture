@@ -6,25 +6,18 @@
 - Task: T-008
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-14
-- Next step: G5-0 已完成（2026-08-13）：readiness inventory、drift
-  ledger 与 census 见
-  [`07-g5-0-readiness-inventory.md`](./07-g5-0-readiness-inventory.md)，
-  profile v1.0.0 已确认冻结（[`08-beta-profile-v1.md`](./08-beta-profile-v1.md)，
-  `CONFIRMED_G5_INPUT`，无必选集变更）。T-011 W1 已冻结，W2/W3.1/W4
-  已按 exact-pin/default-off 收口；W4 read-only director presenter 覆盖
-  D-O01..D-O14，且 D-O13 明确留在 Web workbench。G5-A 的设计与共享
-  source 前置全部满足。G5-A Freeze 仍是严格串行门，需要单独授权；
-  My-Chat 已完成会改变 Candidate shared inputs 的 W2 P0 consumer adoption；
-  W2 closing quality gate 已清除生成客户端漂移和旧 scope-draft 双轨，精确
-  revision pin 验证通过。Freeze 前最终绿色 source revisions 已记录为
-  My-Chat `4db80c91a15859b51b193110efa45acaf019deb5` 与 Nurture W4
-  `69471858c86d3f1e5612cb4e52bd6ed30504f8af`；T-002 exact-pin reseal
-  `a577cb21c1ec425f57232e262ced931401b9c03f` 及其 lock commit
-  `329e2ab258eeb0575f43919d3938b77a821b96b6` 已通过。下一步是单独授权 G5-A，
-  本轮不分配 Candidate identity。Synthetic token 与双平台真机
-  属于后续 G5-D operator package；Q3 live qualification 是 G5-D 内部测试
-  enablement 的前置，不是 G5-A Freeze 前置。不分配 Candidate identity、不实现
-  release-control runtime。
+- Next step: G5-A Service Candidate Freeze 已于 2026-08-14 完成。不可变
+  Candidate 为 `nurture.service-candidate@1.0.0` /
+  `sha256:c739f9291dbed99b8c96dd27be57e88429dfaeb9f2a8946395b9f58ba244debb`，
+  精确 source revision 为 `e6aba3792c3aec9b1b282ca665125fb416fae6f8`，
+  executable digest 为
+  `sha256:74bb40c765776799f5cdccc89933767726c73dd9314d9c63e019e9146e34742b`
+  （974 files）。Candidate 保持 capability-default-off、undeployed、unqualified；
+  未执行 schema/migration apply、部署、激活、internal-test enablement 或流量。
+  下一个串行门是需单独授权的 G5-B Deployment Binding & Local
+  Qualification；G5-C 只可按计划并行准备，其 final handoff 必须引用
+  G5-B readback-verified Binding。Synthetic token、Q3 live qualification 与双平台
+  真机仍留在 G5-D。
 
 ## Goal
 
@@ -88,7 +81,7 @@ D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建�
 
 ## Acceptance Criteria
 
-- [ ] 候选 revision、依赖 pins、manifest/API/presenter/fixture 版本唯一且不可变。
+- [x] 候选 revision、依赖 pins、manifest/API/presenter/fixture 版本唯一且不可变。
 - [ ] 六 surface 主旅程、权限负例、revoke/correction/replay 和 fail-closed 检查通过。
 - [ ] DB/migration 状态可重复验证，且没有未经授权的生产 apply。
 - [ ] interface handoff 使 My-Chat 无需导入 Nurture 代码、读取 ORM/DB 或下载 Candidate bundle 即可接入。
@@ -99,11 +92,9 @@ D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建�
 
 ## Next Step
 
-G5-0 已于 2026-08-13 完成：profile v1.0.0（`CONFIRMED_G5_INPUT`）取代 v0，
-inventory/census 收口于 `07-g5-0-readiness-inventory.md`。下一个门是
-G5-A Candidate Freeze——严格串行、需单独授权；My-Chat 对 W2/W3/W4 exact
-pin 的 dormant 采纳已完成，Freeze 前共享 source closure 已完成，最终绿色
-source revisions 已以上述精确值记录。下一步只进入单独授权的 G5-A。
-Synthetic token、Q3 live qualification 与双平台真机留在 G5-D operator/device
-窗口，其中 Q3 live 只前置内部测试 enablement。不提前分配 Candidate identity，
-不实现 release-control runtime。
+G5-A 已完成，精确 Candidate 身份与 Freeze evidence 见
+[`09-g5-a-candidate-freeze.md`](./09-g5-a-candidate-freeze.md)。下一个门是单独
+授权的 G5-B Deployment Binding & Local Qualification。在建立 observed
+Binding 之前，不执行部署、DB apply 或 internal-test enablement；G5-C final
+handoff 也不得冒充 Binding 已存在。Synthetic token、Q3 live qualification
+与双平台真机仍属于 G5-D operator/device 窗口。

@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "nurture_service_candidate_freeze_evidence_v1",
+  "evidence_ref": "nurture.service-candidate.freeze-evidence@1.0.0",
+  "evidence_digest": "sha256:2756e407ab1534afa3df107f50d2b8694c2638d7b86d292dbfd1cb09f48bdaf6",
+  "candidate_ref": "nurture.service-candidate@1.0.0",
+  "candidate_digest": "sha256:c739f9291dbed99b8c96dd27be57e88429dfaeb9f2a8946395b9f58ba244debb",
+  "source_revision": "e6aba3792c3aec9b1b282ca665125fb416fae6f8",
+  "recorded_on": "2026-08-14",
+  "result": "G5_A_CANDIDATE_FROZEN_DEFAULT_OFF",
+  "checks": [
+    {
+      "id": "candidate_tooling",
+      "command": "node --test scripts/service-candidate/candidate-core.test.mjs",
+      "result": "pass",
+      "summary": "7/7 canonical-digest, full-manifest integrity, inventory and fail-closed Candidate boundary tests passed."
+    },
+    {
+      "id": "source_typecheck",
+      "command": "pnpm typecheck",
+      "result": "pass",
+      "summary": "The full source typecheck passed."
+    },
+    {
+      "id": "source_unit",
+      "command": "pnpm test:unit",
+      "result": "pass",
+      "summary": "98 files and 1086 unit tests passed."
+    },
+    {
+      "id": "scenario_service",
+      "command": "pnpm test:scenario-service",
+      "result": "pass",
+      "summary": "17 files and 135 scenario-service tests passed."
+    },
+    {
+      "id": "executable_reproducibility",
+      "command": "pnpm build:scenario-service && node scripts/service-candidate/verify-service-candidate.mjs (twice)",
+      "result": "pass",
+      "summary": "Two clean builds reproduced 974 files at sha256:74bb40c765776799f5cdccc89933767726c73dd9314d9c63e019e9146e34742b."
+    },
+    {
+      "id": "data_shape",
+      "command": "pnpm exec prisma validate --schema prisma/schema.prisma && pnpm verify:persistence-boundaries",
+      "result": "pass",
+      "summary": "The canonical Prisma schema, 42-migration set and persistence boundaries passed without applying a database."
+    },
+    {
+      "id": "surface_and_ingress",
+      "command": "pnpm verify:surface-contract && pnpm verify:surface-contract-schemas && pnpm verify:formal-ingress-contract",
+      "result": "pass",
+      "summary": "The 1.20.0 contract, 65 capabilities, six surfaces, schemas and formal ingress are exact."
+    },
+    {
+      "id": "owner_pins",
+      "command": "pnpm verify:workflow-contract-pin && pnpm verify:c30-i3-upstream && pnpm verify:c30-i3-owner-adoption",
+      "result": "pass",
+      "summary": "Base, My-Chat, x5, wave4 and Nurture pins passed; the final C30 source lock is sha256:41ad50d4538aec97153d5c19fd42eacad0c758de209be79023a8ce513247b810."
+    },
+    {
+      "id": "context_and_governance",
+      "command": "pnpm lint && node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict && node .ai/scripts/ctl-project-state.mjs verify",
+      "result": "pass",
+      "summary": "Lint, strict context integrity and project-state validation passed after registry refresh and C30 source-lock reseal."
+    },
+    {
+      "id": "default_off",
+      "command": "pnpm verify:c30-i3-default-off",
+      "result": "pass",
+      "summary": "All Candidate boolean gates are false and C30 production action/protected/activation counts remain zero."
+    },
+    {
+      "id": "test_routing",
+      "command": "pnpm verify:test-routing",
+      "result": "pass",
+      "summary": "All 186 routed test files passed deterministic ownership checks."
+    }
+  ],
+  "final_posture": {
+    "candidate_frozen": true,
+    "capabilities_default_off": true,
+    "database_apply": false,
+    "deployment": false,
+    "activation": false,
+    "internal_testing": false,
+    "traffic": false
+  }
+}

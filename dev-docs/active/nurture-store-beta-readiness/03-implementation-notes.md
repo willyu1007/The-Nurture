@@ -19,6 +19,33 @@
   contracts, exact pins, test routing, persistence boundaries and C30 upstream/
   default-off/owner-lock checks.
 
+## 2026-08-14 — G5-A Service Candidate frozen
+
+- The final green source commit `e6aba3792c3aec9b1b282ca665125fb416fae6f8`
+  became the exact Candidate source revision. The append-only Candidate is
+  `nurture.service-candidate@1.0.0` /
+  `sha256:c739f9291dbed99b8c96dd27be57e88429dfaeb9f2a8946395b9f58ba244debb`.
+- Two clean `pnpm build:scenario-service` runs reproduced the same 974-file
+  executable inventory at
+  `sha256:74bb40c765776799f5cdccc89933767726c73dd9314d9c63e019e9146e34742b`.
+  The Candidate also freezes 42 migration directories, the `1.20.0` six-surface
+  contract, W2/W3/W4 exact contracts, profile v1.0.0 and the current Base/My-Chat
+  owner pins.
+- Strict context verification found stale generated registry checksums before
+  the final identity was minted. The registry was refreshed and the three C30
+  lock profiles that include it were requalified, producing source lock
+  `sha256:41ad50d4538aec97153d5c19fd42eacad0c758de209be79023a8ce513247b810`.
+  This changed source metadata only; runtime, interface, beta-profile and
+  default-off semantics did not widen.
+- Final quality review also changed Candidate canonical ordering to a
+  locale-independent comparator and expanded the Candidate digest over the
+  complete manifest body except the digest field itself. This seals frozen
+  metadata and boundaries as well as identity inputs; the superseded trial
+  digests were never committed.
+- Freeze state is `default-off / undeployed / unqualified`. G5-B/G5-C/G5-D were
+  not entered; no schema/migration apply, Docker/image/tag, secret, environment,
+  deployment, activation, internal-test enablement, device or traffic effect occurred.
+
 ## 2026-08-05 — Upstream readiness ledger advanced without starting T-008
 
 - T-005 G2 and T-006 G3 now have exact qualified handoffs; T-004 was already done.
@@ -52,7 +79,6 @@
 
 ## Open Items
 
-- 最终 candidate identifier/checksum 格式。
 - interface contract identity 与 composite validation binding 格式。
 - My-Chat consumer conformance 的可调用入口。
 - 双平台最小设备/OS 矩阵。
