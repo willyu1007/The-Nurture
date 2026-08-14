@@ -1,0 +1,949 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.teacher-class-stream-presenter",
+    "version": "1.0.0",
+    "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+  },
+  "required_negative_scenarios": [
+    "not_authorized_admin",
+    "not_authorized_other_class",
+    "not_authorized_guardian",
+    "revoked_mid_window",
+    "stale_context_ref",
+    "cross_scope_class_ref",
+    "cross_class_child_ref",
+    "invalid_local_date",
+    "disabled_gate",
+    "service_auth_missing",
+    "forbidden_request_field",
+    "hidden_payload_rejected"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "w6-class-context-ready-two-classes",
+      "operation": "class_context_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-class-context-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "local_date": "2026-08-14",
+        "selected_class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:ctx-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "participant",
+          "scope_ref": "participant:ref:teacher-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:class-context:01",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:teacher:ctx-01",
+          "scope_version": 4,
+          "operation": "class_context_query",
+          "query_key": "query:class-context:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "classes": [
+          {
+            "class_ref": "class:ref:sunflower-01",
+            "class_label": "向日葵班",
+            "selectable": true,
+            "current": true
+          },
+          {
+            "class_ref": "class:ref:maple-02",
+            "class_label": "枫叶班",
+            "selectable": true,
+            "current": false
+          }
+        ],
+        "day_header": {
+          "class_ref": "class:ref:sunflower-01",
+          "class_label": "向日葵班",
+          "local_date": "2026-08-14",
+          "effective_schedule": "available",
+          "publication_window": "resolved"
+        }
+      }
+    },
+    {
+      "fixture_id": "w6-class-context-ready-single",
+      "operation": "class_context_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-class-context-02",
+        "context_ref": "context:teacher:willow:v1",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:ctx-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "participant",
+          "scope_ref": "participant:ref:teacher-02",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:class-context:02",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:teacher:ctx-02",
+          "scope_version": 1,
+          "operation": "class_context_query",
+          "query_key": "query:class-context:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "classes": [
+          {
+            "class_ref": "class:ref:willow-01",
+            "class_label": "柳树班",
+            "selectable": true,
+            "current": true
+          }
+        ],
+        "day_header": {
+          "class_ref": "class:ref:willow-01",
+          "class_label": "柳树班",
+          "local_date": "2026-08-14",
+          "effective_schedule": "unknown",
+          "publication_window": "unresolved"
+        }
+      }
+    },
+    {
+      "fixture_id": "w6-child-strip-ready",
+      "operation": "child_strip_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-child-strip-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:strip-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:child-strip:01",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:teacher:strip-01",
+          "scope_version": 4,
+          "operation": "child_strip_query",
+          "query_key": "query:child-strip:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "children": [
+          {
+            "child_ref": "child:ref:sunny-01",
+            "child_safe_label": "小晴",
+            "attention": {
+              "count": 0,
+              "highest_priority": "none",
+              "text_alternative": "无待关注事项"
+            },
+            "last_activity_at": "2026-08-14T08:40:00.000Z"
+          },
+          {
+            "child_ref": "child:ref:rain-02",
+            "child_safe_label": "小雨",
+            "attention": {
+              "count": 2,
+              "highest_priority": "attention",
+              "text_alternative": "2 项待关注，最高级别为需要关注"
+            },
+            "last_activity_at": "2026-08-14T08:52:00.000Z"
+          },
+          {
+            "child_ref": "child:ref:cloud-03",
+            "child_safe_label": "小云",
+            "attention": {
+              "count": 1,
+              "highest_priority": "urgent",
+              "text_alternative": "1 项待关注，最高级别为紧急"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w6-child-strip-ready-empty",
+      "operation": "child_strip_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-child-strip-02",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:strip-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:willow-01",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:child-strip:02",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:teacher:strip-02",
+          "scope_version": 1,
+          "operation": "child_strip_query",
+          "query_key": "query:child-strip:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "children": []
+      }
+    },
+    {
+      "fixture_id": "w6-child-day-detail-ready-full",
+      "operation": "child_day_detail_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-child-detail-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "child_ref": "child:ref:rain-02",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:detail-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:child-detail:01",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:teacher:detail-01",
+          "scope_version": 4,
+          "operation": "child_day_detail_query",
+          "query_key": "query:child-detail:rain-02:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "child_ref": "child:ref:rain-02",
+        "child_safe_label": "小雨",
+        "local_date": "2026-08-14",
+        "sections": [
+          {
+            "section_key": "arrival",
+            "status": "ready",
+            "title": "到园",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 3,
+            "arrival_state": "arrived",
+            "arrived_at": "2026-08-14T00:32:00.000Z"
+          },
+          {
+            "section_key": "daily_care",
+            "status": "ready",
+            "title": "今日照护",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 7,
+            "entries": [
+              {
+                "log_ref": "log:ref:meal-0814-01",
+                "kind": "meal",
+                "summary": "早餐完成，食量正常",
+                "occurred_at": "2026-08-14T01:05:00.000Z",
+                "source_head": 7
+              },
+              {
+                "log_ref": "log:ref:mood-0814-02",
+                "kind": "mood",
+                "summary": "晨间情绪平稳，主动参与晨会",
+                "occurred_at": "2026-08-14T01:20:00.000Z",
+                "source_head": 6
+              }
+            ],
+            "supplement_action": {
+              "capability_key": "record_caregiver_daily_care",
+              "capability_version": "1.0.0",
+              "availability": "available"
+            }
+          },
+          {
+            "section_key": "family_instructions",
+            "status": "ready",
+            "title": "家庭嘱托",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 2,
+            "entries": [
+              {
+                "instruction_ref": "instruction:ref:0814-01",
+                "summary": "今日午睡请盖薄毯",
+                "received_at": "2026-08-13T22:10:00.000Z",
+                "source_head": 2
+              }
+            ]
+          },
+          {
+            "section_key": "observations",
+            "status": "ready",
+            "title": "观察记录",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 5,
+            "entries": [
+              {
+                "observation_ref": "observation:ref:0814-01",
+                "summary": "搭建区专注拼装 15 分钟",
+                "occurred_at": "2026-08-14T02:00:00.000Z",
+                "source_head": 5
+              }
+            ]
+          },
+          {
+            "section_key": "focus_link",
+            "status": "ready",
+            "title": "当前培养重点",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 4,
+            "focus_ref": "focus:ref:rain-02-cycle-03",
+            "focus_label": "专注力培养",
+            "current_goal_summary": "本周目标：独立完成一次 10 分钟拼图"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w6-child-day-detail-ready-partial",
+      "operation": "child_day_detail_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-child-detail-02",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01",
+        "child_ref": "child:ref:pine-04",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:detail-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:willow-01",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:child-detail:02",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:teacher:detail-02",
+          "scope_version": 1,
+          "operation": "child_day_detail_query",
+          "query_key": "query:child-detail:pine-04:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "child_ref": "child:ref:pine-04",
+        "child_safe_label": "小松",
+        "local_date": "2026-08-14",
+        "sections": [
+          {
+            "section_key": "arrival",
+            "status": "empty",
+            "title": "到园"
+          },
+          {
+            "section_key": "daily_care",
+            "status": "ready",
+            "title": "今日照护",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 2,
+            "entries": [
+              {
+                "log_ref": "log:ref:nap-0814-03",
+                "kind": "nap",
+                "summary": "午睡 1 小时 20 分",
+                "occurred_at": "2026-08-14T05:30:00.000Z",
+                "source_head": 2
+              }
+            ],
+            "supplement_action": {
+              "capability_key": "record_caregiver_daily_care",
+              "capability_version": "1.0.0",
+              "availability": "unavailable"
+            }
+          },
+          {
+            "section_key": "family_instructions",
+            "status": "unavailable",
+            "title": "家庭嘱托"
+          },
+          {
+            "section_key": "observations",
+            "status": "empty",
+            "title": "观察记录"
+          },
+          {
+            "section_key": "focus_link",
+            "status": "ready",
+            "title": "当前培养重点",
+            "generated_at": "2026-08-14T09:00:01.000Z",
+            "source_head": 1,
+            "focus_ref": "focus:ref:pine-04-cycle-01",
+            "focus_label": "生活自理"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w6-schedule-ready-day-override",
+      "operation": "schedule_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-schedule-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:schedule-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:schedule:01",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:teacher:schedule-01",
+          "scope_version": 4,
+          "operation": "schedule_query",
+          "query_key": "query:schedule:2026-08-14",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "local_date": "2026-08-14",
+        "resolution": "day_override",
+        "schedule_version_head": 12,
+        "as_of": "2026-08-14T09:00:01.000Z",
+        "slots": [
+          {
+            "slot_ref": "slot:ref:0814-morning",
+            "label": "晨间活动",
+            "starts_at": "08:30",
+            "ends_at": "09:30",
+            "current": false,
+            "placement_state": "completed"
+          },
+          {
+            "slot_ref": "slot:ref:0814-outdoor",
+            "label": "户外游戏",
+            "starts_at": "17:00",
+            "ends_at": "17:45",
+            "current": true,
+            "placement_state": "in_progress",
+            "focus_relations": [
+              {
+                "focus_ref": "focus:ref:class-cycle-02",
+                "focus_label": "大肌肉发展"
+              }
+            ]
+          },
+          {
+            "slot_ref": "slot:ref:0814-story",
+            "label": "绘本时间",
+            "starts_at": "18:00",
+            "ends_at": "18:30",
+            "current": false
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w6-schedule-ready-class-template",
+      "operation": "schedule_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-schedule-02",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01",
+        "local_date": "2026-08-15"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:schedule-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:willow-01",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:schedule:02",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:teacher:schedule-02",
+          "scope_version": 1,
+          "operation": "schedule_query",
+          "query_key": "query:schedule:2026-08-15",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "local_date": "2026-08-15",
+        "resolution": "class_template",
+        "schedule_version_head": 5,
+        "as_of": "2026-08-14T09:00:01.000Z",
+        "slots": [
+          {
+            "slot_ref": "slot:ref:tpl-morning",
+            "label": "晨间活动",
+            "starts_at": "08:30",
+            "ends_at": "09:30",
+            "current": false
+          },
+          {
+            "slot_ref": "slot:ref:tpl-art",
+            "label": "美工时间",
+            "starts_at": "10:00",
+            "ends_at": "10:45",
+            "current": false
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w6-schedule-ready-none",
+      "operation": "schedule_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-02",
+        "host_request_id": "request-schedule-03",
+        "context_ref": "context:teacher:willow:v1",
+        "class_ref": "class:ref:willow-01",
+        "local_date": "2026-08-16"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:teacher:schedule-03",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:willow-01",
+          "context_ref": "context:teacher:willow:v1",
+          "scope_version": 1,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:schedule:03",
+          "interface_key": "nurture.teacher-class-stream-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-02",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:willow:v1",
+          "resolution_ref": "resolution:teacher:schedule-03",
+          "scope_version": 1,
+          "operation": "schedule_query",
+          "query_key": "query:schedule:2026-08-16",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "local_date": "2026-08-16",
+        "resolution": "none",
+        "schedule_version_head": 0,
+        "as_of": "2026-08-14T09:00:01.000Z",
+        "slots": []
+      }
+    },
+    {
+      "fixture_id": "w6-masked-access-changed",
+      "operation": "child_strip_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-03",
+        "host_request_id": "request-child-strip-03",
+        "context_ref": "context:teacher:revoked:v2",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:teacher:revoked:v2",
+        "masked_at": "2026-08-14T09:00:01.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w6-unavailable-temporarily",
+      "operation": "schedule_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-schedule-04",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:teacher:sunflower:v3",
+        "failed_at": "2026-08-14T09:00:01.000Z",
+        "reason_code": "temporarily_unavailable",
+        "retryable": true
+      }
+    },
+    {
+      "fixture_id": "w6-unavailable-request-invalid",
+      "operation": "child_day_detail_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-class-stream-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-child-detail-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "child_ref": "child:ref:rain-02",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:teacher:sunflower:v3",
+        "failed_at": "2026-08-14T09:00:01.000Z",
+        "reason_code": "request_invalid",
+        "retryable": false
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w6-invalid-request-forbidden-care-group",
+      "operation": "class_context_query",
+      "source_fixture_id": "w6-class-context-ready-two-classes",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": ["care_group_id"],
+        "value": "care-group-raw-01"
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-request-version-drift",
+      "operation": "child_strip_query",
+      "source_fixture_id": "w6-child-strip-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": ["interface_contract", "version"],
+        "value": "1.0.1"
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-empty-class-list",
+      "operation": "class_context_query",
+      "source_fixture_id": "w6-class-context-ready-two-classes",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["classes"],
+        "value": []
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-signed-url-slot",
+      "operation": "schedule_query",
+      "source_fixture_id": "w6-schedule-ready-day-override",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["slots", 0, "signed_url"],
+        "value": "https://example.com/leak"
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-empty-section-payload",
+      "operation": "child_day_detail_query",
+      "source_fixture_id": "w6-child-day-detail-ready-partial",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["sections", 0, "arrival_state"],
+        "value": "arrived"
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-arrival-supplement",
+      "operation": "child_day_detail_query",
+      "source_fixture_id": "w6-child-day-detail-ready-full",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["sections", 0, "supplement_action"],
+        "value": {
+          "capability_key": "record_caregiver_daily_care",
+          "capability_version": "1.0.0",
+          "availability": "available"
+        }
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-cache-interface-drift",
+      "operation": "child_strip_query",
+      "source_fixture_id": "w6-child-strip-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["cache_partition", "interface_key"],
+        "value": "nurture.director-presenter"
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-mask-no-purge",
+      "operation": "child_strip_query",
+      "source_fixture_id": "w6-masked-access-changed",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["mask_signal", "purge_partition"],
+        "value": false
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-none-with-slot",
+      "operation": "schedule_query",
+      "source_fixture_id": "w6-schedule-ready-none",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["slots"],
+        "value": [
+          {
+            "slot_ref": "slot:ref:ghost-01",
+            "label": "幽灵时段",
+            "starts_at": "08:00",
+            "ends_at": "08:30",
+            "current": false
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-slot-time",
+      "operation": "schedule_query",
+      "source_fixture_id": "w6-schedule-ready-day-override",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["slots", 0, "starts_at"],
+        "value": "25:00"
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-negative-attention",
+      "operation": "child_strip_query",
+      "source_fixture_id": "w6-child-strip-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["children", 1, "attention", "count"],
+        "value": -1
+      }
+    },
+    {
+      "fixture_id": "w6-invalid-response-foreign-section-key",
+      "operation": "child_day_detail_query",
+      "source_fixture_id": "w6-child-day-detail-ready-full",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": ["sections", 4, "section_key"],
+        "value": "trend"
+      }
+    }
+  ]
+}

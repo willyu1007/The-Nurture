@@ -1,5 +1,23 @@
 # Verification
 
+## 2026-08-14 — W6-1 teacher class-stream contract artifact
+
+- `pnpm verify:teacher-class-stream-contract` passed: digest
+  `sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3`,
+  12 fixtures accepted (every operation has a ready fixture; masked and two
+  unavailable failures covered), 12 invalid probes rejected, T-039 row
+  coverage `T-S03/T-F01/T-H01/T-F03/T-F04/T-F06/T-F07` and the 12 required
+  negative e2e scenarios asserted.
+- `pnpm verify:formal-ingress-contract` passed with the new validator chained;
+  the route census is unchanged (formal-routes=7, controller-routes=26) because
+  W6-2 has not mounted routes yet.
+- Root `pnpm typecheck` passed; `pnpm test:unit` passed 98 files / 1086 tests.
+- No route, gate flag, runtime composition, DB access, activation or consumer
+  change occurred in this step.
+
+Verdict: `W6_1_CONTRACT_ARTIFACT_PASS / EXACT_DIGEST_MINTED / DEFAULT_OFF /
+RUNTIME_AND_OWNER_PORTS_PENDING`.
+
 ## 2026-08-13 — W2 P0 quality closure
 
 - `pnpm typecheck` passed after the command regenerated both Prisma clients;

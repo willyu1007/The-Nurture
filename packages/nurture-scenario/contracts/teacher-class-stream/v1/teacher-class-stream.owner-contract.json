@@ -1,0 +1,794 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.teacher-class-stream-presenter",
+    "version": "1.0.0",
+    "kind": "private_owner_presenter"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "capability_dependencies": [
+    { "key": "query_caregiver_teacher_board", "version": "1.0.0" },
+    { "key": "query_caregiver_child_today", "version": "1.0.0" }
+  ],
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "class_context_query": "/internal/nurture/teacher-class-stream/v1/class-context",
+      "child_strip_query": "/internal/nurture/teacher-class-stream/v1/child-strip",
+      "child_day_detail_query": "/internal/nurture/teacher-class-stream/v1/child-day-detail",
+      "schedule_query": "/internal/nurture/teacher-class-stream/v1/schedule"
+    }
+  },
+  "owner_resolution": {
+    "frequency": "every_call",
+    "accepted_caller_context": [
+      "interface_contract",
+      "workspace_id",
+      "my_chat_user_id",
+      "host_request_id",
+      "context_ref"
+    ],
+    "forbidden_caller_authority_fields": [
+      "participant_id",
+      "role",
+      "role_assignment_id",
+      "scope_id",
+      "institution_id",
+      "care_group_id",
+      "family_id",
+      "child_id",
+      "enrollment_id",
+      "grant_id",
+      "purpose"
+    ],
+    "current_owner_facts": [
+      "active Participant bound from the authenticated My-Chat user",
+      "current caregiver or lead_caregiver RoleAssignment for each read",
+      "exact current CareGroup resolved from the owner-issued opaque class_ref",
+      "current per-fact caregiver visibility for every projected entry"
+    ],
+    "context_ref_rule": "context_ref is routing input and a cache dimension, never authorization",
+    "opaque_ref_rule": "class_ref and child_ref are owner-issued, scope-bound refs; a ref from another scope, class or a revoked assignment fails closed without revealing whether the target exists",
+    "safe_projection": "Responses contain owner-approved display values and opaque refs only"
+  },
+  "mobile_posture": {
+    "mode": "read_only",
+    "write_paths": "none_in_this_contract",
+    "forbidden_response_fields": [
+      "action_ref",
+      "confirmation_ref",
+      "command_request_id",
+      "participant_id",
+      "role_assignment_id",
+      "institution_id",
+      "family_id",
+      "child_id",
+      "care_group_id",
+      "enrollment_id",
+      "grant_id",
+      "storage_ref",
+      "signed_url",
+      "url"
+    ],
+    "rules": [
+      "All four operations are reads; class-stream writes belong to the W7 organization owner.",
+      "Action presence is expressed only as capability availability descriptors, never an executable ref.",
+      "Attention signals describe support context for the class and never rank children or staff.",
+      "Absent owner data is reported as empty or unavailable sections, never inferred as zero or normal.",
+      "Responses are bounded single pages with explicit caps; no cursor exists in this version."
+    ]
+  },
+  "safe_reason_codes": [
+    "access_changed",
+    "context_changed",
+    "refresh_not_retryable",
+    "content_unavailable",
+    "temporarily_unavailable",
+    "request_invalid"
+  ],
+  "operation_order": [
+    "class_context_query",
+    "child_strip_query",
+    "child_day_detail_query",
+    "schedule_query"
+  ],
+  "operations": {
+    "class_context_query": {
+      "t039_rows": ["T-S03", "T-F01", "T-H01"],
+      "request_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/class_context_query_request",
+      "response_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/class_context_query_response",
+      "rules": [
+        "The class list contains only classes reachable through the caller's current caregiver RoleAssignments; inaccessible classes disappear on refresh.",
+        "Exactly one listed class is current; selection input is an owner-issued class_ref, never a caller-supplied class or role.",
+        "The day header states the effective-schedule and publication-window availability without inventing defaults."
+      ]
+    },
+    "child_strip_query": {
+      "t039_rows": ["T-F03"],
+      "request_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/child_strip_query_request",
+      "response_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/child_strip_query_response",
+      "rules": [
+        "Strip cards carry a text alternative for every attention indicator.",
+        "An empty children array under ready status is an owner-confirmed empty class, distinguishable from unavailable.",
+        "At most 80 children are returned; the class is a bounded set, not a paged feed."
+      ]
+    },
+    "child_day_detail_query": {
+      "t039_rows": ["T-F04"],
+      "request_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/child_day_detail_query_request",
+      "response_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/child_day_detail_query_response",
+      "rules": [
+        "Sections return independently so one missing source never blanks the panel.",
+        "Every ready section carries its own generated_at and source_head freshness.",
+        "Empty and unavailable sections carry no payload fields; hidden payloads are rejected.",
+        "A context change to another child or class must not leak the prior family's content; the masked response orders a partition purge.",
+        "The daily-care section may describe the supplement capability's availability; execution stays outside this contract."
+      ]
+    },
+    "schedule_query": {
+      "t039_rows": ["T-F06", "T-F07"],
+      "request_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/schedule_query_request",
+      "response_schema_ref": "urn:nurture:teacher-class-stream:1#/$defs/schedule_query_response",
+      "rules": [
+        "The effective schedule resolves day override, then class template, then institution template; the winning layer is reported.",
+        "resolution none with an empty slots array is an owner-confirmed absence of a schedule, not an error.",
+        "At most one slot is current, computed by the owner at generation time.",
+        "Completion and focus relations appear only where the owner holds those facts; absence stays unknown."
+      ]
+    }
+  },
+  "schemas": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:nurture:teacher-class-stream:1",
+    "$defs": {
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 512
+      },
+      "local_date": {
+        "type": "string",
+        "format": "date"
+      },
+      "source_head": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "version", "digest"],
+        "properties": {
+          "key": { "const": "nurture.teacher-class-stream-presenter" },
+          "version": { "const": "1.0.0" },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": { "$ref": "#/$defs/opaque_ref" },
+          "presentation_role": { "enum": ["caregiver", "lead_caregiver"] },
+          "scope_kind": { "enum": ["participant", "care_group"] },
+          "scope_ref": { "$ref": "#/$defs/opaque_ref" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "scope_version": { "type": "integer", "minimum": 1 },
+          "resolved_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": { "$ref": "#/$defs/opaque_ref" },
+          "interface_key": { "const": "nurture.teacher-class-stream-presenter" },
+          "interface_version": { "const": "1.0.0" },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": { "$ref": "#/$defs/non_empty_string" },
+          "my_chat_user_id": { "$ref": "#/$defs/non_empty_string" },
+          "presentation_role": { "enum": ["caregiver", "lead_caregiver"] },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "resolution_ref": { "$ref": "#/$defs/opaque_ref" },
+          "scope_version": { "type": "integer", "minimum": 1 },
+          "operation": {
+            "enum": [
+              "class_context_query",
+              "child_strip_query",
+              "child_day_detail_query",
+              "schedule_query"
+            ]
+          },
+          "query_key": { "$ref": "#/$defs/opaque_ref" },
+          "expires_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["resolved_at", "source"],
+        "properties": {
+          "resolved_at": { "type": "string", "format": "date-time" },
+          "source": { "const": "current_owner_read" }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "reason_code", "purge_partition", "content_masked"],
+        "properties": {
+          "kind": { "const": "mask" },
+          "reason_code": {
+            "enum": ["access_changed", "context_changed", "refresh_not_retryable"]
+          },
+          "purge_partition": { "const": true },
+          "content_masked": { "const": true }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "context_ref", "masked_at", "mask_signal"],
+        "properties": {
+          "status": { "const": "masked" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "masked_at": { "type": "string", "format": "date-time" },
+          "mask_signal": { "$ref": "#/$defs/mask_signal" }
+        }
+      },
+      "unavailable_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "context_ref", "failed_at", "reason_code", "retryable"],
+        "properties": {
+          "status": { "const": "unavailable" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "failed_at": { "type": "string", "format": "date-time" },
+          "reason_code": {
+            "enum": ["content_unavailable", "temporarily_unavailable", "request_invalid"]
+          },
+          "retryable": { "type": "boolean" }
+        }
+      },
+      "owner_action_availability": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability_key", "capability_version", "availability"],
+        "properties": {
+          "capability_key": { "$ref": "#/$defs/non_empty_string" },
+          "capability_version": { "$ref": "#/$defs/non_empty_string" },
+          "availability": { "enum": ["available", "unavailable"] }
+        }
+      },
+      "class_context_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "$ref": "#/$defs/non_empty_string" },
+          "my_chat_user_id": { "$ref": "#/$defs/non_empty_string" },
+          "host_request_id": { "$ref": "#/$defs/non_empty_string" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "local_date": { "$ref": "#/$defs/local_date" },
+          "selected_class_ref": { "$ref": "#/$defs/opaque_ref" }
+        }
+      },
+      "class_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class_ref", "class_label", "selectable", "current"],
+        "properties": {
+          "class_ref": { "$ref": "#/$defs/opaque_ref" },
+          "class_label": { "$ref": "#/$defs/non_empty_string" },
+          "selectable": { "type": "boolean" },
+          "current": { "type": "boolean" }
+        }
+      },
+      "class_day_header": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "class_ref",
+          "class_label",
+          "local_date",
+          "effective_schedule",
+          "publication_window"
+        ],
+        "properties": {
+          "class_ref": { "$ref": "#/$defs/opaque_ref" },
+          "class_label": { "$ref": "#/$defs/non_empty_string" },
+          "local_date": { "$ref": "#/$defs/local_date" },
+          "effective_schedule": { "enum": ["available", "unknown"] },
+          "publication_window": { "enum": ["resolved", "unresolved"] }
+        }
+      },
+      "class_context_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "classes",
+          "day_header"
+        ],
+        "properties": {
+          "status": { "const": "ready" },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" },
+          "generated_at": { "type": "string", "format": "date-time" },
+          "freshness": { "$ref": "#/$defs/freshness" },
+          "classes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": { "$ref": "#/$defs/class_entry" }
+          },
+          "day_header": { "$ref": "#/$defs/class_day_header" }
+        }
+      },
+      "class_context_query_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/class_context_ready" },
+          { "$ref": "#/$defs/masked_response" },
+          { "$ref": "#/$defs/unavailable_response" }
+        ]
+      },
+      "child_strip_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "class_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "$ref": "#/$defs/non_empty_string" },
+          "my_chat_user_id": { "$ref": "#/$defs/non_empty_string" },
+          "host_request_id": { "$ref": "#/$defs/non_empty_string" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "class_ref": { "$ref": "#/$defs/opaque_ref" },
+          "local_date": { "$ref": "#/$defs/local_date" }
+        }
+      },
+      "attention_summary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["count", "highest_priority", "text_alternative"],
+        "properties": {
+          "count": { "type": "integer", "minimum": 0, "maximum": 999 },
+          "highest_priority": { "enum": ["none", "routine", "attention", "urgent"] },
+          "text_alternative": { "$ref": "#/$defs/non_empty_string" }
+        }
+      },
+      "child_strip_card": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["child_ref", "child_safe_label", "attention"],
+        "properties": {
+          "child_ref": { "$ref": "#/$defs/opaque_ref" },
+          "child_safe_label": { "$ref": "#/$defs/non_empty_string" },
+          "attention": { "$ref": "#/$defs/attention_summary" },
+          "last_activity_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "child_strip_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "children"
+        ],
+        "properties": {
+          "status": { "const": "ready" },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" },
+          "generated_at": { "type": "string", "format": "date-time" },
+          "freshness": { "$ref": "#/$defs/freshness" },
+          "children": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 80,
+            "items": { "$ref": "#/$defs/child_strip_card" }
+          }
+        }
+      },
+      "child_strip_query_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/child_strip_ready" },
+          { "$ref": "#/$defs/masked_response" },
+          { "$ref": "#/$defs/unavailable_response" }
+        ]
+      },
+      "child_day_detail_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "class_ref",
+          "child_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "$ref": "#/$defs/non_empty_string" },
+          "my_chat_user_id": { "$ref": "#/$defs/non_empty_string" },
+          "host_request_id": { "$ref": "#/$defs/non_empty_string" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "class_ref": { "$ref": "#/$defs/opaque_ref" },
+          "child_ref": { "$ref": "#/$defs/opaque_ref" },
+          "local_date": { "$ref": "#/$defs/local_date" }
+        }
+      },
+      "daily_care_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["log_ref", "kind", "summary", "occurred_at", "source_head"],
+        "properties": {
+          "log_ref": { "$ref": "#/$defs/opaque_ref" },
+          "kind": { "enum": ["meal", "nap", "mood", "activity", "health_observation"] },
+          "summary": { "$ref": "#/$defs/non_empty_string" },
+          "occurred_at": { "type": "string", "format": "date-time" },
+          "source_head": { "$ref": "#/$defs/source_head" }
+        }
+      },
+      "family_instruction_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["instruction_ref", "summary", "received_at", "source_head"],
+        "properties": {
+          "instruction_ref": { "$ref": "#/$defs/opaque_ref" },
+          "summary": { "$ref": "#/$defs/non_empty_string" },
+          "received_at": { "type": "string", "format": "date-time" },
+          "source_head": { "$ref": "#/$defs/source_head" }
+        }
+      },
+      "observation_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["observation_ref", "summary", "occurred_at", "source_head"],
+        "properties": {
+          "observation_ref": { "$ref": "#/$defs/opaque_ref" },
+          "summary": { "$ref": "#/$defs/non_empty_string" },
+          "occurred_at": { "type": "string", "format": "date-time" },
+          "source_head": { "$ref": "#/$defs/source_head" }
+        }
+      },
+      "detail_section": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": ["status"],
+              "properties": { "status": { "enum": ["empty", "unavailable"] } }
+            },
+            "then": {
+              "properties": {
+                "arrival_state": false,
+                "arrived_at": false,
+                "entries": false,
+                "focus_ref": false,
+                "focus_label": false,
+                "current_goal_summary": false,
+                "supplement_action": false,
+                "generated_at": false,
+                "source_head": false
+              }
+            }
+          },
+          {
+            "if": {
+              "required": ["section_key"],
+              "properties": { "section_key": { "const": "arrival" } }
+            },
+            "then": {
+              "properties": {
+                "entries": false,
+                "focus_ref": false,
+                "focus_label": false,
+                "current_goal_summary": false,
+                "supplement_action": false
+              }
+            }
+          },
+          {
+            "if": {
+              "required": ["section_key"],
+              "properties": {
+                "section_key": {
+                  "enum": ["daily_care", "family_instructions", "observations"]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "arrival_state": false,
+                "arrived_at": false,
+                "focus_ref": false,
+                "focus_label": false,
+                "current_goal_summary": false
+              }
+            }
+          },
+          {
+            "if": {
+              "required": ["section_key"],
+              "properties": {
+                "section_key": { "enum": ["family_instructions", "observations"] }
+              }
+            },
+            "then": { "properties": { "supplement_action": false } }
+          },
+          {
+            "if": {
+              "required": ["section_key"],
+              "properties": { "section_key": { "const": "focus_link" } }
+            },
+            "then": {
+              "properties": {
+                "arrival_state": false,
+                "arrived_at": false,
+                "entries": false,
+                "supplement_action": false
+              }
+            }
+          }
+        ],
+        "required": ["section_key", "status", "title"],
+        "properties": {
+          "section_key": {
+            "enum": [
+              "arrival",
+              "daily_care",
+              "family_instructions",
+              "observations",
+              "focus_link"
+            ]
+          },
+          "status": { "enum": ["ready", "empty", "unavailable"] },
+          "title": { "$ref": "#/$defs/non_empty_string" },
+          "generated_at": { "type": "string", "format": "date-time" },
+          "source_head": { "$ref": "#/$defs/source_head" },
+          "arrival_state": { "enum": ["arrived", "absent"] },
+          "arrived_at": { "type": "string", "format": "date-time" },
+          "entries": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 40,
+            "items": {
+              "oneOf": [
+                { "$ref": "#/$defs/daily_care_entry" },
+                { "$ref": "#/$defs/family_instruction_entry" },
+                { "$ref": "#/$defs/observation_entry" }
+              ]
+            }
+          },
+          "focus_ref": { "$ref": "#/$defs/opaque_ref" },
+          "focus_label": { "$ref": "#/$defs/non_empty_string" },
+          "current_goal_summary": { "$ref": "#/$defs/non_empty_string" },
+          "supplement_action": { "$ref": "#/$defs/owner_action_availability" }
+        }
+      },
+      "child_day_detail_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "child_ref",
+          "child_safe_label",
+          "local_date",
+          "sections"
+        ],
+        "properties": {
+          "status": { "const": "ready" },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" },
+          "generated_at": { "type": "string", "format": "date-time" },
+          "freshness": { "$ref": "#/$defs/freshness" },
+          "child_ref": { "$ref": "#/$defs/opaque_ref" },
+          "child_safe_label": { "$ref": "#/$defs/non_empty_string" },
+          "local_date": { "$ref": "#/$defs/local_date" },
+          "sections": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "items": { "$ref": "#/$defs/detail_section" }
+          }
+        }
+      },
+      "child_day_detail_query_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/child_day_detail_ready" },
+          { "$ref": "#/$defs/masked_response" },
+          { "$ref": "#/$defs/unavailable_response" }
+        ]
+      },
+      "schedule_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "class_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": { "$ref": "#/$defs/interface_contract" },
+          "workspace_id": { "$ref": "#/$defs/non_empty_string" },
+          "my_chat_user_id": { "$ref": "#/$defs/non_empty_string" },
+          "host_request_id": { "$ref": "#/$defs/non_empty_string" },
+          "context_ref": { "$ref": "#/$defs/opaque_ref" },
+          "class_ref": { "$ref": "#/$defs/opaque_ref" },
+          "local_date": { "$ref": "#/$defs/local_date" }
+        }
+      },
+      "focus_relation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["focus_ref", "focus_label"],
+        "properties": {
+          "focus_ref": { "$ref": "#/$defs/opaque_ref" },
+          "focus_label": { "$ref": "#/$defs/non_empty_string" }
+        }
+      },
+      "schedule_slot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slot_ref", "label", "starts_at", "ends_at", "current"],
+        "properties": {
+          "slot_ref": { "$ref": "#/$defs/opaque_ref" },
+          "label": { "$ref": "#/$defs/non_empty_string" },
+          "starts_at": {
+            "type": "string",
+            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "ends_at": {
+            "type": "string",
+            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "current": { "type": "boolean" },
+          "placement_state": { "enum": ["planned", "in_progress", "completed"] },
+          "focus_relations": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 5,
+            "items": { "$ref": "#/$defs/focus_relation" }
+          }
+        }
+      },
+      "schedule_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": ["resolution"],
+              "properties": { "resolution": { "const": "none" } }
+            },
+            "then": {
+              "properties": { "slots": { "type": "array", "maxItems": 0 } }
+            }
+          }
+        ],
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "local_date",
+          "resolution",
+          "schedule_version_head",
+          "as_of",
+          "slots"
+        ],
+        "properties": {
+          "status": { "const": "ready" },
+          "owner_resolution": { "$ref": "#/$defs/owner_resolution" },
+          "cache_partition": { "$ref": "#/$defs/cache_partition" },
+          "generated_at": { "type": "string", "format": "date-time" },
+          "freshness": { "$ref": "#/$defs/freshness" },
+          "local_date": { "$ref": "#/$defs/local_date" },
+          "resolution": {
+            "enum": ["day_override", "class_template", "institution_template", "none"]
+          },
+          "schedule_version_head": { "type": "integer", "minimum": 0 },
+          "as_of": { "type": "string", "format": "date-time" },
+          "slots": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 24,
+            "items": { "$ref": "#/$defs/schedule_slot" }
+          }
+        }
+      },
+      "schedule_query_response": {
+        "oneOf": [
+          { "$ref": "#/$defs/schedule_ready" },
+          { "$ref": "#/$defs/masked_response" },
+          { "$ref": "#/$defs/unavailable_response" }
+        ]
+      }
+    }
+  }
+}

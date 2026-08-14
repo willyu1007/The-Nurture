@@ -1,5 +1,32 @@
 # Implementation notes
 
+## 2026-08-14 — W6-1 teacher class-stream contract artifact
+
+- Published the W6 contract package at
+  `packages/nurture-scenario/contracts/teacher-class-stream/v1/`: hand-authored
+  owner-contract JSON (four read operations: class-context, child-strip,
+  child-day-detail, schedule), 12 conformance fixtures + 12 executed invalid
+  probes, a hard-pinned `validate-contract.mjs` and the README posture note.
+  Digest
+  `sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3`
+  is minted over the artifact with the shared RFC 8785 canonicalizer and
+  asserted in the validator, the TS interface constant and every fixture.
+- Added `src/teacher-class-stream-contract.ts` (paths + frozen interface +
+  descriptor) exported from the package index, and chained
+  `verify:teacher-class-stream-contract` into `verify:formal-ingress-contract`.
+- Design followed the W4 skeleton with one deliberate simplification recorded
+  against the scope freeze: all four operations are bounded single-page reads
+  with explicit caps (classes 8, children 80, entries 40, slots 24) and no
+  cursor exists in v1, so the freeze's cursored-drift clause is vacuous until
+  a later version introduces paging.
+- Consumer-compatibility detail: invalid probes use only set-mutations at
+  object keys or array indices, because the established My-Chat
+  `applyMutation` helper deletes array elements without splicing; an
+  enum-violation probe replaced the initial array-delete probe.
+- Runtime routes, gate flag, composition and e2e lanes are W6-2; real Prisma
+  ports and DB lanes are W6-3. The ingress census is intentionally untouched
+  in this step and still reports the pre-W6 route population.
+
 ## 2026-08-13 — W2 P0 quality and single-track closure
 
 - Deleted the superseded W2 scope draft. The published contract directory,
