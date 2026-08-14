@@ -17,8 +17,14 @@
   digest-pin handoff, consumer adoption). Next batch: W7 organization-owner
   scope freeze.
 
+- Pin posture: resealing the workflow pin to My-Chat `5babf85` is deferred —
+  `reseal:pins apply` correctly refused because the My-Chat worktree carries
+  another session's uncommitted mobile-e2e work. The current pin remains the
+  self-consistent `afb25b5` snapshot (CI-verifiable); rerun
+  `pnpm reseal:pins plan` once that work lands.
+
 Verdict: `W6_CLOSED_END_TO_END / CONSUMER_ADOPTED_5BABF85 / SEVEN_ROWS_CONTRACT_READY /
-DEFAULT_OFF`.
+DEFAULT_OFF / PIN_RESEAL_DEFERRED_ON_SIBLING_WIP`.
 
 ## 2026-08-14 — x5 joint repair round two (lane 37/37)
 
