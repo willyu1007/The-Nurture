@@ -30,6 +30,7 @@ const standaloneContractFixtures = [
   "packages/nurture-scenario/contracts/teacher-communication-owner/v1/conformance-fixtures.json",
   "packages/nurture-scenario/contracts/teacher-media-association-owner/v1/conformance-fixtures.json",
   "packages/nurture-scenario/contracts/teacher-assistant-query-owner/v1/conformance-fixtures.json",
+  "packages/nurture-scenario/contracts/parent-communication-owner/v1-1/conformance-fixtures.json",
 ];
 
 const sha256Hex = (value) => createHash("sha256").update(value).digest("hex");
