@@ -92,9 +92,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # No version input: this job checks out at the repository root, so the
+      # root package.json packageManager field is authoritative.
       - uses: pnpm/action-setup@v6
-        with:
-          version: 9
 
       - uses: actions/setup-node@v6
         with:
