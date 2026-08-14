@@ -155,10 +155,8 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Resealed on 2026-08-14 for the G5-C readiness batch: My-Chat localizes
-  // sanitized fixture snapshots, refreshes its host adoption lock after the
-  // T-028 merge, and exports the family-nurture-authorization service for the
-  // boundary-clean joint import. Contract and wave4 profiles are unchanged.
+  // 2026-08-14 reseal: package.json gained the reseal:pins entry points;
+  // scenario sources are otherwise unchanged and no contract semantics moved.
   "a9281feb13a055061e6ed39a05fa83c4bede8044",
   "My-Chat revision",
 );

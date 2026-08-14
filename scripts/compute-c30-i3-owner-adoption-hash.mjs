@@ -182,9 +182,11 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      head_revision: "536638a204865ebdc43bca70992388352789a36f",
+      // 2026-08-14 reseal: package.json gained the reseal:pins entry points;
+      // scenario sources are otherwise unchanged and no contract semantics moved.
+      head_revision: "a9281feb13a055061e6ed39a05fa83c4bede8044",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
-      aggregate_source_hash: "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7",
+      aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
     host: {
       // Step-5 requalification binds the current clean Host head while the

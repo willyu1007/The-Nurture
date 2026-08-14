@@ -12,10 +12,8 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-14 G5-C readiness reseal: My-Chat localizes sanitized Nurture
-  // conformance fixture snapshots and reseals its host adoption lock after the
-  // T-028 child-identity merge (tests/fixtures/locks/dev-docs only). Content-inert
-  // for the C30 Host runtime source profiles; the qualified head stays exact.
+  // 2026-08-14 reseal: package.json gained the reseal:pins entry points;
+  // scenario sources are otherwise unchanged and no contract semantics moved.
   hostHead: "a9281feb13a055061e6ed39a05fa83c4bede8044",
 };
 
