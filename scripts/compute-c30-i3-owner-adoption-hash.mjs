@@ -182,10 +182,9 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-14 reseal: W11 parent-communication extension supply moved the
-      // pinned tooling entry points and the My-Chat consumer adopted W11 at
-      // df5af9d
-      head_revision: "df5af9d80a0ecf8f7bdc7bc4ca96eba57455f031",
+      // 2026-08-14 reseal: End-of-schedule deep-review repairs moved the pinned
+      // runtime/tooling paths; My-Chat closure head 046e9f3
+      head_revision: "046e9f321bc4d5a6c40efbf4330e96e4c15ca74e",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
