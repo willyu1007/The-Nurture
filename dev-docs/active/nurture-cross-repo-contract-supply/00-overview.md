@@ -43,9 +43,19 @@
   the frozen G3-C1 machinery (unit 6, W9 DB lane 5, full battery green),
   W9-4 registration and the W9-5 digest-pin handoff with the My-Chat
   dormant strict consumer (`e092613`; T-F14/T-H03 contract-ready, T-F16
-  partial, axis 60/7/21/17). The next executable step is the W10 teacher
-  assistant queries scope design. All batches remain default-off contract
-  supply with no activation, durable apply, deployment or traffic.
+  partial, axis 60/7/21/17). W10
+  (`nurture.teacher-assistant-query-owner@1.0.0`, engine-ready facts only)
+  is closed on the Nurture side: scope freeze, W10-1 contract artifact
+  (digest `sha256:d4010661…`, 11 fixtures / 12 probes / 17-scenario
+  census, first-run strict compile), W10-2 default-off runtime (three
+  mounted routes, controller-routes 49), W10-3 real owner ports (the
+  weekly draft rides a new `NurtureTeacherAssistantTransaction` on the
+  command transaction, domain-idempotent per (class, week); unit 9, W10 DB
+  lane 5, full battery 57 green), W10-4 registration and the W10-5
+  digest-pin artifact. The next executable step is the W10-5 My-Chat
+  dormant consumer adoption (T-H02, T-H04), then the W11 scope freeze. All
+  batches remain default-off contract supply with no activation, durable
+  apply, deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
@@ -223,13 +233,13 @@ conformance fixtures, all default-off.
   handoff artifact; My-Chat adopted the dormant strict consumer with the
   sanitized snapshot at `5babf85` (T-039), moving seven matrix rows to
   contract-ready.
-- [ ] W7: `nurture.teacher-organization-owner@1.0.0` published with the same
+- [x] W7: `nurture.teacher-organization-owner@1.0.0` published with the same
   gate set plus prepare/confirm command semantics, actor-scoped idempotency
   and owner-persisted lane state.
-- [ ] W8: `nurture.teacher-communication-owner@1.0.0` published reusing the
+- [x] W8: `nurture.teacher-communication-owner@1.0.0` published reusing the
   W3 shape family with the IR-C01..C07 gate list re-run for the teacher
   actor; `class_group` send remains unavailable absent a separate decision.
-- [ ] W9: media association supply (association-only before the reserved
+- [x] W9: media association supply (association-only before the reserved
   media ingress exists).
 - [ ] W10: teacher assistant queries (missing-record handoff, weekly draft)
   with agent-generated labelling and no direct provider calls.
