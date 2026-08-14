@@ -485,8 +485,12 @@ DEFAULT_OFF / CANDIDATE_NOT_FROZEN / LIVE_OWNER_AND_MOBILE_PENDING`.
   tests, all 17 workspace typechecks and repository ESLint.
 - Generated `packages/nurture-scenario/dist`, `packages/nurture-db/dist` and
   My-Chat `packages/workflow-contracts/dist` directories created/refreshed by
-  checks were removed. No retained test, alternate route or obsolete drawer
+  checks were removed. No unretained test, alternate route or obsolete drawer
   gesture branch remains.
+- Final exact revisions are provider `69471858c86d3f1e5612cb4e52bd6ed30504f8af`,
+  My-Chat consumer `4db80c91a15859b51b193110efa45acaf019deb5`,
+  pin source `a577cb21c1ec425f57232e262ced931401b9c03f` and C30 lock
+  `329e2ab258eeb0575f43919d3938b77a821b96b6`.
 
 Verdict: `W4_QUALITY_CLOSED / PAGE_AND_LIFETIME_BOUND /
 FAIL_CLOSED_NON_RETRYABLE_DRIFT / GENERATED_ARTIFACTS_CLEANED /

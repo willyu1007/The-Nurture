@@ -17,10 +17,10 @@
   My-Chat 已完成会改变 Candidate shared inputs 的 W2 P0 consumer adoption；
   W2 closing quality gate 已清除生成客户端漂移和旧 scope-draft 双轨，精确
   revision pin 验证通过。Freeze 前最终绿色 source revisions 已记录为
-  My-Chat `e0e5e937cb16b6b49e918656a4af214ddea41a48` 与 Nurture W4
-  `d5df447ff0ab33911396531e47775364e62b0e4f`；T-002 exact-pin reseal
-  `a9e1be9054e5a42e0e985bf491da13c1228b77c9` 及其 lock commit
-  `035d009b7a5501081f13b2d173242b1d18020e92` 已通过。下一步是单独授权 G5-A，
+  My-Chat `4db80c91a15859b51b193110efa45acaf019deb5` 与 Nurture W4
+  `69471858c86d3f1e5612cb4e52bd6ed30504f8af`；T-002 exact-pin reseal
+  `a577cb21c1ec425f57232e262ced931401b9c03f` 及其 lock commit
+  `329e2ab258eeb0575f43919d3938b77a821b96b6` 已通过。下一步是单独授权 G5-A，
   本轮不分配 Candidate identity。Synthetic token 与双平台真机
   属于后续 G5-D operator package；Q3 live qualification 是 G5-D 内部测试
   enablement 的前置，不是 G5-A Freeze 前置。不分配 Candidate identity、不实现

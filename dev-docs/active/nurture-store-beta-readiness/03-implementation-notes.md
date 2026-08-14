@@ -45,13 +45,28 @@
 - T-011 W2, W3/W3.1 and W4 now form the closed source-side shared-input set for
   this reconciliation. W4 is the read-only director presenter; it contributes
   no Mobile command, deployment, activation or device claim.
-- Final green source revisions are My-Chat
+- The first green W4 source closure recorded My-Chat
   `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4
   `d5df447ff0ab33911396531e47775364e62b0e4f`; the exact W2/W3/W4 identities
   are recorded in the readiness inventory. T-002 resealed the exact pin at
   `a9e1be9054e5a42e0e985bf491da13c1228b77c9` and committed the current C30
-  lock at `035d009b7a5501081f13b2d173242b1d18020e92`. Candidate Freeze starts
+  lock at `035d009b7a5501081f13b2d173242b1d18020e92`. It was superseded by the
+  final quality reseal below. Candidate Freeze starts
   only after this completed reconciliation and separate authorization.
+
+## 2026-08-14 — Pre-Freeze W4 quality reseal
+
+- The final quality review repaired cursor replay, cache/access lifetime,
+  unavailable-section payload, ratio and photo-accessibility gaps without
+  changing `nurture.director-presenter@1.0.0` or enabling either side.
+- Final green source revisions are My-Chat
+  `4db80c91a15859b51b193110efa45acaf019deb5` and Nurture W4
+  `69471858c86d3f1e5612cb4e52bd6ed30504f8af`. The final contract digest is
+  `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`.
+- T-002 resealed the exact source pin at
+  `a577cb21c1ec425f57232e262ced931401b9c03f` and the C30 lock at
+  `329e2ab258eeb0575f43919d3938b77a821b96b6`. G5-A still requires separate
+  authorization; no Candidate identity was allocated.
 
 ## 2026-07-30 — Stage G5 delivery structure accepted
 

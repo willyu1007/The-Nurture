@@ -125,3 +125,30 @@ T-008 and all activation gates remain separately closed.
 - This is an exact source-lock reseal backed by W4's own conformance evidence.
   It does not authorize Candidate Freeze, schema/migration work, database
   mutation, deployment, activation, Pilot or traffic.
+
+## 2026-08-14 W4 final quality reseal addendum
+
+- My-Chat pin head advances to
+  `4db80c91a15859b51b193110efa45acaf019deb5`; the shared workflow contract
+  remains `85cf56e24227e730f23f5b5f68684aec507d04b017e8746e4d078a2dd2151225`
+  and `wave4_binding_host` remains
+  `65d6b0a0b52cdb2f98151b2841761c52e8daf7329c981975b5143a9ad15f2a43`.
+- `x5_joint_api` advances to
+  `ecaa2de5ee328a71eb68cfa43204e6efeb2a133dd11fc5f43bc410093b8eac17`
+  across 296 files because the strict W4 consumer and tests now enforce exact
+  page/lifetime and fail-closed transport semantics.
+- Nurture scenario self-pin advances to
+  `9f65dc8d97e8c24aa2e85383c17e0fbfdd83e6072ccbb6e2a3fa73e956156cf7`
+  across the same 328-file population. W4 provider source is
+  `69471858c86d3f1e5612cb4e52bd6ed30504f8af`; exact pin source is
+  `a577cb21c1ec425f57232e262ced931401b9c03f`.
+- The C30 owner lock at commit
+  `329e2ab258eeb0575f43919d3938b77a821b96b6` advances to aggregate
+  `e55c8771f33827454f7f23f91983c5868a69fa85f12cf606fea40cf015066aff`.
+  Only manifest-foundation (`b3df3f72…`) and cumulative-convergence
+  (`3761fa49…`) profiles rotate because the exact upstream guard revisions
+  changed; the C30 Host runtime revision and aggregate remain byte-identical.
+- Workflow pin, G2, exact upstream, default-off census, seven pin-verifier
+  tests and the C30 lock all pass. This is source metadata closure only: no
+  Candidate Freeze, schema/migration, database mutation, deployment,
+  activation, Pilot or traffic is authorized.

@@ -64,8 +64,10 @@ Project: `main`
 ### Next Governance Checkpoint
 
 1. **Pre-Freeze source facts are closed** at My-Chat
-   `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4
-   `d5df447ff0ab33911396531e47775364e62b0e4f`. Keep
+   `4db80c91a15859b51b193110efa45acaf019deb5` and Nurture W4
+   `69471858c86d3f1e5612cb4e52bd6ed30504f8af`; the exact-pin source is
+   `a577cb21c1ec425f57232e262ced931401b9c03f` and the C30 lock commit is
+   `329e2ab258eeb0575f43919d3938b77a821b96b6`. Keep
    provider and consumer flags false; W3.2 requires separate authorization;
    use the W5-hardened settlement surface as the base for the separate W1
    callback implementation batch (all default-off).

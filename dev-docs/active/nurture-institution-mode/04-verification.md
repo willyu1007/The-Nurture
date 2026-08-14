@@ -2044,6 +2044,16 @@ the rejected checkpoint and are historical.
 | Pin verifier tests | PASS | 7/7 Node tests; exact revision/hash drift still fails closed |
 | Effect boundary | PASS | W4 remains read-only/default-off; no Candidate identity, schema/migration, database mutation, deployment, activation, Pilot or traffic |
 
+## 2026-08-14 — W4 final quality source reseal
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact cross-repository pin | PASS | My-Chat `4db80c91a15859b51b193110efa45acaf019deb5`; parity `85cf56e2…`; `x5_joint_api=ecaa2de…` / 296 files; unchanged `wave4_binding_host=65d6b0a0…`; Nurture scenario `9f65dc8d…` / 328 files |
+| G2 and C30 upstream guards | PASS | Current W4-quality Host head accepted; C30 Host runtime revision `149424c…` and aggregate `aac525c4…` remain unchanged |
+| C30 owner source lock | PASS | Pin source `a577cb21c1ec425f57232e262ced931401b9c03f`; lock commit `329e2ab258eeb0575f43919d3938b77a821b96b6`; aggregate `e55c8771…`; only the two guard-bearing profiles rotate |
+| Default-off and pin-verifier tests | PASS | Default-off census remains zero for production C30 capabilities/actions/routes/activation models; verifier tests 7/7 |
+| Effect boundary | PASS | No Candidate identity/Freeze, schema/migration, database mutation, deployment, activation, Pilot or traffic |
+
 ## 2026-08-01 — G1 Joint Conformance (G1-06 matrix, joint run)
 
 | Check | Result | Evidence |

@@ -419,7 +419,8 @@ Project: `main`
   private routes; Institution Mobile remains action-free. Real W4 owner ports,
   public API/Mobile composition, deployment and device evidence remain later
   gates. W2/W3/W4 shared inputs and final green source revisions are reconciled
-  at My-Chat `e0e5e93…` and Nurture W4 `d5df447…`, without activation. G5-A
+  at My-Chat `4db80c9…`, Nurture W4 `6947185…`, exact-pin source
+  `a577cb2…` and C30 lock `329e2ab…`, without activation. G5-A
   Candidate Freeze remains a separate authorization. Q3 live
   qualification gates G5-D scoped internal-test enablement, not G5-A Freeze.
   Candidate Freeze, durable apply, deployment,
