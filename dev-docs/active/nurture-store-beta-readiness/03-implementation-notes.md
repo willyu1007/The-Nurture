@@ -48,8 +48,10 @@
 - Final green source revisions are My-Chat
   `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4
   `d5df447ff0ab33911396531e47775364e62b0e4f`; the exact W2/W3/W4 identities
-  are recorded in the readiness inventory. Candidate Freeze starts only after
-  this completed reconciliation and separate authorization.
+  are recorded in the readiness inventory. T-002 resealed the exact pin at
+  `a9e1be9054e5a42e0e985bf491da13c1228b77c9` and committed the current C30
+  lock at `035d009b7a5501081f13b2d173242b1d18020e92`. Candidate Freeze starts
+  only after this completed reconciliation and separate authorization.
 
 ## 2026-07-30 — Stage G5 delivery structure accepted
 

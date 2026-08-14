@@ -40,6 +40,7 @@
 | 2026-07-31 | Detailed G6 scope/order/acceptance and G5 carry-forward sync: governance apply/lint, T-002/T-008 doc lint, strict context verify, semantic scan and `git diff --check` | PASS; T-002 0 errors/21 warnings, T-008 0 errors/2 warnings |
 | 2026-08-01 | W0 Beta Profile v0 freeze: `nurture.six-surface-beta-profile@0.1.0`, governance apply/lint, strict context verify, scoped docs/anchor lint and `git diff --check` | PASS; required/optional paths are explicit, 9 files checked with 0 errors/0 warnings, and no Candidate/runtime/environment/traffic effect occurred |
 | 2026-08-14 | G5 shared-input source closure census after T-011 W4 | PASS; W2/W3/W3.1/W4 are classified, W4 remains read-only/default-off, final green sources are My-Chat `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4 `d5df447ff0ab33911396531e47775364e62b0e4f`, and Candidate Freeze was not run |
+| 2026-08-14 | T-002 current-pin reseal after W4 | PASS; workflow parity and wave4 remain unchanged, `x5_joint_api=de1e840d…`, Nurture scenario `6695faaa…`, C30 lock aggregate `2eb6f416…`, every gate remains default-off, and no Candidate identity was minted |
 
 ## Candidate Verification (planned)
 

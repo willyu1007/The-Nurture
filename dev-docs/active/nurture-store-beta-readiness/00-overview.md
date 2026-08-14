@@ -18,7 +18,9 @@
   W2 closing quality gate 已清除生成客户端漂移和旧 scope-draft 双轨，精确
   revision pin 验证通过。Freeze 前最终绿色 source revisions 已记录为
   My-Chat `e0e5e937cb16b6b49e918656a4af214ddea41a48` 与 Nurture W4
-  `d5df447ff0ab33911396531e47775364e62b0e4f`；下一步是单独授权 G5-A，
+  `d5df447ff0ab33911396531e47775364e62b0e4f`；T-002 exact-pin reseal
+  `a9e1be9054e5a42e0e985bf491da13c1228b77c9` 及其 lock commit
+  `035d009b7a5501081f13b2d173242b1d18020e92` 已通过。下一步是单独授权 G5-A，
   本轮不分配 Candidate identity。Synthetic token 与双平台真机
   属于后续 G5-D operator package；Q3 live qualification 是 G5-D 内部测试
   enablement 的前置，不是 G5-A Freeze 前置。不分配 Candidate identity、不实现
