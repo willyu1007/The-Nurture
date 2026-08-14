@@ -23,7 +23,8 @@
 - **Landing status (2026-08-12):** C30 has current-pin three-repository
   evidence again. The 2026-08-08 record remains historical after its revision
   binding was invalidated; record 26 is authoritative for the current Nurture
-  source pin and preserves records 22–25 as underlying qualification evidence.
+  source pin, including its 2026-08-14 W4 source-reseal addendum, and preserves
+  records 22–25 as underlying qualification evidence.
   All capabilities remain default-off and no durable environment was touched.
 - Next step: T-007 G4-F and T-010 are archived; T-008 G5-0 is complete.
   Keep C31-C35 closed until the separately authorized G5-A Candidate Freeze

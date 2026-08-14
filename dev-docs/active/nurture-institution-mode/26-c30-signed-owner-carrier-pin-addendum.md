@@ -96,3 +96,32 @@ T-008 and all activation gates remain separately closed.
   requalification evidence remains authoritative for runtime behavior.
   Both repos' fix batches carry their own two-round adversarial review
   records.
+
+## 2026-08-14 W4 source reseal addendum
+
+- My-Chat pin head is
+  `e0e5e937cb16b6b49e918656a4af214ddea41a48`, the committed T-039 W4
+  read-only director-presenter consumer. The shared workflow contract stays
+  `85cf56e24227e730f23f5b5f68684aec507d04b017e8746e4d078a2dd2151225`
+  and `wave4_binding_host` stays
+  `65d6b0a0b52cdb2f98151b2841761c52e8daf7329c981975b5143a9ad15f2a43`.
+- The broad `x5_joint_api` pin rotates to
+  `de1e840d859012585140ac37280c1e722493c6d0b23fb0b9abb4f47ba7f2d1e2`
+  because the exact scenario-integrations package now contains W4. The
+  existing C30 Host runtime revision and aggregate stay unchanged.
+- Nurture scenario self-pin is
+  `6695faaa101c0f356785819cc86dabf9cb4538a20b2d8e866228ead1321324f7`
+  across 328 exact files. Reseal source is
+  `a9e1be9054e5a42e0e985bf491da13c1228b77c9`; the C30 owner aggregate is
+  `2eb6f416d97a06ca5004889681fcc55291e2aed23e97c25479c039bf10c1c6e7`.
+- The reseal also closes accumulated lock drift from the already-qualified W5
+  trust hardening and W3.1 repository/context refresh. Six profiles rotate:
+  manifest foundation, private trust, pair-local persistence, canonical action,
+  protected-owner lifecycle and cumulative convergence. Changed inputs are
+  limited to the canonicalizer/trusted invocation, generated DB context and
+  registry, DB/scenario barrels, package metadata, test census and exact
+  upstream guards; the prior W5/W3.1 full unit and production-DB evidence
+  remains the qualification basis for those bytes.
+- This is an exact source-lock reseal backed by W4's own conformance evidence.
+  It does not authorize Candidate Freeze, schema/migration work, database
+  mutation, deployment, activation, Pilot or traffic.

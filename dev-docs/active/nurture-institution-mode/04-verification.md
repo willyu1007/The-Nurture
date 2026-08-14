@@ -2034,6 +2034,16 @@ the rejected checkpoint and are historical.
 | Census/routing | PASS | `verify:test-routing` dev-host 12 -> 10; scenario-service suite 42/42; unit 249/249. |
 | Effect boundary | PASS | No schema/migration, database mutation, capability, secret, deployment, activation or traffic change; default-off posture unchanged. |
 
+## 2026-08-14 — W4 exact source reseal
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact cross-repository pin | PASS | My-Chat `e0e5e937cb16b6b49e918656a4af214ddea41a48`; workflow parity `85cf56e2…`; `x5_joint_api=de1e840d…`; unchanged `wave4_binding_host=65d6b0a0…`; Nurture scenario `6695faaa…` / 328 files |
+| G2 and C30 upstream guards | PASS | `verify:g2-exit-contract` and `verify:c30-i3-upstream` accept the W4 head while retaining the original Host runtime aggregate |
+| C30 owner source lock | PASS | Source `a9e1be9054e5a42e0e985bf491da13c1228b77c9`; aggregate `2eb6f416…`; six accumulated W5/W3.1/W4 profiles rotate and the changed-file census is explicit in record 26 |
+| Pin verifier tests | PASS | 7/7 Node tests; exact revision/hash drift still fails closed |
+| Effect boundary | PASS | W4 remains read-only/default-off; no Candidate identity, schema/migration, database mutation, deployment, activation, Pilot or traffic |
+
 ## 2026-08-01 — G1 Joint Conformance (G1-06 matrix, joint run)
 
 | Check | Result | Evidence |
