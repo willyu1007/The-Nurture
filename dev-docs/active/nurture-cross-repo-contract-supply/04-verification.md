@@ -1,5 +1,13 @@
 # Verification
 
+## 2026-08-15 — W10-4 assistant-query registration
+
+- `candidate-core.test.mjs` 7/7 green after the fixture-list addition;
+  project-governance `sync --apply --changelog` + `lint` and strict doc
+  lint green; no derived-view drift.
+
+Verdict: `W10_4_REGISTERED / CANDIDATE_LIST_EXTENDED / G5A_FREEZE_UNTOUCHED`.
+
 ## 2026-08-15 — W10-3 assistant-query real owner ports
 
 - Unit lane: new 9-case service suite over fake ports (week arithmetic at

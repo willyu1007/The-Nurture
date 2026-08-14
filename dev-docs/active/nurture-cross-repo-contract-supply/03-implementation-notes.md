@@ -1,5 +1,13 @@
 # Implementation notes
 
+## 2026-08-15 — W10-4 assistant-query registration closes
+
+- Registered the W10 conformance fixtures in the service-candidate
+  standalone-fixture list (now 8 entries); the frozen G5-A Candidate is
+  untouched. The remaining registration surface (env 5-file set, censuses,
+  safe codes, context checksum) landed with W10-2/W10-3;
+  project-governance sync/lint re-ran clean with no derived-view drift.
+
 ## 2026-08-15 — W10-3 assistant-query real owner ports
 
 - Added the DB-free domain service
