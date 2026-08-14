@@ -1,5 +1,24 @@
 # Implementation notes
 
+## 2026-08-14 — Reseal tooling consolidation
+
+- Consolidated the manual reseal chain into
+  `scripts/reseal-cross-repo-pins.mjs` (`pnpm reseal:pins`): `plan` reports
+  every stale pin/lock/literal read-only; `apply --note` rewrites the
+  workflow contract pin plus the g2/c30-upstream/owner-adoption revision
+  literals (replacing their dated comment blocks with the supplied
+  rationale) and runs the three verifiers; `lock` mints the C30-I3 owner
+  adoption lock at the committed HEAD. The two-step split preserves the
+  commit-then-lock discipline; sibling worktrees must be clean; a Base
+  revision move is refused without `--allow-base-move`; a stale My-Chat
+  scenario-host-adoption lock is reported with its My-Chat-side refresh
+  instructions and never written from here.
+- `replaceAnchoredLiteral` is covered by
+  `scripts/reseal-cross-repo-pins.test.mjs` (`pnpm test:reseal-pins`, 3
+  cases). Entry points are recorded in the W6-W11 schedule artifact (per
+  batch/adoption) and in the T-002 implementation notes (C30 lock
+  governance).
+
 ## 2026-08-14 — W6-3 teacher class-stream real owner ports
 
 - Added the DB-free domain owner

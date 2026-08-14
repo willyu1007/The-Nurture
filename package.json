@@ -75,6 +75,8 @@
     "verify:x4-handoff-replay-contract": "node scripts/assert-x4-handoff-replay-contract.mjs",
     "test:workflow-contract-pin": "node --test scripts/verify-workflow-contract-pin.test.mjs",
     "verify:workflow-contract-pin": "node scripts/verify-workflow-contract-pin.mjs",
+    "reseal:pins": "node scripts/reseal-cross-repo-pins.mjs",
+    "test:reseal-pins": "node --test scripts/reseal-cross-repo-pins.test.mjs",
     "verify:c30-i3-upstream": "node scripts/verify-c30-i3-upstream.mjs",
     "verify:c30-i3-default-off": "node scripts/verify-c30-i3-default-off.mjs",
     "hash:c30-i3-owner-adoption": "node scripts/compute-c30-i3-owner-adoption-hash.mjs",

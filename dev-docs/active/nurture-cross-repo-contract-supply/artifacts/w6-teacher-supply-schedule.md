@@ -45,6 +45,10 @@ chained into `verify:formal-ingress-contract`, runtime response enforcement,
 unit + scenario-service e2e lanes, a standalone digest-pin handoff artifact
 (W2 precedent), and the My-Chat sanitized fixture-snapshot refresh duty
 (`My-Chat packages/scenario-integrations/fixtures/nurture/SNAPSHOT.json`).
+Because every source commit rotates the directory-level pin populations,
+each batch (and each My-Chat consumer adoption) ends with the standard
+reseal flow: `pnpm reseal:pins plan` -> `apply --note "<why>"` -> commit ->
+`pnpm reseal:pins lock` -> commit.
 
 | Batch | Contract identity | Rows served | Reuses | Notes |
 | --- | --- | --- | --- | --- |

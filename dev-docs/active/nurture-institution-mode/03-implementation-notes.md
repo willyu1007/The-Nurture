@@ -18,6 +18,17 @@
 The current C30 qualification binds Base `536638a`, My-Chat `2d415ce`, Nurture
 lock source `de4897f…` and owner lock `856cd6c6…`; record 26 is authoritative.
 
+Tooling note (2026-08-14): routine content-inert pin/lock reseals (the
+workflow contract pin, the g2/c30-upstream/owner-adoption revision literals
+and the C30-I3 owner lock) are now executed with `pnpm reseal:pins`
+(`plan` -> `apply --note` -> commit -> `lock` -> commit; see
+`scripts/reseal-cross-repo-pins.mjs`). The tool refuses a Base revision move
+without `--allow-base-move`, refuses dirty sibling worktrees, and never
+writes My-Chat's own scenario-host-adoption lock — stale states there are
+reported with the My-Chat-side refresh instructions. Semantic
+requalification (x5 joint lanes, record addenda) remains a separate,
+human-judged step.
+
 ## What changed
 
 - 2026-08-12: Adopted final My-Chat T-041 provider source `2d415ce`, Nurture
