@@ -6,12 +6,19 @@
 - Updated: 2026-08-14
 - Supply extension (2026-08-14): the owner directed the main effort to the
   teacher-side contract gaps. The batch schedule W6-W11 is frozen in
-  `artifacts/w6-teacher-supply-schedule.md` and summarized in `01-plan.md`;
-  the next executable step is the W6
-  `nurture.teacher-class-stream-presenter@1.0.0` design freeze, then
-  implementation per the W4 skeleton plus the W3.1 real-owner step. All
-  batches remain default-off contract supply with no activation, durable
-  apply, deployment or traffic.
+  `artifacts/w6-teacher-supply-schedule.md` and summarized in `01-plan.md`.
+  W6 progress: the scope freeze
+  (`artifacts/w6-class-stream-presenter-scope-freeze.md`), the W6-1 contract
+  artifact (digest `sha256:00a84945…`, 12 fixtures / 12 invalid probes) and
+  the W6-2 default-off runtime (four mounted routes, censuses expanded,
+  env key registered, e2e green, built-process smoke green) are complete
+  and committed. The next executable step is W6-3: real Prisma owner ports
+  per the freeze (scenario domain service + nurture-db composition and
+  repositories + unit and production-DB lanes, reusing
+  `PrismaCaregiverBoardReadPort` and the three-layer schedule models),
+  then W6-4 governance sync and the W6-5 digest-pin handoff with the
+  My-Chat sanitized snapshot refresh. All batches remain default-off
+  contract supply with no activation, durable apply, deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
