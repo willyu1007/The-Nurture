@@ -76,3 +76,21 @@ committed return `outcome_unknown/reconcile_same_command`; deterministic
 validation, revocation, expiry and conflict failures return closed
 `not_committed` reasons. No path tells the caller to mint a replacement command
 for an unknown outcome.
+
+## W4 director presenter boundary
+
+```text
+My-Chat current institution context (routing only)
+  -> Nurture current Participant/role/association/Institution/purpose reread
+  -> read-only overview | bounded drilldown | protected-material presenter
+  -> exact pinned My-Chat private consumer
+```
+
+The W4 interface is deliberately not a command surface. Institution Mobile
+remains action-free under the current product contract; D-O13 is represented
+only as `web_workbench_required`, and action, confirmation, command, storage
+and URL fields are rejected. Every deeper open reruns current authority and
+uses owner-issued opaque refs. Section failures are independent, missing never
+means zero or normal, attention never ranks staff, and family-private content
+is absent by default. Real owner ports, public API/Mobile composition,
+deployment and device evidence remain separate increments.

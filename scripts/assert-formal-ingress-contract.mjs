@@ -53,6 +53,14 @@ const parentCommunicationOwnerPaths = {
   PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH:
     "/internal/nurture/parent-communication-owner/v1/send-text",
 };
+const directorPresenterPaths = {
+  DIRECTOR_PRESENTER_OVERVIEW_PATH:
+    "/internal/nurture/director-presenter/v1/overview",
+  DIRECTOR_PRESENTER_DRILLDOWN_PATH:
+    "/internal/nurture/director-presenter/v1/drilldown",
+  DIRECTOR_PRESENTER_MATERIALS_PATH:
+    "/internal/nurture/director-presenter/v1/materials",
+};
 const expectedPaths = [
   healthPath,
   ownerPath,
@@ -86,6 +94,9 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_MEDIA_ACCESS_PATH`,
   `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH`,
   `apps/scenario-service/src/parent-communication-owner.controller.ts:POST:PARENT_COMMUNICATION_OWNER_SUMMARY_PATH`,
+  `apps/scenario-service/src/director-presenter.controller.ts:POST:DIRECTOR_PRESENTER_DRILLDOWN_PATH`,
+  `apps/scenario-service/src/director-presenter.controller.ts:POST:DIRECTOR_PRESENTER_MATERIALS_PATH`,
+  `apps/scenario-service/src/director-presenter.controller.ts:POST:DIRECTOR_PRESENTER_OVERVIEW_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -95,12 +106,14 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",
   "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
   "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
+  "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",
   "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
   "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
+  "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -866,6 +879,151 @@ for (const route of [
   assertIncludes(
     parentCommunicationOwnerHttpSource,
     "body.interface_contract.digest !== PARENT_COMMUNICATION_OWNER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const directorPresenterControllerSource = read(
+  "apps/scenario-service/src/director-presenter.controller.ts",
+);
+const directorPresenterHttpSource = read(
+  "apps/scenario-service/src/director-presenter-http.ts",
+);
+const directorPresenterRuntimeSource = read(
+  "apps/scenario-service/src/director-presenter-runtime.ts",
+);
+const directorPresenterCompositionSource = read(
+  "apps/scenario-service/src/director-presenter-composition.ts",
+);
+const directorPresenterResponseValidatorSource = read(
+  "apps/scenario-service/src/director-presenter-response-validator.ts",
+);
+const directorPresenterContractSource = read(
+  "packages/nurture-scenario/src/director-presenter-contract.ts",
+);
+const directorPresenterArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/director-presenter/v1/director-presenter.owner-contract.json",
+  ),
+);
+assertIncludes(
+  directorPresenterControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "director presenter guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  directorPresenterControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "director presenter guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.director-presenter"',
+  'version: "1.0.0"',
+  "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'mobile_mode: "read_only"',
+]) {
+  assertIncludes(
+    directorPresenterContractSource,
+    fragment,
+    `director presenter exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  directorPresenterArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "director presenter mounted route posture",
+);
+assertEqual(
+  directorPresenterArtifact.mobile_posture?.mode,
+  "read_only",
+  "director presenter Mobile remains read-only",
+);
+assertEqual(
+  directorPresenterArtifact.mobile_posture?.operation_entry,
+  "web_workbench_required",
+  "director presenter routes Institution operations to Web",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_DIRECTOR_PRESENTER_ENABLED",
+  "director presenter has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    directorPresenterRuntimeSource,
+    fragment,
+    `director presenter complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  directorPresenterResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "director presenter runtime compiles the published schema artifact",
+);
+assertIncludes(
+  directorPresenterResponseValidatorSource,
+  "digest !== DIRECTOR_PRESENTER_INTERFACE.digest",
+  "director presenter runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  directorPresenterCompositionSource,
+  "assertPublishedDirectorPresenterResponse(operation, response)",
+  "director presenter composition enforces published responses",
+);
+assertIncludes(
+  directorPresenterCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "director presenter rereads current authority for every operation",
+);
+for (const route of [
+  {
+    constant: "DIRECTOR_PRESENTER_OVERVIEW_PATH",
+    handler: "overview",
+    parser: "parseDirectorPresenterOverviewRequestV1",
+  },
+  {
+    constant: "DIRECTOR_PRESENTER_DRILLDOWN_PATH",
+    handler: "drilldown",
+    parser: "parseDirectorPresenterDrilldownRequestV1",
+  },
+  {
+    constant: "DIRECTOR_PRESENTER_MATERIALS_PATH",
+    handler: "materials",
+    parser: "parseDirectorPresenterMaterialRequestV1",
+  },
+]) {
+  const expectedPath = directorPresenterPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    directorPresenterContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    directorPresenterControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    directorPresenterHttpSource,
+    "contract.digest !== DIRECTOR_PRESENTER_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

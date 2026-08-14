@@ -137,3 +137,15 @@
 - Prevention: every command built on a broader idempotency namespace must bind
   the narrower actor/scope in its canonical payload and carry a negative
   cross-actor replay test.
+
+## 2026-08-14 — Source aliases covered subpaths but not package roots
+
+- Symptom: the focused W4 scenario-service test could not resolve root imports
+  for `@the-nurture/scenario` and `@the-nurture/db` without first building the
+  workspace packages.
+- Root cause: Vitest source aliases covered their subpaths but omitted the exact
+  package-root specifiers used by the production controller composition.
+- Fix: add exact root aliases after the existing subpath aliases so source tests
+  resolve TypeScript while built runtime exports remain unchanged.
+- Prevention: when a workspace exposes both root and subpath exports, test the
+  exact production import forms in a clean source-only runner.

@@ -8,12 +8,13 @@ Project: `main`
 
 ### Current Focus
 
-- Active tasks: T-002 (institution-mode owner gates, holding at C30) and
-  T-011 (cross-repo contract supply and guardian-decision callback). T-007
+- Active tasks: T-002 (institution-mode owner gates, holding after C30), T-008
+  (G5-0 complete; final shared-input revision reconciliation next) and T-011
+  (cross-repo contract supply and guardian-decision callback). T-007
   and T-010 are archived with their exact default-off exits retained.
   2026-08-13 owner decision: authorizations and quota budgets released for the
-  agreed sequencing — T-008 G5-0 is separately authorized and starts after the
-  T-011 W1/W2 supply steps; C31 stays deferred until after a G5-A Candidate
+  agreed sequencing — T-008 G5-0 is complete after the T-011 W1/W2 supply
+  steps; C31 stays deferred until after a separately authorized G5-A Candidate
   Freeze. Durable apply, activation, deployment and traffic keep their own
   per-gate decisions.
 - Archived baseline (2026-08-11 approval): T-001, T-003, T-004, T-005, T-006,
@@ -45,10 +46,12 @@ Project: `main`
   and wave4 unchanged) and Nurture owner lock `fbbc34c6…` sealed by
   `170edd4`. C31–C35, D and Pilot remain closed.
 - Cross-repo contract supply order (decided 2026-08-11): parent-context
-  presenter and IR-C01 parent-communication P0 are now exact-pin adopted and
-  default-off; the director presenter is the next contract-supply item. W3 live
-  local owner ports are qualified; deployment/current-context secrets/private
-  path and native/accessibility evidence remain W3.2 gates.
+  presenter, IR-C01 parent-communication P0 and the read-only director
+  presenter are now published, exact-pin adopted and default-off. W3 live local
+  owner ports are qualified; deployment/current-context secrets/private path
+  and native/accessibility evidence remain W3.2 gates. W4 real owner ports,
+  public API/Mobile composition, deployment and device evidence remain later
+  gates; Institution Mobile stays action-free and director operations stay Web.
   This supply line and
   the guardian-decision callback joint design (transport 1.0.0 has none;
   teacher queue stops at `pending`) are now owned by T-011; the callback
@@ -59,15 +62,16 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **W3.2 deployment qualification or W4 director supply** after My-Chat T-039
-   completed W3 P0 adoption of `nurture.parent-communication-owner@1.0.0`
-   (`sha256:b1dce3a7…`) and Nurture closed W3.1 local owner qualification. Keep
+1. **Final shared-input revision reconciliation before Candidate Freeze** after
+   My-Chat T-039 completed W2/W3/W4 exact-pin adoption and Nurture completed
+   W4 read-only source supply. Keep
    provider and consumer flags false; W3.2 requires separate authorization;
    use the W5-hardened settlement surface as the base for the separate W1
    callback implementation batch (all default-off).
-2. **Candidate shared-input closure** with the completed W2 adoption, then schedule the
-   separately authorized G5-A Freeze without dragging the later device window
-   into its prerequisites.
+2. **Separately authorize G5-A Candidate Freeze** only after the final green
+   source revisions and exact W2/W3/W4 digests are recorded. Do not drag the
+   later deployment/device window into Freeze prerequisites or treat Freeze as
+   activation.
 3. **G5-A Candidate Freeze** stays strictly serial and separately
    authorized; W1 frozen design and profile v1.0.0 satisfy its design
    preconditions. Synthetic token, Q3 live qualification and dual-platform

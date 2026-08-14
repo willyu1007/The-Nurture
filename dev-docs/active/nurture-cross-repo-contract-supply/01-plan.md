@@ -75,3 +75,25 @@ W3.2 remains separately authorized work.
 - Change gates only under a separate rollout decision.
 
 W3.2 is not authorized by the W3.1 implementation request.
+
+## W4 — Read-only director presenter
+
+1. Publish `nurture.director-presenter@1.0.0` with sectioned overview,
+   bounded drilldown and protected-material read operations covering D-O01
+   through D-O14.
+2. Reread current Nurture institution role, association, purpose and protected
+   display policy for every overview, drilldown and material open. Host
+   workspace/user/context remains routing only.
+3. Preserve the current product SSOT: Institution Mobile is read-only. D-O13
+   reports `web_workbench_required`; no action, confirmation or command ref is
+   admitted.
+4. Mount service-authenticated private routes behind a default-false provider
+   gate that additionally requires complete authority/owner ports.
+5. Supply closed schemas, conformance fixtures, runtime response enforcement
+   and an exact-pin My-Chat private consumer. Public API/Mobile composition and
+   real owner ports stay in later owner/consumer increments.
+
+Exit: complete on 2026-08-14 at digest
+`sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1`.
+All provider/consumer behavior remains dormant; no Candidate, deployment,
+activation, traffic or device claim was created.

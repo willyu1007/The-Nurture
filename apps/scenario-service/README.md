@@ -63,6 +63,7 @@ The service reads configuration only through `src/config.ts`.
 | `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `false` | exact `true` enables only the additional Institution owner-read route after the Harness is available |
 | `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED` | `false` | exact `true` permits parent-context composition only when the exact adopted digest and all owner ports are also configured |
 | `NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED` | `false` | exact `true` permits parent-communication composition only when the exact adopted digest and authority/owner/async ports are also configured |
+| `NURTURE_DIRECTOR_PRESENTER_ENABLED` | `false` | exact `true` permits the read-only director presenter only when its exact digest and current-authority/owner ports are configured; Institution Mobile never gains command authority |
 
 The service token is loaded into a dedicated timing-safe authenticator rather
 than the printable non-secret configuration object. The evidence key is loaded

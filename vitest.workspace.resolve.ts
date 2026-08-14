@@ -19,11 +19,17 @@ export const workspaceResolve = {
     "@the-nurture/scenario/family-growth": source(
       "./packages/nurture-scenario/src/family-growth.ts",
     ),
+    "@the-nurture/scenario": source(
+      "./packages/nurture-scenario/src/index.ts",
+    ),
     "@the-nurture/db/binding-owner": source(
       "./packages/nurture-db/src/binding-owner.ts",
     ),
     "@the-nurture/db/harness": source(
       "./packages/nurture-db/src/harness-entry.ts",
+    ),
+    "@the-nurture/db": source(
+      "./packages/nurture-db/src/index.ts",
     ),
   },
 } as const;

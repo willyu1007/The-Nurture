@@ -1,0 +1,660 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.director-presenter",
+    "version": "1.0.0",
+    "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+  },
+  "required_negative_scenarios": [
+    "scope_loss",
+    "revoked",
+    "stale_context_ref",
+    "ambiguous_institution",
+    "purpose_denied",
+    "non_retryable_refresh",
+    "protected_material_denied",
+    "mobile_action_forbidden"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "w4-overview-ready-partial",
+      "operation": "overview_query",
+      "polarity": "positive",
+      "scenario": "sectioned_partial",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-overview-01",
+        "context_ref": "context:institution:maple:v4",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:director:maple:v4",
+          "presentation_role": "institution_director",
+          "scope_kind": "institution",
+          "scope_ref": "scope:institution:maple:v4",
+          "context_ref": "context:institution:maple:v4",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T02:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:director:overview:maple:2026-08-14:v4",
+          "interface_key": "nurture.director-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+          "workspace_id": "workspace-director-01",
+          "my_chat_user_id": "user-director-01",
+          "presentation_role": "institution_director",
+          "context_ref": "context:institution:maple:v4",
+          "resolution_ref": "resolution:director:maple:v4",
+          "scope_version": 4,
+          "operation": "overview_query",
+          "query_key": "2026-08-14",
+          "expires_at": "2026-08-14T02:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T02:00:00.000Z",
+        "freshness": "fresh",
+        "overall_state": "partial",
+        "organization": {
+          "organization_ref": "organization:maple:display",
+          "display_name": "Maple kindergarten",
+          "local_date": "2026-08-14"
+        },
+        "sections": [
+          {
+            "section_key": "attendance",
+            "status": "ready",
+            "title": "Attendance",
+            "summary": "36 of 40 current formal enrollments have a submitted attendance state.",
+            "metric": {
+              "primary_value": 36,
+              "secondary_value": 40,
+              "unit": "ratio",
+              "definition": "Submitted current-day attendance over current formal enrollment roster.",
+              "time_window_label": "Today"
+            },
+            "drilldown_ref": "drilldown:attendance:maple:2026-08-14:v4",
+            "availability": "current"
+          },
+          {
+            "section_key": "activity",
+            "status": "ready",
+            "title": "Activities",
+            "summary": "Six current-day activities are visible in the approved institution scope.",
+            "metric": {
+              "primary_value": 6,
+              "unit": "count",
+              "definition": "Current-day activity records visible to this institution purpose.",
+              "time_window_label": "Today"
+            },
+            "drilldown_ref": "drilldown:activity:maple:2026-08-14:v4",
+            "availability": "current"
+          },
+          {
+            "section_key": "message_response",
+            "status": "ready",
+            "title": "Family communication",
+            "summary": "Response state is an aggregate service signal and is not a staff ranking.",
+            "metric": {
+              "primary_value": 12,
+              "secondary_value": 15,
+              "unit": "ratio",
+              "definition": "Current-window family items with at least one current CareGroup response.",
+              "time_window_label": "Last 24 hours"
+            },
+            "availability": "current"
+          },
+          {
+            "section_key": "home_kindergarten_flow",
+            "status": "ready",
+            "title": "Home and kindergarten flow",
+            "summary": "Eight home-to-kindergarten and eleven kindergarten-to-home items are visible.",
+            "metric": {
+              "primary_value": 8,
+              "secondary_value": 11,
+              "unit": "flow",
+              "definition": "Direction-safe current-window CareInteraction aggregates.",
+              "time_window_label": "Today"
+            },
+            "drilldown_ref": "drilldown:flow:maple:2026-08-14:v4",
+            "availability": "current"
+          },
+          {
+            "section_key": "authorization_changes",
+            "status": "unavailable",
+            "title": "Authorization changes",
+            "summary": "Current authorization-change presentation is unavailable.",
+            "availability": "not_available"
+          },
+          {
+            "section_key": "philosophy_observation",
+            "status": "ready",
+            "title": "Focus and observations",
+            "summary": "Observation volume is descriptive and does not establish quality or causality.",
+            "metric": {
+              "primary_value": 9,
+              "unit": "count",
+              "definition": "Current owner-approved observations associated with the displayed focus.",
+              "time_window_label": "This week"
+            },
+            "drilldown_ref": "drilldown:observation:maple:week-33:v4",
+            "availability": "current"
+          },
+          {
+            "section_key": "trend",
+            "status": "ready",
+            "title": "Seven-day activity trend",
+            "summary": "The trend shows recorded activity volume, not performance.",
+            "trend": {
+              "points": [
+                4,
+                5,
+                5,
+                7,
+                6,
+                3,
+                6
+              ],
+              "accessible_summary": "Recorded activity rose from four to six across the displayed seven days, with a high of seven."
+            },
+            "availability": "current"
+          },
+          {
+            "section_key": "class_load_attention",
+            "status": "ready",
+            "title": "Class support signal",
+            "summary": "One class crossed the configured absolute message-volume support threshold; this is not a staff judgment.",
+            "metric": {
+              "primary_value": 1,
+              "unit": "count",
+              "definition": "Classes crossing the configured absolute support threshold.",
+              "time_window_label": "Today"
+            },
+            "drilldown_ref": "drilldown:support:maple:2026-08-14:v4",
+            "availability": "current"
+          },
+          {
+            "section_key": "family_focus_attention",
+            "status": "empty",
+            "title": "New family focus signals",
+            "summary": "No owner-approved aggregate signal is available in the current window.",
+            "availability": "current"
+          },
+          {
+            "section_key": "organized_materials",
+            "status": "ready",
+            "title": "Organized materials",
+            "summary": "Protected items require a fresh purpose check on every open.",
+            "material_collection_ref": "materials:maple:2026-08-14:v4",
+            "availability": "current"
+          },
+          {
+            "section_key": "operation_entry",
+            "status": "unavailable",
+            "title": "Institution operations",
+            "summary": "Institution operations remain in the Web workbench.",
+            "availability": "web_workbench_required"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w4-drilldown-ready",
+      "operation": "drilldown_query",
+      "polarity": "positive",
+      "scenario": "current_authorized_class_list",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-drilldown-01",
+        "context_ref": "context:institution:maple:v4",
+        "drilldown_ref": "drilldown:activity:maple:2026-08-14:v4"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:director:maple:v4",
+          "presentation_role": "institution_director",
+          "scope_kind": "institution",
+          "scope_ref": "scope:institution:maple:v4",
+          "context_ref": "context:institution:maple:v4",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T02:01:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:director:drilldown:activity:v4",
+          "interface_key": "nurture.director-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+          "workspace_id": "workspace-director-01",
+          "my_chat_user_id": "user-director-01",
+          "presentation_role": "institution_director",
+          "context_ref": "context:institution:maple:v4",
+          "resolution_ref": "resolution:director:maple:v4",
+          "scope_version": 4,
+          "operation": "drilldown_query",
+          "query_key": "drilldown:activity:maple:2026-08-14:v4",
+          "expires_at": "2026-08-14T02:06:00.000Z"
+        },
+        "generated_at": "2026-08-14T02:01:00.000Z",
+        "drilldown_ref": "drilldown:activity:maple:2026-08-14:v4",
+        "title": "Current-day activities by class",
+        "purpose_label": "Institution activity support",
+        "breadcrumbs": [
+          {
+            "label": "Activities",
+            "level": "aggregate"
+          }
+        ],
+        "items": [
+          {
+            "item_ref": "drilldown-item:class:aster:v2",
+            "kind": "class",
+            "label": "Aster class",
+            "summary": "Three visible current-day activities.",
+            "next_drilldown_ref": "drilldown:activity:aster:2026-08-14:v2",
+            "material_collection_ref": "materials:aster:2026-08-14:v2"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w4-material-ready-protected",
+      "operation": "material_query",
+      "polarity": "positive",
+      "scenario": "fresh_protected_owner_stream",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-material-01",
+        "context_ref": "context:institution:maple:v4",
+        "collection_ref": "materials:aster:2026-08-14:v2"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:director:maple:v4",
+          "presentation_role": "institution_director",
+          "scope_kind": "institution",
+          "scope_ref": "scope:institution:maple:v4",
+          "context_ref": "context:institution:maple:v4",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T02:02:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:director:materials:aster:v2",
+          "interface_key": "nurture.director-presenter",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1",
+          "workspace_id": "workspace-director-01",
+          "my_chat_user_id": "user-director-01",
+          "presentation_role": "institution_director",
+          "context_ref": "context:institution:maple:v4",
+          "resolution_ref": "resolution:director:maple:v4",
+          "scope_version": 4,
+          "operation": "material_query",
+          "query_key": "materials:aster:2026-08-14:v2",
+          "expires_at": "2026-08-14T02:04:00.000Z"
+        },
+        "generated_at": "2026-08-14T02:02:00.000Z",
+        "collection_ref": "materials:aster:2026-08-14:v2",
+        "items": [
+          {
+            "material_ref": "material:activity:aster:0001",
+            "kind": "photo",
+            "title": "Morning construction activity",
+            "occurred_at": "2026-08-14T01:20:00.000Z",
+            "alt_text": "Children's building materials arranged on a classroom table.",
+            "access": {
+              "status": "protected_available",
+              "access_ref": "access:director:material:0001",
+              "access_expires_at": "2026-08-14T02:04:00.000Z",
+              "delivery_mode": "owner_stream"
+            }
+          }
+        ],
+        "next_cursor": null
+      }
+    },
+    {
+      "fixture_id": "w4-overview-scope-loss",
+      "operation": "overview_query",
+      "polarity": "negative",
+      "scenario": "scope_loss",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-01",
+        "context_ref": "context:institution:maple:v4",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:maple:v4",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-overview-revoked",
+      "operation": "overview_query",
+      "polarity": "negative",
+      "scenario": "revoked",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-02",
+        "context_ref": "context:institution:maple:v4",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:maple:v4",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-overview-stale-context",
+      "operation": "overview_query",
+      "polarity": "negative",
+      "scenario": "stale_context_ref",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-03",
+        "context_ref": "context:institution:maple:v3",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:maple:v3",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "context_changed",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-overview-ambiguous-institution",
+      "operation": "overview_query",
+      "polarity": "negative",
+      "scenario": "ambiguous_institution",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-04",
+        "context_ref": "context:institution:ambiguous:v1",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:ambiguous:v1",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "ambiguous_institution",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-drilldown-purpose-denied",
+      "operation": "drilldown_query",
+      "polarity": "negative",
+      "scenario": "purpose_denied",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-05",
+        "context_ref": "context:institution:maple:v4",
+        "drilldown_ref": "drilldown:family-private:blocked:v1"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:maple:v4",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "purpose_denied",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-overview-refresh-not-retryable",
+      "operation": "overview_query",
+      "polarity": "negative",
+      "scenario": "non_retryable_refresh",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-06",
+        "context_ref": "context:institution:maple:v4",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:maple:v4",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "refresh_not_retryable",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-material-protected-denied",
+      "operation": "material_query",
+      "polarity": "negative",
+      "scenario": "protected_material_denied",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-mask-07",
+        "context_ref": "context:institution:maple:v4",
+        "collection_ref": "materials:protected:denied:v1"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:institution:maple:v4",
+        "masked_at": "2026-08-14T02:03:00.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "protected_material_denied",
+          "purge_partition": true,
+          "content_masked": true,
+          "material_access_invalidated": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w4-overview-mobile-action-forbidden",
+      "operation": "overview_query",
+      "polarity": "negative",
+      "scenario": "mobile_action_forbidden",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.director-presenter",
+          "version": "1.0.0",
+          "digest": "sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1"
+        },
+        "workspace_id": "workspace-director-01",
+        "my_chat_user_id": "user-director-01",
+        "host_request_id": "request-action-01",
+        "context_ref": "context:institution:maple:v4",
+        "local_date": "2026-08-14"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:institution:maple:v4",
+        "failed_at": "2026-08-14T02:03:00.000Z",
+        "reason_code": "mobile_action_forbidden",
+        "retryable": false
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w4-invalid-request-foreign-role",
+      "operation": "overview_query",
+      "source_fixture_id": "w4-overview-ready-partial",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "role"
+        ],
+        "value": "institution_director"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-request-pin-drift",
+      "operation": "overview_query",
+      "source_fixture_id": "w4-overview-ready-partial",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "interface_contract",
+          "version"
+        ],
+        "value": "1.0"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-action-ref",
+      "operation": "overview_query",
+      "source_fixture_id": "w4-overview-ready-partial",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "sections",
+          10,
+          "action_ref"
+        ],
+        "value": "action:forbidden"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-operation-available",
+      "operation": "overview_query",
+      "source_fixture_id": "w4-overview-ready-partial",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "sections",
+          10,
+          "availability"
+        ],
+        "value": "current"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-foreign-context",
+      "operation": "drilldown_query",
+      "source_fixture_id": "w4-drilldown-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "owner_resolution",
+          "context_ref"
+        ],
+        "value": "context:institution:foreign:v1"
+      }
+    },
+    {
+      "fixture_id": "w4-invalid-response-storage-url",
+      "operation": "material_query",
+      "source_fixture_id": "w4-material-ready-protected",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "items",
+          0,
+          "url"
+        ],
+        "value": "https://example.invalid/protected"
+      }
+    }
+  ]
+}

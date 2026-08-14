@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-13T21:54:25Z`
+Generated at (UTC): `2026-08-14T04:20:23Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -21,6 +21,7 @@ Generated at (UTC): `2026-08-13T21:54:25Z`
 | `MY_CHAT_INTERNAL_BASE_URL` | `active` | `url` | no | no | `` | `` | `*` | `` | `` | `` | My-Chat host base URL for host-ward internal reads (ST-5 derived age/stage); the shared internal service token authenticates the call. Absence keeps derived reads disabled. |
 | `NURTURE_BACKEND_URL` | `active` | `url` | no | no | `http://localhost:3200` | `` | `dev` | `` | `` | `` | Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field. |
 | `NURTURE_BINDING_EVIDENCE_KEY` | `active` | `string` | no | yes | `` | `nurture_binding_evidence_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) enabling the scenario-binding owner endpoint; absence keeps the endpoint disabled and never degrades to an unhashed path. |
+| `NURTURE_DIRECTOR_PRESENTER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the read-only director presenter v1 composition; true requires the exact adopted contract digest, current-authority/owner ports and separate activation approval, and never enables Institution Mobile commands. |
 | `NURTURE_HARNESS_INTEGRITY_KEY` | `active` | `string` | no | yes | `` | `nurture_harness_integrity_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) for Harness confirmation input-integrity tags and owner-issued target refs; absence keeps both Harness routes disabled. |
 | `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption. |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `nurture_internal_service_token` | `*` | `` | `` | `` | Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged. |

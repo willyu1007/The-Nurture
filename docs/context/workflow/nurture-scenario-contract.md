@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 generic Host adoption accepted default-off; C30-I3 scope frozen; I3-A, joint adoption and activation require separate authorization
+Status: G4 exit and C30 current-pin requalification complete; surface identity is `nurture.surface-contract@1.20.0`; W2 parent context, W3.1 parent communication and W4 read-only director contract supply are qualified default-off. G5 Candidate is not frozen; C31+, deployment, activation and traffic require their own gates.
 
 ## Product Terminology Compatibility
 

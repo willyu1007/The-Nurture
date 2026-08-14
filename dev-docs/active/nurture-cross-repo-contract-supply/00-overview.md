@@ -28,7 +28,8 @@
   false. W3.2 deployment/current-context carrier, secret delivery,
   cross-service/native/accessibility qualification and any gate change require
   separate authorization; protected media remains unavailable. The other
-  permitted planning branch is W4 director contract design. W1 is FROZEN
+  completed W4 branch publishes the read-only director contract described
+  below. W1 is FROZEN
   (2026-08-13):
   `artifacts/w1-guardian-decision-callback-design-draft.md` is the frozen
   joint design record for the additive `family_growth_transport@1.1.0`
@@ -47,9 +48,14 @@
   exact-pin consumer adoption on 2026-08-13 across its default-off private
   source, public API/client and production Mobile controller; joint negative
   conformance passes with no activation. W3 now has the P0 contract/runtime
-  boundary and exact consumer adoption described above; W4 director presenter
-  remains the next contract-supply workstream. My-Chat owns consumer adoption and must preserve
-  default-off behavior. The closing quality pass removed the obsolete W2 scope
+  boundary and exact consumer adoption described above. W4 is published as
+  `nurture.director-presenter@1.0.0` at digest
+  `sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1`;
+  its three default-off read operations cover D-O01 through D-O14, and the
+  current Institution Mobile action-free rule makes D-O13 explicitly
+  `web_workbench_required` with no action/confirmation/command refs. My-Chat
+  owns consumer adoption and has exact-pinned the strict private source without
+  composing a public API or Mobile controller. The closing quality pass removed the obsolete W2 scope
   draft, made the accepted digest pin the only active handoff, repaired
   generated-client typecheck drift and passed the repository unit/typecheck,
   direct frontend lint and exact-revision cross-repo pin gates. W1's design
@@ -95,8 +101,9 @@ conformance fixtures, all default-off.
 - W3 IR-C01 parent-communication gates: owner contracts for the
   parent-communication surfaces (P-C01..P-C07 equivalents) with
   negative-path fixtures.
-- W4 director presenter: the director lens owner contract (D-O01..D-O14
-  equivalents); starts only after W2/W3.
+- W4 director presenter: the read-only director lens owner contract
+  (D-O01..D-O14 equivalents), exact-pin consumer and conformance fixtures;
+  Institution Mobile remains action-free and operations stay in Web.
 - W5 audit-defect hardening: fix the 2026-08-13 Codex audit findings in
   the provider delivery/receipt path and the family-sharing validators
   (`artifacts/w5-audit-defect-ledger.md`). These defects originate in
@@ -148,7 +155,11 @@ conformance fixtures, all default-off.
   teacher-text confirm, exact replay, revocation rollback and bounded
   latest-generation behavior are qualified. Media streaming, deployment,
   activation, traffic and device evidence remain separate gates.
-- [ ] W4: the director presenter contract is registered after W2/W3.
+- [x] W4: `nurture.director-presenter@1.0.0` is registered after W2/W3 with
+  exact digest, three default-off service-authenticated read routes, current-
+  authority port contracts, conformance fixtures and a strict My-Chat private
+  consumer. Public API/Mobile composition, real owner ports, deployment and
+  device evidence remain later gates.
 - [x] W5: every open ledger item is fixed forward-only with its negative
   test; N3's additive migration passes disposable-target qualification;
   N2/N5/N6/N8 land before or with the W1 callback implementation.

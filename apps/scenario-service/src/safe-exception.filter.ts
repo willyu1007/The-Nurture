@@ -27,6 +27,7 @@ const allowedErrors = new Set([
   "institution_business_communication_read_disabled",
   "teacher_release_owner_disabled",
   "parent_context_presenter_disabled",
+  "director_presenter_disabled",
   "family_sharing_private_disabled",
   "family_sharing_private_auth_failed",
   "family_sharing_private_replay",
@@ -36,6 +37,8 @@ const allowedErrors = new Set([
   "teacher_release_owner_contract_mismatch",
   "invalid_parent_context_presenter_request",
   "parent_context_presenter_contract_mismatch",
+  "invalid_director_presenter_request",
+  "director_presenter_contract_mismatch",
   // family_growth_transport@1.0.0 §5 — the frozen rendition-exchange taxonomy.
   "service_unauthorized",
   "rendition_ref_invalid",
@@ -83,7 +86,8 @@ export class SafeExceptionFilter implements ExceptionFilter {
       error !== "harness_disabled" &&
       error !== "institution_business_communication_read_disabled" &&
       error !== "teacher_release_owner_disabled" &&
-      error !== "parent_context_presenter_disabled"
+      error !== "parent_context_presenter_disabled" &&
+      error !== "director_presenter_disabled"
     ) {
       this.logger.unhandledException(requestContext);
     }

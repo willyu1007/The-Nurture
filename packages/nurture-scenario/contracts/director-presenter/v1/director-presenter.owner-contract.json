@@ -1,0 +1,953 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.director-presenter",
+    "version": "1.0.0",
+    "kind": "private_owner_presenter"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "overview_query": "/internal/nurture/director-presenter/v1/overview",
+      "drilldown_query": "/internal/nurture/director-presenter/v1/drilldown",
+      "material_query": "/internal/nurture/director-presenter/v1/materials"
+    }
+  },
+  "owner_resolution": {
+    "frequency": "every_call_and_every_drilldown_or_material_open",
+    "accepted_caller_context": [
+      "interface_contract",
+      "workspace_id",
+      "my_chat_user_id",
+      "host_request_id",
+      "context_ref"
+    ],
+    "forbidden_caller_authority_fields": [
+      "participant_id",
+      "role",
+      "role_assignment_id",
+      "scope_id",
+      "institution_id",
+      "care_group_id",
+      "family_id",
+      "child_id",
+      "enrollment_id",
+      "grant_id",
+      "purpose"
+    ],
+    "current_owner_facts": [
+      "active Participant bound from the authenticated My-Chat user",
+      "current institution director or administrator RoleAssignment",
+      "exact current workspace association and Institution selected by context_ref",
+      "current purpose and protected-display policy for each overview, drilldown and material read"
+    ],
+    "context_ref_rule": "context_ref is routing input and a cache dimension, never authorization",
+    "safe_projection": "Responses contain owner-approved display values and opaque refs only"
+  },
+  "mobile_posture": {
+    "mode": "read_only",
+    "operation_entry": "web_workbench_required",
+    "forbidden_response_fields": [
+      "action_ref",
+      "confirmation_ref",
+      "command_request_id",
+      "participant_id",
+      "role_assignment_id",
+      "institution_id",
+      "family_id",
+      "child_id",
+      "grant_id",
+      "storage_ref",
+      "signed_url",
+      "url"
+    ],
+    "rules": [
+      "Institution Mobile remains a read-only board; commands stay in InstitutionAdminWorkbench.",
+      "Attention signals describe support context and never rank or judge staff.",
+      "Family-private content is absent by default and cannot be inferred from empty aggregates.",
+      "Protected material access is reread on every open and never implies download or share authority."
+    ]
+  },
+  "safe_reason_codes": [
+    "access_changed",
+    "context_changed",
+    "ambiguous_institution",
+    "purpose_denied",
+    "protected_material_denied",
+    "refresh_not_retryable",
+    "content_unavailable",
+    "temporarily_unavailable",
+    "request_invalid",
+    "mobile_action_forbidden"
+  ],
+  "operation_order": [
+    "overview_query",
+    "drilldown_query",
+    "material_query"
+  ],
+  "operations": {
+    "overview_query": {
+      "t039_rows": [
+        "D-O01",
+        "D-O02",
+        "D-O03",
+        "D-O04",
+        "D-O05",
+        "D-O06",
+        "D-O07",
+        "D-O08",
+        "D-O09",
+        "D-O10",
+        "D-O13",
+        "D-O14"
+      ],
+      "request_schema_ref": "urn:nurture:director-presenter:1#/$defs/overview_query_request",
+      "response_schema_ref": "urn:nurture:director-presenter:1#/$defs/overview_query_response",
+      "rules": [
+        "All eleven sections are returned independently so one missing source does not blank the page.",
+        "Missing is never interpreted as zero, absence, normality or successful delivery.",
+        "The operation_entry section is always unavailable with web_workbench_required and carries no action fields."
+      ]
+    },
+    "drilldown_query": {
+      "t039_rows": [
+        "D-O02",
+        "D-O03",
+        "D-O05",
+        "D-O06",
+        "D-O07",
+        "D-O09",
+        "D-O10",
+        "D-O11"
+      ],
+      "request_schema_ref": "urn:nurture:director-presenter:1#/$defs/drilldown_query_request",
+      "response_schema_ref": "urn:nurture:director-presenter:1#/$defs/drilldown_query_response",
+      "rules": [
+        "The opaque drilldown_ref fixes the owner-approved next level and purpose.",
+        "Every open rereads current authority; no overview snapshot grants deeper access.",
+        "Results are capped at 50 and contain no family-private body or staff ranking."
+      ]
+    },
+    "material_query": {
+      "t039_rows": [
+        "D-O12"
+      ],
+      "request_schema_ref": "urn:nurture:director-presenter:1#/$defs/material_query_request",
+      "response_schema_ref": "urn:nurture:director-presenter:1#/$defs/material_query_response",
+      "rules": [
+        "The owner-issued collection_ref is presentation routing only and each open rereads purpose.",
+        "At most 20 entries are returned; protected media uses expiring owner-stream access refs only.",
+        "No storage ref, signed URL, download or share capability crosses the contract."
+      ]
+    }
+  },
+  "schemas": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:nurture:director-presenter:1",
+    "$defs": {
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 512
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.director-presenter"
+          },
+          "version": {
+            "const": "1.0.0"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "presentation_role": {
+            "const": "institution_director"
+          },
+          "scope_kind": {
+            "const": "institution"
+          },
+          "scope_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "interface_key": {
+            "const": "nurture.director-presenter"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "presentation_role": {
+            "const": "institution_director"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "operation": {
+            "enum": [
+              "overview_query",
+              "drilldown_query",
+              "material_query"
+            ]
+          },
+          "query_key": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "reason_code",
+          "purge_partition",
+          "content_masked",
+          "material_access_invalidated"
+        ],
+        "properties": {
+          "kind": {
+            "const": "mask"
+          },
+          "reason_code": {
+            "enum": [
+              "access_changed",
+              "context_changed",
+              "ambiguous_institution",
+              "purpose_denied",
+              "protected_material_denied",
+              "refresh_not_retryable"
+            ]
+          },
+          "purge_partition": {
+            "const": true
+          },
+          "content_masked": {
+            "const": true
+          },
+          "material_access_invalidated": {
+            "const": true
+          }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "masked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mask_signal": {
+            "$ref": "#/$defs/mask_signal"
+          }
+        }
+      },
+      "unavailable_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "failed_at",
+          "reason_code",
+          "retryable"
+        ],
+        "properties": {
+          "status": {
+            "const": "unavailable"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "failed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason_code": {
+            "enum": [
+              "content_unavailable",
+              "temporarily_unavailable",
+              "request_invalid",
+              "mobile_action_forbidden"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "overview_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "local_date"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "local_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "metric": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "primary_value",
+          "unit",
+          "definition",
+          "time_window_label"
+        ],
+        "properties": {
+          "primary_value": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "secondary_value": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unit": {
+            "enum": [
+              "count",
+              "ratio",
+              "flow"
+            ]
+          },
+          "definition": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "time_window_label": {
+            "$ref": "#/$defs/non_empty_string"
+          }
+        }
+      },
+      "trend": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "points",
+          "accessible_summary"
+        ],
+        "properties": {
+          "points": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 14,
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "accessible_summary": {
+            "$ref": "#/$defs/non_empty_string"
+          }
+        }
+      },
+      "overview_section": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "section_key",
+          "status",
+          "title"
+        ],
+        "properties": {
+          "section_key": {
+            "enum": [
+              "attendance",
+              "activity",
+              "message_response",
+              "home_kindergarten_flow",
+              "authorization_changes",
+              "philosophy_observation",
+              "trend",
+              "class_load_attention",
+              "family_focus_attention",
+              "organized_materials",
+              "operation_entry"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "empty",
+              "unavailable"
+            ]
+          },
+          "title": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "summary": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "metric": {
+            "$ref": "#/$defs/metric"
+          },
+          "trend": {
+            "$ref": "#/$defs/trend"
+          },
+          "drilldown_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "material_collection_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "availability": {
+            "enum": [
+              "current",
+              "web_workbench_required",
+              "not_available"
+            ]
+          }
+        }
+      },
+      "overview_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "overall_state",
+          "organization",
+          "sections"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "freshness": {
+            "enum": [
+              "fresh",
+              "stale"
+            ]
+          },
+          "overall_state": {
+            "enum": [
+              "ready",
+              "partial",
+              "empty"
+            ]
+          },
+          "organization": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "organization_ref",
+              "display_name",
+              "local_date"
+            ],
+            "properties": {
+              "organization_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "display_name": {
+                "$ref": "#/$defs/non_empty_string"
+              },
+              "local_date": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "sections": {
+            "type": "array",
+            "minItems": 11,
+            "maxItems": 11,
+            "items": {
+              "$ref": "#/$defs/overview_section"
+            }
+          }
+        }
+      },
+      "overview_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/overview_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "drilldown_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "drilldown_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "drilldown_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "breadcrumb": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "level"
+        ],
+        "properties": {
+          "label": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "level": {
+            "enum": [
+              "aggregate",
+              "class",
+              "individual",
+              "observation"
+            ]
+          }
+        }
+      },
+      "drilldown_item": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item_ref",
+          "kind",
+          "label",
+          "summary"
+        ],
+        "properties": {
+          "item_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "enum": [
+              "class",
+              "individual",
+              "observation"
+            ]
+          },
+          "label": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "summary": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "next_drilldown_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "material_collection_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "drilldown_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "drilldown_ref",
+          "title",
+          "purpose_label",
+          "breadcrumbs",
+          "items"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "drilldown_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "title": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "purpose_label": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "breadcrumbs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "$ref": "#/$defs/breadcrumb"
+            }
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/$defs/drilldown_item"
+            }
+          }
+        }
+      },
+      "drilldown_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/drilldown_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "material_query_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref",
+          "collection_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "collection_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "cursor": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "material_access": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason_code"
+            ],
+            "properties": {
+              "status": {
+                "const": "unavailable"
+              },
+              "reason_code": {
+                "const": "protected_material_denied"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "access_ref",
+              "access_expires_at",
+              "delivery_mode"
+            ],
+            "properties": {
+              "status": {
+                "const": "protected_available"
+              },
+              "access_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "access_expires_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "delivery_mode": {
+                "const": "owner_stream"
+              }
+            }
+          }
+        ]
+      },
+      "material_item": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "material_ref",
+          "kind",
+          "title",
+          "occurred_at",
+          "access"
+        ],
+        "properties": {
+          "material_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "enum": [
+              "photo",
+              "text"
+            ]
+          },
+          "title": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "alt_text": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "access": {
+            "$ref": "#/$defs/material_access"
+          }
+        }
+      },
+      "material_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "collection_ref",
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "collection_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/$defs/material_item"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 8,
+            "maxLength": 512
+          }
+        }
+      },
+      "material_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/material_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      }
+    }
+  }
+}

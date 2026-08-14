@@ -1,4 +1,4 @@
-# W3 parent-communication environment change intent
+# W3/W4 owner-presenter environment change intent
 
 Register one optional, non-secret, default-false gate for the standalone
 parent-communication owner v1 composition. The key does not activate the
@@ -7,3 +7,8 @@ and complete authority, owner and async-boundary ports.
 
 No existing key is renamed or removed. The change is backward compatible and
 does not update any environment-specific value or secret reference.
+
+W4 adds `NURTURE_DIRECTOR_PRESENTER_ENABLED` as a second optional,
+non-secret, default-false gate. Exact `true` still requires configured service
+auth plus complete current-authority and owner ports. The presenter is
+read-only and the gate cannot enable Institution Mobile commands.

@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-13T21:54:25Z",
+  "generated_at_utc": "2026-08-14T04:20:23Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -182,6 +182,23 @@
       "secret_ref": "nurture_binding_evidence_key",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_DIRECTOR_PRESENTER_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the read-only director presenter v1 composition; true requires the exact adopted contract digest, current-authority/owner ports and separate activation approval, and never enables Institution Mobile commands.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "NURTURE_HARNESS_INTEGRITY_KEY": {
       "default": null,

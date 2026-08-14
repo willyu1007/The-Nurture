@@ -389,3 +389,26 @@
   trigger outside UTC.
 - No Prisma schema, migration, dependency, environment default, deployment,
   activation or traffic change was made.
+
+## 2026-08-14 — W4 read-only director presenter supply
+
+- Published `nurture.director-presenter@1.0.0` at exact digest
+  `sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1`
+  with overview, bounded drilldown and protected-material query operations.
+- Reconciled D-O13 with the current product authority: Institution Mobile is
+  action-free, so W4 returns only `web_workbench_required`. The artifact and
+  both strict runtimes reject action, confirmation, command, storage and URL
+  fields instead of publishing an unauthorized Mobile command surface.
+- Added current-authority and read-owner port contracts, exact request/response
+  binding, service bearer authentication, private/no-store responses and one
+  default-false provider gate. The runtime is unavailable unless every owner
+  port and service-auth dependency is explicitly supplied.
+- Added 11 positive conformance fixtures, six invalid probes, response-shape
+  enforcement and three controller routes. The W4 validator is a maintained
+  top-level command and is chained into formal-ingress verification.
+- My-Chat T-039 adopted only the exact private consumer: it sends host routing
+  context, validates the full response locally and fails closed on any drift.
+  Public API/Mobile composition and any family archive/organization admission
+  remain outside this batch.
+- No real Prisma owner port, schema/migration, database operation, deployment,
+  activation, traffic, native-device or accessibility work was performed.

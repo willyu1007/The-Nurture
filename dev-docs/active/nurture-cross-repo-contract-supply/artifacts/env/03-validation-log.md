@@ -1,7 +1,7 @@
 # Env Contract Validation
 
-- Timestamp (UTC): `2026-08-13T21:54:25Z`
-- Root: `/Users/phoenix/project/The-Nurture`
+- Timestamp (UTC): `2026-08-14T04:20:22Z`
+- Root: `/Volumes/DataDisk/Project/The-Nurture`
 - Envs: `dev, prod, staging`
 - Status: **PASS**
 
@@ -21,7 +21,7 @@
         "dev_host_database_url",
         "nurture_internal_service_token"
       ],
-      "secrets_ref_file": "/Users/phoenix/project/The-Nurture/env/secrets/dev.ref.yaml",
+      "secrets_ref_file": "/Volumes/DataDisk/Project/The-Nurture/env/secrets/dev.ref.yaml",
       "used_secret_refs": [
         "database_url",
         "dev_host_database_url",
@@ -33,7 +33,7 @@
         "nurture_internal_service_token",
         "nurture_protected_content_key"
       ],
-      "values_file": "/Users/phoenix/project/The-Nurture/env/values/dev.yaml",
+      "values_file": "/Volumes/DataDisk/Project/The-Nurture/env/values/dev.yaml",
       "values_keys": [
         "DEV_HOST_PORT",
         "NURTURE_BACKEND_URL",
@@ -46,7 +46,7 @@
         "database_url",
         "nurture_internal_service_token"
       ],
-      "secrets_ref_file": "/Users/phoenix/project/The-Nurture/env/secrets/prod.ref.yaml",
+      "secrets_ref_file": "/Volumes/DataDisk/Project/The-Nurture/env/secrets/prod.ref.yaml",
       "used_secret_refs": [
         "database_url",
         "family_growth_events_service_token",
@@ -57,7 +57,7 @@
         "nurture_internal_service_token",
         "nurture_protected_content_key"
       ],
-      "values_file": "/Users/phoenix/project/The-Nurture/env/values/prod.yaml",
+      "values_file": "/Volumes/DataDisk/Project/The-Nurture/env/values/prod.yaml",
       "values_keys": [
         "PORT",
         "SERVICE_NAME"
@@ -68,7 +68,7 @@
         "database_url",
         "nurture_internal_service_token"
       ],
-      "secrets_ref_file": "/Users/phoenix/project/The-Nurture/env/secrets/staging.ref.yaml",
+      "secrets_ref_file": "/Volumes/DataDisk/Project/The-Nurture/env/secrets/staging.ref.yaml",
       "used_secret_refs": [
         "database_url",
         "family_growth_events_service_token",
@@ -79,16 +79,16 @@
         "nurture_internal_service_token",
         "nurture_protected_content_key"
       ],
-      "values_file": "/Users/phoenix/project/The-Nurture/env/values/staging.yaml",
+      "values_file": "/Volumes/DataDisk/Project/The-Nurture/env/values/staging.yaml",
       "values_keys": [
         "PORT",
         "SERVICE_NAME"
       ]
     }
   },
-  "variables_non_secret": 10,
+  "variables_non_secret": 11,
   "variables_secret": 9,
-  "variables_total": 19
+  "variables_total": 20
 }
 ```
 

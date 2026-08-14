@@ -438,3 +438,29 @@ EXACT_REVISION_PIN / DEFAULT_OFF / LIVE_PORTS_PENDING`.
 
 Verdict: `W3_1_LOCAL_OWNER_QUALIFIED / CANONICAL_G2_WRITE_REUSED /
 CURRENT_AUTHORITY_REREAD / EXACT_REPLAY / DEFAULT_OFF / W3_2_NOT_AUTHORIZED`.
+
+## 2026-08-14 — W4 read-only director presenter qualification
+
+- `pnpm verify:formal-ingress-contract` passed both maintained owner-artifact
+  validators. W4 matched the exact digest, 11 positive fixtures and six invalid
+  probes; the route census passed with 26 controller routes and all three W4
+  private paths.
+- `node .ai/tests/run.mjs --suite environment` passed after adding optional,
+  non-secret `NURTURE_DIRECTOR_PRESENTER_ENABLED=false` and refreshing the
+  generated environment context and examples.
+- Direct scenario and scenario-service TypeScript checks passed. The complete
+  unit lane passed 98 files / 1086 tests; the complete scenario-service lane
+  passed 17 files / 135 tests, including five W4 controller cases.
+- The My-Chat scenario-integrations package typecheck and focused exact-pin
+  consumer suite passed: one file / four tests against all provider fixtures,
+  malformed-response probes, exact paths/body minimization and forbidden
+  action-field rejection.
+- My-Chat's complete typecheck passed all 17 participating workspaces; its unit
+  lane passed 173 files / 1199 tests, with 24 files / 146 existing environment-
+  gated tests skipped. My-Chat ESLint passed with zero diagnostics.
+- Both project-governance sync/lint runs and strict task-document lint passed.
+  Candidate Freeze, provider/consumer enablement, real W4 owner ports, public
+  API/Mobile composition, deployment and device qualification were not run.
+
+Verdict: `W4_SOURCE_SUPPLY_PASS / EXACT_PIN / READ_ONLY /
+DEFAULT_OFF / CANDIDATE_NOT_FROZEN / LIVE_OWNER_AND_MOBILE_PENDING`.
