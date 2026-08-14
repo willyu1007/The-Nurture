@@ -22,6 +22,7 @@ describe("scenario-service configuration", () => {
       teacherCommunicationOwnerEnabled: false,
       teacherMediaAssociationOwnerEnabled: false,
       teacherAssistantQueryOwnerEnabled: false,
+      parentCommunicationExtensionEnabled: false,
     });
   });
 
@@ -70,6 +71,10 @@ describe("scenario-service configuration", () => {
     [
       { NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED: "TRUE" },
       "NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED",
+    ],
+    [
+      { NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED: "TRUE" },
+      "NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED",
     ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
@@ -146,6 +151,14 @@ describe("scenario-service configuration", () => {
       loadScenarioServiceConfig({
         NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED: "true",
       }).teacherAssistantQueryOwnerEnabled,
+    ).toBe(true);
+  });
+
+  it("loads the parent-communication extension gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED: "true",
+      }).parentCommunicationExtensionEnabled,
     ).toBe(true);
   });
 

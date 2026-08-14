@@ -1,5 +1,24 @@
 # Implementation notes
 
+## 2026-08-15 — W11-2 parent-communication extension default-off runtime
+
+- Mounted the three v1.1 routes in `apps/scenario-service` behind
+  `NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED` (independent of the
+  frozen v1 gate) with the established runtime set: strict allowlist
+  parsers (confirmation refs 32-256, `sha256:` preview digests validated
+  at parse), the authority-rereading composition, the digest-pinned Ajv
+  response validator and the guarded controller.
+- W11-specific bindings: the preview must echo the exact
+  `command_request_id`, `message_ref` and `presentation_version` it was
+  asked for; the delivery read must echo its `message_ref`; committed
+  redactions must echo command identity and message; the runtime
+  validator enforces the applied-vs-already_satisfied evidence rule
+  (instant+cascade exactly when applied) and the frozen reason→recovery
+  pairing.
+- Registration surface: safe codes allowlisted, env 5-file set
+  regenerated, ingress census asserts the W11 block (controller-routes
+  52), scenario-service routing census 26.
+
 ## 2026-08-15 — W11-1 parent-communication extension contract artifact
 
 - Published `contracts/parent-communication-owner/v1-1/`: the extension

@@ -115,6 +115,11 @@ variables:
     required: false
     default: false
     description: Default-off gate for the teacher assistant-query owner v1 exchange composition (missing-records, weekly-source, weekly-draft); true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval; the owner assembles deterministic facts only and never calls a model provider.
+  NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED:
+    type: bool
+    required: false
+    default: false
+    description: Default-off gate for the parent-communication owner v1.1 additive extension (guardian redaction preview/commit and the per-message delivery-receipt read); independent of the frozen v1 gate so the 1.0.0 posture is untouched; true requires the exact adopted extension digest, complete guardian authority/owner ports and separate activation approval.
   FAMILY_GROWTH_EVENTS_SERVICE_TOKEN:
     type: string
     required: false

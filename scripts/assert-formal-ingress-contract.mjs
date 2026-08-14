@@ -81,6 +81,14 @@ const teacherMediaAssociationOwnerPaths = {
   TEACHER_MEDIA_ASSOCIATION_OWNER_DISCARD_PATH:
     "/internal/nurture/teacher-media-association-owner/v1/discard",
 };
+const parentCommunicationExtensionPaths = {
+  PARENT_COMMUNICATION_EXTENSION_REDACTION_PREVIEW_PATH:
+    "/internal/nurture/parent-communication-owner/v1.1/redaction-preview",
+  PARENT_COMMUNICATION_EXTENSION_REDACT_PATH:
+    "/internal/nurture/parent-communication-owner/v1.1/redact",
+  PARENT_COMMUNICATION_EXTENSION_DELIVERY_RECEIPTS_PATH:
+    "/internal/nurture/parent-communication-owner/v1.1/delivery-receipts",
+};
 const teacherAssistantQueryOwnerPaths = {
   TEACHER_ASSISTANT_QUERY_OWNER_MISSING_RECORDS_PATH:
     "/internal/nurture/teacher-assistant-query-owner/v1/missing-records",
@@ -176,6 +184,9 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/teacher-assistant-query-owner.controller.ts:POST:TEACHER_ASSISTANT_QUERY_OWNER_MISSING_RECORDS_PATH`,
   `apps/scenario-service/src/teacher-assistant-query-owner.controller.ts:POST:TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_SOURCE_PATH`,
   `apps/scenario-service/src/teacher-assistant-query-owner.controller.ts:POST:TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_DRAFT_PATH`,
+  `apps/scenario-service/src/parent-communication-extension.controller.ts:POST:PARENT_COMMUNICATION_EXTENSION_REDACTION_PREVIEW_PATH`,
+  `apps/scenario-service/src/parent-communication-extension.controller.ts:POST:PARENT_COMMUNICATION_EXTENSION_REDACT_PATH`,
+  `apps/scenario-service/src/parent-communication-extension.controller.ts:POST:PARENT_COMMUNICATION_EXTENSION_DELIVERY_RECEIPTS_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -191,6 +202,7 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
   "apps/scenario-service/src/teacher-media-association-owner.controller.ts#TeacherMediaAssociationOwnerController",
   "apps/scenario-service/src/teacher-assistant-query-owner.controller.ts#TeacherAssistantQueryOwnerController",
+  "apps/scenario-service/src/parent-communication-extension.controller.ts#ParentCommunicationExtensionController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
@@ -203,6 +215,7 @@ const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
   "apps/scenario-service/src/teacher-media-association-owner.controller.ts#TeacherMediaAssociationOwnerController",
   "apps/scenario-service/src/teacher-assistant-query-owner.controller.ts#TeacherAssistantQueryOwnerController",
+  "apps/scenario-service/src/parent-communication-extension.controller.ts#ParentCommunicationExtensionController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -1905,6 +1918,158 @@ for (const route of [
   assertIncludes(
     teacherAssistantQueryHttpSource,
     "contract.digest !== TEACHER_ASSISTANT_QUERY_OWNER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const parentCommunicationExtensionControllerSource = read(
+  "apps/scenario-service/src/parent-communication-extension.controller.ts",
+);
+const parentCommunicationExtensionHttpSource = read(
+  "apps/scenario-service/src/parent-communication-extension-http.ts",
+);
+const parentCommunicationExtensionRuntimeSource = read(
+  "apps/scenario-service/src/parent-communication-extension-runtime.ts",
+);
+const parentCommunicationExtensionCompositionSource = read(
+  "apps/scenario-service/src/parent-communication-extension-composition.ts",
+);
+const parentCommunicationExtensionResponseValidatorSource = read(
+  "apps/scenario-service/src/parent-communication-extension-response-validator.ts",
+);
+const parentCommunicationExtensionContractSource = read(
+  "packages/nurture-scenario/src/parent-communication-extension-contract.ts",
+);
+const parentCommunicationExtensionArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/parent-communication-owner/v1-1/parent-communication-owner-extension.owner-contract.json",
+  ),
+);
+assertIncludes(
+  parentCommunicationExtensionControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "parent-communication extension guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  parentCommunicationExtensionControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "parent-communication extension guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.parent-communication-owner"',
+  'version: "1.1.0"',
+  "sha256:d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1",
+  "sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+]) {
+  assertIncludes(
+    parentCommunicationExtensionContractSource,
+    fragment,
+    `parent-communication extension exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  parentCommunicationExtensionArtifact.base_interface?.relationship,
+  "additive_extension_no_base_mutation",
+  "parent-communication extension declares the additive base relationship",
+);
+assertEqual(
+  parentCommunicationExtensionArtifact.publication_posture?.base_contract,
+  "frozen_1_0_0_untouched",
+  "parent-communication extension keeps the frozen v1 untouched",
+);
+assertIncludes(
+  String(
+    parentCommunicationExtensionArtifact.command_semantics?.outcome_unknown ?? "",
+  ),
+  "exact same-command replay",
+  "parent-communication extension outcome_unknown recovery stays same-command replay",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED",
+  "parent-communication extension has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    parentCommunicationExtensionRuntimeSource,
+    fragment,
+    `parent-communication extension complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  parentCommunicationExtensionResponseValidatorSource,
+  "ajv.addSchema(artifact.contract_schema)",
+  "parent-communication extension runtime compiles the published schema artifact",
+);
+assertIncludes(
+  parentCommunicationExtensionResponseValidatorSource,
+  "digest !== PARENT_COMMUNICATION_EXTENSION_INTERFACE.digest",
+  "parent-communication extension runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  parentCommunicationExtensionCompositionSource,
+  "assertPublishedParentCommunicationExtensionResponse(operation, response)",
+  "parent-communication extension composition enforces published responses",
+);
+assertIncludes(
+  parentCommunicationExtensionCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "parent-communication extension rereads current authority for every operation",
+);
+assertIncludes(
+  parentCommunicationExtensionCompositionSource,
+  "response.command_request_id !== redact.command_request_id",
+  "parent-communication extension exchange echoes the exact command identity",
+);
+for (const route of [
+  {
+    constant: "PARENT_COMMUNICATION_EXTENSION_REDACTION_PREVIEW_PATH",
+    handler: "redactionPreview",
+    parser: "parseParentCommunicationRedactionPreviewRequestV1",
+  },
+  {
+    constant: "PARENT_COMMUNICATION_EXTENSION_REDACT_PATH",
+    handler: "redact",
+    parser: "parseParentCommunicationRedactRequestV1",
+  },
+  {
+    constant: "PARENT_COMMUNICATION_EXTENSION_DELIVERY_RECEIPTS_PATH",
+    handler: "deliveryReceipt",
+    parser: "parseParentCommunicationDeliveryReceiptRequestV1",
+  },
+]) {
+  const expectedPath = parentCommunicationExtensionPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    parentCommunicationExtensionContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    parentCommunicationExtensionControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    parentCommunicationExtensionHttpSource,
+    "contract.digest !== PARENT_COMMUNICATION_EXTENSION_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

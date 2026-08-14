@@ -81,6 +81,12 @@ import {
   type TeacherAssistantQueryOwnerConfig,
   TeacherAssistantQueryOwnerServiceAuthGuard,
 } from "./teacher-assistant-query-owner.controller.js";
+import {
+  PARENT_COMMUNICATION_EXTENSION_CONFIG,
+  ParentCommunicationExtensionController,
+  type ParentCommunicationExtensionConfig,
+  ParentCommunicationExtensionServiceAuthGuard,
+} from "./parent-communication-extension.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
 
@@ -99,6 +105,7 @@ import { ScenarioStructuredLogger } from "./structured-logger.js";
     TeacherCommunicationOwnerController,
     TeacherMediaAssociationOwnerController,
     TeacherAssistantQueryOwnerController,
+    ParentCommunicationExtensionController,
     FamilySharingPrivateController,
   ],
 })
@@ -117,6 +124,7 @@ export class AppModule {
     teacherCommunicationOwner?: TeacherCommunicationOwnerConfig;
     teacherMediaAssociationOwner?: TeacherMediaAssociationOwnerConfig;
     teacherAssistantQueryOwner?: TeacherAssistantQueryOwnerConfig;
+    parentCommunicationExtension?: ParentCommunicationExtensionConfig;
     familySharingPrivate: FamilySharingPrivateConfig;
   }): DynamicModule {
     return {
@@ -224,6 +232,15 @@ export class AppModule {
           }),
         },
         TeacherAssistantQueryOwnerServiceAuthGuard,
+        {
+          provide: PARENT_COMMUNICATION_EXTENSION_CONFIG,
+          useValue: Object.freeze({
+            ...(input.parentCommunicationExtension ?? {
+              serviceAuth: input.parentContextPresenter.serviceAuth,
+            }),
+          }),
+        },
+        ParentCommunicationExtensionServiceAuthGuard,
         {
           provide: FAMILY_SHARING_PRIVATE_CONFIG,
           useValue: Object.freeze({ ...input.familySharingPrivate }),

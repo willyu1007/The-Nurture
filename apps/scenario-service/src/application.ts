@@ -75,6 +75,11 @@ import {
   createTeacherAssistantQueryOwnerComposition,
   type TeacherAssistantQueryOwnerBindingV1,
 } from "./teacher-assistant-query-owner-runtime.js";
+import type { ParentCommunicationExtensionComposition } from "./parent-communication-extension-composition.js";
+import {
+  createParentCommunicationExtensionComposition,
+  type ParentCommunicationExtensionBindingV1,
+} from "./parent-communication-extension-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -108,6 +113,8 @@ export async function createScenarioServiceApplication(input?: {
   teacherMediaAssociationOwnerBinding?: TeacherMediaAssociationOwnerBindingV1;
   teacherAssistantQueryOwnerComposition?: TeacherAssistantQueryOwnerComposition;
   teacherAssistantQueryOwnerBinding?: TeacherAssistantQueryOwnerBindingV1;
+  parentCommunicationExtensionComposition?: ParentCommunicationExtensionComposition;
+  parentCommunicationExtensionBinding?: ParentCommunicationExtensionBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -210,6 +217,15 @@ export async function createScenarioServiceApplication(input?: {
         ? { ownerBinding: input.teacherAssistantQueryOwnerBinding }
         : {}),
     });
+  const parentCommunicationExtensionComposition =
+    input?.parentCommunicationExtensionComposition
+    ?? createParentCommunicationExtensionComposition({
+      enabled: config.parentCommunicationExtensionEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.parentCommunicationExtensionBinding
+        ? { ownerBinding: input.parentCommunicationExtensionBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -256,6 +272,10 @@ export async function createScenarioServiceApplication(input?: {
       },
       teacherAssistantQueryOwner: {
         composition: teacherAssistantQueryOwnerComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      parentCommunicationExtension: {
+        composition: parentCommunicationExtensionComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

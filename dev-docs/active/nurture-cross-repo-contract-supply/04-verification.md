@@ -1,5 +1,23 @@
 # Verification
 
+## 2026-08-15 — W11-2 parent-communication extension default-off runtime
+
+- Scenario-service suite 23 files / 187 tests green incl. the new 7-case
+  W11 e2e (all-routes mount with private headers and no
+  receipt/participant leakage; replayed, already_satisfied-without-
+  fabricated-evidence and outcome_unknown command echoes; masked
+  short-circuit without owner calls; parse rejection of caller authority,
+  pin drift, short confirmations and malformed preview digests; 500 on
+  command drift and fabricated already-satisfied evidence; 500 on preview
+  message drift, receipt echo drift and wrong recovery pairing; 503/401
+  default-off and service-auth) plus the config-gate cases.
+- Ingress census green at controller-routes 52 with the W11 assertion
+  block; test-routing census 26 scenario-service files; root typecheck
+  green; env 5-file set regenerated with the context checksum resealed.
+
+Verdict: `W11_2_MOUNTED_DEFAULT_OFF / E2E_7_CASES_GREEN /
+CENSUSES_52_AND_26 / FROZEN_V1_GATE_UNTOUCHED / NO_OWNER_PORTS_YET`.
+
 ## 2026-08-15 — W11-1 parent-communication extension contract artifact
 
 - `verify:parent-communication-extension-contract` green first run

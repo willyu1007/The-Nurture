@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-14T15:54:23Z",
+  "generated_at_utc": "2026-08-14T16:52:13Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -250,6 +250,23 @@
       "secret_ref": "nurture_internal_service_token",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the parent-communication owner v1.1 additive extension (guardian redaction preview/commit and the per-message delivery-receipt read); independent of the frozen v1 gate so the 1.0.0 posture is untouched; true requires the exact adopted extension digest, complete guardian authority/owner ports and separate activation approval.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED": {
       "default": false,

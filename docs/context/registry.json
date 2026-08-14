@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T15:54:44.771Z",
+  "updatedAt": "2026-08-14T16:52:13.159Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -136,8 +136,8 @@
         "config",
         "llm"
       ],
-      "checksumSha256": "a0b02cc3f89d40ab5f492a57abc80144bbd346089f4587cba3dc9871988700b3",
-      "lastUpdated": "2026-08-14T15:54:44.769Z",
+      "checksumSha256": "f603a43ea23e840832118a4d89bc68ea2d2e511e16ca3ac296ebfed64eb197e4",
+      "lastUpdated": "2026-08-14T16:52:13.158Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
