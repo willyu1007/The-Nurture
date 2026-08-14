@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@my-chat/api': link:../My-Chat/apps/api
   '@my-chat/db': link:../My-Chat/packages/db
   '@my-chat/domain': link:../My-Chat/packages/domain
   '@my-chat/llm': link:../My-Chat/packages/llm
@@ -168,6 +169,9 @@ importers:
         specifier: workspace:*
         version: link:../nurture-scenario
     devDependencies:
+      '@my-chat/api':
+        specifier: link:../../../My-Chat/apps/api
+        version: link:../../../My-Chat/apps/api
       '@my-chat/db':
         specifier: link:../../../My-Chat/packages/db
         version: link:../../../My-Chat/packages/db

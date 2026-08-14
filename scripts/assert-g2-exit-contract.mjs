@@ -155,10 +155,11 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Resealed on 2026-08-14 after My-Chat adopted the W4 read-only director
-  // presenter. x5_joint_api rotated because scenario-integrations changed;
-  // the shared Base/My-Chat workflow contract and wave4 profile are unchanged.
-  "4db80c91a15859b51b193110efa45acaf019deb5",
+  // Resealed on 2026-08-14 for the G5-C readiness batch: My-Chat localizes
+  // sanitized fixture snapshots, refreshes its host adoption lock after the
+  // T-028 merge, and exports the family-nurture-authorization service for the
+  // boundary-clean joint import. Contract and wave4 profiles are unchanged.
+  "a9281feb13a055061e6ed39a05fa83c4bede8044",
   "My-Chat revision",
 );
 assertEqual(

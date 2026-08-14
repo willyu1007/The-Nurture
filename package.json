@@ -98,6 +98,7 @@
   },
   "pnpm": {
     "overrides": {
+      "@my-chat/api": "link:../My-Chat/apps/api",
       "@my-chat/db": "link:../My-Chat/packages/db",
       "@my-chat/domain": "link:../My-Chat/packages/domain",
       "@my-chat/llm": "link:../My-Chat/packages/llm",

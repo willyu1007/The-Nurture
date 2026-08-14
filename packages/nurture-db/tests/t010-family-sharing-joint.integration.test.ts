@@ -24,7 +24,7 @@ import {
 import {
   FamilyNurtureAuthorizationService,
   HmacFamilyNurtureAuthorizationCodec,
-} from "../../../../My-Chat/apps/api/src/family-growth/family-nurture-authorization.service.js";
+} from "@my-chat/api/family-nurture-authorization";
 import {
   createPrismaClient as createNurturePrismaClient,
   PrismaNurtureFamilySharingCleanupLedger,

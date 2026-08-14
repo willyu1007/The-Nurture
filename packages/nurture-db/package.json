@@ -32,6 +32,7 @@
     "@the-nurture/scenario": "workspace:*"
   },
   "devDependencies": {
+    "@my-chat/api": "0.1.0",
     "@my-chat/db": "0.1.0",
     "@my-chat/domain": "0.1.0",
     "@my-chat/llm": "0.1.0",

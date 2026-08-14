@@ -189,12 +189,12 @@ const computeLock = () => {
     host: {
       // Step-5 requalification binds the current clean Host head while the
       // runtime revision points at the committed source population sealed by
-      // My-Chat's independently verified adoption lock. 2026-08-14: W4
-      // read-only presenter adoption rotated the broad x5 pin while the C30
-      // Host runtime source profiles remained unchanged.
-      head_revision: "4db80c91a15859b51b193110efa45acaf019deb5",
-      runtime_revision: "149424c9a05a28aa8c1654258bb919a434208732",
-      aggregate_source_hash: "aac525c4f13953671040ce759da8eadf0f55dee9063db8b6389282f78635617d",
+      // My-Chat's independently verified adoption lock. 2026-08-14: the T-028
+      // child-identity merge rotated that lock; fixture localization and the
+      // curated api export keep the C30 Host runtime source profiles unchanged.
+      head_revision: "a9281feb13a055061e6ed39a05fa83c4bede8044",
+      runtime_revision: "53e62c5175aec1cea20a6e3f8999731dd839875d",
+      aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
     source_hash: sha256(
       sourceProfiles.map(({ source_identity, source_hash }) =>

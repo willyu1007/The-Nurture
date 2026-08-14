@@ -16,7 +16,7 @@ const expected = {
   // conformance fixture snapshots and reseals its host adoption lock after the
   // T-028 child-identity merge (tests/fixtures/locks/dev-docs only). Content-inert
   // for the C30 Host runtime source profiles; the qualified head stays exact.
-  hostHead: "d45fe69f2cd5ee211828c0c25dd3213a42774ca4",
+  hostHead: "a9281feb13a055061e6ed39a05fa83c4bede8044",
 };
 
 const run = (command, args, cwd) =>
