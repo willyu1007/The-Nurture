@@ -512,7 +512,9 @@ const asyncKey = (input: {
 const digestPreview = (preview: unknown): string =>
   `sha256:${createHash("sha256").update(nurtureCanonicalJson(preview), "utf8").digest("hex")}`;
 
-const presentationVersionFor = (
+// Exported for the W11 v1.1 extension, which must derive the exact same
+// presentation identity the v1 owner serves.
+export const presentationVersionFor = (
   authority: ParentCommunicationResolvedAuthorityV1,
   presentationHead: string,
 ): string => `pc-${createHash("sha256")

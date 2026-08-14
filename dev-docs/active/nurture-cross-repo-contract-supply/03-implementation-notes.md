@@ -1,5 +1,36 @@
 # Implementation notes
 
+## 2026-08-15 — W11-3 parent-communication extension real owner ports
+
+- Added the DB-free extension service
+  (`src/parent-communication-extension-service.ts`): authority,
+  presentation identity and message refs come from the SAME machinery the
+  frozen v1 owner uses (the v1 resolver, the v1 read port and the exact v1
+  ref HMAC, exported `presentationVersionFor`), so a ref the v1 detail
+  issued resolves in the extension and nothing about the v1 surface moves.
+  Message resolution runs over the thread's FULL id set (terminal states
+  included — the W7/W8 replay lesson).
+- The preview restates the frozen G4-C author-authority rule, refuses a
+  stale presentation by masking `context_changed`, and issues the
+  confirmation with the full prepared command (message id, expected head,
+  minted cascade audit id, scope) in the interaction-context state.
+- The commit follows the W8 confirm discipline exactly: the command
+  identity is the confirmation digest + actor HMAC; the confirmation is
+  verified and consumed INSIDE the command transaction, then the frozen
+  `createRedactFamilyCareMessageSpec("author")` preconditions/apply/
+  finalize run through composition — an exact replay short-circuits on the
+  ledger and never re-touches the consumed confirmation. The recorded
+  result is enriched with `redactedAt` and the cascade size (from the
+  finalization refs) so replays answer the original apply evidence and
+  `already_satisfied` never fabricates one.
+- Prisma side: `PrismaParentCommunicationExtensionReadPort` (thread ids,
+  bounded impact facts over item-linked replies and derived daily-care
+  logs, receipt aggregate promoting read > delivered > sent with
+  `not_applicable` only when every receipt is terminal) and
+  `createPrismaParentCommunicationExtensionBinding` reusing the v1
+  resolver/read repository, the family-care facts read and the generic
+  command runner. No new kernel transaction and no schema change.
+
 ## 2026-08-15 — W11-2 parent-communication extension default-off runtime
 
 - Mounted the three v1.1 routes in `apps/scenario-service` behind

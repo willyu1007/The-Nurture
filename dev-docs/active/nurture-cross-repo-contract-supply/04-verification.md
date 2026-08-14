@@ -1,5 +1,29 @@
 # Verification
 
+## 2026-08-15 — W11-3 parent-communication extension real owner ports
+
+- Unit lane: new 7-case service suite over fake ports and the REAL frozen
+  spec against an in-memory transaction (typed preview with digest and
+  envelope bindings; stale-presentation, foreign-message and non-author
+  masking; end-to-end prepare→commit with the confirmation-digest command
+  identity, actor HMAC, enriched cascade evidence and consumed-confirmation
+  refusal; digest-mismatch and expired-confirmation pairing;
+  already_satisfied without fabricated evidence; delivery passthrough
+  under the v1 envelope; authority-failure boundary mapping);
+  nurture-scenario suite 104 files / 1133 tests.
+- Production-DB lane: new 5-case W11 integration file green over a real
+  v1-sent message (preview→commit→exact replay with the recorded instant;
+  fresh-command `already_satisfied` after redaction; divergent
+  same-command `command_payload_conflict`; live receipt aggregate
+  promoting delivered→read with no receipt-id leakage; foreign-ref and
+  stale-context masking through the v1 boundary). Seed lesson: the
+  presentation identity must be derived from a POST-send re-resolve — the
+  send moves the scope versions the presentation hash covers.
+- Root typecheck green; routing census 104/58/26.
+
+Verdict: `W11_3_OWNER_PORTS_REAL / FROZEN_SPEC_COMPOSED /
+UNIT_1133_DB_5CASE_GREEN / NO_ACTIVATION`.
+
 ## 2026-08-15 — W11-2 parent-communication extension default-off runtime
 
 - Scenario-service suite 23 files / 187 tests green incl. the new 7-case

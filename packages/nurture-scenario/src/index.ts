@@ -138,6 +138,7 @@ export * from "./teacher-media-association-owner-contract.js";
 export * from "./teacher-assistant-query-owner-contract.js";
 export * from "./parent-communication-owner-contract.js";
 export * from "./parent-communication-extension-contract.js";
+export * from "./parent-communication-extension-service.js";
 export * from "./parent-communication-owner-service.js";
 export * from "./teacher-class-stream-service.js";
 export * from "./teacher-organization-owner-service.js";
