@@ -15,11 +15,13 @@
   and committed. W6-3 real owner ports are complete and disposable-DB
   qualified (domain service + Prisma binding, 9/9 unit + 4/4 integration,
   full DB lane 53/472; observations/focus sections stay honestly
-  `unavailable` pending W9/W10 sources). The next executable step is W6-4/
-  W6-5: governance/feature-map sync, the standalone digest-pin handoff
-  artifact and the My-Chat sanitized snapshot refresh with a dormant strict
-  consumer. All batches remain default-off contract supply with no
-  activation, durable apply, deployment or traffic.
+  `unavailable` pending W9/W10 sources). W6-4/W6-5 are complete — governance
+  sync, the digest-pin handoff artifact and the My-Chat dormant strict
+  consumer with snapshot refresh all landed; W6 is closed end to end. The
+  next executable step is the W7
+  `nurture.teacher-organization-owner@1.0.0` scope freeze. All batches
+  remain default-off contract supply with no activation, durable apply,
+  deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
@@ -191,10 +193,12 @@ conformance fixtures, all default-off.
   N2/N5/N6/N8 land before or with the W1 callback implementation.
 - [x] W3 implementation remains default-off; no durable apply, activation,
   deployment or traffic results from this task.
-- [ ] W6: `nurture.teacher-class-stream-presenter@1.0.0` published with exact
+- [x] W6: `nurture.teacher-class-stream-presenter@1.0.0` published with exact
   digest, default-off service-authenticated routes, real Prisma owner ports,
   conformance fixtures, formal-ingress gate registration and a digest-pin
-  handoff artifact.
+  handoff artifact; My-Chat adopted the dormant strict consumer with the
+  sanitized snapshot at `5babf85` (T-039), moving seven matrix rows to
+  contract-ready.
 - [ ] W7: `nurture.teacher-organization-owner@1.0.0` published with the same
   gate set plus prepare/confirm command semantics, actor-scoped idempotency
   and owner-persisted lane state.

@@ -1,5 +1,25 @@
 # Verification
 
+## 2026-08-14 — W6-5 consumer adoption closes W6
+
+- My-Chat `5babf85` (T-039) adopts the W6 contract as a dormant strict
+  client: exact pin `nurture.teacher-class-stream-presenter@1.0.0` /
+  `sha256:00a84945…`, digest-typed cache partition, contract-invariant
+  validators, sanitized fixture snapshot with provenance at Nurture
+  `db214f8`, consumer suite 6/6 under `NURTURE_REPO_ROOT` (12 fixtures
+  accepted, 12 invalid probes rejected), repository typecheck/lint/unit
+  (1231) green. Seven T-039 matrix rows moved to `contract-ready`
+  (T-S03, T-F01, T-F03, T-F04, T-F06, T-F07, T-H01); contract axis is now
+  44 ready / 20 blocked / 24 partial / 17 local. Live remains blocked on
+  the W6 runtime gate plus deployment; no activation occurred.
+- W6 is closed end to end (scope freeze, contract artifact, default-off
+  runtime, disposable-qualified real owner ports, governance sync,
+  digest-pin handoff, consumer adoption). Next batch: W7 organization-owner
+  scope freeze.
+
+Verdict: `W6_CLOSED_END_TO_END / CONSUMER_ADOPTED_5BABF85 / SEVEN_ROWS_CONTRACT_READY /
+DEFAULT_OFF`.
+
 ## 2026-08-14 — x5 joint repair round two (lane 37/37)
 
 - Full x5 joint lane on a fresh disposable pair (both migration sets applied
