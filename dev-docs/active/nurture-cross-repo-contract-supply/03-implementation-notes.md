@@ -1,5 +1,32 @@
 # Implementation notes
 
+## 2026-08-14 — W8-1 teacher communication-owner contract artifact
+
+- Published the W8 contract package at
+  `packages/nurture-scenario/contracts/teacher-communication-owner/v1/`:
+  owner-contract JSON with six operations (targets, membership, timeline,
+  send-text, withdraw-staged, mark-read), 18 conformance fixtures + 14
+  executed invalid probes + the 20-scenario negative census, hard-pinned
+  `validate-contract.mjs` and README. Digest
+  `sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf`
+  minted with the shared canonicalizer; the W7 Ajv strict-mode lessons were
+  applied up front and the schema compiled clean on the first run — zero
+  digest re-mints this batch.
+- W8-specific validator invariants beyond the W7 set: the targets unread
+  summary must equal its threads (sum capped 999 + count of non-zero), the
+  timeline `cursor_echo` must equal the request cursor (`null` first page,
+  the W4 replay rule), thread/member/message ref uniqueness, membership and
+  mark-read thread echo, withdraw process echo, and the frozen-unavailable
+  `class_group` entry (probe flips it to `available` and must be rejected).
+- One probe lesson recorded: a schema pattern cannot reject a well-formed
+  wrong digest, so the digest probe mutates to a malformed value; exact
+  digest admission stays a runtime-parse and validator-equality concern.
+- Added `src/teacher-communication-owner-contract.ts` (six paths + frozen
+  interface + descriptor) exported from the package index and chained
+  `verify:teacher-communication-owner-contract` into
+  `verify:formal-ingress-contract`. Runtime is W8-2; the ingress census is
+  intentionally untouched.
+
 ## 2026-08-14 — W8 communication-owner scope freeze
 
 - Froze `nurture.teacher-communication-owner@1.0.0`

@@ -1,5 +1,19 @@
 # Verification
 
+## 2026-08-14 — W8-1 communication-owner contract artifact
+
+- `pnpm verify:teacher-communication-owner-contract`: digest
+  `sha256:e4a831cd…` recomputed, schemas compiled under Ajv 2020 strict on
+  the first attempt, 18 fixtures accepted, 14 invalid probes rejected,
+  operation/row/negative censuses exact (6 operations;
+  T-C02/T-C03/T-C04/T-C05/T-C07/T-C09/T-S04; 20 scenarios).
+- Full `pnpm verify:formal-ingress-contract` chain green (five contract
+  validators + ingress assert; route population unchanged); repo typecheck
+  green; nurture-scenario suite 1104/1104.
+
+Verdict: `W8_1_CONTRACT_PUBLISHED / DIGEST_E4A831CD / STRICT_COMPILE_FIRST_RUN /
+DEFAULT_OFF / NO_RUNTIME_YET`.
+
 ## 2026-08-14 — W7-5 consumer adoption closes W7
 
 - My-Chat `33686a8` (T-039) adopts the W7 contract as a dormant strict

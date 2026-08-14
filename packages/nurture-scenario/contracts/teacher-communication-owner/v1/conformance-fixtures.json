@@ -1,0 +1,934 @@
+{
+  "schema_version": 1,
+  "interface_contract": {
+    "key": "nurture.teacher-communication-owner",
+    "version": "1.0.0",
+    "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+  },
+  "required_negative_scenarios": [
+    "not_authorized_admin",
+    "not_authorized_other_class",
+    "not_authorized_guardian",
+    "revoked_mid_window",
+    "stale_context_ref",
+    "cross_scope_class_ref",
+    "cross_scope_thread_ref",
+    "cross_thread_message_ref",
+    "cross_scope_process_ref",
+    "disabled_gate",
+    "service_auth_missing",
+    "forbidden_request_field",
+    "hidden_payload_rejected",
+    "cross_actor_replay_denied",
+    "divergent_command_payload_conflict",
+    "confirmation_expired",
+    "confirmation_single_use",
+    "outcome_unknown_same_command_recovery",
+    "backwards_mark_read_denied",
+    "timeline_cursor_echo_enforced"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "w8-targets-ready",
+      "operation": "targets_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-targets-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:comm:targets-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:comm:targets-01",
+          "interface_key": "nurture.teacher-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:comm:targets-01",
+          "scope_version": 4,
+          "operation": "targets_query",
+          "query_key": "class:ref:sunflower-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "class_group": {
+          "send_availability": "unavailable",
+          "reason_code": "class_group_reserved"
+        },
+        "threads": [
+          {
+            "thread_ref": "thread:ref:family-mingming-01",
+            "family_safe_label": "小明家庭",
+            "child_safe_label": "小明",
+            "unread_count": 3,
+            "latest_message_at": "2026-08-14T08:55:00.000Z"
+          },
+          {
+            "thread_ref": "thread:ref:family-xiaohong-01",
+            "family_safe_label": "小红家庭",
+            "child_safe_label": "小红",
+            "unread_count": 0
+          }
+        ],
+        "unread_summary": {
+          "total_unread": 3,
+          "threads_with_unread": 1
+        }
+      }
+    },
+    {
+      "fixture_id": "w8-targets-ready-empty",
+      "operation": "targets_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-targets-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:comm:targets-02",
+          "presentation_role": "caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 3,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:comm:targets-02",
+          "interface_key": "nurture.teacher-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:comm:targets-02",
+          "scope_version": 3,
+          "operation": "targets_query",
+          "query_key": "class:ref:sunflower-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "class_group": {
+          "send_availability": "unavailable",
+          "reason_code": "class_group_reserved"
+        },
+        "threads": [],
+        "unread_summary": {
+          "total_unread": 0,
+          "threads_with_unread": 0
+        }
+      }
+    },
+    {
+      "fixture_id": "w8-membership-ready",
+      "operation": "membership_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-membership-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:comm:membership-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:comm:membership-01",
+          "interface_key": "nurture.teacher-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:comm:membership-01",
+          "scope_version": 4,
+          "operation": "membership_query",
+          "query_key": "thread:ref:family-mingming-01",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "thread_ref": "thread:ref:family-mingming-01",
+        "members": [
+          {
+            "member_ref": "member:ref:guardian-01",
+            "display_name": "小明妈妈",
+            "role_display": "家长"
+          },
+          {
+            "member_ref": "member:ref:teacher-01",
+            "display_name": "林老师",
+            "role_display": "带班老师"
+          },
+          {
+            "member_ref": "member:ref:teacher-02",
+            "display_name": "吴老师",
+            "role_display": "配班老师"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "w8-timeline-ready-first-page",
+      "operation": "timeline_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-timeline-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:comm:timeline-01",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:comm:timeline-01",
+          "interface_key": "nurture.teacher-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:comm:timeline-01",
+          "scope_version": 4,
+          "operation": "timeline_query",
+          "query_key": "thread:ref:family-mingming-01|first",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "thread_ref": "thread:ref:family-mingming-01",
+        "cursor_echo": null,
+        "messages": [
+          {
+            "message_ref": "message:ref:m-0001",
+            "kind": "text",
+            "sender_kind": "parent",
+            "agent_authored": false,
+            "sender_display": "小明妈妈",
+            "sent_at": "2026-08-14T08:40:00.000Z",
+            "delivery_state": "read",
+            "has_media": false,
+            "body": "今天小明有点咳嗽，麻烦老师留意。"
+          },
+          {
+            "message_ref": "message:ref:m-0002",
+            "kind": "media",
+            "sender_kind": "teacher",
+            "agent_authored": false,
+            "sender_display": "林老师",
+            "sent_at": "2026-08-14T08:50:00.000Z",
+            "delivery_state": "delivered",
+            "has_media": true
+          },
+          {
+            "message_ref": "message:ref:m-0003",
+            "kind": "system",
+            "sender_kind": "agent",
+            "agent_authored": true,
+            "sender_display": "整理助手",
+            "sent_at": "2026-08-14T08:55:00.000Z",
+            "delivery_state": "not_applicable",
+            "has_media": false
+          }
+        ],
+        "page": {
+          "has_more": true,
+          "next_cursor": "cursor:after:m-0003"
+        }
+      }
+    },
+    {
+      "fixture_id": "w8-timeline-ready-cursored",
+      "operation": "timeline_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-timeline-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "cursor": "cursor:after:m-0003"
+      },
+      "response": {
+        "status": "ready",
+        "owner_resolution": {
+          "resolution_ref": "resolution:comm:timeline-02",
+          "presentation_role": "lead_caregiver",
+          "scope_kind": "care_group",
+          "scope_ref": "class:ref:sunflower-01",
+          "context_ref": "context:teacher:sunflower:v3",
+          "scope_version": 4,
+          "resolved_at": "2026-08-14T09:00:00.000Z"
+        },
+        "cache_partition": {
+          "partition_key": "partition:comm:timeline-02",
+          "interface_key": "nurture.teacher-communication-owner",
+          "interface_version": "1.0.0",
+          "contract_digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf",
+          "workspace_id": "workspace-teacher-01",
+          "my_chat_user_id": "user-teacher-01",
+          "presentation_role": "lead_caregiver",
+          "context_ref": "context:teacher:sunflower:v3",
+          "resolution_ref": "resolution:comm:timeline-02",
+          "scope_version": 4,
+          "operation": "timeline_query",
+          "query_key": "thread:ref:family-mingming-01|cursor:after:m-0003",
+          "expires_at": "2026-08-14T09:05:00.000Z"
+        },
+        "generated_at": "2026-08-14T09:00:01.000Z",
+        "freshness": {
+          "resolved_at": "2026-08-14T09:00:00.000Z",
+          "source": "current_owner_read"
+        },
+        "thread_ref": "thread:ref:family-mingming-01",
+        "cursor_echo": "cursor:after:m-0003",
+        "messages": [
+          {
+            "message_ref": "message:ref:m-0004",
+            "kind": "text",
+            "sender_kind": "teacher",
+            "agent_authored": false,
+            "sender_display": "林老师",
+            "sent_at": "2026-08-14T08:58:00.000Z",
+            "delivery_state": "sent",
+            "has_media": false,
+            "body": "收到，已经安排多喝水并观察。"
+          }
+        ],
+        "page": {
+          "has_more": false
+        }
+      }
+    },
+    {
+      "fixture_id": "w8-send-prepare-ready",
+      "operation": "send_text_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-send-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "command_request_id": "command-w8-send-0001",
+        "kind": "prepare",
+        "prepare": {
+          "text": "明天春游请给小明带一件外套。"
+        }
+      },
+      "response": {
+        "status": "ready_to_confirm",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-send-0001",
+        "confirmation_ref": "confirmation:ref:send-0001",
+        "prepared_preview_digest": "sha256:abababababababababababababababababababababababababababababababab",
+        "expires_at": "2026-08-14T09:05:01.000Z"
+      }
+    },
+    {
+      "fixture_id": "w8-send-confirm-committed",
+      "operation": "send_text_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-send-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "command_request_id": "command-w8-send-0001",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:send-0001",
+          "prepared_preview_digest": "sha256:abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-send-0001",
+        "executed": "executed",
+        "message_ref": "message:ref:m-0005",
+        "committed_at": "2026-08-14T09:00:02.000Z"
+      }
+    },
+    {
+      "fixture_id": "w8-send-confirm-replayed",
+      "operation": "send_text_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-send-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "command_request_id": "command-w8-send-0001",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:send-0001",
+          "prepared_preview_digest": "sha256:abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-send-0001",
+        "executed": "replayed",
+        "message_ref": "message:ref:m-0005",
+        "committed_at": "2026-08-14T09:00:02.000Z"
+      }
+    },
+    {
+      "fixture_id": "w8-send-not-committed-expired",
+      "operation": "send_text_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-send-04",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "command_request_id": "command-w8-send-0002",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:send-0002",
+          "prepared_preview_digest": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        }
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-send-0002",
+        "reason_code": "confirmation_expired"
+      }
+    },
+    {
+      "fixture_id": "w8-send-outcome-unknown",
+      "operation": "send_text_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-send-05",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "command_request_id": "command-w8-send-0003",
+        "kind": "confirm",
+        "confirm": {
+          "confirmation_ref": "confirmation:ref:send-0003",
+          "prepared_preview_digest": "sha256:efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+        }
+      },
+      "response": {
+        "status": "outcome_unknown",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-send-0003",
+        "recovery": "reconcile_same_command"
+      }
+    },
+    {
+      "fixture_id": "w8-withdraw-committed",
+      "operation": "withdraw_staged_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-withdraw-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "process_ref": "process:ref:staged-0001",
+        "command_request_id": "command-w8-withdraw-0001"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-withdraw-0001",
+        "executed": "executed",
+        "disposition": "withdrawn",
+        "process_ref": "process:ref:staged-0001",
+        "withdrawn_at": "2026-08-14T09:00:03.000Z"
+      }
+    },
+    {
+      "fixture_id": "w8-withdraw-replayed-already",
+      "operation": "withdraw_staged_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-withdraw-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "process_ref": "process:ref:staged-0001",
+        "command_request_id": "command-w8-withdraw-0001"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-withdraw-0001",
+        "executed": "replayed",
+        "disposition": "withdrawn",
+        "process_ref": "process:ref:staged-0001",
+        "withdrawn_at": "2026-08-14T09:00:03.000Z"
+      }
+    },
+    {
+      "fixture_id": "w8-withdraw-not-committed-released",
+      "operation": "withdraw_staged_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-withdraw-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "process_ref": "process:ref:staged-0002",
+        "command_request_id": "command-w8-withdraw-0002"
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-withdraw-0002",
+        "reason_code": "already_released"
+      }
+    },
+    {
+      "fixture_id": "w8-mark-read-committed-advanced",
+      "operation": "mark_read_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-markread-01",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "message_ref": "message:ref:m-0003",
+        "command_request_id": "command-w8-markread-0001"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-markread-0001",
+        "executed": "executed",
+        "disposition": "advanced",
+        "thread_ref": "thread:ref:family-mingming-01"
+      }
+    },
+    {
+      "fixture_id": "w8-mark-read-already-satisfied",
+      "operation": "mark_read_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-markread-02",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "message_ref": "message:ref:m-0001",
+        "command_request_id": "command-w8-markread-0002"
+      },
+      "response": {
+        "status": "committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-markread-0002",
+        "executed": "executed",
+        "disposition": "already_satisfied",
+        "thread_ref": "thread:ref:family-mingming-01"
+      }
+    },
+    {
+      "fixture_id": "w8-mark-read-not-committed-regression",
+      "operation": "mark_read_exchange",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-markread-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-mingming-01",
+        "message_ref": "message:ref:m-0001",
+        "command_request_id": "command-w8-markread-0003"
+      },
+      "response": {
+        "status": "not_committed",
+        "context_ref": "context:teacher:sunflower:v3",
+        "command_request_id": "command-w8-markread-0003",
+        "reason_code": "cursor_regression"
+      }
+    },
+    {
+      "fixture_id": "w8-masked-access-changed",
+      "operation": "targets_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-targets-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:willow-01"
+      },
+      "response": {
+        "status": "masked",
+        "context_ref": "context:teacher:sunflower:v3",
+        "masked_at": "2026-08-14T09:00:01.000Z",
+        "mask_signal": {
+          "kind": "mask",
+          "reason_code": "access_changed",
+          "purge_partition": true,
+          "content_masked": true
+        }
+      }
+    },
+    {
+      "fixture_id": "w8-unavailable-temporarily",
+      "operation": "timeline_query",
+      "request": {
+        "interface_contract": {
+          "key": "nurture.teacher-communication-owner",
+          "version": "1.0.0",
+          "digest": "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf"
+        },
+        "workspace_id": "workspace-teacher-01",
+        "my_chat_user_id": "user-teacher-01",
+        "host_request_id": "request-timeline-03",
+        "context_ref": "context:teacher:sunflower:v3",
+        "class_ref": "class:ref:sunflower-01",
+        "thread_ref": "thread:ref:family-xiaohong-01"
+      },
+      "response": {
+        "status": "unavailable",
+        "context_ref": "context:teacher:sunflower:v3",
+        "failed_at": "2026-08-14T09:00:01.000Z",
+        "reason_code": "temporarily_unavailable",
+        "retryable": true
+      }
+    }
+  ],
+  "invalid_fixtures": [
+    {
+      "fixture_id": "w8-invalid-request-digest-malformed",
+      "operation": "targets_query",
+      "source_fixture_id": "w8-targets-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "interface_contract",
+          "digest"
+        ],
+        "value": "sha256:not-a-hex-digest"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-request-authority-claim",
+      "operation": "membership_query",
+      "source_fixture_id": "w8-membership-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "participant_id"
+        ],
+        "value": "participant-raw-01"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-request-short-thread-ref",
+      "operation": "timeline_query",
+      "source_fixture_id": "w8-timeline-ready-first-page",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "thread_ref"
+        ],
+        "value": "abc"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-request-send-text-too-long",
+      "operation": "send_text_exchange",
+      "source_fixture_id": "w8-send-prepare-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "prepare",
+          "text"
+        ],
+        "value": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-request-send-both-payloads",
+      "operation": "send_text_exchange",
+      "source_fixture_id": "w8-send-prepare-ready",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "confirm"
+        ],
+        "value": {
+          "confirmation_ref": "confirmation:ref:send-0001",
+          "prepared_preview_digest": "sha256:abababababababababababababababababababababababababababababababab"
+        }
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-request-empty-cursor",
+      "operation": "timeline_query",
+      "source_fixture_id": "w8-timeline-ready-cursored",
+      "target": "request",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "cursor"
+        ],
+        "value": ""
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-request-mark-read-missing-message",
+      "operation": "mark_read_exchange",
+      "source_fixture_id": "w8-mark-read-committed-advanced",
+      "target": "request",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "message_ref"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-unread-over-cap",
+      "operation": "targets_query",
+      "source_fixture_id": "w8-targets-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "threads",
+          0,
+          "unread_count"
+        ],
+        "value": 100
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-class-group-sendable",
+      "operation": "targets_query",
+      "source_fixture_id": "w8-targets-ready",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "class_group",
+          "send_availability"
+        ],
+        "value": "available"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-cursor-echo-missing",
+      "operation": "timeline_query",
+      "source_fixture_id": "w8-timeline-ready-first-page",
+      "target": "response",
+      "mutation": {
+        "kind": "delete",
+        "path": [
+          "cursor_echo"
+        ]
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-media-with-body",
+      "operation": "timeline_query",
+      "source_fixture_id": "w8-timeline-ready-first-page",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "messages",
+          1,
+          "body"
+        ],
+        "value": "隐藏正文"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-withdraw-open-reason",
+      "operation": "withdraw_staged_exchange",
+      "source_fixture_id": "w8-withdraw-not-committed-released",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "reason_code"
+        ],
+        "value": "mystery_reason"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-executed-open",
+      "operation": "send_text_exchange",
+      "source_fixture_id": "w8-send-confirm-committed",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "executed"
+        ],
+        "value": "twice"
+      }
+    },
+    {
+      "fixture_id": "w8-invalid-response-next-cursor-without-more",
+      "operation": "timeline_query",
+      "source_fixture_id": "w8-timeline-ready-cursored",
+      "target": "response",
+      "mutation": {
+        "kind": "set",
+        "path": [
+          "page",
+          "next_cursor"
+        ],
+        "value": "cursor:after:m-0004"
+      }
+    }
+  ]
+}

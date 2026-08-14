@@ -1,0 +1,1427 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.teacher-communication-owner",
+    "version": "1.0.0",
+    "kind": "private_owner_exchange"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "digest": "sha256:35d6340f60aa2d81523b0c8af977c8c5bb8f01a05a84d1a73b5baffbe8654273",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "capability_dependencies": [
+    {
+      "key": "initiate_caregiver_direct_message",
+      "version": "1.0.0",
+      "use": "target vocabulary only"
+    },
+    {
+      "key": "organize_care_capture_batch",
+      "version": "1.0.0",
+      "use": "staged-item provenance only"
+    }
+  ],
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "mobile_posture": {
+    "mode": "read_and_command",
+    "forbidden_response_fields": [
+      "action_ref",
+      "participant_id",
+      "role_assignment_id",
+      "institution_id",
+      "family_id",
+      "child_id",
+      "care_group_id",
+      "enrollment_id",
+      "grant_id",
+      "thread_id",
+      "message_id",
+      "storage_ref",
+      "signed_url",
+      "url"
+    ],
+    "rules": [
+      "The class_group rail entry is frozen unavailable (reason class_group_reserved); no operation accepts it as a send target.",
+      "Media messages are presence descriptors only; bytes and access stay reserved for the W9 media supply.",
+      "Unread counts derive from the teacher's own thread cursor; reads never advance it — mark_read_exchange is the only clear.",
+      "Sent-message withdrawal is a different lifecycle outside this contract; withdraw_staged_exchange touches pre-release items only.",
+      "Voice input is excluded from every write in this version."
+    ]
+  },
+  "command_model": {
+    "idempotency": "Every exchange binds an actor-scoped identity (workspace + current participant + command_request_id); another authorized actor replaying the same command_request_id is denied, never served the first actor's result.",
+    "replay": "An exact same-command replay returns the recorded result with executed: replayed and mutates nothing.",
+    "outcome_unknown": "Recovery is exact same-command replay; a new command is never the recovery path.",
+    "confirmation": "send_text_exchange is the only two-step confirm (outward family-visible effect); its confirmation_ref is single-use, five-minute, body-free, surface-bound and never extended or revived.",
+    "no_auto_send": "Nothing here schedules or auto-sends; scheduled delivery stays gated on product decision I-Q1 outside this contract."
+  },
+  "safe_reason_codes": [
+    "teacher_communication_owner_disabled",
+    "invalid_teacher_communication_request",
+    "teacher_communication_contract_mismatch"
+  ],
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "targets_query": "/internal/nurture/teacher-communication-owner/v1/targets",
+      "membership_query": "/internal/nurture/teacher-communication-owner/v1/membership",
+      "timeline_query": "/internal/nurture/teacher-communication-owner/v1/timeline",
+      "send_text_exchange": "/internal/nurture/teacher-communication-owner/v1/send-text",
+      "withdraw_staged_exchange": "/internal/nurture/teacher-communication-owner/v1/withdraw-staged",
+      "mark_read_exchange": "/internal/nurture/teacher-communication-owner/v1/mark-read"
+    }
+  },
+  "operation_order": [
+    "targets_query",
+    "membership_query",
+    "timeline_query",
+    "send_text_exchange",
+    "withdraw_staged_exchange",
+    "mark_read_exchange"
+  ],
+  "operations": {
+    "targets_query": {
+      "path": "/internal/nurture/teacher-communication-owner/v1/targets",
+      "t039_rows": [
+        "T-C02",
+        "T-S04"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/targets_query_request",
+      "response_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/targets_query_response"
+    },
+    "membership_query": {
+      "path": "/internal/nurture/teacher-communication-owner/v1/membership",
+      "t039_rows": [
+        "T-C03"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/membership_query_request",
+      "response_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/membership_query_response"
+    },
+    "timeline_query": {
+      "path": "/internal/nurture/teacher-communication-owner/v1/timeline",
+      "t039_rows": [
+        "T-C04"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/timeline_query_request",
+      "response_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/timeline_query_response"
+    },
+    "send_text_exchange": {
+      "path": "/internal/nurture/teacher-communication-owner/v1/send-text",
+      "t039_rows": [
+        "T-C09"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/send_text_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/send_text_exchange_response"
+    },
+    "withdraw_staged_exchange": {
+      "path": "/internal/nurture/teacher-communication-owner/v1/withdraw-staged",
+      "t039_rows": [
+        "T-C07",
+        "T-C05"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/withdraw_staged_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/withdraw_staged_exchange_response"
+    },
+    "mark_read_exchange": {
+      "path": "/internal/nurture/teacher-communication-owner/v1/mark-read",
+      "t039_rows": [
+        "T-C02"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/mark_read_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-communication-owner:1#/$defs/mark_read_exchange_response"
+    }
+  },
+  "schemas": {
+    "$id": "urn:nurture:teacher-communication-owner:1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 512
+      },
+      "instant": {
+        "type": "string",
+        "format": "date-time",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+      },
+      "command_request_id": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "cursor_token": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "safe_label": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.teacher-communication-owner"
+          },
+          "version": {
+            "const": "1.0.0"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "scope_kind": {
+            "const": "care_group"
+          },
+          "scope_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "interface_key": {
+            "const": "nurture.teacher-communication-owner"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "operation": {
+            "enum": [
+              "targets_query",
+              "membership_query",
+              "timeline_query"
+            ]
+          },
+          "query_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolved_at",
+          "source"
+        ],
+        "properties": {
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "source": {
+            "const": "current_owner_read"
+          }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "reason_code",
+          "purge_partition",
+          "content_masked"
+        ],
+        "properties": {
+          "kind": {
+            "const": "mask"
+          },
+          "reason_code": {
+            "enum": [
+              "access_changed",
+              "context_changed",
+              "refresh_not_retryable"
+            ]
+          },
+          "purge_partition": {
+            "const": true
+          },
+          "content_masked": {
+            "const": true
+          }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "masked_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "mask_signal": {
+            "$ref": "#/$defs/mask_signal"
+          }
+        }
+      },
+      "unavailable_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "failed_at",
+          "reason_code",
+          "retryable"
+        ],
+        "properties": {
+          "status": {
+            "const": "unavailable"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "failed_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "reason_code": {
+            "enum": [
+              "content_unavailable",
+              "temporarily_unavailable",
+              "request_invalid"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "outcome_unknown_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "outcome_unknown"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "recovery": {
+            "const": "reconcile_same_command"
+          }
+        }
+      },
+      "executed_kind": {
+        "enum": [
+          "executed",
+          "replayed"
+        ]
+      },
+      "identity_request": {
+        "type": "object",
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "targets_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "membership_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "thread_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "timeline_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "thread_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "cursor": {
+            "$ref": "#/$defs/cursor_token"
+          }
+        }
+      },
+      "send_text_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "thread_ref",
+          "command_request_id",
+          "kind"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "kind": {
+            "enum": [
+              "prepare",
+              "confirm"
+            ]
+          },
+          "prepare": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            }
+          },
+          "confirm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "confirmation_ref",
+              "prepared_preview_digest"
+            ],
+            "properties": {
+              "confirmation_ref": {
+                "$ref": "#/$defs/opaque_ref"
+              },
+              "prepared_preview_digest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "prepare"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "kind",
+                "prepare"
+              ],
+              "properties": {
+                "kind": true,
+                "prepare": true,
+                "confirm": false
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "confirm"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "kind",
+                "confirm"
+              ],
+              "properties": {
+                "kind": true,
+                "confirm": true,
+                "prepare": false
+              }
+            }
+          }
+        ]
+      },
+      "withdraw_staged_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "process_ref",
+          "command_request_id"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          }
+        }
+      },
+      "mark_read_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "thread_ref",
+          "message_ref",
+          "command_request_id"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "message_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          }
+        }
+      },
+      "class_group_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "send_availability",
+          "reason_code"
+        ],
+        "properties": {
+          "send_availability": {
+            "const": "unavailable"
+          },
+          "reason_code": {
+            "const": "class_group_reserved"
+          }
+        }
+      },
+      "thread_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "thread_ref",
+          "family_safe_label",
+          "child_safe_label",
+          "unread_count"
+        ],
+        "properties": {
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "family_safe_label": {
+            "$ref": "#/$defs/safe_label"
+          },
+          "child_safe_label": {
+            "$ref": "#/$defs/safe_label"
+          },
+          "unread_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99
+          },
+          "latest_message_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "unread_summary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "total_unread",
+          "threads_with_unread"
+        ],
+        "properties": {
+          "total_unread": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "threads_with_unread": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 80
+          }
+        }
+      },
+      "targets_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "class_group",
+          "threads",
+          "unread_summary"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "class_group": {
+            "$ref": "#/$defs/class_group_entry"
+          },
+          "threads": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 80,
+            "items": {
+              "$ref": "#/$defs/thread_entry"
+            }
+          },
+          "unread_summary": {
+            "$ref": "#/$defs/unread_summary"
+          }
+        }
+      },
+      "targets_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/targets_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "member": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "member_ref",
+          "display_name",
+          "role_display"
+        ],
+        "properties": {
+          "member_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "display_name": {
+            "$ref": "#/$defs/safe_label"
+          },
+          "role_display": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          }
+        }
+      },
+      "membership_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "thread_ref",
+          "members"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "members": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/$defs/member"
+            }
+          }
+        }
+      },
+      "membership_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/membership_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "timeline_message": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "text"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "kind",
+                "body"
+              ],
+              "properties": {
+                "kind": true,
+                "body": true
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "media",
+                    "system"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "body": false
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "media"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "kind",
+                "has_media"
+              ],
+              "properties": {
+                "kind": true,
+                "has_media": {
+                  "const": true
+                }
+              }
+            }
+          }
+        ],
+        "required": [
+          "message_ref",
+          "kind",
+          "sender_kind",
+          "agent_authored",
+          "sender_display",
+          "sent_at",
+          "delivery_state",
+          "has_media"
+        ],
+        "properties": {
+          "message_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "kind": {
+            "enum": [
+              "text",
+              "media",
+              "system"
+            ]
+          },
+          "sender_kind": {
+            "enum": [
+              "parent",
+              "teacher",
+              "system",
+              "agent"
+            ]
+          },
+          "agent_authored": {
+            "type": "boolean"
+          },
+          "sender_display": {
+            "$ref": "#/$defs/safe_label"
+          },
+          "sent_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "delivery_state": {
+            "enum": [
+              "sent",
+              "delivered",
+              "read",
+              "not_applicable"
+            ]
+          },
+          "has_media": {
+            "type": "boolean"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        }
+      },
+      "timeline_page": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "has_more": {
+                  "const": true
+                }
+              },
+              "required": [
+                "has_more"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "has_more",
+                "next_cursor"
+              ],
+              "properties": {
+                "has_more": true,
+                "next_cursor": true
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "has_more": {
+                  "const": false
+                }
+              },
+              "required": [
+                "has_more"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "next_cursor": false
+              }
+            }
+          }
+        ],
+        "required": [
+          "has_more"
+        ],
+        "properties": {
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "$ref": "#/$defs/cursor_token"
+          }
+        }
+      },
+      "timeline_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "thread_ref",
+          "cursor_echo",
+          "messages",
+          "page"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "cursor_echo": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/cursor_token"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "messages": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/$defs/timeline_message"
+            }
+          },
+          "page": {
+            "$ref": "#/$defs/timeline_page"
+          }
+        }
+      },
+      "timeline_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/timeline_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "send_ready_to_confirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "confirmation_ref",
+          "prepared_preview_digest",
+          "expires_at"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready_to_confirm"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "confirmation_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "prepared_preview_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "send_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "message_ref",
+          "committed_at"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "message_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "committed_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "send_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "confirmation_expired",
+              "confirmation_consumed",
+              "confirmation_foreign",
+              "preview_digest_mismatch",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "send_text_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/send_ready_to_confirm"
+          },
+          {
+            "$ref": "#/$defs/send_committed"
+          },
+          {
+            "$ref": "#/$defs/send_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "withdraw_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "disposition",
+          "process_ref",
+          "withdrawn_at"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "disposition": {
+            "enum": [
+              "withdrawn",
+              "already_withdrawn"
+            ]
+          },
+          "process_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "withdrawn_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "withdraw_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "target_unavailable",
+              "already_released",
+              "illegal_transition",
+              "cancel_evidence_unavailable",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "withdraw_staged_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/withdraw_committed"
+          },
+          {
+            "$ref": "#/$defs/withdraw_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "mark_read_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "disposition",
+          "thread_ref"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "disposition": {
+            "enum": [
+              "advanced",
+              "already_satisfied"
+            ]
+          },
+          "thread_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "mark_read_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "cursor_regression",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "mark_read_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/mark_read_committed"
+          },
+          {
+            "$ref": "#/$defs/mark_read_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      }
+    }
+  }
+}
