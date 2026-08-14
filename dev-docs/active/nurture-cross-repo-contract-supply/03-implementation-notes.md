@@ -1,5 +1,35 @@
 # Implementation notes
 
+## 2026-08-14 — W9-3 teacher media-association real owner ports
+
+- Added the DB-free domain service
+  (`src/teacher-media-association-owner-service.ts`): W6-discipline
+  authority and read envelopes; the unassociated queue filters to assets
+  with no confirmed attribution (queue-wide count capped 999, page ≤50,
+  display fields merged from the new asset-display read); the child option
+  list reuses the daily-care eligibility port; the two exchanges run on the
+  generic command ledger with the W7 actor HMAC.
+- Media refs resolve over the class's FULL asset set (terminal lifecycles
+  included) — the W7/W8 replay-resolution lesson applied up front, so
+  exact replays after a decision or discard never mask.
+- Associate rides the frozen G3-C1 confirm/reject specs verbatim (the
+  request carries the expected revisions, so they stay inside the command
+  identity); a head conflict is attributed honestly with one extra
+  failure-path read (`media_revision_moved` vs
+  `attribution_revision_moved`). Discard rides
+  `createDiscardMediaAssetSpec` with head-free identity, the freshly-read
+  heads as expected-heads, and a wrapped apply that records the discard
+  instant into the committed result so replays answer the original moment.
+- Prisma side: `PrismaTeacherMediaAssociationReadPort` delegates the G3-C1
+  attribution/lifecycle reads to the existing media-safety port and adds
+  the class-wide candidate list plus display fields (no bytes or storage
+  handles anywhere); `createPrismaTeacherMediaAssociationBinding`
+  assembles context/media/child-option reads and the command runner. No
+  schema change.
+- DB-lane world lesson: `NurtureMediaAttributionSource` has no
+  `organizer_candidate` value — candidate rows seed as `history_match`
+  (the harness vocabulary maps sources at the read boundary).
+
 ## 2026-08-14 — W9-2 teacher media-association default-off runtime
 
 - Mounted the four W9 routes in `apps/scenario-service` behind

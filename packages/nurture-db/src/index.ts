@@ -135,4 +135,5 @@ export * from "./repositories/parent-communication-owner.repository.js";
 export * from "./teacher-class-stream.composition.js";
 export * from "./teacher-organization-owner.composition.js";
 export * from "./teacher-communication-owner.composition.js";
+export * from "./teacher-media-association-owner.composition.js";
 export * from "./repositories/teacher-class-stream.repository.js";

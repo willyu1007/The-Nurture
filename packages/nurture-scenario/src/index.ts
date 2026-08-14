@@ -139,4 +139,5 @@ export * from "./parent-communication-owner-service.js";
 export * from "./teacher-class-stream-service.js";
 export * from "./teacher-organization-owner-service.js";
 export * from "./teacher-communication-owner-service.js";
+export * from "./teacher-media-association-owner-service.js";
 export type * from "@my-chat/workflow-contracts";

@@ -1,5 +1,24 @@
 # Verification
 
+## 2026-08-14 — W9-3 media-association real owner ports
+
+- Unit lane: 6-case service suite over fake ports (foreign-ref masking,
+  retryable resolver failure, queue filtering with display/options merge,
+  association echo, associate commit mapping with actor-bound canonical and
+  honest head-drift attribution, head-free discard with the recorded
+  instant); nurture-scenario suite 1117/1117.
+- Production-DB lane: new 5-case W9 integration file green — live
+  unassociated queue with child options, confirm + exact replay +
+  cross-actor denial + queue drain, moved-revision refusal, discard +
+  replayed instant + terminal reuse refusal with the asset row landing
+  `discarded`, cross-class/foreign-media masking; full `test:db` battery
+  green (exit 0; 56 files per the routing census).
+- Repo typecheck, `assert-test-routing` (unit=102, production-db=56),
+  `verify:formal-ingress-contract` chain and both doc lints green.
+
+Verdict: `W9_3_REAL_PORTS_QUALIFIED / LEDGER_EXCHANGES_PROVEN /
+REPLAY_RESOLUTION_LESSON_APPLIED_UP_FRONT / DEFAULT_OFF_UNCHANGED`.
+
 ## 2026-08-14 — W9-2 media-association default-off runtime
 
 - scenario-service suite 169/169 including the new 7-case W9 e2e and the
