@@ -1,5 +1,22 @@
 # Verification
 
+## 2026-08-14 — x5 joint repair round two (lane 37/37)
+
+- Full x5 joint lane on a fresh disposable pair (both migration sets applied
+  cleanly, containers destroyed afterwards): 5 files / 37 tests pass —
+  t007 knowledge 12, t007 settlement 8, t009 family-growth 8,
+  x5-acceptance 4, t010 authorization 5. First complete lane pass since the
+  W5 N1 hardening (2026-08-13).
+- Repairs were test-fixture-scoped only: the t010 query-clock alignment and
+  the x5-acceptance eligible-recipient seed (workspace + user + active
+  membership per the T-042 notification hardening) plus a stale header-note
+  correction. No provider or consumer runtime source changed in this round.
+- Root gates after the changes: typecheck passes; unit 99 files / 1095;
+  test routing 189 files unchanged.
+
+Verdict: `X5_JOINT_LANE_GREEN_37_OF_37 / FIXTURE_ONLY_ROUND /
+T042_RECIPIENT_ELIGIBILITY_SEEDED / CLOCK_ALIGNMENT_COMPLETED`.
+
 ## 2026-08-14 — x5 joint repair round one (t009 + t007 green)
 
 - On a fresh disposable pair (both migration sets applied cleanly): the

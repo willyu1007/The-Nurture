@@ -207,7 +207,7 @@ describe("T-010 My-Chat/Nurture two-database authorization conformance", () => {
     const grant = await prepareMedia(service, "t010-joint-withdraw-grant");
     await service.confirm(context(), confirmRequest(grant, "t010-joint-withdraw-grant"), () => CONFIRM_NOW);
 
-    const presentation = await service.query(context(), scopeRequest());
+    const presentation = await service.query(context(), scopeRequest(), () => COMMAND_NOW);
     const media = requireMediaChange(presentation);
     expect(media.decision).toBe("withdraw");
     const ownerCallsBeforeWithdrawal = transport.calls;
@@ -383,7 +383,7 @@ async function prepareMedia(
   service: FamilyNurtureAuthorizationService,
   clientCommandId: string,
 ): Promise<PreparedAuthorization> {
-  const presentation = await service.query(context(), scopeRequest());
+  const presentation = await service.query(context(), scopeRequest(), () => COMMAND_NOW);
   const media = requireMediaChange(presentation);
   expect(media.decision).toBe("accept");
   const currentContextVersion = await contextVersion();

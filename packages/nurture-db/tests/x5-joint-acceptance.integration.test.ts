@@ -33,12 +33,11 @@ import {
 import {
   createWorkflowHandoffDraftsFromScenarioSnapshots,
 } from "@my-chat/workflow-runtime";
-// NOTE(T-002): the T-009 pin rotation surfaced owner-path drift — My-Chat's
-// Dashboard interaction loop (8d508f1) replaced the route-only attention
-// resolution with typed dashboard items and an acknowledge contract, while
-// Nurture's user-attention owner endpoint still serves the route_key shape.
-// This lane compiles against the NEW contract and stays red until the
-// Nurture owner endpoint adopts it (tracked as T-002 follow-up work).
+// NOTE(T-002): the Nurture owner endpoint adopted the typed Dashboard
+// contract on 2026-08-08 (record 19; joint lane green at My-Chat df7a273).
+// The My-Chat fixture additionally seeds the caregiver recipient as an
+// active workspace member because the T-042 hardening notifies only active
+// members of the exact workspace.
 import {
   createNurtureUserAttentionHttpSource,
   resolveNurtureDashboardItem,
@@ -729,6 +728,19 @@ async function seedMyChatFixture(
   const runId = `x5-joint-run-${suffix}`;
   const stepId = `x5-joint-step-${suffix}`;
   const otherStepId = `x5-joint-step-other-${suffix}`;
+  // The T-042 hardening only notifies active members of the exact workspace,
+  // so the caregiver recipient the Nurture owner resolves must exist here.
+  await prisma.workspace.create({
+    data: { id: workspaceId, name: `x5 joint ${suffix}`, type: "organization" },
+  });
+  await prisma.user.create({ data: { id: `caregiver:${workspaceId}` } });
+  await prisma.membership.create({
+    data: {
+      userId: `caregiver:${workspaceId}`,
+      workspaceId,
+      role: "member",
+    },
+  });
   await prisma.workflowRun.create({
     data: {
       id: runId,

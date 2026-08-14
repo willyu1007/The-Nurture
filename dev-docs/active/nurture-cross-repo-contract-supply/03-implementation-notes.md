@@ -1,5 +1,27 @@
 # Implementation notes
 
+## 2026-08-14 — x5 joint repair round two: full lane green (37/37)
+
+- t010 authorization suite (5): completed the b514b68 clock alignment — the
+  suite already passed `() => COMMAND_NOW` Clock ports to prepare/confirm but
+  left `service.query`'s optional clock on the system default, so the
+  T-042-era freshness evaluation ran at wall-clock against the fixture's
+  frozen `T010_EVALUATED_AT` window and reported the media change
+  unavailable. Both query call sites now pass the fixture clock.
+- x5-acceptance (2 asserted, 4 total): the stop was
+  `target_unavailable` from the My-Chat consumer, not an owner fault — the
+  Nurture user-attention resolve answered a healthy `nurture_attention_v1`
+  item, but the T-042 notification hardening
+  (`assertActiveWorkspaceRecipients`) refuses recipients who are not active
+  members of the exact workspace, and the x5 My-Chat fixture never seeded
+  the `caregiver:<workspaceId>` user. The fixture now creates the workspace
+  (type `organization`), the caregiver user and an active membership. The
+  stale 2026-08-08-era header note claiming the lane "stays red until the
+  Nurture owner endpoint adopts" the Dashboard contract was corrected — the
+  adoption completed on 2026-08-08 (record 19).
+- Full x5 joint lane on the disposable pair: 5 files / 37 tests green — the
+  first complete lane pass since the W5 N1 hardening landed.
+
 ## 2026-08-14 — x5 joint repair: t009 provenance seed and replay settlement
 
 - Repaired the T-009 joint fixture to the W5 N1 provenance model: the seed now
