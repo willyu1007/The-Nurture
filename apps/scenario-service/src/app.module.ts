@@ -75,6 +75,12 @@ import {
   type TeacherMediaAssociationOwnerConfig,
   TeacherMediaAssociationOwnerServiceAuthGuard,
 } from "./teacher-media-association-owner.controller.js";
+import {
+  TEACHER_ASSISTANT_QUERY_OWNER_CONFIG,
+  TeacherAssistantQueryOwnerController,
+  type TeacherAssistantQueryOwnerConfig,
+  TeacherAssistantQueryOwnerServiceAuthGuard,
+} from "./teacher-assistant-query-owner.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
 
@@ -92,6 +98,7 @@ import { ScenarioStructuredLogger } from "./structured-logger.js";
     TeacherOrganizationOwnerController,
     TeacherCommunicationOwnerController,
     TeacherMediaAssociationOwnerController,
+    TeacherAssistantQueryOwnerController,
     FamilySharingPrivateController,
   ],
 })
@@ -109,6 +116,7 @@ export class AppModule {
     teacherOrganizationOwner?: TeacherOrganizationOwnerConfig;
     teacherCommunicationOwner?: TeacherCommunicationOwnerConfig;
     teacherMediaAssociationOwner?: TeacherMediaAssociationOwnerConfig;
+    teacherAssistantQueryOwner?: TeacherAssistantQueryOwnerConfig;
     familySharingPrivate: FamilySharingPrivateConfig;
   }): DynamicModule {
     return {
@@ -207,6 +215,15 @@ export class AppModule {
           }),
         },
         TeacherMediaAssociationOwnerServiceAuthGuard,
+        {
+          provide: TEACHER_ASSISTANT_QUERY_OWNER_CONFIG,
+          useValue: Object.freeze({
+            ...(input.teacherAssistantQueryOwner ?? {
+              serviceAuth: input.parentContextPresenter.serviceAuth,
+            }),
+          }),
+        },
+        TeacherAssistantQueryOwnerServiceAuthGuard,
         {
           provide: FAMILY_SHARING_PRIVATE_CONFIG,
           useValue: Object.freeze({ ...input.familySharingPrivate }),

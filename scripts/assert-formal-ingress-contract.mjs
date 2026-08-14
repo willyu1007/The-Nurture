@@ -81,6 +81,14 @@ const teacherMediaAssociationOwnerPaths = {
   TEACHER_MEDIA_ASSOCIATION_OWNER_DISCARD_PATH:
     "/internal/nurture/teacher-media-association-owner/v1/discard",
 };
+const teacherAssistantQueryOwnerPaths = {
+  TEACHER_ASSISTANT_QUERY_OWNER_MISSING_RECORDS_PATH:
+    "/internal/nurture/teacher-assistant-query-owner/v1/missing-records",
+  TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_SOURCE_PATH:
+    "/internal/nurture/teacher-assistant-query-owner/v1/weekly-source",
+  TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_DRAFT_PATH:
+    "/internal/nurture/teacher-assistant-query-owner/v1/weekly-draft",
+};
 const teacherCommunicationOwnerPaths = {
   TEACHER_COMMUNICATION_OWNER_TARGETS_PATH:
     "/internal/nurture/teacher-communication-owner/v1/targets",
@@ -165,6 +173,9 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATION_PATH`,
   `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_ASSOCIATE_PATH`,
   `apps/scenario-service/src/teacher-media-association-owner.controller.ts:POST:TEACHER_MEDIA_ASSOCIATION_OWNER_DISCARD_PATH`,
+  `apps/scenario-service/src/teacher-assistant-query-owner.controller.ts:POST:TEACHER_ASSISTANT_QUERY_OWNER_MISSING_RECORDS_PATH`,
+  `apps/scenario-service/src/teacher-assistant-query-owner.controller.ts:POST:TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_SOURCE_PATH`,
+  `apps/scenario-service/src/teacher-assistant-query-owner.controller.ts:POST:TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_DRAFT_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -179,6 +190,7 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
   "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
   "apps/scenario-service/src/teacher-media-association-owner.controller.ts#TeacherMediaAssociationOwnerController",
+  "apps/scenario-service/src/teacher-assistant-query-owner.controller.ts#TeacherAssistantQueryOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
@@ -190,6 +202,7 @@ const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
   "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
   "apps/scenario-service/src/teacher-media-association-owner.controller.ts#TeacherMediaAssociationOwnerController",
+  "apps/scenario-service/src/teacher-assistant-query-owner.controller.ts#TeacherAssistantQueryOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -1735,6 +1748,163 @@ for (const route of [
   assertIncludes(
     teacherMediaAssociationHttpSource,
     "contract.digest !== TEACHER_MEDIA_ASSOCIATION_OWNER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const teacherAssistantQueryControllerSource = read(
+  "apps/scenario-service/src/teacher-assistant-query-owner.controller.ts",
+);
+const teacherAssistantQueryHttpSource = read(
+  "apps/scenario-service/src/teacher-assistant-query-owner-http.ts",
+);
+const teacherAssistantQueryRuntimeSource = read(
+  "apps/scenario-service/src/teacher-assistant-query-owner-runtime.ts",
+);
+const teacherAssistantQueryCompositionSource = read(
+  "apps/scenario-service/src/teacher-assistant-query-owner-composition.ts",
+);
+const teacherAssistantQueryResponseValidatorSource = read(
+  "apps/scenario-service/src/teacher-assistant-query-owner-response-validator.ts",
+);
+const teacherAssistantQueryContractSource = read(
+  "packages/nurture-scenario/src/teacher-assistant-query-owner-contract.ts",
+);
+const teacherAssistantQueryArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/teacher-assistant-query-owner/v1/teacher-assistant-query-owner.owner-contract.json",
+  ),
+);
+assertIncludes(
+  teacherAssistantQueryControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "teacher assistant-query guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  teacherAssistantQueryControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "teacher assistant-query guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.teacher-assistant-query-owner"',
+  'version: "1.0.0"',
+  "sha256:d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'mobile_mode: "read_and_command"',
+]) {
+  assertIncludes(
+    teacherAssistantQueryContractSource,
+    fragment,
+    `teacher assistant-query exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  teacherAssistantQueryArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "teacher assistant-query mounted route posture",
+);
+assertIncludes(
+  String(teacherAssistantQueryArtifact.command_model?.outcome_unknown ?? ""),
+  "exact same-command replay",
+  "teacher assistant-query outcome_unknown recovery stays same-command replay",
+);
+assertIncludes(
+  String(
+    teacherAssistantQueryArtifact.mobile_posture?.rules?.join("\n") ?? "",
+  ),
+  "never calls a model provider",
+  "teacher assistant-query generation boundary stays engine-ready",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED",
+  "teacher assistant-query has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    teacherAssistantQueryRuntimeSource,
+    fragment,
+    `teacher assistant-query complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  teacherAssistantQueryResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "teacher assistant-query runtime compiles the published schema artifact",
+);
+assertIncludes(
+  teacherAssistantQueryResponseValidatorSource,
+  "digest !== TEACHER_ASSISTANT_QUERY_OWNER_INTERFACE.digest",
+  "teacher assistant-query runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  teacherAssistantQueryCompositionSource,
+  "assertPublishedTeacherAssistantQueryResponse(operation, response)",
+  "teacher assistant-query composition enforces published responses",
+);
+assertIncludes(
+  teacherAssistantQueryCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "teacher assistant-query rereads current authority for every operation",
+);
+assertIncludes(
+  teacherAssistantQueryCompositionSource,
+  "response.command_request_id !== commandRequestId",
+  "teacher assistant-query exchange echoes the exact command identity",
+);
+assertIncludes(
+  teacherAssistantQueryHttpSource,
+  "// Week boundaries are owner-computed",
+  "teacher assistant-query rejects caller week boundaries at parse",
+);
+for (const route of [
+  {
+    constant: "TEACHER_ASSISTANT_QUERY_OWNER_MISSING_RECORDS_PATH",
+    handler: "missingRecords",
+    parser: "parseTeacherAssistantQueryMissingRecordsRequestV1",
+  },
+  {
+    constant: "TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_SOURCE_PATH",
+    handler: "weeklySource",
+    parser: "parseTeacherAssistantQueryWeeklySourceRequestV1",
+  },
+  {
+    constant: "TEACHER_ASSISTANT_QUERY_OWNER_WEEKLY_DRAFT_PATH",
+    handler: "weeklyDraft",
+    parser: "parseTeacherAssistantQueryWeeklyDraftRequestV1",
+  },
+]) {
+  const expectedPath = teacherAssistantQueryOwnerPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    teacherAssistantQueryContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    teacherAssistantQueryControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    teacherAssistantQueryHttpSource,
+    "contract.digest !== TEACHER_ASSISTANT_QUERY_OWNER_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

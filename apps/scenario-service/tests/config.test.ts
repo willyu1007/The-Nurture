@@ -21,6 +21,7 @@ describe("scenario-service configuration", () => {
       teacherOrganizationOwnerEnabled: false,
       teacherCommunicationOwnerEnabled: false,
       teacherMediaAssociationOwnerEnabled: false,
+      teacherAssistantQueryOwnerEnabled: false,
     });
   });
 
@@ -65,6 +66,10 @@ describe("scenario-service configuration", () => {
     [
       { NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED: "TRUE" },
       "NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED",
+    ],
+    [
+      { NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED: "TRUE" },
+      "NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED",
     ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
@@ -133,6 +138,14 @@ describe("scenario-service configuration", () => {
       loadScenarioServiceConfig({
         NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED: "true",
       }).teacherMediaAssociationOwnerEnabled,
+    ).toBe(true);
+  });
+
+  it("loads the teacher assistant-query gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED: "true",
+      }).teacherAssistantQueryOwnerEnabled,
     ).toBe(true);
   });
 

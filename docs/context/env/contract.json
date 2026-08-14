@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-14T15:13:05Z",
+  "generated_at_utc": "2026-08-14T15:54:23Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -301,6 +301,23 @@
       "secret_ref": "nurture_protected_content_key",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the teacher assistant-query owner v1 exchange composition (missing-records, weekly-source, weekly-draft); true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval; the owner assembles deterministic facts only and never calls a model provider.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED": {
       "default": false,

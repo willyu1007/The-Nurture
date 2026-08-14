@@ -1,5 +1,22 @@
 # Verification
 
+## 2026-08-14 — W10-2 assistant-query default-off runtime
+
+- Scenario-service suite 22 files / 178 tests green incl. the new 7-case
+  W10 e2e (all-routes mount with private headers and no `action_ref`
+  anywhere; executed/replayed/already_satisfied/outcome_unknown command
+  echoes; masked short-circuit without owner calls; parse rejection of
+  caller authority, pin drift, calendar-invalid dates and week claims;
+  500 on command-identity drift and unpublished dispositions; 500 on date
+  echo, week window and missing-count drift; 503/401 default-off and
+  service-auth) plus the two config-gate cases.
+- Ingress census green at controller-routes 49 with the W10 assertion
+  block; test-routing census 25 scenario-service files; root typecheck
+  green; env 5-file set regenerated with the context checksum resealed.
+
+Verdict: `W10_2_MOUNTED_DEFAULT_OFF / E2E_7_CASES_GREEN /
+CENSUSES_49_AND_25 / NO_OWNER_PORTS_YET`.
+
 ## 2026-08-14 — W10-1 assistant-query contract artifact
 
 - `verify:teacher-assistant-query-owner-contract` green (digest recompute,

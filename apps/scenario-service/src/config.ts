@@ -20,6 +20,7 @@ export type ScenarioServiceConfig = Readonly<{
   teacherOrganizationOwnerEnabled: boolean;
   teacherCommunicationOwnerEnabled: boolean;
   teacherMediaAssociationOwnerEnabled: boolean;
+  teacherAssistantQueryOwnerEnabled: boolean;
 }>;
 
 const DEFAULT_SERVICE_NAME = "the-nurture";
@@ -78,6 +79,10 @@ export function loadScenarioServiceConfig(
     teacherMediaAssociationOwnerEnabled: parseBoolean(
       env.NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED,
       "NURTURE_TEACHER_MEDIA_ASSOCIATION_OWNER_ENABLED",
+    ),
+    teacherAssistantQueryOwnerEnabled: parseBoolean(
+      env.NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED,
+      "NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED",
     ),
   });
 }

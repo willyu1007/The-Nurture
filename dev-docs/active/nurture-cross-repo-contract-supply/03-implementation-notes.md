@@ -1,5 +1,25 @@
 # Implementation notes
 
+## 2026-08-14 — W10-2 assistant-query default-off runtime
+
+- Mounted the three W10 routes in `apps/scenario-service` behind
+  `NURTURE_TEACHER_ASSISTANT_QUERY_OWNER_ENABLED` with the W6-W9 runtime
+  set: strict allowlist HTTP parsers (calendar-valid `local_date`; any
+  caller `week_start`/`week_end` — or other hidden field — dies at parse),
+  the authority-rereading composition, the digest-pinned Ajv response
+  validator, the fail-closed factory and the guarded controller
+  (service bearer, `private, no-store`).
+- W10-specific bindings: missing-records must echo the requested
+  `local_date` and key its partition `class_ref|local_date`; weekly-source
+  keys `class_ref|week_start` from the answered owner-computed week and
+  the requested date must fall inside the answered window; the runtime
+  validator recomputes `missing_count`, the five-kind partition,
+  handoff-presence-iff-missing, the seven-day window and both class
+  totals. The exchange echoes exact command identity.
+- Registration surface: safe codes allowlisted, env 5-file set
+  regenerated, ingress census now asserts the W10 block
+  (controller-routes 49), scenario-service routing census 25.
+
 ## 2026-08-14 — W10-1 assistant-query contract artifact
 
 - Published `contracts/teacher-assistant-query-owner/v1/`: owner-contract
