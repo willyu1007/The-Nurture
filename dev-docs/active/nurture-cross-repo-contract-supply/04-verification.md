@@ -1,5 +1,44 @@
 # Verification
 
+## 2026-08-14 — Cross-repo pin reseal and inherited-red diagnosis
+
+- Mainline CI had been red since the G5-A freeze chain: the workflow contract
+  pin missed its final reseal (scenario closure expected `9f65dc8d…`, actual
+  bytes `efe102e8…` already at freeze commit `98d3504`), and the CI context
+  job has lacked installed dependencies since the W5 ingress census began
+  importing `typescript` (`0f312c3`). Local verification had masked both
+  because root `typecheck` does not run the pin gate and local runs always
+  have node_modules.
+- Reseal chain executed in order: My-Chat `d45fe69` refreshes its scenario
+  host-adoption lock (rotated by the T-028 child-identity merge; caught only
+  by the Nurture-side upstream verifier); the Nurture pin now records
+  My-Chat `d45fe69`, x5_joint_api `564c83ed…` (300 files), wave4
+  `3ee0c69c…`, scenario closure `63706eff…` (337 files, includes W6); the
+  upstream verifier literal moved with a dated content-inert note; the
+  C30-I3 owner adoption lock was regenerated at the reseal commit
+  (`a0fa9a94…`). `verify:workflow-contract-pin`,
+  `verify:c30-i3-{owner-adoption,upstream,default-off}` all pass. The CI
+  context job now installs dependencies (`--ignore-scripts`).
+- Joint x5 requalification attempt on a fresh disposable pair
+  (`postgres:16-alpine` + `pgvector/pgvector:pg16`, both migration sets
+  applied cleanly, containers destroyed afterwards): **15/39 joint tests
+  fail, and the failure predates this session's work.** Probe evidence: the
+  T-009 joint fixture prepares with
+  `{"status":"denied","reason":"authorization_provenance_invalid"}` because
+  it still seeds the pre-W5 provenance shape
+  (`authorizationSourceRef: "my_chat_child_identity"`, line 511) while the
+  W5 N1 predicate in
+  `packages/nurture-scenario/src/domain/family-growth/target-resolution.ts`
+  requires the exact `nurture-care-role:<roleAssignmentId>` chain with
+  matching versions. The x5 joint lane has therefore been red since W5 N1
+  landed (2026-08-13); the last green x5 claims cite older pins. Repair
+  (fixture provenance re-seed for the t009 joint and x5 acceptance suites) is
+  queued as the next hygiene item; no green x5 claim exists at the current
+  pins and none is made here.
+
+Verdict: `PIN_RESEAL_PASS / CI_CONTEXT_JOB_REPAIRED /
+X5_JOINT_RED_INHERITED_DIAGNOSED / FIXTURE_REPAIR_QUEUED`.
+
 ## 2026-08-14 — W6-3 teacher class-stream real owner ports
 
 - Unit lane: the new service suite passes 9/9 (participant/class scope
