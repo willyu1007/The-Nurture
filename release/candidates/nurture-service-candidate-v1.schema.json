@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://contracts.the-nurture.local/release/nurture-service-candidate-v1.schema.json",
+  "title": "NurtureServiceCandidateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_kind",
+    "candidate_ref",
+    "candidate_digest",
+    "frozen_on",
+    "lifecycle",
+    "qualification_state",
+    "deployment_state",
+    "identity_inputs",
+    "boundaries"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "candidate_kind": { "const": "nurture_service_candidate_v1" },
+    "candidate_ref": { "const": "nurture.service-candidate@1.0.0" },
+    "candidate_digest": { "$ref": "#/$defs/sha256" },
+    "frozen_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "lifecycle": { "const": "frozen" },
+    "qualification_state": { "const": "not_run" },
+    "deployment_state": { "const": "undeployed" },
+    "identity_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable",
+        "data_shape",
+        "scenario",
+        "contracts_and_fixtures",
+        "configuration_and_gates",
+        "beta_profile",
+        "owner_pins",
+        "freeze_posture"
+      ],
+      "properties": {
+        "source": { "type": "object" },
+        "executable": { "type": "object" },
+        "data_shape": { "type": "object" },
+        "scenario": { "type": "object" },
+        "contracts_and_fixtures": { "type": "object" },
+        "configuration_and_gates": { "type": "object" },
+        "beta_profile": { "type": "object" },
+        "owner_pins": { "type": "object" },
+        "freeze_posture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilities",
+            "activation_authority",
+            "deployment_authority",
+            "database_apply_authority",
+            "traffic_authority"
+          ],
+          "properties": {
+            "capabilities": { "const": "default_off" },
+            "activation_authority": { "const": "none" },
+            "deployment_authority": { "const": "none" },
+            "database_apply_authority": { "const": "none" },
+            "traffic_authority": { "const": "none" }
+          }
+        }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contains_secrets",
+        "contains_pii",
+        "contains_my_chat_runtime_or_client_bundle",
+        "authorizes_database_apply",
+        "authorizes_deployment",
+        "authorizes_activation",
+        "authorizes_internal_testing",
+        "authorizes_traffic"
+      ],
+      "properties": {
+        "contains_secrets": { "const": false },
+        "contains_pii": { "const": false },
+        "contains_my_chat_runtime_or_client_bundle": { "const": false },
+        "authorizes_database_apply": { "const": false },
+        "authorizes_deployment": { "const": false },
+        "authorizes_activation": { "const": false },
+        "authorizes_internal_testing": { "const": false },
+        "authorizes_traffic": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

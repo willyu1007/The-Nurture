@@ -1,5 +1,24 @@
 # Implementation Notes — Store Beta Readiness
 
+## 2026-08-14 — G5-A deterministic Freeze tooling prepared
+
+- The separately authorized G5-A execution uses a two-commit freeze: first land
+  deterministic tooling as the exact green source revision, then build and hash
+  that revision before committing the immutable Candidate manifest and evidence.
+- Added a canonical-JSON Candidate digest, raw-byte executable/migration/contract
+  inventories, JSON Schema validation and fail-closed checks for source, schema,
+  migrations, manifests, configuration/gates, contracts/fixtures, beta profile
+  and Base/My-Chat owner pins.
+- The executable unit is the compiled ESM output of `@the-nurture/scenario-service`
+  plus the Nurture scenario and DB runtime dist trees. No Docker image, Git tag,
+  secret, PII, My-Chat runtime/client bundle, deployment or database apply is
+  created by Freeze.
+- Candidate tooling negatives reject identity drift, qualification/deployment
+  claims and authorization-boundary drift. The first source gate passed typecheck,
+  1086 unit tests, 135 scenario-service tests, Prisma validation, surface/formal
+  contracts, exact pins, test routing, persistence boundaries and C30 upstream/
+  default-off/owner-lock checks.
+
 ## 2026-08-05 — Upstream readiness ledger advanced without starting T-008
 
 - T-005 G2 and T-006 G3 now have exact qualified handoffs; T-004 was already done.

@@ -42,6 +42,9 @@
 | 2026-08-14 | G5 shared-input source closure census after T-011 W4 | PASS; W2/W3/W3.1/W4 are classified, W4 remains read-only/default-off, final green sources are My-Chat `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4 `d5df447ff0ab33911396531e47775364e62b0e4f`, and Candidate Freeze was not run |
 | 2026-08-14 | T-002 current-pin reseal after W4 | PASS; workflow parity and wave4 remain unchanged, `x5_joint_api=de1e840d…`, Nurture scenario `6695faaa…`, C30 lock aggregate `2eb6f416…`, every gate remains default-off, and no Candidate identity was minted |
 | 2026-08-14 | Final W4 quality source and lock reseal | PASS; My-Chat `4db80c91a15859b51b193110efa45acaf019deb5`, Nurture W4 `69471858c86d3f1e5612cb4e52bd6ed30504f8af`, pin source `a577cb21c1ec425f57232e262ced931401b9c03f`, lock commit `329e2ab258eeb0575f43919d3938b77a821b96b6`; exact contract, source, G2, upstream, default-off and lock gates passed; Candidate Freeze was not run |
+| 2026-08-14 | `node --test scripts/service-candidate/candidate-core.test.mjs` | PASS; 6/6 deterministic digest and fail-closed Freeze-tooling tests |
+| 2026-08-14 | G5-A source gate: `pnpm typecheck`; `pnpm test:unit`; `pnpm test:scenario-service` | PASS; typecheck green, 98 files / 1086 unit tests and 17 files / 135 scenario-service tests passed |
+| 2026-08-14 | G5-A source identity/data/gate checks: Prisma validate; persistence/test routing; surface/schema/formal ingress; workflow pin; C30 upstream/default-off/owner lock | PASS; schema valid, 65-capability/six-surface contract exact, all production enablement counts remain zero and exact owner pins remain current |
 
 ## Candidate Verification (planned)
 
