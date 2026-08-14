@@ -1,5 +1,43 @@
 # Implementation notes
 
+## 2026-08-14 — W8-3 teacher communication-owner real owner ports
+
+- Added the DB-free domain service
+  (`src/teacher-communication-owner-service.ts`): W6-discipline authority
+  and read envelopes; targets rail from live threads with the unread count
+  derived from the teacher's own participant cursor (capped 99, summary
+  capped 999, `class_group` frozen unavailable); display-safe membership;
+  timeline pages sealed behind owner-HMAC cursors (`body` unsealed from the
+  protected envelope, ≤4000; a tampered cursor is a non-retryable invalid
+  request); and the three exchanges on the generic command ledger with the
+  W7 actor HMAC in every canonical payload.
+- Send is the W3 prepare/confirm re-run for the teacher actor: prepare
+  seals the body into the confirmation state; confirm consumes the
+  single-use token and lands `applyThreadTextMessage` (new W8 owner write:
+  `caregiver_reply` + `caregiver_confirmed`, protected storage, thread
+  activity bump, role re-read in-transaction).
+- Withdraw rides the existing `createCancelPublishProcessSpec` with
+  head-free command identity (the W7 organize lesson) — and its own W8
+  variant of the same defect class surfaced in the DB lane: after a
+  successful cancel the process leaves the active lane, so withdraw
+  resolution uses a dedicated candidate read that includes `cancelled`
+  processes, keeping exact replays resolvable instead of masking.
+- Mark-read is the only cursor clear (`applyThreadReadCursor`): candidate
+  matching over the exact thread's messages, own-row upsert (participant
+  row created on first mark-read with the current role), never backwards
+  (`cursor_regression`), never another participant's cursor.
+- Prisma side: `PrismaTeacherCommunicationReadPort` (threads, withdraw
+  candidates, members with W3-style display fallbacks, cursor-paged
+  messages; teacher-message delivery derives from guardian cursors —
+  `delivered` never appears since no device-delivery source exists) and
+  `PrismaTeacherCommunicationTransaction` wired into the command
+  repository; `createPrismaTeacherCommunicationBinding` assembles the
+  binding. No schema change.
+- DB-lane world lessons recorded: thread `visibility_scope` uses the
+  frozen enum (`enrollment_private`), and a `pending_release` seed must
+  satisfy the all-seven-or-none schedule check
+  (`ck_nurture_publish_process_state`).
+
 ## 2026-08-14 — W8-2 teacher communication-owner default-off runtime
 
 - Mounted the six W8 routes in `apps/scenario-service` behind

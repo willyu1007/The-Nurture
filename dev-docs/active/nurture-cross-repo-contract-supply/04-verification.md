@@ -1,5 +1,28 @@
 # Verification
 
+## 2026-08-14 — W8-3 communication-owner real owner ports
+
+- Unit lane: 7-case service suite over fake ports (foreign-ref masking,
+  retryable resolver failure, capped unread + frozen class_group +
+  summary consistency, W4 cursor echo round-trip + tampered-cursor
+  closure, send prepare digest + foreign-thread mask, send confirm mapping
+  with actor-bound payload, head-free withdraw canonical, mark-read
+  disposition and regression mapping); nurture-scenario suite 1111/1111.
+- Production-DB lane: new 5-case W8 integration file green — rail/
+  membership/timeline over live thread rows (parent bodies unsealed from
+  the real AES port), prepare/confirm send with ledger replay and the
+  `caregiver_reply` row landing protected, own-cursor mark-read
+  (advanced -> unread 0 -> regression refused -> foreign masked), staged
+  withdrawal committed + replayed with the process row landing
+  `cancelled`, cross-class masking; full `test:db` battery 55 files /
+  484 tests green.
+- Repo typecheck, `assert-test-routing` (unit=101, production-db=55),
+  scenario-service suite 160/160, `verify:formal-ingress-contract` chain
+  and both doc lints green.
+
+Verdict: `W8_3_REAL_PORTS_QUALIFIED / LEDGER_EXCHANGES_PROVEN /
+DB_BATTERY_55_FILES_GREEN / DEFAULT_OFF_UNCHANGED`.
+
 ## 2026-08-14 — W8-2 communication-owner default-off runtime
 
 - scenario-service suite 160/160 (20 files under the app config) including
