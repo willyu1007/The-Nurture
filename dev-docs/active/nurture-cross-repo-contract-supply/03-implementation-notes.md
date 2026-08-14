@@ -1,5 +1,21 @@
 # Implementation notes
 
+## 2026-08-14 — W10 assistant-query scope freeze
+
+- Froze `nurture.teacher-assistant-query-owner@1.0.0`
+  (`artifacts/w10-assistant-query-scope-freeze.md`): missing-records query
+  with the typed non-executable supplement handoff (T-H02), the
+  deterministic weekly-source facts (daily-care counts per kind plus the
+  confirmed-media counts W9's association chain supplies), and the
+  weekly-draft exchange that creates one owner-side publish process per
+  (class, ISO week) — agent-labelled, entering the existing W7 review lane,
+  domain-idempotent with `already_satisfied` answering the same
+  `process_ref`. The generation boundary stays engine-ready: no provider
+  calls, no generated prose, facts only.
+- Week identity is owner-computed under the publication-policy timezone;
+  requests never carry week boundaries. Draft editing, release and
+  scheduling stay with their existing owners.
+
 ## 2026-08-14 — W9-4 teacher media-association registration closes
 
 - Registered the W9 conformance fixtures in the service-candidate
