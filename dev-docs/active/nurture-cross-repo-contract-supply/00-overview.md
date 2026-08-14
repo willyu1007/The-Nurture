@@ -52,10 +52,22 @@
   weekly draft rides a new `NurtureTeacherAssistantTransaction` on the
   command transaction, domain-idempotent per (class, week); unit 9, W10 DB
   lane 5, full battery 57 green), W10-4 registration and the W10-5
-  digest-pin artifact. The next executable step is the W10-5 My-Chat
-  dormant consumer adoption (T-H02, T-H04), then the W11 scope freeze. All
-  batches remain default-off contract supply with no activation, durable
-  apply, deployment or traffic.
+  digest-pin artifact; My-Chat adopted the dormant strict consumer at
+  `3693e8f` (T-H02/T-H04 contract-ready, axis recount 62/4/22/17) and the
+  deferred cross-repo pin reseal landed (`3a8e49e`/`a9c8125`), returning
+  both CIs to green. W11 (`nurture.parent-communication-owner@1.1.0`,
+  additive extension, base pin `sha256:b1dce3a7…` proven unmoved by the
+  validator) is closed on the Nurture side: scope freeze, W11-1 contract
+  artifact (digest `sha256:d705146e…`, 11 fixtures / 12 probes /
+  16-scenario census, first-run strict compile), W11-2 default-off runtime
+  (three v1.1 routes, controller-routes 52), W11-3 real owner ports over
+  the frozen v1 resolver/reads and the G4-C redaction spec (unit 7, W11 DB
+  lane 5, full battery 58/499), W11-4 registration and the W11-5
+  digest-pin artifact. The next executable step is the W11-5 My-Chat
+  dormant consumer adoption (P-H05, P-H06), then the user-directed
+  end-of-schedule deep quality and closure review. All batches remain
+  default-off contract supply with no activation, durable apply,
+  deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
@@ -241,7 +253,7 @@ conformance fixtures, all default-off.
   actor; `class_group` send remains unavailable absent a separate decision.
 - [x] W9: media association supply (association-only before the reserved
   media ingress exists).
-- [ ] W10: teacher assistant queries (missing-record handoff, weekly draft)
+- [x] W10: teacher assistant queries (missing-record handoff, weekly draft)
   with agent-generated labelling and no direct provider calls.
 - [ ] W11: `nurture.parent-communication-owner@1.1.0` additive extensions
   for redaction prepare and delivery receipts; the frozen 1.0.0 artifact is
