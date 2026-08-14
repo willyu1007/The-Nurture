@@ -1,5 +1,22 @@
 # Implementation notes
 
+## 2026-08-15 — W11 parent-communication extension scope freeze
+
+- Froze `nurture.parent-communication-owner@1.1.0`
+  (`artifacts/w11-parent-communication-extension-scope-freeze.md`): an
+  ADDITIVE extension of the frozen 1.0.0 (base pin `sha256:b1dce3a7…`
+  declared, never re-published) supplying P-H05 — the guardian redaction
+  preview/commit pair over the existing G4-C author-redaction machinery
+  (two-step confirm, cascade summary, irreversible and audited) — and
+  P-H06 — the per-message aggregate delivery-receipt read over the
+  existing ChildLinkReceipt facts with the frozen v1 state mapping and no
+  recipient identity leakage.
+- Separate default-off gate
+  (`NURTURE_PARENT_COMMUNICATION_EXTENSION_ENABLED`) and a v1.1 base path
+  keep the frozen v1 artifact, routes and posture byte-identical. No new
+  kernel transaction: the commit rides the existing `familyCare`
+  transaction and `createRedactFamilyCareMessageSpec("author")` verbatim.
+
 ## 2026-08-15 — W10-4 assistant-query registration closes
 
 - Registered the W10 conformance fixtures in the service-candidate
