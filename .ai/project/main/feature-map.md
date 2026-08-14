@@ -428,6 +428,16 @@ Project: `main`
   `sha256:74bb40c7…`; it remains default-off,
   undeployed and unqualified. G5-B is the next separately authorized serial
   gate. Q3 live qualification gates G5-D scoped internal-test enablement.
+  2026-08-14 (post-Freeze supply): the owner-directed W6-W11 teacher-side
+  schedule is frozen. W6 publishes
+  `nurture.teacher-class-stream-presenter@1.0.0` / `sha256:00a84945…` — four
+  bounded read operations (class context, child strip, child day detail,
+  schedule) serving T-039 rows T-S03/T-F01/T-H01/T-F03/T-F04/T-F06/T-F07 —
+  with four default-off private routes, real disposable-DB-qualified Prisma
+  owner ports, and honestly `unavailable` observations/focus sections pending
+  W9/W10 sources. Mainline W6 supply does not touch the frozen G5-A
+  Candidate; My-Chat consumer adoption and any successor-candidate selection
+  remain separate steps.
   Durable apply, deployment, activation and external traffic remain closed.
 
 ### F-004 Family growth material provider

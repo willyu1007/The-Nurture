@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G4 exit and C30 current-pin requalification complete; surface identity is `nurture.surface-contract@1.20.0`; W2 parent context, W3.1 parent communication and W4 read-only director contract supply are qualified default-off. G5 Candidate is not frozen; C31+, deployment, activation and traffic require their own gates.
+Status: G4 exit and C30 current-pin requalification complete; surface identity is `nurture.surface-contract@1.20.0`; W2 parent context, W3.1 parent communication, W4 read-only director and W6 teacher class-stream contract supply are qualified default-off (W6 with disposable-DB-qualified real owner ports). G5-A Candidate `nurture.service-candidate@1.0.0` is frozen and untouched by later mainline supply; C31+, deployment, activation and traffic require their own gates.
 
 ## Product Terminology Compatibility
 
