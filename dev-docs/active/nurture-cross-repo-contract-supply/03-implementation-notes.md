@@ -1,5 +1,13 @@
 # Implementation notes
 
+## 2026-08-14 — W8-4 teacher communication-owner registration closes
+
+- Registered the W8 conformance fixtures in the service-candidate
+  standalone-fixture list; the frozen G5-A Candidate is untouched. The
+  remaining registration surface (env 5-file set, ingress and test-routing
+  censuses, safe codes, context registry checksum) had already landed with
+  W8-2/W8-3. Governance sync/lint re-ran clean with no derived-view drift.
+
 ## 2026-08-14 — W8-3 teacher communication-owner real owner ports
 
 - Added the DB-free domain service
