@@ -9,3 +9,8 @@ The W4 key follows the same additive compatibility rule. Its absence and the
 literal `false` both keep the presenter unavailable. A later rollout must
 separately supply complete owner ports and approval; no configuration permits
 Institution Mobile commands through this read-only presenter.
+
+The W6 key follows the same additive compatibility rule. Its absence and the
+literal `false` both keep the presenter unavailable. A later rollout must
+separately supply complete caregiver owner ports and approval; no
+configuration admits a write path through this read-only presenter.

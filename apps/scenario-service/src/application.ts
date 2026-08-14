@@ -50,6 +50,11 @@ import {
   createDirectorPresenterComposition,
   type DirectorPresenterOwnerBindingV1,
 } from "./director-presenter-runtime.js";
+import type { TeacherClassStreamComposition } from "./teacher-class-stream-composition.js";
+import {
+  createTeacherClassStreamComposition,
+  type TeacherClassStreamOwnerBindingV1,
+} from "./teacher-class-stream-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -73,6 +78,8 @@ export async function createScenarioServiceApplication(input?: {
   parentCommunicationOwnerBinding?: ParentCommunicationOwnerBindingV1;
   directorPresenterComposition?: DirectorPresenterComposition;
   directorPresenterOwnerBinding?: DirectorPresenterOwnerBindingV1;
+  teacherClassStreamComposition?: TeacherClassStreamComposition;
+  teacherClassStreamOwnerBinding?: TeacherClassStreamOwnerBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -130,6 +137,15 @@ export async function createScenarioServiceApplication(input?: {
         ? { ownerBinding: input.directorPresenterOwnerBinding }
         : {}),
     });
+  const teacherClassStreamComposition =
+    input?.teacherClassStreamComposition
+    ?? createTeacherClassStreamComposition({
+      enabled: config.teacherClassStreamPresenterEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.teacherClassStreamOwnerBinding
+        ? { ownerBinding: input.teacherClassStreamOwnerBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -156,6 +172,10 @@ export async function createScenarioServiceApplication(input?: {
       },
       directorPresenter: {
         composition: directorPresenterComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      teacherClassStream: {
+        composition: teacherClassStreamComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

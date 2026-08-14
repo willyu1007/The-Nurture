@@ -163,6 +163,15 @@ const validateReadyBinding = (fixture) => {
     response.freshness.resolved_at === resolution.resolved_at,
     `${id} freshness detached from the resolution`,
   );
+  const expectedQueryKey = operation === "class_context_query"
+    ? request.local_date
+    : operation === "child_day_detail_query"
+      ? `${request.child_ref}|${request.local_date}`
+      : `${request.class_ref}|${request.local_date}`;
+  assert(
+    partition.query_key === expectedQueryKey,
+    `${id} query_key is not the deterministic request derivation`,
+  );
   if (operation === "class_context_query") {
     assert(resolution.scope_kind === "participant", `${id} scope kind drifted`);
     const currentClasses = response.classes.filter((entry) => entry.current);

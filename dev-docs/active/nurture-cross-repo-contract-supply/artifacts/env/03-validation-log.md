@@ -95,3 +95,9 @@
 ## Notes
 - This report never includes secret values.
 - If this is used in CI, treat any ERROR as a merge blocker.
+
+## W6 revalidation (2026-08-14)
+
+- `env_contractctl.py validate --root .` -> **PASS** after adding
+  `NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED` (non-secret 12 / secret 9 /
+  total 21).

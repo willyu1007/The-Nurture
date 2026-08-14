@@ -17,6 +17,7 @@ describe("scenario-service configuration", () => {
       parentContextPresenterEnabled: false,
       parentCommunicationOwnerEnabled: false,
       directorPresenterEnabled: false,
+      teacherClassStreamPresenterEnabled: false,
     });
   });
 
@@ -45,6 +46,10 @@ describe("scenario-service configuration", () => {
     [
       { NURTURE_DIRECTOR_PRESENTER_ENABLED: "TRUE" },
       "NURTURE_DIRECTOR_PRESENTER_ENABLED",
+    ],
+    [
+      { NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED: "TRUE" },
+      "NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED",
     ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
@@ -81,6 +86,14 @@ describe("scenario-service configuration", () => {
       loadScenarioServiceConfig({
         NURTURE_DIRECTOR_PRESENTER_ENABLED: "true",
       }).directorPresenterEnabled,
+    ).toBe(true);
+  });
+
+  it("loads the teacher class-stream gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED: "true",
+      }).teacherClassStreamPresenterEnabled,
     ).toBe(true);
   });
 

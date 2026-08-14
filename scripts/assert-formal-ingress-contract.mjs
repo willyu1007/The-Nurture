@@ -61,6 +61,16 @@ const directorPresenterPaths = {
   DIRECTOR_PRESENTER_MATERIALS_PATH:
     "/internal/nurture/director-presenter/v1/materials",
 };
+const teacherClassStreamPaths = {
+  TEACHER_CLASS_STREAM_CLASS_CONTEXT_PATH:
+    "/internal/nurture/teacher-class-stream/v1/class-context",
+  TEACHER_CLASS_STREAM_CHILD_STRIP_PATH:
+    "/internal/nurture/teacher-class-stream/v1/child-strip",
+  TEACHER_CLASS_STREAM_CHILD_DAY_DETAIL_PATH:
+    "/internal/nurture/teacher-class-stream/v1/child-day-detail",
+  TEACHER_CLASS_STREAM_SCHEDULE_PATH:
+    "/internal/nurture/teacher-class-stream/v1/schedule",
+};
 const expectedPaths = [
   healthPath,
   ownerPath,
@@ -97,6 +107,10 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/director-presenter.controller.ts:POST:DIRECTOR_PRESENTER_DRILLDOWN_PATH`,
   `apps/scenario-service/src/director-presenter.controller.ts:POST:DIRECTOR_PRESENTER_MATERIALS_PATH`,
   `apps/scenario-service/src/director-presenter.controller.ts:POST:DIRECTOR_PRESENTER_OVERVIEW_PATH`,
+  `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_CHILD_DAY_DETAIL_PATH`,
+  `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_CHILD_STRIP_PATH`,
+  `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_CLASS_CONTEXT_PATH`,
+  `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_SCHEDULE_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -107,6 +121,7 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
   "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
   "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
+  "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
@@ -114,6 +129,7 @@ const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/parent-context-presenter.controller.ts#ParentContextPresenterController",
   "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
   "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
+  "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -1024,6 +1040,156 @@ for (const route of [
   assertIncludes(
     directorPresenterHttpSource,
     "contract.digest !== DIRECTOR_PRESENTER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const teacherClassStreamControllerSource = read(
+  "apps/scenario-service/src/teacher-class-stream.controller.ts",
+);
+const teacherClassStreamHttpSource = read(
+  "apps/scenario-service/src/teacher-class-stream-http.ts",
+);
+const teacherClassStreamRuntimeSource = read(
+  "apps/scenario-service/src/teacher-class-stream-runtime.ts",
+);
+const teacherClassStreamCompositionSource = read(
+  "apps/scenario-service/src/teacher-class-stream-composition.ts",
+);
+const teacherClassStreamResponseValidatorSource = read(
+  "apps/scenario-service/src/teacher-class-stream-response-validator.ts",
+);
+const teacherClassStreamContractSource = read(
+  "packages/nurture-scenario/src/teacher-class-stream-contract.ts",
+);
+const teacherClassStreamArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/teacher-class-stream/v1/teacher-class-stream.owner-contract.json",
+  ),
+);
+assertIncludes(
+  teacherClassStreamControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "teacher class-stream guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  teacherClassStreamControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "teacher class-stream guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.teacher-class-stream-presenter"',
+  'version: "1.0.0"',
+  "sha256:00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'mobile_mode: "read_only"',
+]) {
+  assertIncludes(
+    teacherClassStreamContractSource,
+    fragment,
+    `teacher class-stream exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  teacherClassStreamArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "teacher class-stream mounted route posture",
+);
+assertEqual(
+  teacherClassStreamArtifact.mobile_posture?.mode,
+  "read_only",
+  "teacher class-stream Mobile remains read-only",
+);
+assertEqual(
+  teacherClassStreamArtifact.mobile_posture?.write_paths,
+  "none_in_this_contract",
+  "teacher class-stream contract carries no write path",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED",
+  "teacher class-stream has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    teacherClassStreamRuntimeSource,
+    fragment,
+    `teacher class-stream complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  teacherClassStreamResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "teacher class-stream runtime compiles the published schema artifact",
+);
+assertIncludes(
+  teacherClassStreamResponseValidatorSource,
+  "digest !== TEACHER_CLASS_STREAM_INTERFACE.digest",
+  "teacher class-stream runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  teacherClassStreamCompositionSource,
+  "assertPublishedTeacherClassStreamResponse(operation, response)",
+  "teacher class-stream composition enforces published responses",
+);
+assertIncludes(
+  teacherClassStreamCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "teacher class-stream rereads current authority for every operation",
+);
+for (const route of [
+  {
+    constant: "TEACHER_CLASS_STREAM_CLASS_CONTEXT_PATH",
+    handler: "classContext",
+    parser: "parseTeacherClassStreamClassContextRequestV1",
+  },
+  {
+    constant: "TEACHER_CLASS_STREAM_CHILD_STRIP_PATH",
+    handler: "childStrip",
+    parser: "parseTeacherClassStreamChildStripRequestV1",
+  },
+  {
+    constant: "TEACHER_CLASS_STREAM_CHILD_DAY_DETAIL_PATH",
+    handler: "childDayDetail",
+    parser: "parseTeacherClassStreamChildDayDetailRequestV1",
+  },
+  {
+    constant: "TEACHER_CLASS_STREAM_SCHEDULE_PATH",
+    handler: "schedule",
+    parser: "parseTeacherClassStreamScheduleRequestV1",
+  },
+]) {
+  const expectedPath = teacherClassStreamPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    teacherClassStreamContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    teacherClassStreamControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    teacherClassStreamHttpSource,
+    "contract.digest !== TEACHER_CLASS_STREAM_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-14T04:20:23Z",
+  "generated_at_utc": "2026-08-14T08:51:29Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -301,6 +301,23 @@
       "secret_ref": "nurture_protected_content_key",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off gate for the read-only teacher class-stream presenter v1 composition; true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval, and admits no class-stream write path.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "NURTURE_TEACHER_RELEASE_OWNER_ENABLED": {
       "default": false,

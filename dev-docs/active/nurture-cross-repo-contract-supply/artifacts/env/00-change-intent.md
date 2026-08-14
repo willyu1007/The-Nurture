@@ -12,3 +12,8 @@ W4 adds `NURTURE_DIRECTOR_PRESENTER_ENABLED` as a second optional,
 non-secret, default-false gate. Exact `true` still requires configured service
 auth plus complete current-authority and owner ports. The presenter is
 read-only and the gate cannot enable Institution Mobile commands.
+
+W6 adds `NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED` as a third
+optional, non-secret, default-false gate. Exact `true` still requires
+configured service auth plus complete caregiver current-authority and owner
+ports. The presenter is read-only and admits no class-stream write path.

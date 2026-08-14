@@ -6,3 +6,6 @@
 - No existing configuration behavior changes while the key is absent.
 - Add `NURTURE_DIRECTOR_PRESENTER_ENABLED` as optional `bool` with default
   `false`; no environment value, secret value or secret reference is added.
+- Add `NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED` as optional `bool`
+  with default `false`; no environment value, secret value or secret
+  reference is added.

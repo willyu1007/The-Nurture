@@ -16,6 +16,7 @@ export type ScenarioServiceConfig = Readonly<{
   parentContextPresenterEnabled: boolean;
   parentCommunicationOwnerEnabled: boolean;
   directorPresenterEnabled: boolean;
+  teacherClassStreamPresenterEnabled: boolean;
 }>;
 
 const DEFAULT_SERVICE_NAME = "the-nurture";
@@ -58,6 +59,10 @@ export function loadScenarioServiceConfig(
     directorPresenterEnabled: parseBoolean(
       env.NURTURE_DIRECTOR_PRESENTER_ENABLED,
       "NURTURE_DIRECTOR_PRESENTER_ENABLED",
+    ),
+    teacherClassStreamPresenterEnabled: parseBoolean(
+      env.NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED,
+      "NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED",
     ),
   });
 }

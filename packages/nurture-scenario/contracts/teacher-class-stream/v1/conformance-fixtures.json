@@ -59,7 +59,7 @@
           "resolution_ref": "resolution:teacher:ctx-01",
           "scope_version": 4,
           "operation": "class_context_query",
-          "query_key": "query:class-context:2026-08-14",
+          "query_key": "2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -128,7 +128,7 @@
           "resolution_ref": "resolution:teacher:ctx-02",
           "scope_version": 1,
           "operation": "class_context_query",
-          "query_key": "query:class-context:2026-08-14",
+          "query_key": "2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -192,7 +192,7 @@
           "resolution_ref": "resolution:teacher:strip-01",
           "scope_version": 4,
           "operation": "child_strip_query",
-          "query_key": "query:child-strip:2026-08-14",
+          "query_key": "class:ref:sunflower-01|2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -272,7 +272,7 @@
           "resolution_ref": "resolution:teacher:strip-02",
           "scope_version": 1,
           "operation": "child_strip_query",
-          "query_key": "query:child-strip:2026-08-14",
+          "query_key": "class:ref:willow-01|2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -323,7 +323,7 @@
           "resolution_ref": "resolution:teacher:detail-01",
           "scope_version": 4,
           "operation": "child_day_detail_query",
-          "query_key": "query:child-detail:rain-02:2026-08-14",
+          "query_key": "child:ref:rain-02|2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -455,7 +455,7 @@
           "resolution_ref": "resolution:teacher:detail-02",
           "scope_version": 1,
           "operation": "child_day_detail_query",
-          "query_key": "query:child-detail:pine-04:2026-08-14",
+          "query_key": "child:ref:pine-04|2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -554,7 +554,7 @@
           "resolution_ref": "resolution:teacher:schedule-01",
           "scope_version": 4,
           "operation": "schedule_query",
-          "query_key": "query:schedule:2026-08-14",
+          "query_key": "class:ref:sunflower-01|2026-08-14",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -638,7 +638,7 @@
           "resolution_ref": "resolution:teacher:schedule-02",
           "scope_version": 1,
           "operation": "schedule_query",
-          "query_key": "query:schedule:2026-08-15",
+          "query_key": "class:ref:willow-01|2026-08-15",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -707,7 +707,7 @@
           "resolution_ref": "resolution:teacher:schedule-03",
           "scope_version": 1,
           "operation": "schedule_query",
-          "query_key": "query:schedule:2026-08-16",
+          "query_key": "class:ref:willow-01|2026-08-16",
           "expires_at": "2026-08-14T09:05:00.000Z"
         },
         "generated_at": "2026-08-14T09:00:01.000Z",
@@ -808,7 +808,9 @@
       "target": "request",
       "mutation": {
         "kind": "set",
-        "path": ["care_group_id"],
+        "path": [
+          "care_group_id"
+        ],
         "value": "care-group-raw-01"
       }
     },
@@ -819,7 +821,10 @@
       "target": "request",
       "mutation": {
         "kind": "set",
-        "path": ["interface_contract", "version"],
+        "path": [
+          "interface_contract",
+          "version"
+        ],
         "value": "1.0.1"
       }
     },
@@ -830,7 +835,9 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["classes"],
+        "path": [
+          "classes"
+        ],
         "value": []
       }
     },
@@ -841,7 +848,11 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["slots", 0, "signed_url"],
+        "path": [
+          "slots",
+          0,
+          "signed_url"
+        ],
         "value": "https://example.com/leak"
       }
     },
@@ -852,7 +863,11 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["sections", 0, "arrival_state"],
+        "path": [
+          "sections",
+          0,
+          "arrival_state"
+        ],
         "value": "arrived"
       }
     },
@@ -863,7 +878,11 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["sections", 0, "supplement_action"],
+        "path": [
+          "sections",
+          0,
+          "supplement_action"
+        ],
         "value": {
           "capability_key": "record_caregiver_daily_care",
           "capability_version": "1.0.0",
@@ -878,7 +897,10 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["cache_partition", "interface_key"],
+        "path": [
+          "cache_partition",
+          "interface_key"
+        ],
         "value": "nurture.director-presenter"
       }
     },
@@ -889,7 +911,10 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["mask_signal", "purge_partition"],
+        "path": [
+          "mask_signal",
+          "purge_partition"
+        ],
         "value": false
       }
     },
@@ -900,7 +925,9 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["slots"],
+        "path": [
+          "slots"
+        ],
         "value": [
           {
             "slot_ref": "slot:ref:ghost-01",
@@ -919,7 +946,11 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["slots", 0, "starts_at"],
+        "path": [
+          "slots",
+          0,
+          "starts_at"
+        ],
         "value": "25:00"
       }
     },
@@ -930,7 +961,12 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["children", 1, "attention", "count"],
+        "path": [
+          "children",
+          1,
+          "attention",
+          "count"
+        ],
         "value": -1
       }
     },
@@ -941,7 +977,11 @@
       "target": "response",
       "mutation": {
         "kind": "set",
-        "path": ["sections", 4, "section_key"],
+        "path": [
+          "sections",
+          4,
+          "section_key"
+        ],
         "value": "trend"
       }
     }

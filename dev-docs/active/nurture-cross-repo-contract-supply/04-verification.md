@@ -1,5 +1,32 @@
 # Verification
 
+## 2026-08-14 — W6-2 teacher class-stream default-off runtime
+
+- `pnpm verify:formal-ingress-contract` passed with the W6 validator and the
+  expanded census: controller-routes=30, the seventh owner-contract
+  controller registered with the private response filter, and the full
+  teacher-class-stream per-contract assertion block (guard fail-closed,
+  digest pins in all four homes, gate literal, complete-binding factory,
+  runtime schema compilation, per-route parser/header/composition checks).
+- `pnpm verify:test-routing` passed at 187 files (scenario-service 21);
+  `pnpm verify:port-topology`, `pnpm verify:persistence-boundaries` and
+  `pnpm verify:surface-contract` passed unchanged.
+- Environment: `env_contractctl.py generate` + `validate` pass (non-secret 12
+  / secret 9 / total 21) and strict context verification passes after the
+  `env-contract` checksum refresh.
+- Candidate tooling remains green (7/7) with the W6 fixtures added to the
+  future-candidate list; the frozen 1.0.0 Candidate is untouched.
+- Root `pnpm typecheck` passed; `pnpm test:unit` 98 files / 1086 tests;
+  `pnpm test:scenario-service` 18 files / 142 tests (new e2e suite included);
+  `pnpm build:scenario-service` plus `pnpm smoke:scenario-service` prove the
+  compiled process starts healthy with every gate disabled and the legacy
+  route absent.
+- No durable apply, activation, deployment, traffic or consumer change
+  occurred; the presenter remains default-off with no real owner ports bound.
+
+Verdict: `W6_2_RUNTIME_MOUNTED_DEFAULT_OFF / CENSUS_EXPANDED / EXACT_PIN /
+REAL_OWNER_PORTS_PENDING`.
+
 ## 2026-08-14 — W6-1 teacher class-stream contract artifact
 
 - `pnpm verify:teacher-class-stream-contract` passed: digest

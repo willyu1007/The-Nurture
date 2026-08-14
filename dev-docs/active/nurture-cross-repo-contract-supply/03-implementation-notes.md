@@ -1,5 +1,30 @@
 # Implementation notes
 
+## 2026-08-14 — W6-2 teacher class-stream default-off runtime
+
+- Mounted the four class-stream routes in `apps/scenario-service` with the
+  established five-file shape: controller (guard + private headers),
+  strict request parsers, composition (authority reread + owner ports +
+  request binding), fail-closed runtime factory and an Ajv runtime response
+  validator that re-mints the artifact digest at load. The composition binds
+  `query_key` to its deterministic request derivation (`local_date`,
+  `class_ref|local_date`, `child_ref|local_date`), and the same rule now
+  lives in the contract validator and fixtures.
+- Registered gate `NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED`
+  (default false; exact-literal parsing) in config, safe reason codes in the
+  exception filter, module/application wiring with the optional
+  `teacherClassStream` register input, the ingress census (controller routes
+  26 -> 30, six -> seven owner-contract controllers), the test-routing census
+  (scenario-service 20 -> 21) and the future-candidate fixture list.
+- Environment contract: added the key to `env/contract.yaml`, regenerated
+  `.env.example`/`docs/env.md`/`docs/context/env/contract.json`, refreshed the
+  `env-contract` registry checksum and appended the W6 entries to the env
+  change-record set.
+- New e2e suite covers: all four routes with private headers, read-only
+  availability-descriptor semantics, masked fail-closed without owner reads,
+  foreign-authority/pin-drift 400s, owner scope/query-key/hidden-payload/
+  double-current 500s, and default-off 503 plus 401 service auth.
+
 ## 2026-08-14 — W6-1 teacher class-stream contract artifact
 
 - Published the W6 contract package at

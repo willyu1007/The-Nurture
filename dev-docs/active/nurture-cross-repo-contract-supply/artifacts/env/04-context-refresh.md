@@ -12,3 +12,10 @@
 ## Notes
 - No secret values are generated or written.
 - Treat generated files as build artifacts; do not hand-edit.
+
+## W6 regeneration (2026-08-14)
+
+- `env_contractctl.py generate --root .` regenerated `env/.env.example`,
+  `docs/env.md` and `docs/context/env/contract.json`; `ctl-context touch`
+  refreshed the `env-contract` checksum and strict context verification
+  passes.

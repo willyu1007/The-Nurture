@@ -19,7 +19,7 @@ async function collect(directory) {
 
 const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await collect(path.join(repoRoot, 'apps')))];
 const routes = { unit: [], productionDb: [], devHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
-const expectedCounts = { unit: 98, productionDb: 52, devHost: 11, scenarioService: 20, x5Joint: 5 };
+const expectedCounts = { unit: 98, productionDb: 52, devHost: 11, scenarioService: 21, x5Joint: 5 };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
   else if (

@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-14T04:20:23Z`
+Generated at (UTC): `2026-08-14T08:51:29Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -28,6 +28,7 @@ Generated at (UTC): `2026-08-14T04:20:23Z`
 | `NURTURE_PARENT_COMMUNICATION_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the parent-communication owner v1 composition; true requires the exact adopted contract digest, complete authority/owner/async ports and separately authorized activation. |
 | `NURTURE_PARENT_CONTEXT_PRESENTER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the parent-context presenter v1 owner composition; true requires the exact adopted contract digest and separately authorized owner-port activation. |
 | `NURTURE_PROTECTED_CONTENT_KEY` | `active` | `string` | no | yes | `` | `nurture_protected_content_key` | `*` | `` | `` | `` | AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext. |
+| `NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the read-only teacher class-stream presenter v1 composition; true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval, and admits no class-stream write path. |
 | `NURTURE_TEACHER_RELEASE_OWNER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the versioned teacher release owner composition; true requires the exact My-Chat consumer pin and separately authorized activation. |
 | `PORT` | `active` | `int` | yes | no | `8000` | `` | `*` | `` | `` | `` | Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately. |
 | `SERVICE_NAME` | `active` | `string` | yes | no | `the-nurture` | `` | `*` | `` | `` | `` | Nurture owner service name used by logs and deployment metadata. |
