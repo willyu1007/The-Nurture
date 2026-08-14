@@ -1,0 +1,1007 @@
+{
+  "schema_version": 1,
+  "interface": {
+    "key": "nurture.teacher-media-association-owner",
+    "version": "1.0.0",
+    "kind": "private_owner_exchange"
+  },
+  "surface_baseline": {
+    "key": "nurture.surface-contract",
+    "version": "1.20.0",
+    "digest": "sha256:35d6340f60aa2d81523b0c8af977c8c5bb8f01a05a84d1a73b5baffbe8654273",
+    "relationship": "standalone_composition_no_surface_mutation"
+  },
+  "capability_dependencies": [
+    {
+      "key": "confirm_child_media_attribution",
+      "version": "1.0.0",
+      "use": "associate confirm decisions"
+    },
+    {
+      "key": "reject_child_media_attribution",
+      "version": "1.0.0",
+      "use": "associate reject decisions"
+    },
+    {
+      "key": "discard_media_asset",
+      "version": "1.0.0",
+      "use": "discard exchange"
+    }
+  ],
+  "publication_posture": {
+    "default_off": true,
+    "route_registration": "scenario_service_mounted_default_off",
+    "runtime_adapter": "owner_ports_required_default_off",
+    "activation_authority": "none",
+    "consumer_adoption": "exact_key_version_digest_only"
+  },
+  "mobile_posture": {
+    "mode": "read_and_command",
+    "forbidden_response_fields": [
+      "action_ref",
+      "participant_id",
+      "role_assignment_id",
+      "institution_id",
+      "family_id",
+      "child_id",
+      "care_group_id",
+      "enrollment_id",
+      "grant_id",
+      "media_asset_id",
+      "attribution_id",
+      "storage_ref",
+      "signed_url",
+      "url",
+      "thumbnail_url",
+      "preview_ref"
+    ],
+    "rules": [
+      "No bytes, thumbnails or previews exist in this version; the private media stream ingress and My-Chat proxy stay reserved.",
+      "Decisions are always explicit child refs; no face or name inference input exists anywhere in this contract.",
+      "Multi-selection is a client batch of single-decision idempotent commands, so per-child partial failure stays explicit.",
+      "Attribution decisions bind the exact immutable media_revision; a moved revision refuses instead of guessing.",
+      "Supersede/correction stays with the G4-C correction-candidate lane; automatic face matching stays default-off G3-C2."
+    ]
+  },
+  "command_model": {
+    "idempotency": "Every exchange binds an actor-scoped identity (workspace + current participant + command_request_id); another authorized actor replaying the same command_request_id is denied, never served the first actor's result.",
+    "replay": "An exact same-command replay returns the recorded result with executed: replayed and mutates nothing.",
+    "outcome_unknown": "Recovery is exact same-command replay; a new command is never the recovery path.",
+    "confirmation": "No two-step confirm exists in this contract: association and discard are class-internal single-step commands (nothing here is family-visible until the separate release confirm).",
+    "no_auto_send": "Nothing here releases, schedules or auto-sends; association only prepares owner facts for the separate release lifecycle."
+  },
+  "safe_reason_codes": [
+    "teacher_media_association_owner_disabled",
+    "invalid_teacher_media_association_request",
+    "teacher_media_association_contract_mismatch"
+  ],
+  "transport": {
+    "method": "POST",
+    "content_type": "application/json",
+    "authentication": "service_bearer",
+    "cache_control": "private, no-store",
+    "paths": {
+      "unassociated_query": "/internal/nurture/teacher-media-association-owner/v1/unassociated",
+      "association_query": "/internal/nurture/teacher-media-association-owner/v1/association",
+      "associate_exchange": "/internal/nurture/teacher-media-association-owner/v1/associate",
+      "discard_exchange": "/internal/nurture/teacher-media-association-owner/v1/discard"
+    }
+  },
+  "operation_order": [
+    "unassociated_query",
+    "association_query",
+    "associate_exchange",
+    "discard_exchange"
+  ],
+  "operations": {
+    "unassociated_query": {
+      "path": "/internal/nurture/teacher-media-association-owner/v1/unassociated",
+      "t039_rows": [
+        "T-F14",
+        "T-H03"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/unassociated_query_request",
+      "response_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/unassociated_query_response"
+    },
+    "association_query": {
+      "path": "/internal/nurture/teacher-media-association-owner/v1/association",
+      "t039_rows": [
+        "T-F14"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/association_query_request",
+      "response_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/association_query_response"
+    },
+    "associate_exchange": {
+      "path": "/internal/nurture/teacher-media-association-owner/v1/associate",
+      "t039_rows": [
+        "T-F14"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/associate_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/associate_exchange_response"
+    },
+    "discard_exchange": {
+      "path": "/internal/nurture/teacher-media-association-owner/v1/discard",
+      "t039_rows": [
+        "T-F14"
+      ],
+      "request_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/discard_exchange_request",
+      "response_schema_ref": "urn:nurture:teacher-media-association-owner:1#/$defs/discard_exchange_response"
+    }
+  },
+  "schemas": {
+    "$id": "urn:nurture:teacher-media-association-owner:1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "opaque_ref": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 512
+      },
+      "instant": {
+        "type": "string",
+        "format": "date-time",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+      },
+      "command_request_id": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "safe_label": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "interface_contract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version",
+          "digest"
+        ],
+        "properties": {
+          "key": {
+            "const": "nurture.teacher-media-association-owner"
+          },
+          "version": {
+            "const": "1.0.0"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "owner_resolution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolution_ref",
+          "presentation_role",
+          "scope_kind",
+          "scope_ref",
+          "context_ref",
+          "scope_version",
+          "resolved_at"
+        ],
+        "properties": {
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "scope_kind": {
+            "const": "care_group"
+          },
+          "scope_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "cache_partition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partition_key",
+          "interface_key",
+          "interface_version",
+          "contract_digest",
+          "workspace_id",
+          "my_chat_user_id",
+          "presentation_role",
+          "context_ref",
+          "resolution_ref",
+          "scope_version",
+          "operation",
+          "query_key",
+          "expires_at"
+        ],
+        "properties": {
+          "partition_key": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "interface_key": {
+            "const": "nurture.teacher-media-association-owner"
+          },
+          "interface_version": {
+            "const": "1.0.0"
+          },
+          "contract_digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "presentation_role": {
+            "enum": [
+              "caregiver",
+              "lead_caregiver"
+            ]
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "resolution_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "scope_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "operation": {
+            "enum": [
+              "unassociated_query",
+              "association_query"
+            ]
+          },
+          "query_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800
+          },
+          "expires_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "freshness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolved_at",
+          "source"
+        ],
+        "properties": {
+          "resolved_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "source": {
+            "const": "current_owner_read"
+          }
+        }
+      },
+      "mask_signal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "reason_code",
+          "purge_partition",
+          "content_masked"
+        ],
+        "properties": {
+          "kind": {
+            "const": "mask"
+          },
+          "reason_code": {
+            "enum": [
+              "access_changed",
+              "context_changed",
+              "refresh_not_retryable"
+            ]
+          },
+          "purge_partition": {
+            "const": true
+          },
+          "content_masked": {
+            "const": true
+          }
+        }
+      },
+      "masked_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "masked_at",
+          "mask_signal"
+        ],
+        "properties": {
+          "status": {
+            "const": "masked"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "masked_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "mask_signal": {
+            "$ref": "#/$defs/mask_signal"
+          }
+        }
+      },
+      "unavailable_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "failed_at",
+          "reason_code",
+          "retryable"
+        ],
+        "properties": {
+          "status": {
+            "const": "unavailable"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "failed_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "reason_code": {
+            "enum": [
+              "content_unavailable",
+              "temporarily_unavailable",
+              "request_invalid"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "outcome_unknown_response": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "recovery"
+        ],
+        "properties": {
+          "status": {
+            "const": "outcome_unknown"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "recovery": {
+            "const": "reconcile_same_command"
+          }
+        }
+      },
+      "executed_kind": {
+        "enum": [
+          "executed",
+          "replayed"
+        ]
+      },
+      "attribution_state": {
+        "enum": [
+          "candidate",
+          "confirmed",
+          "rejected",
+          "superseded"
+        ]
+      },
+      "identity_request": {
+        "type": "object",
+        "required": [
+          "interface_contract",
+          "workspace_id",
+          "my_chat_user_id",
+          "host_request_id",
+          "context_ref"
+        ],
+        "properties": {
+          "interface_contract": {
+            "$ref": "#/$defs/interface_contract"
+          },
+          "workspace_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "my_chat_user_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "host_request_id": {
+            "$ref": "#/$defs/non_empty_string"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "unassociated_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "association_query_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "media_ref"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          }
+        }
+      },
+      "associate_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "media_ref",
+          "child_ref",
+          "command_request_id",
+          "decision",
+          "expected_attribution_revision",
+          "expected_media_revision"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "decision": {
+            "enum": [
+              "confirm",
+              "reject"
+            ]
+          },
+          "expected_attribution_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expected_media_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "discard_exchange_request": {
+        "type": "object",
+        "$ref": "#/$defs/identity_request",
+        "unevaluatedProperties": false,
+        "required": [
+          "class_ref",
+          "media_ref",
+          "command_request_id"
+        ],
+        "properties": {
+          "class_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          }
+        }
+      },
+      "unassociated_asset": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "media_ref",
+          "lifecycle",
+          "media_revision",
+          "candidate_count",
+          "confirmed_count"
+        ],
+        "properties": {
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "safe_title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "captured_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "lifecycle": {
+            "enum": [
+              "ready",
+              "unavailable"
+            ]
+          },
+          "media_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "candidate_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99
+          },
+          "confirmed_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99
+          }
+        }
+      },
+      "child_option": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "child_ref",
+          "child_safe_label"
+        ],
+        "properties": {
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "child_safe_label": {
+            "$ref": "#/$defs/safe_label"
+          }
+        }
+      },
+      "unassociated_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "unassociated_count",
+          "assets",
+          "children"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "unassociated_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "assets": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/$defs/unassociated_asset"
+            }
+          },
+          "children": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 80,
+            "items": {
+              "$ref": "#/$defs/child_option"
+            }
+          }
+        }
+      },
+      "unassociated_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/unassociated_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "attribution_entry": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "const": "candidate"
+                }
+              },
+              "required": [
+                "state"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "decided_at": false
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "enum": [
+                    "confirmed",
+                    "rejected",
+                    "superseded"
+                  ]
+                }
+              },
+              "required": [
+                "state"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "state",
+                "decided_at"
+              ],
+              "properties": {
+                "state": true,
+                "decided_at": true
+              }
+            }
+          }
+        ],
+        "required": [
+          "child_ref",
+          "state",
+          "revision"
+        ],
+        "properties": {
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "state": {
+            "$ref": "#/$defs/attribution_state"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "decided_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "association_ready": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "owner_resolution",
+          "cache_partition",
+          "generated_at",
+          "freshness",
+          "media_ref",
+          "lifecycle",
+          "media_revision",
+          "attributions"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "owner_resolution": {
+            "$ref": "#/$defs/owner_resolution"
+          },
+          "cache_partition": {
+            "$ref": "#/$defs/cache_partition"
+          },
+          "generated_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "freshness": {
+            "$ref": "#/$defs/freshness"
+          },
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "lifecycle": {
+            "enum": [
+              "ready",
+              "unavailable"
+            ]
+          },
+          "media_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "attributions": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 80,
+            "items": {
+              "$ref": "#/$defs/attribution_entry"
+            }
+          }
+        }
+      },
+      "association_query_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/association_ready"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "associate_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "disposition",
+          "media_ref",
+          "child_ref",
+          "state",
+          "revision",
+          "decided_at"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "disposition": {
+            "enum": [
+              "applied",
+              "already_satisfied"
+            ]
+          },
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "child_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "state": {
+            "enum": [
+              "confirmed",
+              "rejected"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "decided_at": {
+            "$ref": "#/$defs/instant"
+          }
+        }
+      },
+      "associate_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "media_revision_moved",
+              "attribution_revision_moved",
+              "illegal_attribution_transition",
+              "target_unavailable",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "associate_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/associate_committed"
+          },
+          {
+            "$ref": "#/$defs/associate_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      },
+      "discard_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "executed",
+          "media_ref",
+          "discarded_at",
+          "affected_draft_count"
+        ],
+        "properties": {
+          "status": {
+            "const": "committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "executed": {
+            "$ref": "#/$defs/executed_kind"
+          },
+          "media_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "discarded_at": {
+            "$ref": "#/$defs/instant"
+          },
+          "affected_draft_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99
+          }
+        }
+      },
+      "discard_not_committed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "context_ref",
+          "command_request_id",
+          "reason_code"
+        ],
+        "properties": {
+          "status": {
+            "const": "not_committed"
+          },
+          "context_ref": {
+            "$ref": "#/$defs/opaque_ref"
+          },
+          "command_request_id": {
+            "$ref": "#/$defs/command_request_id"
+          },
+          "reason_code": {
+            "enum": [
+              "already_released",
+              "media_already_terminal",
+              "target_unavailable",
+              "command_actor_mismatch",
+              "command_payload_conflict"
+            ]
+          }
+        }
+      },
+      "discard_exchange_response": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/discard_committed"
+          },
+          {
+            "$ref": "#/$defs/discard_not_committed"
+          },
+          {
+            "$ref": "#/$defs/outcome_unknown_response"
+          },
+          {
+            "$ref": "#/$defs/masked_response"
+          },
+          {
+            "$ref": "#/$defs/unavailable_response"
+          }
+        ]
+      }
+    }
+  }
+}

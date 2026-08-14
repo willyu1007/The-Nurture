@@ -1,5 +1,31 @@
 # Implementation notes
 
+## 2026-08-14 — W9-1 teacher media-association contract artifact
+
+- Published the W9 contract package at
+  `packages/nurture-scenario/contracts/teacher-media-association-owner/v1/`:
+  owner-contract JSON with four operations (unassociated, association,
+  associate, discard), 15 conformance fixtures + 12 executed invalid probes
+  + the 18-scenario negative census, hard-pinned `validate-contract.mjs`
+  and README. Digest
+  `sha256:528e50c8170a8b2fa41679cd7fc8d20f5fb344278a6d8e3a6294adc405dd96b4`
+  minted with the shared canonicalizer; strict compile clean on the first
+  run, zero digest re-mints (second batch in a row).
+- W9-specific validator invariants: media/child ref uniqueness, the
+  queue-wide `unassociated_count` may never undercut its own page,
+  association media echo, associate media+child echo with decision→state
+  pairing (confirm→confirmed, reject→rejected), discard media echo, and the
+  candidate/decided_at if-then (a candidate never carries a decision
+  instant).
+- The forbidden response set adds `media_asset_id`, `attribution_id`,
+  `thumbnail_url` and `preview_ref` — bytes/previews have no home in this
+  version by design.
+- Added `src/teacher-media-association-owner-contract.ts` exported from the
+  package index and chained
+  `verify:teacher-media-association-owner-contract` into
+  `verify:formal-ingress-contract` (six contract validators now). Runtime
+  is W9-2; the ingress census is intentionally untouched.
+
 ## 2026-08-14 — W9 media-association scope freeze
 
 - Froze `nurture.teacher-media-association-owner@1.0.0`

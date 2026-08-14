@@ -1,5 +1,19 @@
 # Verification
 
+## 2026-08-14 — W9-1 media-association contract artifact
+
+- `pnpm verify:teacher-media-association-owner-contract`: digest
+  `sha256:528e50c8…` recomputed, schemas compiled under Ajv 2020 strict on
+  the first attempt, 15 fixtures accepted, 12 invalid probes rejected,
+  operation/row/negative censuses exact (4 operations; T-F14/T-H03;
+  18 scenarios).
+- Full `pnpm verify:formal-ingress-contract` chain green (six contract
+  validators + ingress assert; route population unchanged); repo typecheck
+  green; nurture-scenario suite 1111/1111.
+
+Verdict: `W9_1_CONTRACT_PUBLISHED / DIGEST_528E50C8 / STRICT_COMPILE_FIRST_RUN /
+DEFAULT_OFF / NO_RUNTIME_YET`.
+
 ## 2026-08-14 — W8-5 consumer adoption closes W8
 
 - My-Chat `967342e` (T-039) adopts the W8 contract as a dormant strict
