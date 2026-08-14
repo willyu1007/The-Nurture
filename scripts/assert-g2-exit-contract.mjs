@@ -155,9 +155,11 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-14 reseal: package.json gained the reseal:pins entry points;
-  // scenario sources are otherwise unchanged and no contract semantics moved.
-  "a9281feb13a055061e6ed39a05fa83c4bede8044",
+  // 2026-08-14 reseal: My-Chat afb25b5 threads the original intake instant
+  // through receipts (T-031) and Nurture aligns replay settlement plus the
+  // t009 provenance seed; wire receipt semantics converge on the frozen
+  // contract, no capability or activation change.
+  "afb25b57d89c9bf98e3eb2ec9259d22643e538af",
   "My-Chat revision",
 );
 assertEqual(

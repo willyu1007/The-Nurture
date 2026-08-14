@@ -182,9 +182,11 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-14 reseal: package.json gained the reseal:pins entry points;
-      // scenario sources are otherwise unchanged and no contract semantics moved.
-      head_revision: "a9281feb13a055061e6ed39a05fa83c4bede8044",
+      // 2026-08-14 reseal: My-Chat afb25b5 threads the original intake instant
+      // through receipts (T-031) and Nurture aligns replay settlement plus the
+      // t009 provenance seed; wire receipt semantics converge on the frozen
+      // contract, no capability or activation change.
+      head_revision: "afb25b57d89c9bf98e3eb2ec9259d22643e538af",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
