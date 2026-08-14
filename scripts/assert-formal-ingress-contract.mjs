@@ -71,6 +71,20 @@ const teacherClassStreamPaths = {
   TEACHER_CLASS_STREAM_SCHEDULE_PATH:
     "/internal/nurture/teacher-class-stream/v1/schedule",
 };
+const teacherCommunicationOwnerPaths = {
+  TEACHER_COMMUNICATION_OWNER_TARGETS_PATH:
+    "/internal/nurture/teacher-communication-owner/v1/targets",
+  TEACHER_COMMUNICATION_OWNER_MEMBERSHIP_PATH:
+    "/internal/nurture/teacher-communication-owner/v1/membership",
+  TEACHER_COMMUNICATION_OWNER_TIMELINE_PATH:
+    "/internal/nurture/teacher-communication-owner/v1/timeline",
+  TEACHER_COMMUNICATION_OWNER_SEND_TEXT_PATH:
+    "/internal/nurture/teacher-communication-owner/v1/send-text",
+  TEACHER_COMMUNICATION_OWNER_WITHDRAW_STAGED_PATH:
+    "/internal/nurture/teacher-communication-owner/v1/withdraw-staged",
+  TEACHER_COMMUNICATION_OWNER_MARK_READ_PATH:
+    "/internal/nurture/teacher-communication-owner/v1/mark-read",
+};
 const teacherOrganizationOwnerPaths = {
   TEACHER_ORGANIZATION_OWNER_FEED_PATH:
     "/internal/nurture/teacher-organization-owner/v1/feed",
@@ -131,6 +145,12 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_SUPPLEMENT_PATH`,
   `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_CLASS_NOTE_PATH`,
   `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_QUEUE_ADMISSION_PATH`,
+  `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_TARGETS_PATH`,
+  `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_MEMBERSHIP_PATH`,
+  `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_TIMELINE_PATH`,
+  `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_SEND_TEXT_PATH`,
+  `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_WITHDRAW_STAGED_PATH`,
+  `apps/scenario-service/src/teacher-communication-owner.controller.ts:POST:TEACHER_COMMUNICATION_OWNER_MARK_READ_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -143,6 +163,7 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
   "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
   "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
+  "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
@@ -152,6 +173,7 @@ const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
   "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
   "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
+  "apps/scenario-service/src/teacher-communication-owner.controller.ts#TeacherCommunicationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -1377,6 +1399,176 @@ for (const route of [
   assertIncludes(
     teacherOrganizationHttpSource,
     "contract.digest !== TEACHER_ORGANIZATION_OWNER_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const teacherCommunicationControllerSource = read(
+  "apps/scenario-service/src/teacher-communication-owner.controller.ts",
+);
+const teacherCommunicationHttpSource = read(
+  "apps/scenario-service/src/teacher-communication-owner-http.ts",
+);
+const teacherCommunicationRuntimeSource = read(
+  "apps/scenario-service/src/teacher-communication-owner-runtime.ts",
+);
+const teacherCommunicationCompositionSource = read(
+  "apps/scenario-service/src/teacher-communication-owner-composition.ts",
+);
+const teacherCommunicationResponseValidatorSource = read(
+  "apps/scenario-service/src/teacher-communication-owner-response-validator.ts",
+);
+const teacherCommunicationContractSource = read(
+  "packages/nurture-scenario/src/teacher-communication-owner-contract.ts",
+);
+const teacherCommunicationArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/teacher-communication-owner/v1/teacher-communication-owner.owner-contract.json",
+  ),
+);
+assertIncludes(
+  teacherCommunicationControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "teacher communication guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  teacherCommunicationControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "teacher communication guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.teacher-communication-owner"',
+  'version: "1.0.0"',
+  "sha256:e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'mobile_mode: "read_and_command"',
+]) {
+  assertIncludes(
+    teacherCommunicationContractSource,
+    fragment,
+    `teacher communication exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  teacherCommunicationArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "teacher communication mounted route posture",
+);
+assertEqual(
+  teacherCommunicationArtifact.mobile_posture?.mode,
+  "read_and_command",
+  "teacher communication Mobile read-and-command posture",
+);
+assertIncludes(
+  String(teacherCommunicationArtifact.command_model?.outcome_unknown ?? ""),
+  "exact same-command replay",
+  "teacher communication outcome_unknown recovery stays same-command replay",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_TEACHER_COMMUNICATION_OWNER_ENABLED",
+  "teacher communication has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    teacherCommunicationRuntimeSource,
+    fragment,
+    `teacher communication complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  teacherCommunicationResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "teacher communication runtime compiles the published schema artifact",
+);
+assertIncludes(
+  teacherCommunicationResponseValidatorSource,
+  "digest !== TEACHER_COMMUNICATION_OWNER_INTERFACE.digest",
+  "teacher communication runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  teacherCommunicationCompositionSource,
+  "assertPublishedTeacherCommunicationResponse(operation, response)",
+  "teacher communication composition enforces published responses",
+);
+assertIncludes(
+  teacherCommunicationCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "teacher communication rereads current authority for every operation",
+);
+assertIncludes(
+  teacherCommunicationCompositionSource,
+  "response.command_request_id !== commandRequestId",
+  "teacher communication exchanges echo the exact command identity",
+);
+assertIncludes(
+  teacherCommunicationCompositionSource,
+  'response.cursor_echo !== (cursor ?? null)',
+  "teacher communication timeline enforces the W4 cursor echo",
+);
+for (const route of [
+  {
+    constant: "TEACHER_COMMUNICATION_OWNER_TARGETS_PATH",
+    handler: "targets",
+    parser: "parseTeacherCommunicationTargetsRequestV1",
+  },
+  {
+    constant: "TEACHER_COMMUNICATION_OWNER_MEMBERSHIP_PATH",
+    handler: "membership",
+    parser: "parseTeacherCommunicationMembershipRequestV1",
+  },
+  {
+    constant: "TEACHER_COMMUNICATION_OWNER_TIMELINE_PATH",
+    handler: "timeline",
+    parser: "parseTeacherCommunicationTimelineRequestV1",
+  },
+  {
+    constant: "TEACHER_COMMUNICATION_OWNER_SEND_TEXT_PATH",
+    handler: "sendText",
+    parser: "parseTeacherCommunicationSendTextRequestV1",
+  },
+  {
+    constant: "TEACHER_COMMUNICATION_OWNER_WITHDRAW_STAGED_PATH",
+    handler: "withdrawStaged",
+    parser: "parseTeacherCommunicationWithdrawStagedRequestV1",
+  },
+  {
+    constant: "TEACHER_COMMUNICATION_OWNER_MARK_READ_PATH",
+    handler: "markRead",
+    parser: "parseTeacherCommunicationMarkReadRequestV1",
+  },
+]) {
+  const expectedPath = teacherCommunicationOwnerPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    teacherCommunicationContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    teacherCommunicationControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    teacherCommunicationHttpSource,
+    "contract.digest !== TEACHER_COMMUNICATION_OWNER_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

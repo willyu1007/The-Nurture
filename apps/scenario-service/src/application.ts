@@ -60,6 +60,11 @@ import {
   createTeacherOrganizationOwnerComposition,
   type TeacherOrganizationOwnerBindingV1,
 } from "./teacher-organization-owner-runtime.js";
+import type { TeacherCommunicationOwnerComposition } from "./teacher-communication-owner-composition.js";
+import {
+  createTeacherCommunicationOwnerComposition,
+  type TeacherCommunicationOwnerBindingV1,
+} from "./teacher-communication-owner-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -87,6 +92,8 @@ export async function createScenarioServiceApplication(input?: {
   teacherClassStreamOwnerBinding?: TeacherClassStreamOwnerBindingV1;
   teacherOrganizationOwnerComposition?: TeacherOrganizationOwnerComposition;
   teacherOrganizationOwnerBinding?: TeacherOrganizationOwnerBindingV1;
+  teacherCommunicationOwnerComposition?: TeacherCommunicationOwnerComposition;
+  teacherCommunicationOwnerBinding?: TeacherCommunicationOwnerBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -162,6 +169,15 @@ export async function createScenarioServiceApplication(input?: {
         ? { ownerBinding: input.teacherOrganizationOwnerBinding }
         : {}),
     });
+  const teacherCommunicationOwnerComposition =
+    input?.teacherCommunicationOwnerComposition
+    ?? createTeacherCommunicationOwnerComposition({
+      enabled: config.teacherCommunicationOwnerEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.teacherCommunicationOwnerBinding
+        ? { ownerBinding: input.teacherCommunicationOwnerBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -196,6 +212,10 @@ export async function createScenarioServiceApplication(input?: {
       },
       teacherOrganizationOwner: {
         composition: teacherOrganizationOwnerComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      teacherCommunicationOwner: {
+        composition: teacherCommunicationOwnerComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

@@ -1,5 +1,22 @@
 # Verification
 
+## 2026-08-14 — W8-2 communication-owner default-off runtime
+
+- scenario-service suite 160/160 (20 files under the app config) including
+  the new 7-case W8 e2e and the config gate cases; repo typecheck green.
+- `assert-formal-ingress-contract` green with the W8 census
+  (controller-routes 42, six communication-owner routes pinned end to end
+  including the cursor-echo assert); `assert-test-routing` green at
+  scenario-service=23; `verify:formal-ingress-contract` full chain green.
+- env-contractctl generate+validate green; context registry checksum
+  refreshed and `ctl-context verify --strict` green.
+- Default-off proven at the HTTP boundary: no composition -> 503
+  `teacher_communication_owner_disabled` with private headers; wrong
+  bearer -> 401; masked authority short-circuits without owner port calls.
+
+Verdict: `W8_2_RUNTIME_MOUNTED_DEFAULT_OFF / SIX_ROUTES_CENSUSED /
+CURSOR_ECHO_ENFORCED / NO_OWNER_PORTS_YET`.
+
 ## 2026-08-14 — W8-1 communication-owner contract artifact
 
 - `pnpm verify:teacher-communication-owner-contract`: digest

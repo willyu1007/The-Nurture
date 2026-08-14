@@ -1,5 +1,31 @@
 # Implementation notes
 
+## 2026-08-14 — W8-2 teacher communication-owner default-off runtime
+
+- Mounted the six W8 routes in `apps/scenario-service` behind
+  `NURTURE_TEACHER_COMMUNICATION_OWNER_ENABLED` with the established
+  五件套 shape: exact-shape parsers (send prepare/confirm union with the
+  1..2000 text bound, optional timeline cursor 1..256), current-authority
+  composition, Ajv-pinned response validator, fail-closed factory and the
+  guarded controller. The three W8 safe codes joined the allowlist.
+- Binding asserts beyond W7: the timeline response must echo the exact
+  request cursor (`null` first page, the W4 replay rule) and the requested
+  `thread_ref`; targets responses must keep the unread summary equal to
+  their threads; membership/mark-read echo the thread, withdraw echoes the
+  process; `query_key` derivations are `class_ref` / `thread_ref` /
+  `thread_ref|cursor-or-first`.
+- e2e (7 cases, 31 tests with config) covers the six mounts, replay and
+  outcome_unknown echo, masked short-circuit, parse rejections (foreign
+  authority field, digest drift, 2001-char text, prepare+confirm double
+  payload), command/pairing/process kills, unread-summary and cursor-echo
+  kills, default-503 and 401 — all green on the first full run.
+- Census sync: ingress census pins the six routes and the W8 assertion
+  block (controller-routes 36 -> 42); test-routing scenario-service census
+  22 -> 23; env contract 5-file set gained the gate variable with registry
+  checksum refresh.
+- Real Prisma owner ports and DB lanes are W8-3; no schema change, no
+  activation, no deployment.
+
 ## 2026-08-14 — W8-1 teacher communication-owner contract artifact
 
 - Published the W8 contract package at
