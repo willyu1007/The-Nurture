@@ -12,9 +12,9 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-13 T-042 reseal: x5_joint_api content rotated by the
-  // authorization-hardening batch; C30 Host source profiles unchanged.
-  hostHead: "b90cce2e11e17dec238854b39954b4dae31e14db",
+  // 2026-08-14 W4 reseal: the read-only director presenter rotates the broad
+  // x5 pin but does not change the C30 Host runtime source profiles.
+  hostHead: "e0e5e937cb16b6b49e918656a4af214ddea41a48",
 };
 
 const run = (command, args, cwd) =>

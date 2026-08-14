@@ -155,11 +155,10 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Resealed on 2026-08-13 after the T-042 authorization-hardening batch:
-  // x5_joint_api content rotated (worker/notification/scenario-integration
-  // fixes); the shared Base/My-Chat workflow contract and wave4 profile
-  // remain byte-identical.
-  "b90cce2e11e17dec238854b39954b4dae31e14db",
+  // Resealed on 2026-08-14 after My-Chat adopted the W4 read-only director
+  // presenter. x5_joint_api rotated because scenario-integrations changed;
+  // the shared Base/My-Chat workflow contract and wave4 profile are unchanged.
+  "e0e5e937cb16b6b49e918656a4af214ddea41a48",
   "My-Chat revision",
 );
 assertEqual(
