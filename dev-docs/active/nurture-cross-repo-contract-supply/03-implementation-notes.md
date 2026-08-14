@@ -1,5 +1,13 @@
 # Implementation notes
 
+## 2026-08-14 — W9-4 teacher media-association registration closes
+
+- Registered the W9 conformance fixtures in the service-candidate
+  standalone-fixture list; the frozen G5-A Candidate is untouched. The
+  remaining registration surface (env 5-file set, censuses, safe codes,
+  context checksum) landed with W9-2/W9-3; governance sync/lint re-ran
+  clean with no derived-view drift.
+
 ## 2026-08-14 — W9-3 teacher media-association real owner ports
 
 - Added the DB-free domain service

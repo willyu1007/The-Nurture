@@ -1,5 +1,13 @@
 # Verification
 
+## 2026-08-14 — W9-4 media-association registration
+
+- `candidate-core.test.mjs` green after the fixture-list addition;
+  project-governance `sync --apply --changelog` + `lint` and strict doc
+  lint green; no derived-view drift.
+
+Verdict: `W9_4_REGISTERED / CANDIDATE_LIST_EXTENDED / G5A_FREEZE_UNTOUCHED`.
+
 ## 2026-08-14 — W9-3 media-association real owner ports
 
 - Unit lane: 6-case service suite over fake ports (foreign-ref masking,
