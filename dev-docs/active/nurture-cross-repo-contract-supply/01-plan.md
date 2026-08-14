@@ -97,3 +97,31 @@ Exit: complete on 2026-08-14 at digest
 `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`.
 All provider/consumer behavior remains dormant; no Candidate, deployment,
 activation, traffic or device claim was created.
+
+## W6+ — Teacher-side supply extension (2026-08-14)
+
+Owner decision: after G5-A, the main supply effort targets the remaining
+teacher-side contract gaps (26 Contract-blocked rows in My-Chat's T-039
+matrix, minus the two My-Chat-owned rows). The production schedule, batch
+composition, reuse map, exclusions and ordering rationale are frozen in
+`artifacts/w6-teacher-supply-schedule.md`:
+
+- W6 `nurture.teacher-class-stream-presenter@1.0.0` — read core
+  (T-S03, T-F01, T-F03, T-F04, T-F06, T-F07).
+- W7 `nurture.teacher-organization-owner@1.0.0` — feed/proposal/lane reads
+  plus organize/supplement/class-note/queue-admission actions.
+- W8 `nurture.teacher-communication-owner@1.0.0` — target rail, membership,
+  timeline, staged withdrawal, manual text send, unread summary.
+- W9 media association (association-only before the reserved media ingress
+  exists).
+- W10 teacher assistant queries (missing-record handoff, weekly draft).
+- W11 `nurture.parent-communication-owner@1.1.0` additive extensions
+  (P-H05 redaction prepare, P-H06 delivery receipts).
+
+Every batch replicates the W4 skeleton plus the W3.1 real-owner step in the
+same wave, ships default-off with exact digest pins and conformance
+fixtures, chains its validator into `verify:formal-ingress-contract`,
+produces a standalone digest-pin handoff artifact, and triggers the My-Chat
+sanitized fixture-snapshot refresh duty. `P-G03`/`P-H03` are routed to
+My-Chat; `T-C08` waits on product decision I-Q1; voice input and media
+upload ingress are explicitly out of first versions.

@@ -4,7 +4,15 @@
 
 - State: in-progress
 - Updated: 2026-08-14
-- Next step: W3.1 real local owner qualification is complete without
+- Supply extension (2026-08-14): the owner directed the main effort to the
+  teacher-side contract gaps. The batch schedule W6-W11 is frozen in
+  `artifacts/w6-teacher-supply-schedule.md` and summarized in `01-plan.md`;
+  the next executable step is the W6
+  `nurture.teacher-class-stream-presenter@1.0.0` design freeze, then
+  implementation per the W4 skeleton plus the W3.1 real-owner step. All
+  batches remain default-off contract supply with no activation, durable
+  apply, deployment or traffic.
+- Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
   serves minimized summary and bounded teacher detail from canonical
@@ -114,6 +122,12 @@ conformance fixtures, all default-off.
   F-004/F-005 code (mapped through R-003/R-004); they execute here
   because the W1 callback implementation lands on the same settlement
   surface, and channel hardening precedes the second delivery leg.
+- W6-W11 teacher-side supply extension (2026-08-14): close the remaining
+  teacher/parent contract-blocked rows in My-Chat's T-039 matrix through
+  six ordered default-off batches — W6 class-stream read core, W7
+  organization loop, W8 teacher communication owner, W9 media association,
+  W10 assistant queries, W11 parent-communication additive extensions.
+  Schedule SSOT: `artifacts/w6-teacher-supply-schedule.md`.
 
 ## Non-goals
 
@@ -169,3 +183,20 @@ conformance fixtures, all default-off.
   N2/N5/N6/N8 land before or with the W1 callback implementation.
 - [x] W3 implementation remains default-off; no durable apply, activation,
   deployment or traffic results from this task.
+- [ ] W6: `nurture.teacher-class-stream-presenter@1.0.0` published with exact
+  digest, default-off service-authenticated routes, real Prisma owner ports,
+  conformance fixtures, formal-ingress gate registration and a digest-pin
+  handoff artifact.
+- [ ] W7: `nurture.teacher-organization-owner@1.0.0` published with the same
+  gate set plus prepare/confirm command semantics, actor-scoped idempotency
+  and owner-persisted lane state.
+- [ ] W8: `nurture.teacher-communication-owner@1.0.0` published reusing the
+  W3 shape family with the IR-C01..C07 gate list re-run for the teacher
+  actor; `class_group` send remains unavailable absent a separate decision.
+- [ ] W9: media association supply (association-only before the reserved
+  media ingress exists).
+- [ ] W10: teacher assistant queries (missing-record handoff, weekly draft)
+  with agent-generated labelling and no direct provider calls.
+- [ ] W11: `nurture.parent-communication-owner@1.1.0` additive extensions
+  for redaction prepare and delivery receipts; the frozen 1.0.0 artifact is
+  not mutated.
