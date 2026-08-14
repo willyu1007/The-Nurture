@@ -1,5 +1,22 @@
 # Implementation notes
 
+## 2026-08-14 — W9 media-association scope freeze
+
+- Froze `nurture.teacher-media-association-owner@1.0.0`
+  (`artifacts/w9-media-association-scope-freeze.md`): association-only over
+  existing owner-side assets — four operations (unassociated read with the
+  eligible-children option list and the T-H03 count, per-asset association
+  read, single-decision associate exchange over the frozen G3-C1
+  confirm/reject commands, and a discard exchange over
+  `discard_media_asset@1.0.0`). The UI's multi-selection is a client batch
+  of single-decision idempotent commands so per-child partial failure stays
+  explicit; decisions bind the exact immutable `media_revision`.
+- Explicitly out: upload/bytes/thumbnails/preview (reserved ingress + proxy
+  do not exist; T-F16's camera half stays blocked), supersede (G4-C
+  correction lane), automatic face matching (default-off G3-C2). No schema
+  change expected — the G3-C1 read port, command specs and transaction
+  wiring already exist.
+
 ## 2026-08-14 — W8-4 teacher communication-owner registration closes
 
 - Registered the W8 conformance fixtures in the service-candidate
