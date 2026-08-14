@@ -13,6 +13,7 @@ import type { NurtureEnrollmentJourneyPreparedCommandLedgerV1 } from "../institu
 import type { NurtureCareCaptureTransaction } from "../institution/care-capture-transaction.js";
 import type { NurturePublishQueueAdmissionTransaction } from "../institution/publish-queue-admission.js";
 import type { NurtureTeacherCommunicationTransaction } from "../institution/teacher-communication-transaction.js";
+import type { NurtureTeacherAssistantTransaction } from "../institution/teacher-assistant-transaction.js";
 import type { NurtureAttendanceCommandTransaction } from "../institution/attendance-closeout.js";
 import type { NurtureContentRevisionTransaction } from "../institution/content-revision.js";
 import type { NurtureAttributionCorrectionCandidateTransaction } from "../institution/attribution-correction-candidate.js";
@@ -90,6 +91,8 @@ export type NurtureCommandTransaction = {
   publishQueueAdmission?: NurturePublishQueueAdmissionTransaction;
   /** Present when the W8 teacher-communication owner writes are wired. */
   teacherCommunication?: NurtureTeacherCommunicationTransaction;
+  /** Present when the W10 teacher-assistant weekly-draft owner write is wired. */
+  teacherAssistant?: NurtureTeacherAssistantTransaction;
   /** Present when the G4-B attendance closeout owner write adapter is wired. */
   attendance?: NurtureAttendanceCommandTransaction;
   /** Present when the G4-C append-only content revision owner is wired. */

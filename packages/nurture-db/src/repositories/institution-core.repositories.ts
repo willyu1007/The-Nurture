@@ -30,6 +30,7 @@ import { PrismaPublicationSafetyTransaction } from "./publication-safety.transac
 import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaPublishQueueAdmissionTransaction } from "./publish-queue-admission.service.js";
 import { PrismaTeacherCommunicationTransaction } from "./teacher-communication-owner.repository.js";
+import { PrismaTeacherAssistantTransaction } from "./teacher-assistant-query-owner.repository.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 import { PrismaEnrollmentJourneyRepository } from "./enrollment-journey.repository.js";
 import { PrismaEnrollmentWaitlistRepository } from "./enrollment-waitlist.repository.js";
@@ -192,6 +193,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly publishQueueAdmission: PrismaPublishQueueAdmissionTransaction;
   /** W8 teacher-communication owner writes, same transaction. */
   readonly teacherCommunication: PrismaTeacherCommunicationTransaction;
+  /** W10 teacher-assistant weekly-draft owner write, same transaction. */
+  readonly teacherAssistant: PrismaTeacherAssistantTransaction;
 
   constructor(
     private readonly transaction: Prisma.TransactionClient,
@@ -226,6 +229,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     this.careCapture = new PrismaCareCaptureTransaction(transaction);
     this.publishQueueAdmission = new PrismaPublishQueueAdmissionTransaction(transaction);
     this.teacherCommunication = new PrismaTeacherCommunicationTransaction(transaction);
+    this.teacherAssistant = new PrismaTeacherAssistantTransaction(transaction);
   }
 
   async findCommitted(input: {

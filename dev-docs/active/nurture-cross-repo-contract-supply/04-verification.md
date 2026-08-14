@@ -1,5 +1,29 @@
 # Verification
 
+## 2026-08-15 — W10-3 assistant-query real owner ports
+
+- Unit lane: new 9-case service suite over fake ports (week arithmetic at
+  Monday/Wednesday/Sunday, kind partition with typed handoffs and
+  availability, owner-computed week totals with the existing-draft ref,
+  real-spec draft creation over a fake transaction — canonical payload,
+  sealed envelopes, target keys and the id-free document all asserted —
+  duplicate-week `already_satisfied`, the empty-week refusal that never
+  vetoes an existing draft, frozen reason-code mapping, foreign-class
+  masking and resolver-outage honesty); nurture-scenario suite
+  103 files / 1126 tests.
+- Production-DB lane: new 5-case W10 integration file green — live
+  missing-record partition, weekly aggregation over real logs and W9
+  attribution rows (out-of-week rows excluded), draft create/replay/
+  duplicate `already_satisfied` with one process row + sealed revision +
+  target + assessment verified in the database, cross-actor denial,
+  grant-free `no_eligible_target` plus foreign-class masking. Seed lesson:
+  a `confirmed` attribution row requires `exposurePolicyPayload` (check
+  constraint `ck_nurture_media_attribution_confirmation`).
+- Root typecheck green; routing census 103/57/25.
+
+Verdict: `W10_3_OWNER_PORTS_REAL / LEDGER_DOMAIN_IDEMPOTENT /
+UNIT_1126_DB_5CASE_GREEN / NO_ACTIVATION`.
+
 ## 2026-08-14 — W10-2 assistant-query default-off runtime
 
 - Scenario-service suite 22 files / 178 tests green incl. the new 7-case

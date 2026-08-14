@@ -1,5 +1,41 @@
 # Implementation notes
 
+## 2026-08-15 — W10-3 assistant-query real owner ports
+
+- Added the DB-free domain service
+  (`src/teacher-assistant-query-owner-service.ts`): W6-discipline authority
+  and read envelopes; missing-records partitions the five kinds per
+  enrolled child and attaches the typed supplement handoff with
+  availability from the same daily-care eligibility read the W6 action
+  uses; weekly-source computes the Monday-Sunday window by pure calendar
+  arithmetic from `local_date` and zero-fills per-child counts.
+- The weekly draft is a raw ledger spec (`teacher_assistant_weekly_draft`):
+  actor HMAC rides the canonical payload `{care_group_id, week_start,
+  actor_binding_ref}` with no volatile heads; `checkPreconditions` re-reads
+  authority, the safety-policy identity, the existing (class, week) process
+  and the care_day_note/family_weekly_summary target set inside the
+  command transaction (`loadWeeklyDraftFacts`), answering
+  `already_satisfied` with the existing process; `apply` routes the
+  facts-only document through `evaluateContentSafetyRoute` (no classifier)
+  and lands process + sealed first revision + targets + assessment row in
+  one transaction (`applyWeeklyDraftProcess`, new
+  `NurtureTeacherAssistantTransaction` on the command transaction; no
+  schema change — `captureBatchId` stays null).
+- Replay honesty (the W7 lesson): the `no_weekly_facts` pre-check only
+  fires when NO (class, week) draft exists; with one present the command
+  always runs so the ledger or the domain answers it. The sealed body is
+  the deterministic weekly-facts document (safe labels and counts only, no
+  ids); `command_actor_mismatch` stays reserved vocabulary — the kernel
+  folds actor identity into the payload hash, so cross-actor reuse lands
+  `command_payload_conflict` exactly as W7-W9 do.
+- Prisma side: `PrismaTeacherAssistantQueryReadPort` (enrolled children,
+  per-day recorded kinds from payload presence, weekly per-kind day counts,
+  confirmed-attribution counts over assets captured in-window, weekly-draft
+  lookup by process key) and `PrismaTeacherAssistantTransaction` wired into
+  `PrismaNurtureCommandRepository`;
+  `createPrismaTeacherAssistantQueryBinding` composes them with the AES-GCM
+  protected-content port.
+
 ## 2026-08-14 — W10-2 assistant-query default-off runtime
 
 - Mounted the three W10 routes in `apps/scenario-service` behind
