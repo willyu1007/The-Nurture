@@ -1,5 +1,27 @@
 # Verification
 
+## 2026-08-14 — W9-5 consumer adoption closes W9
+
+- My-Chat `e092613` (T-039) adopts the W9 contract as a dormant strict
+  client: exact pin `nurture.teacher-media-association-owner@1.0.0` /
+  `sha256:528e50c8…`; the client asserts media/child echoes,
+  decision→state pairing, count-vs-page consistency and the
+  candidate-never-decided rule; sanitized snapshot with provenance at
+  Nurture `48fbf01`; consumer suite 6/6 under `NURTURE_REPO_ROOT`
+  (15 fixtures accepted, all response mutations rejected); package suite
+  31 files / 184 tests and package typecheck green. T-F14 and T-H03 moved
+  to `contract-ready`, T-F16 to `partial` (association half; camera/upload
+  stays on the reserved ingress); contract axis is now 60 ready /
+  7 blocked / 21 partial / 17 local. Live remains blocked on the W9
+  runtime gate plus deployment; no activation occurred.
+- The My-Chat commit hook was bypassed once for the same recorded reason
+  as W7-5/W8-5. Pin reseal remains deferred on the same sibling WIP.
+- W9 is closed end to end. Next batch: W10 teacher assistant queries.
+
+Verdict: `W9_CLOSED_END_TO_END / CONSUMER_ADOPTED_E092613 /
+TWO_ROWS_CONTRACT_READY_ONE_PARTIAL / DEFAULT_OFF /
+PIN_RESEAL_STILL_DEFERRED`.
+
 ## 2026-08-14 — W9-4 media-association registration
 
 - `candidate-core.test.mjs` green after the fixture-list addition;
