@@ -16,10 +16,10 @@ const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-14 reseal: W10 assistant-query supply moved the pinned tooling
-  // entry points and the My-Chat consumer advanced through the W7-W10
-  // adoptions to 3693e8f
-  hostHead: "3693e8f794c47569f9e425f5456a02e5064449f1",
+  // 2026-08-14 reseal: W11 parent-communication extension supply moved the
+  // pinned tooling entry points and the My-Chat consumer adopted W11 at
+  // df5af9d
+  hostHead: "df5af9d80a0ecf8f7bdc7bc4ca96eba57455f031",
 };
 
 const run = (command, args, cwd) =>

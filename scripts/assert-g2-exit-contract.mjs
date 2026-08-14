@@ -155,10 +155,10 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-14 reseal: W10 assistant-query supply moved the pinned tooling
-  // entry points and the My-Chat consumer advanced through the W7-W10
-  // adoptions to 3693e8f
-  "3693e8f794c47569f9e425f5456a02e5064449f1",
+  // 2026-08-14 reseal: W11 parent-communication extension supply moved the
+  // pinned tooling entry points and the My-Chat consumer adopted W11 at
+  // df5af9d
+  "df5af9d80a0ecf8f7bdc7bc4ca96eba57455f031",
   "My-Chat revision",
 );
 assertEqual(
