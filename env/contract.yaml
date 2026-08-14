@@ -95,6 +95,11 @@ variables:
     required: false
     default: false
     description: Default-off gate for the read-only teacher class-stream presenter v1 composition; true requires the exact adopted contract digest, complete caregiver authority/owner ports and separate activation approval, and admits no class-stream write path.
+  NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED:
+    type: bool
+    required: false
+    default: false
+    description: Default-off gate for the teacher organization-owner v1 exchange composition; true requires the exact adopted contract digest, complete caregiver authority/owner/protected-content ports and separate activation approval, and never authorizes release or auto-send.
   FAMILY_GROWTH_EVENTS_SERVICE_TOKEN:
     type: string
     required: false

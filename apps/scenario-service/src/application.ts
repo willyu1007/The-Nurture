@@ -55,6 +55,11 @@ import {
   createTeacherClassStreamComposition,
   type TeacherClassStreamOwnerBindingV1,
 } from "./teacher-class-stream-runtime.js";
+import type { TeacherOrganizationOwnerComposition } from "./teacher-organization-owner-composition.js";
+import {
+  createTeacherOrganizationOwnerComposition,
+  type TeacherOrganizationOwnerBindingV1,
+} from "./teacher-organization-owner-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -80,6 +85,8 @@ export async function createScenarioServiceApplication(input?: {
   directorPresenterOwnerBinding?: DirectorPresenterOwnerBindingV1;
   teacherClassStreamComposition?: TeacherClassStreamComposition;
   teacherClassStreamOwnerBinding?: TeacherClassStreamOwnerBindingV1;
+  teacherOrganizationOwnerComposition?: TeacherOrganizationOwnerComposition;
+  teacherOrganizationOwnerBinding?: TeacherOrganizationOwnerBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
@@ -146,6 +153,15 @@ export async function createScenarioServiceApplication(input?: {
         ? { ownerBinding: input.teacherClassStreamOwnerBinding }
         : {}),
     });
+  const teacherOrganizationOwnerComposition =
+    input?.teacherOrganizationOwnerComposition
+    ?? createTeacherOrganizationOwnerComposition({
+      enabled: config.teacherOrganizationOwnerEnabled,
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.teacherOrganizationOwnerBinding
+        ? { ownerBinding: input.teacherOrganizationOwnerBinding }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       logger,
@@ -176,6 +192,10 @@ export async function createScenarioServiceApplication(input?: {
       },
       teacherClassStream: {
         composition: teacherClassStreamComposition,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      teacherOrganizationOwner: {
+        composition: teacherOrganizationOwnerComposition,
         serviceAuth: bindingOwnerServiceAuth,
       },
       familySharingPrivate: {

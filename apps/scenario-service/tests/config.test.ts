@@ -18,6 +18,7 @@ describe("scenario-service configuration", () => {
       parentCommunicationOwnerEnabled: false,
       directorPresenterEnabled: false,
       teacherClassStreamPresenterEnabled: false,
+      teacherOrganizationOwnerEnabled: false,
     });
   });
 
@@ -50,6 +51,10 @@ describe("scenario-service configuration", () => {
     [
       { NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED: "TRUE" },
       "NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED",
+    ],
+    [
+      { NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED: "TRUE" },
+      "NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED",
     ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
@@ -94,6 +99,14 @@ describe("scenario-service configuration", () => {
       loadScenarioServiceConfig({
         NURTURE_TEACHER_CLASS_STREAM_PRESENTER_ENABLED: "true",
       }).teacherClassStreamPresenterEnabled,
+    ).toBe(true);
+  });
+
+  it("loads the teacher organization-owner gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED: "true",
+      }).teacherOrganizationOwnerEnabled,
     ).toBe(true);
   });
 

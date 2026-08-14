@@ -42,6 +42,9 @@ const allowedErrors = new Set([
   "director_presenter_contract_mismatch",
   "invalid_teacher_class_stream_request",
   "teacher_class_stream_contract_mismatch",
+  "teacher_organization_owner_disabled",
+  "invalid_teacher_organization_request",
+  "teacher_organization_contract_mismatch",
   // family_growth_transport@1.0.0 §5 — the frozen rendition-exchange taxonomy.
   "service_unauthorized",
   "rendition_ref_invalid",

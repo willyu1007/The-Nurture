@@ -1,5 +1,39 @@
 # Implementation notes
 
+## 2026-08-14 — W7-2 teacher organization-owner default-off runtime
+
+- Mounted the six W7 routes in `apps/scenario-service` behind
+  `NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED` with the W6 五件套 shape:
+  exact-shape HTTP parsers (including the supplement prepare/confirm
+  discriminated union and the note/text 1..500 bound), current-authority
+  composition, Ajv-pinned response validator, fail-closed factory and the
+  guarded Nest controller. The three W7 safe codes joined the
+  `SafeExceptionFilter` allowlist.
+- Write-path binding asserts beyond W6: exchange responses must echo the
+  exact `command_request_id`; supplement responses must pair with the
+  request kind (prepare never lands `committed`, confirm never answers
+  `ready_to_confirm`); a committed admission must answer the requested
+  `process_ref`. Read asserts reuse the W6 resolution/cache/query-key
+  discipline with `query_key === class_ref`.
+- Two composition lessons recorded: ready read responses carry the context
+  echo only inside `owner_resolution`/`cache_partition` (a top-level
+  `context_ref` check must branch by status first), and a `never`-returning
+  `violation` helper needs an explicit `() => never` annotation for TS
+  control-flow narrowing.
+- e2e (listener-free light-my-request, 7 cases) covers all six mounts with
+  private headers, replay/outcome_unknown echo, masked short-circuit without
+  owner calls, parse-level rejections (foreign authority field, digest
+  drift, non-manual trigger, 501-char note), command-identity/pairing/
+  process drift kills, quick-adjust duplication kill, default-503 and 401.
+- Census sync: ingress census now pins the six routes, controller
+  registration, contract constants, gate flag, runtime completeness and
+  command-echo assert (controller-routes 30 -> 36); test-routing
+  scenario-service census 21 -> 22; env contract 5-file set gained the gate
+  variable (SSOT yaml, regenerated example/docs/context JSON, registry
+  checksum refreshed).
+- Real Prisma owner ports and DB lanes are W7-3; no schema change, no
+  activation, no deployment.
+
 ## 2026-08-14 — W7-1 teacher organization-owner contract artifact
 
 - Published the W7 contract package at

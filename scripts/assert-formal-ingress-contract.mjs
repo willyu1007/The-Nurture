@@ -71,6 +71,20 @@ const teacherClassStreamPaths = {
   TEACHER_CLASS_STREAM_SCHEDULE_PATH:
     "/internal/nurture/teacher-class-stream/v1/schedule",
 };
+const teacherOrganizationOwnerPaths = {
+  TEACHER_ORGANIZATION_OWNER_FEED_PATH:
+    "/internal/nurture/teacher-organization-owner/v1/feed",
+  TEACHER_ORGANIZATION_OWNER_ORGANIZATION_PATH:
+    "/internal/nurture/teacher-organization-owner/v1/organization",
+  TEACHER_ORGANIZATION_OWNER_ORGANIZE_PATH:
+    "/internal/nurture/teacher-organization-owner/v1/organize",
+  TEACHER_ORGANIZATION_OWNER_SUPPLEMENT_PATH:
+    "/internal/nurture/teacher-organization-owner/v1/supplement",
+  TEACHER_ORGANIZATION_OWNER_CLASS_NOTE_PATH:
+    "/internal/nurture/teacher-organization-owner/v1/class-note",
+  TEACHER_ORGANIZATION_OWNER_QUEUE_ADMISSION_PATH:
+    "/internal/nurture/teacher-organization-owner/v1/queue-admission",
+};
 const expectedPaths = [
   healthPath,
   ownerPath,
@@ -111,6 +125,12 @@ const expectedControllerRoutes = [
   `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_CHILD_STRIP_PATH`,
   `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_CLASS_CONTEXT_PATH`,
   `apps/scenario-service/src/teacher-class-stream.controller.ts:POST:TEACHER_CLASS_STREAM_SCHEDULE_PATH`,
+  `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_FEED_PATH`,
+  `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_ORGANIZATION_PATH`,
+  `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_ORGANIZE_PATH`,
+  `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_SUPPLEMENT_PATH`,
+  `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_CLASS_NOTE_PATH`,
+  `apps/scenario-service/src/teacher-organization-owner.controller.ts:POST:TEACHER_ORGANIZATION_OWNER_QUEUE_ADMISSION_PATH`,
 ].sort();
 const expectedRegisteredControllers = [
   "apps/scenario-service/src/health.controller.ts#HealthController",
@@ -122,6 +142,7 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
   "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
   "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
+  "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ];
 const expectedPrivateResponseControllers = [
@@ -130,6 +151,7 @@ const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/parent-communication-owner.controller.ts#ParentCommunicationOwnerController",
   "apps/scenario-service/src/director-presenter.controller.ts#DirectorPresenterController",
   "apps/scenario-service/src/teacher-class-stream.controller.ts#TeacherClassStreamController",
+  "apps/scenario-service/src/teacher-organization-owner.controller.ts#TeacherOrganizationOwnerController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
 ].sort();
 const expectedPrivateResponseFilterProviders = [
@@ -1190,6 +1212,171 @@ for (const route of [
   assertIncludes(
     teacherClassStreamHttpSource,
     "contract.digest !== TEACHER_CLASS_STREAM_INTERFACE.digest",
+    `${route.handler} exact digest admission`,
+  );
+}
+
+const teacherOrganizationControllerSource = read(
+  "apps/scenario-service/src/teacher-organization-owner.controller.ts",
+);
+const teacherOrganizationHttpSource = read(
+  "apps/scenario-service/src/teacher-organization-owner-http.ts",
+);
+const teacherOrganizationRuntimeSource = read(
+  "apps/scenario-service/src/teacher-organization-owner-runtime.ts",
+);
+const teacherOrganizationCompositionSource = read(
+  "apps/scenario-service/src/teacher-organization-owner-composition.ts",
+);
+const teacherOrganizationResponseValidatorSource = read(
+  "apps/scenario-service/src/teacher-organization-owner-response-validator.ts",
+);
+const teacherOrganizationContractSource = read(
+  "packages/nurture-scenario/src/teacher-organization-owner-contract.ts",
+);
+const teacherOrganizationArtifact = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/teacher-organization-owner/v1/teacher-organization-owner.owner-contract.json",
+  ),
+);
+assertIncludes(
+  teacherOrganizationControllerSource,
+  "!this.config.composition || !this.config.serviceAuth.configured",
+  "teacher organization guard fails closed when disabled or unauthenticated",
+);
+assertIncludes(
+  teacherOrganizationControllerSource,
+  "this.config.serviceAuth.bearerAuthorized(request.headers.authorization)",
+  "teacher organization guard authenticates the service bearer",
+);
+for (const fragment of [
+  'key: "nurture.teacher-organization-owner"',
+  'version: "1.0.0"',
+  "sha256:b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161",
+  'authentication: "service_bearer"',
+  'cache_control: "private, no-store"',
+  "default_off: true",
+  'mobile_mode: "read_and_command"',
+]) {
+  assertIncludes(
+    teacherOrganizationContractSource,
+    fragment,
+    `teacher organization exact contract pin ${fragment}`,
+  );
+}
+assertEqual(
+  teacherOrganizationArtifact.publication_posture?.route_registration,
+  "scenario_service_mounted_default_off",
+  "teacher organization mounted route posture",
+);
+assertEqual(
+  teacherOrganizationArtifact.mobile_posture?.mode,
+  "read_and_command",
+  "teacher organization Mobile read-and-command posture",
+);
+assertIncludes(
+  String(teacherOrganizationArtifact.command_model?.outcome_unknown ?? ""),
+  "exact same-command replay",
+  "teacher organization outcome_unknown recovery stays same-command replay",
+);
+assertIncludes(
+  scenarioServiceConfigSource,
+  "env.NURTURE_TEACHER_ORGANIZATION_OWNER_ENABLED",
+  "teacher organization has an explicit runtime gate",
+);
+for (const fragment of [
+  "!input.enabled",
+  "|| !binding?.authorityResolver",
+  "|| !binding.owner",
+]) {
+  assertIncludes(
+    teacherOrganizationRuntimeSource,
+    fragment,
+    `teacher organization complete owner binding ${fragment}`,
+  );
+}
+assertIncludes(
+  teacherOrganizationResponseValidatorSource,
+  "ajv.addSchema(artifact.schemas)",
+  "teacher organization runtime compiles the published schema artifact",
+);
+assertIncludes(
+  teacherOrganizationResponseValidatorSource,
+  "digest !== TEACHER_ORGANIZATION_OWNER_INTERFACE.digest",
+  "teacher organization runtime hard-checks the artifact pin",
+);
+assertIncludes(
+  teacherOrganizationCompositionSource,
+  "assertPublishedTeacherOrganizationResponse(operation, response)",
+  "teacher organization composition enforces published responses",
+);
+assertIncludes(
+  teacherOrganizationCompositionSource,
+  "await this.authorityResolver.resolve({",
+  "teacher organization rereads current authority for every operation",
+);
+assertIncludes(
+  teacherOrganizationCompositionSource,
+  "response.command_request_id !== commandRequestId",
+  "teacher organization exchanges echo the exact command identity",
+);
+for (const route of [
+  {
+    constant: "TEACHER_ORGANIZATION_OWNER_FEED_PATH",
+    handler: "feed",
+    parser: "parseTeacherOrganizationFeedRequestV1",
+  },
+  {
+    constant: "TEACHER_ORGANIZATION_OWNER_ORGANIZATION_PATH",
+    handler: "organization",
+    parser: "parseTeacherOrganizationOrganizationRequestV1",
+  },
+  {
+    constant: "TEACHER_ORGANIZATION_OWNER_ORGANIZE_PATH",
+    handler: "organize",
+    parser: "parseTeacherOrganizationOrganizeRequestV1",
+  },
+  {
+    constant: "TEACHER_ORGANIZATION_OWNER_SUPPLEMENT_PATH",
+    handler: "supplement",
+    parser: "parseTeacherOrganizationSupplementRequestV1",
+  },
+  {
+    constant: "TEACHER_ORGANIZATION_OWNER_CLASS_NOTE_PATH",
+    handler: "classNote",
+    parser: "parseTeacherOrganizationClassNoteRequestV1",
+  },
+  {
+    constant: "TEACHER_ORGANIZATION_OWNER_QUEUE_ADMISSION_PATH",
+    handler: "queueAdmission",
+    parser: "parseTeacherOrganizationQueueAdmissionRequestV1",
+  },
+]) {
+  const expectedPath = teacherOrganizationOwnerPaths[route.constant];
+  assertTruthy(expectedPath, `${route.constant} expected literal path`);
+  assertMatches(
+    teacherOrganizationContractSource,
+    new RegExp(
+      `export const ${route.constant} =\\s+${escapeRegExp(JSON.stringify(expectedPath))};`,
+      "u",
+    ),
+    `${route.handler} route exact path pin`,
+  );
+  const block = routeDecoratorBlock(
+    teacherOrganizationControllerSource,
+    `@Post(${route.constant})`,
+  );
+  assertIncludes(block, '@Header("Cache-Control", "private, no-store")',
+    `${route.handler} private no-store response`);
+  assertIncludes(block, '@Header("Pragma", "no-cache")',
+    `${route.handler} legacy no-cache response`);
+  assertIncludes(block, `${route.parser}(`,
+    `${route.handler} exact pinned request parser`);
+  assertIncludes(block, `this.composition().${route.handler}(`,
+    `${route.handler} current-authority owner composition`);
+  assertIncludes(
+    teacherOrganizationHttpSource,
+    "contract.digest !== TEACHER_ORGANIZATION_OWNER_INTERFACE.digest",
     `${route.handler} exact digest admission`,
   );
 }

@@ -1,5 +1,24 @@
 # Verification
 
+## 2026-08-14 — W7-2 organization-owner default-off runtime
+
+- scenario-service suite 151/151 (22 files) including the new 7-case W7 e2e
+  and the config gate cases; nurture-scenario suite 1095/1095; repo
+  typecheck green.
+- `assert-formal-ingress-contract` green with the W7 census
+  (controller-routes 36, six organization-owner routes pinned end to end);
+  `assert-test-routing` green at scenario-service=22;
+  `verify:formal-ingress-contract` full chain green.
+- env-contractctl generate+validate green; context registry checksum
+  refreshed and `ctl-context verify --strict` green.
+- Default-off proven at the HTTP boundary: no composition -> 503
+  `teacher_organization_owner_disabled` with private headers; wrong bearer
+  -> 401 `service_auth_required`; masked authority short-circuits without
+  owner port calls.
+
+Verdict: `W7_2_RUNTIME_MOUNTED_DEFAULT_OFF / SIX_ROUTES_CENSUSED /
+COMMAND_ECHO_ENFORCED / NO_OWNER_PORTS_YET`.
+
 ## 2026-08-14 — W7-1 organization-owner contract artifact
 
 - `pnpm verify:teacher-organization-owner-contract`: digest
