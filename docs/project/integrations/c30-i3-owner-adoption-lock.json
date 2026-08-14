@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "504ca2ec1e9a839579661bb3bda22f78ad8ecfb3",
+  "source_revision": "3a8e49e8e086a3655adcc83b393423e4f362a798",
   "base": {
-    "head_revision": "afb25b57d89c9bf98e3eb2ec9259d22643e538af",
+    "head_revision": "3693e8f794c47569f9e425f5456a02e5064449f1",
     "source_revision": "6740871affd53a1200af8e19eaee67f4f0aff52d",
     "aggregate_source_hash": "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2"
   },
@@ -12,11 +12,11 @@
     "runtime_revision": "53e62c5175aec1cea20a6e3f8999731dd839875d",
     "aggregate_source_hash": "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2"
   },
-  "source_hash": "87457e11d7eadcdf6167a03043be941e9523d6dc4cfa5aa59e288dc269182df8",
+  "source_hash": "940f67d256796d26eb32880d76eb8b5450fe928043087354b6b70cdb55b100b0",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
-      "source_hash": "04b94450d134f37e25f0b24485319b69e823e2ca3a727e7ffaa2bac6d8423519",
+      "source_hash": "4e08646abcdcdeb493b13046163ce31f774d884f24bab359f4e3a6af50828432",
       "files": [
         "package.json",
         "packages/nurture-scenario/package.json",
@@ -50,7 +50,7 @@
     },
     {
       "source_identity": "nurture_c30_pair_local_persistence_v1",
-      "source_hash": "574fed158f4a72fe4f6809e01c7e11f1e567dfa9d57b11e30a68780cc4ae43d5",
+      "source_hash": "ea633b676869369b982cf1fcc836954f631e64a618b0c85acf6894d25e8c7544",
       "files": [
         "docs/context/db/schema.json",
         "docs/context/registry.json",
@@ -79,7 +79,7 @@
     },
     {
       "source_identity": "nurture_c30_canonical_action_v1",
-      "source_hash": "1dfe5f56565189637a0e786fa0b94bd67343f2639a9a01fe50cfc34382246e44",
+      "source_hash": "489ad4c525d61ec38c8d2e48e9ec8ca5f9adb0ffa9650162ff94ec2a3a0c17a4",
       "files": [
         "docs/context/db/schema.json",
         "docs/context/registry.json",
@@ -95,7 +95,7 @@
     },
     {
       "source_identity": "nurture_c30_protected_owner_lifecycle_v1",
-      "source_hash": "cd2fae2fc85c657215b838b07096caf1ea9e6f26ebf133c6b7fd527a0d9a57b9",
+      "source_hash": "1fc1a9d8823fb2a39237b66a254428fd704cc31c63529b089269455dd8448925",
       "files": [
         "docs/context/db/schema.json",
         "docs/context/registry.json",
@@ -123,7 +123,7 @@
     },
     {
       "source_identity": "nurture_c30_cumulative_convergence_v1",
-      "source_hash": "5365abc1953290586060093e0afbd436d6e4fc66a6cebac810f61bb1b902fb38",
+      "source_hash": "117aa7f4a6ef95e3b7a67f7d8f9aa62e22e7bc7946a99b4a1ae168d1c49c1668",
       "files": [
         "package.json",
         "packages/nurture-scenario/scenario.manifest.yaml",
