@@ -88,13 +88,23 @@ jobs:
   context-verify:
     name: Context and Environment Contracts
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
 
       - uses: actions/setup-node@v6
         with:
           node-version: "20"
+          cache: pnpm
+
+      # The formal-ingress census parses controllers with the typescript
+      # package, so this job needs installed dependencies (scripts only).
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Validate environment contract
         run: |
