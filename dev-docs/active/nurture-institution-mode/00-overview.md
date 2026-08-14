@@ -5,7 +5,7 @@
 - State: in-progress
 - **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（quality-repaired and reaccepted, default-off）/ C30-I4 family-sharing provider A/B（accepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-08-12
+- **Updated:** 2026-08-14
 - **Owner:** willyu1007
 - **Execution refresh (2026-08-12, current main):** the authorized joint plan
   passed all three disposable qualification tracks. T-007/My-Chat T-041
@@ -25,11 +25,12 @@
   binding was invalidated; record 26 is authoritative for the current Nurture
   source pin and preserves records 22–25 as underlying qualification evidence.
   All capabilities remain default-off and no durable environment was touched.
-- Next step: T-007 may execute G4-F now that G4-D I4 and the exact C30 source
-  reseal pass. T-010 is ready for governance handoff/closure, while My-Chat T-039
-  continues device-independent local-ready work without treating fixtures as
-  Live evidence. C31-C35, T-008 Candidate Freeze, durable environment apply,
-  deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
+- Next step: T-007 G4-F and T-010 are archived; T-008 G5-0 is complete.
+  Keep C31-C35 closed until the separately authorized G5-A Candidate Freeze
+  completes. T-011 W2/W3.1/W4 contract supply is exact-pin and default-off;
+  it does not authorize durable environment apply, deployment, activation,
+  Pilot or traffic. My-Chat T-039 may continue device-independent local-ready
+  work without treating fixtures as Live evidence. G1, T-005 G2
   Exit, T-006 G3 Exit, all `C30-I0` gates and `C30-I1-A` are PASS. `C30-I1`
   remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
