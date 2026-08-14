@@ -1,4 +1,5 @@
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
+import type { ParentCommunicationResolvedAuthorityV1 } from "../../parent-communication-owner-contract.js";
 import type {
   NurtureGrantDataClass,
   NurtureGrantDirection,
@@ -222,6 +223,8 @@ export type G2SubmitApplyInput = G2SubmitCommandPayload & {
   care_group_id: string;
   thread_id: string;
   grant_id: string;
+  /** W3.1 callers pin the exact communication-thread head. */
+  expected_thread_version?: number;
   body_envelope: unknown;
   safe_summary: string;
 };
@@ -423,6 +426,18 @@ export type G2RedactMessageApplied = {
   finalization: G2RedactionFinalization;
 };
 
+export type ParentCommunicationSendFactsV1 = Readonly<{
+  current: boolean;
+  participant_id?: string;
+  guardian_role_assignment_id?: string;
+  child_care_process_id?: string;
+  family_id?: string;
+  enrollment_id?: string;
+  care_group_id?: string;
+  thread_id?: string;
+  grant_id?: string;
+}>;
+
 export type NurtureFamilyCareCommandTransaction = {
   loadFamilyCareGrantRevokeFacts(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<FamilyCareGrantRevokeFacts>;
   revokeFamilyCareGrant(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<{
@@ -452,6 +467,11 @@ export type NurtureFamilyCareCommandTransaction = {
   /** Present when the G2 three-axis Harness writer is wired. */
   loadG2SubmitFacts?(input: FamilyCareTransactionInput<G2SubmitCommandPayload>): Promise<G2SubmitFacts>;
   applyG2Submit?(input: FamilyCareTransactionInput<G2SubmitApplyInput>): Promise<G2SubmitApplied>;
+  /** Exact W3.1 authority-head reread inside the send transaction. */
+  loadParentCommunicationSendFacts?(input: {
+    workspace_id: string;
+    authority: ParentCommunicationResolvedAuthorityV1;
+  }): Promise<ParentCommunicationSendFactsV1>;
   loadG2DirectMessageFacts?(
     input: FamilyCareTransactionInput<G2DirectMessagePayload>,
   ): Promise<G2DirectMessageFacts>;

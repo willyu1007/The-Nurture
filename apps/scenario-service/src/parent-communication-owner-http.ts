@@ -4,6 +4,11 @@ import {
   PARENT_COMMUNICATION_OWNER_MEDIA_ACCESS_PATH,
   PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH,
   PARENT_COMMUNICATION_OWNER_SUMMARY_PATH,
+  type ParentCommunicationDetailRequestV1,
+  type ParentCommunicationIdentityV1,
+  type ParentCommunicationMediaAccessRequestV1,
+  type ParentCommunicationSendTextRequestV1,
+  type ParentCommunicationSummaryRequestV1,
 } from "@the-nurture/scenario";
 
 export {
@@ -13,6 +18,15 @@ export {
   PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH,
   PARENT_COMMUNICATION_OWNER_SUMMARY_PATH,
 };
+export type {
+  ParentCommunicationDetailRequestV1,
+  ParentCommunicationIdentityV1,
+  ParentCommunicationMediaAccessRequestV1,
+  ParentCommunicationSendTextConfirmRequestV1,
+  ParentCommunicationSendTextPrepareRequestV1,
+  ParentCommunicationSendTextRequestV1,
+  ParentCommunicationSummaryRequestV1,
+} from "@the-nurture/scenario";
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/u;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._~:/+@=-]{0,2047}$/u;
@@ -25,54 +39,6 @@ const IDENTITY_KEYS = [
   "host_request_id",
   "context_ref",
 ] as const;
-
-export type ParentCommunicationIdentityV1 = Readonly<{
-  workspace_id: string;
-  my_chat_user_id: string;
-  host_request_id: string;
-  context_ref: string;
-}>;
-
-export type ParentCommunicationSummaryRequestV1 = ParentCommunicationIdentityV1;
-export type ParentCommunicationDetailRequestV1 = ParentCommunicationIdentityV1 &
-  Readonly<{
-    segment: "teachers" | "class_group";
-    page_size: number;
-    cursor?: string;
-  }>;
-export type ParentCommunicationMediaAccessRequestV1 =
-  ParentCommunicationIdentityV1 &
-    Readonly<{
-      presentation_version: string;
-      segment: "teachers" | "class_group";
-      message_ref: string;
-      media_ref: string;
-      purpose: "family_teacher_communication";
-    }>;
-export type ParentCommunicationSendTextPrepareRequestV1 =
-  ParentCommunicationIdentityV1 &
-    Readonly<{
-      kind: "prepare";
-      presentation_version: string;
-      segment: "teachers";
-      command_request_id: string;
-      body: string;
-      purpose: "family_teacher_communication";
-    }>;
-export type ParentCommunicationSendTextConfirmRequestV1 =
-  ParentCommunicationIdentityV1 &
-    Readonly<{
-      kind: "confirm";
-      presentation_version: string;
-      segment: "teachers";
-      command_request_id: string;
-      confirmation_ref: string;
-      prepared_preview_digest: string;
-      purpose: "family_teacher_communication";
-    }>;
-export type ParentCommunicationSendTextRequestV1 =
-  | ParentCommunicationSendTextPrepareRequestV1
-  | ParentCommunicationSendTextConfirmRequestV1;
 
 export class ParentCommunicationOwnerRequestParseError extends Error {
   constructor(

@@ -208,7 +208,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     this.institutionKnowledge = new PrismaInstitutionKnowledgeRepository(transaction, now);
     this.institutionKnowledgeConflicts =
       new PrismaInstitutionKnowledgeConflictCandidateRepository(transaction);
-    this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
+    this.familyCare = new PrismaFamilyCareCommandTransaction(transaction, now);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
     this.publishProcess = new PrismaPublishProcessTransaction(transaction);

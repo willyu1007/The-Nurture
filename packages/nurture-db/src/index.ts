@@ -130,3 +130,5 @@ export * from "./repositories/family-sharing-exact-local-pair.repository.js";
 export * from "./repositories/family-sharing-cleanup-ledger.repository.js";
 export * from "./enrollment-journey-owner-providers.js";
 export * from "./enrollment-journey-owners.composition.js";
+export * from "./parent-communication-owner.composition.js";
+export * from "./repositories/parent-communication-owner.repository.js";

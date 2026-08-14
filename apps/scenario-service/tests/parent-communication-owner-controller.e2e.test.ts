@@ -103,11 +103,28 @@ function resolvedAuthority(response: unknown): ParentCommunicationAuthorityResul
     status: "resolved",
     authority: {
       participant_id: "internal-participant-current",
+      participant_version: 3,
       guardian_role_assignment_id: "internal-guardian-role-current",
+      guardian_role_version: 4,
       association_ref: "internal-association-current",
+      association_version: 2,
       enrollment_ref: "internal-enrollment-current",
+      enrollment_version: 5,
       care_group_ref: "internal-care-group-current",
+      care_group_version: 6,
+      institution_ref: "internal-institution-current",
+      institution_version: 7,
+      family_ref: "internal-family-current",
+      family_version: 8,
+      child_care_process_ref: "internal-process-current",
+      child_care_process_version: 9,
+      thread_ref: "internal-thread-current",
+      thread_version: 10,
+      membership_ref: "internal-membership-current",
+      membership_version: 11,
       grant_ref: "internal-grant-current",
+      grant_version: 12,
+      context_version: "context-version-current",
       resolution_ref:
         typeof resolution.resolution_ref === "string"
           ? resolution.resolution_ref

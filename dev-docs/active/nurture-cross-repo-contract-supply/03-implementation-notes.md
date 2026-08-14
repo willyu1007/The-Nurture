@@ -354,3 +354,38 @@
   hash changed only because `package.json` now contains the maintained
   validator command. No database, deployment, activation or traffic action was
   performed.
+
+## 2026-08-14 — W3.1 real local owner qualification
+
+- Added one HTTP-free scenario contract for context selection, exact authority,
+  owner/read and async-generation ports, then removed the duplicate service
+  request/authority/binding declarations. The published `1.0.0` artifact and
+  digest are unchanged.
+- Added the explicit Prisma binding factory. Host current-context selection
+  supplies only one Enrollment candidate; the resolver rereads the current
+  Participant, Guardian role, current association/anchors, Enrollment,
+  CareGroup/institution, primary family/process, private thread membership and
+  purpose-scoped bidirectional Grant before every operation.
+- Summary returns only availability and bounded unread counts. Teacher detail
+  is explicit, capped, actor-ref protected, encrypted-cursor paginated and
+  decrypts message bodies only after the exact owner chain succeeds. Summary
+  and detail share one presentation head. `class_group` and media remain
+  unavailable.
+- Prepare writes only an encrypted, five-minute InteractionContext. Confirm
+  reuses `NurtureCommandRunner`, the existing CommandExecution ledger and the
+  existing G2 transaction to consume the token and atomically write
+  Message/Item/ItemEvent/ChildLinkReceipt/Attention. Exact replay returns the
+  stored opaque refs; the internal command hash now includes an actor-bound
+  value so a second guardian cannot replay another guardian's result.
+- Strengthened the existing family-care writer with an exact thread-head and
+  full-scope CAS, propagated the command clock into its transaction, and kept
+  the family-growth provider outbox restricted to its existing cross-owner
+  release/lifecycle semantics. No generic local-message outbox or second
+  persistence track was added.
+- The final review repaired bounded-map recency eviction, latest receipt-head
+  selection, control-character/surrogate-safe display text, association anchor
+  currentness, PostgreSQL 17's reserved `authorization` alias, raw Date UTC
+  comparisons and one raw workflow timestamp that violated its monotonicity
+  trigger outside UTC.
+- No Prisma schema, migration, dependency, environment default, deployment,
+  activation or traffic change was made.

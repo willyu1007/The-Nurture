@@ -1,16 +1,12 @@
 import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
+import type {
+  ParentCommunicationOwnerBindingV1,
+} from "@the-nurture/scenario";
 import {
   ParentCommunicationOwnerComposition,
-  type ParentCommunicationAsyncBoundaryV1,
-  type ParentCommunicationAuthorityResolverV1,
-  type ParentCommunicationOwnerV1,
 } from "./parent-communication-owner-composition.js";
 
-export type ParentCommunicationOwnerBindingV1 = Readonly<{
-  authorityResolver: ParentCommunicationAuthorityResolverV1;
-  owner: ParentCommunicationOwnerV1;
-  asyncBoundary: ParentCommunicationAsyncBoundaryV1;
-}>;
+export type { ParentCommunicationOwnerBindingV1 } from "@the-nurture/scenario";
 
 export const createParentCommunicationOwnerComposition = (input: {
   enabled: boolean;

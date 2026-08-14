@@ -43,6 +43,7 @@ import type {
   G2WithdrawalFacts,
   G2WithdrawalPayload,
   NurtureFamilyCareCommandTransaction,
+  ParentCommunicationSendFactsV1,
 } from "@the-nurture/scenario/harness";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 
@@ -81,7 +82,10 @@ const roleCurrent = (row: {
   );
 
 export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareCommandTransaction {
-  constructor(private readonly transaction: Prisma.TransactionClient | PrismaClient) {}
+  constructor(
+    private readonly transaction: Prisma.TransactionClient | PrismaClient,
+    private readonly now: () => Date = () => new Date(),
+  ) {}
 
   private async currentGrant(input: {
     workspace_id: string;
@@ -92,7 +96,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
     data_class: FamilyInputRoutePayload["data_class"];
     direction: "family_to_org" | "org_to_family";
   }): Promise<FamilyCareCurrentGrant> {
-    const now = new Date();
+    const now = this.now();
     const target = {
       OR: [
         { grantedToScopeType: "care_group" as const, grantedToScopeId: input.care_group_id },
@@ -713,6 +717,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
   }
 
   async applyG2Submit(input: FamilyCareTransactionInput<G2SubmitApplyInput>): Promise<G2SubmitApplied> {
+    const now = this.now();
     const message = await this.transaction.nurtureFamilyCareMessage.create({
       data: {
         workspaceId: input.workspace_id,
@@ -748,13 +753,26 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         targetScopeType: "care_group",
         targetScopeId: input.care_group_id,
         status: "delivered",
-        deliveredAt: new Date(),
+        deliveredAt: now,
       },
     });
-    await this.transaction.nurtureFamilyCareThread.updateMany({
-      where: { id: input.thread_id, workspaceId: input.workspace_id, status: "active" },
+    const threadUpdated = await this.transaction.nurtureFamilyCareThread.updateMany({
+      where: {
+        id: input.thread_id,
+        workspaceId: input.workspace_id,
+        childCareProcessId: input.child_care_process_id,
+        familyId: input.family_id,
+        enrollmentId: input.enrollment_id,
+        careGroupId: input.care_group_id,
+        status: "active",
+        deletedAt: null,
+        ...(input.expected_thread_version === undefined
+          ? {}
+          : { aggregateVersion: input.expected_thread_version }),
+      },
       data: { latestMessageAt: message.createdAt, aggregateVersion: { increment: 1 } },
     });
+    if (threadUpdated.count !== 1) throw new Error("G2 submit thread head conflict");
     const item = await this.transaction.nurtureFamilyCareItem.create({
       data: {
         workspaceId: input.workspace_id,
@@ -806,7 +824,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         summary: input.safe_summary,
         priority: "attention",
         status: "active",
-        effectiveDate: new Date(),
+        effectiveDate: now,
       },
     });
     return {
@@ -815,6 +833,227 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       item_event_ref: domainRef("family_care_item_event", event.id),
       receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
       attention_ref: domainRef("teacher_attention_item", attention.id, attention.aggregateVersion),
+    };
+  }
+
+  async loadParentCommunicationSendFacts(input: {
+    workspace_id: string;
+    authority: import("@the-nurture/scenario").ParentCommunicationResolvedAuthorityV1;
+  }): Promise<ParentCommunicationSendFactsV1> {
+    const { authority } = input;
+    const now = this.now();
+    const [
+      participant,
+      role,
+      association,
+      enrollment,
+      careGroup,
+      institution,
+      family,
+      process,
+      thread,
+      membership,
+      grant,
+    ] = await Promise.all([
+      this.transaction.nurtureParticipant.findFirst({
+        where: {
+          id: authority.participant_id,
+          workspaceId: input.workspace_id,
+          aggregateVersion: authority.participant_version,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureCareRoleAssignment.findFirst({
+        where: {
+          id: authority.guardian_role_assignment_id,
+          workspaceId: input.workspace_id,
+          participantId: authority.participant_id,
+          aggregateVersion: authority.guardian_role_version,
+          role: "guardian",
+          status: "active",
+          deletedAt: null,
+          OR: [{ startsAt: null }, { startsAt: { lte: now } }],
+          AND: [{ OR: [{ endsAt: null }, { endsAt: { gt: now } }] }],
+        },
+      }),
+      this.transaction.nurtureFamilyAnchorAssociation.findFirst({
+        where: {
+          id: authority.association_ref,
+          workspaceId: input.workspace_id,
+          childCareProcessId: authority.child_care_process_ref,
+          familyId: authority.family_ref,
+          aggregateVersion: authority.association_version,
+          status: "active",
+          currentKey: "current",
+          currentChildAssociationId: { not: null },
+          revokedAt: null,
+          quarantinedAt: null,
+          familyAnchor: {
+            status: "associated",
+            revokedAt: null,
+            quarantinedAt: null,
+          },
+          childAnchor: {
+            status: "associated",
+            revokedAt: null,
+            quarantinedAt: null,
+          },
+          childAssociation: {
+            status: "active",
+            currentKey: "current",
+            revokedAt: null,
+            quarantinedAt: null,
+          },
+          currentChildAssociation: {
+            is: {
+              status: "active",
+              currentKey: "current",
+              revokedAt: null,
+              quarantinedAt: null,
+            },
+          },
+        },
+      }),
+      this.transaction.nurtureEnrollment.findFirst({
+        where: {
+          id: authority.enrollment_ref,
+          workspaceId: input.workspace_id,
+          childCareProcessId: authority.child_care_process_ref,
+          careGroupId: authority.care_group_ref,
+          institutionId: authority.institution_ref,
+          aggregateVersion: authority.enrollment_version,
+          status: "active",
+          deletedAt: null,
+          OR: [{ leftAt: null }, { leftAt: { gt: now } }],
+        },
+      }),
+      this.transaction.nurtureCareGroup.findFirst({
+        where: {
+          id: authority.care_group_ref,
+          workspaceId: input.workspace_id,
+          institutionId: authority.institution_ref,
+          aggregateVersion: authority.care_group_version,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureCareInstitution.findFirst({
+        where: {
+          id: authority.institution_ref,
+          workspaceId: input.workspace_id,
+          aggregateVersion: authority.institution_version,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureFamily.findFirst({
+        where: {
+          id: authority.family_ref,
+          workspaceId: input.workspace_id,
+          childCareProcessId: authority.child_care_process_ref,
+          aggregateVersion: authority.family_version,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureChildCareProcess.findFirst({
+        where: {
+          id: authority.child_care_process_ref,
+          workspaceId: input.workspace_id,
+          primaryFamilyId: authority.family_ref,
+          aggregateVersion: authority.child_care_process_version,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureFamilyCareThread.findFirst({
+        where: {
+          id: authority.thread_ref,
+          workspaceId: input.workspace_id,
+          childCareProcessId: authority.child_care_process_ref,
+          familyId: authority.family_ref,
+          enrollmentId: authority.enrollment_ref,
+          careGroupId: authority.care_group_ref,
+          aggregateVersion: authority.thread_version,
+          visibilityScope: { in: ["family_private", "enrollment_private"] },
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureFamilyCareThreadParticipant.findFirst({
+        where: {
+          id: authority.membership_ref,
+          workspaceId: input.workspace_id,
+          threadId: authority.thread_ref,
+          participantId: authority.participant_id,
+          roleAssignmentId: authority.guardian_role_assignment_id,
+          aggregateVersion: authority.membership_version,
+          participantKind: "guardian",
+          visibilityStatus: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureChildLinkGrant.findFirst({
+        where: {
+          id: authority.grant_ref,
+          workspaceId: input.workspace_id,
+          childCareProcessId: authority.child_care_process_ref,
+          enrollmentId: authority.enrollment_ref,
+          aggregateVersion: authority.grant_version,
+          status: "active",
+          revokedAt: null,
+          deletedAt: null,
+          directions: { hasEvery: ["family_to_org", "org_to_family"] },
+          dataClasses: { has: "family_care_question" },
+          purposes: { has: FAMILY_CARE_PURPOSE },
+          OR: [{ effectiveFrom: null }, { effectiveFrom: { lte: now } }],
+          AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] }],
+        },
+      }),
+    ]);
+    const roleReaches = Boolean(
+      role &&
+        ((role.scopeType === "family" && role.scopeId === authority.family_ref) ||
+          (role.scopeType === "child_care_process" &&
+            role.scopeId === authority.child_care_process_ref) ||
+          (role.scopeType === "enrollment" && role.scopeId === authority.enrollment_ref)),
+    );
+    const grantReaches = Boolean(
+      grant &&
+        ((grant.grantedToScopeType === "care_group" &&
+          grant.grantedToScopeId === authority.care_group_ref) ||
+          (grant.grantedToScopeType === "enrollment" &&
+            grant.grantedToScopeId === authority.enrollment_ref) ||
+          (grant.grantedToScopeType === "institution" &&
+            grant.grantedToScopeId === authority.institution_ref)),
+    );
+    if (
+      !participant ||
+      !roleReaches ||
+      !association ||
+      association.childAssociationId !== association.currentChildAssociationId ||
+      !enrollment ||
+      !careGroup ||
+      !institution ||
+      !family ||
+      !process ||
+      !thread ||
+      !membership ||
+      !grantReaches
+    ) {
+      return { current: false };
+    }
+    return {
+      current: true,
+      participant_id: participant.id,
+      guardian_role_assignment_id: role!.id,
+      child_care_process_id: process.id,
+      family_id: family.id,
+      enrollment_id: enrollment.id,
+      care_group_id: careGroup.id,
+      thread_id: thread.id,
+      grant_id: grant!.id,
     };
   }
 
@@ -1274,10 +1513,11 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         deliveredAt: new Date(),
       },
     });
-    await this.transaction.nurtureFamilyCareThread.updateMany({
+    const threadUpdated = await this.transaction.nurtureFamilyCareThread.updateMany({
       where: { id: item.threadId, workspaceId: input.workspace_id, status: "active", deletedAt: null },
       data: { latestMessageAt: message.createdAt, aggregateVersion: { increment: 1 } },
     });
+    if (threadUpdated.count !== 1) throw new Error("G2 reply thread head conflict");
     let attentionEffect: "resolved" | "unchanged" = "unchanged";
     if (responseEffect === "first_response") {
       const resolved = await this.transaction.nurtureTeacherAttentionItem.updateMany({

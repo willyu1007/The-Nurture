@@ -4,8 +4,15 @@
 
 - State: in-progress
 - Updated: 2026-08-14
-- Next step: W3 P0 is implemented and exact-pin adopted without activation.
-  The standalone `nurture.parent-communication-owner@1.0.0` contract is
+- Next step: W3.1 real local owner qualification is complete without
+  activation. The default-off binding now resolves one host-selected
+  Enrollment as routing input only, rereads exact current Nurture authority,
+  serves minimized summary and bounded teacher detail from canonical
+  family-care rows, and closes encrypted prepare plus atomic
+  Message/Item/Event/Receipt/Attention/CommandExecution confirm with exact
+  replay. Real PostgreSQL revocation rollback and cross-actor replay denial are
+  qualified. The standalone `nurture.parent-communication-owner@1.0.0`
+  contract is
   frozen at digest
   `sha256:b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f`.
   It supplies minimized summary, explicit-open bounded detail, a frozen
@@ -17,9 +24,11 @@
   send. The final 2026-08-14 audit verified the same narrow write union in
   My-Chat Mobile DTOs and Composer guards, promoted the contract validator into
   the maintained formal-ingress gate, and resealed the consumer at My-Chat
-  `30a14d0`. My-Chat T-039 has the exact-pin dormant consumer. Next, keep both flags
-  false and either implement the real Nurture owner/async ports for controlled
-  W3 qualification or begin W4 director contract design. W1 is FROZEN
+  `84914f2`. My-Chat T-039 has the exact-pin dormant consumer. Next, keep both flags
+  false. W3.2 deployment/current-context carrier, secret delivery,
+  cross-service/native/accessibility qualification and any gate change require
+  separate authorization; protected media remains unavailable. The other
+  permitted planning branch is W4 director contract design. W1 is FROZEN
   (2026-08-13):
   `artifacts/w1-guardian-decision-callback-design-draft.md` is the frozen
   joint design record for the additive `family_growth_transport@1.1.0`
@@ -132,10 +141,13 @@ conformance fixtures, all default-off.
   remain mounted default-off and require the explicit gate, service auth,
   complete Q6 owner ports and the active consumer-generation boundary port;
   their presence is not activation.
-- [x] W3 P0: parent-communication owner contracts, four default-off private
+- [x] W3.0 P0: parent-communication owner contracts, four default-off private
   routes, response-schema enforcement, negative-path fixtures and exact My-Chat
-  consumer adoption are implemented. Real owner ports, media streaming,
-  deployment and traffic remain separate gates.
+  consumer adoption are implemented.
+- [x] W3.1: real Prisma authority/read ports, encrypted prepare, atomic
+  teacher-text confirm, exact replay, revocation rollback and bounded
+  latest-generation behavior are qualified. Media streaming, deployment,
+  activation, traffic and device evidence remain separate gates.
 - [ ] W4: the director presenter contract is registered after W2/W3.
 - [x] W5: every open ledger item is fixed forward-only with its negative
   test; N3's additive migration passes disposable-target qualification;

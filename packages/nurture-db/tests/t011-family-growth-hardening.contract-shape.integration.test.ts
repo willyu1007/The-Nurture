@@ -618,7 +618,7 @@ describe("T-011 N1 prepared binding-head commit guard", () => {
       await familyGrowthPreparedBindingHeadsAreCurrent(transaction, heads(), new Date("2026-08-13T08:00:00.000Z")),
     ).toBe(true);
     expect(reads).toBe(1);
-    expect(sql).toContain("FOR SHARE OF authorization");
+    expect(sql.match(/FOR SHARE OF authz/g)).toHaveLength(2);
     expect(sql).toContain(
       "FOR SHARE OF family_association, child_association, child_anchor, family_anchor, child_role, child_participant, family_role, family_participant",
     );

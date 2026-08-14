@@ -406,3 +406,35 @@ NO_MEDIA_STREAM / NO_DEPLOYMENT_OR_TRAFFIC_CLAIM`.
 
 Verdict: `W3_P0_QUALITY_PASS / SINGLE_WRITE_TRACK / VALIDATOR_IN_GATE /
 EXACT_REVISION_PIN / DEFAULT_OFF / LIVE_PORTS_PENDING`.
+
+## 2026-08-14 — W3.1 local owner qualification
+
+- Fresh isolated PostgreSQL database: 42/42 migrations applied; the exact
+  disposable target was dropped after qualification and its absence verified.
+- Focused real-owner database suite: 2/2 passed, covering current
+  summary/detail, protected body storage, prepare-without-business-write,
+  atomic confirm, exact replay, cross-actor replay denial and revoked-authority
+  rollback with an unconsumed token.
+- Focused async-generation suite: 3/3 passed, including context replacement,
+  TTL/bounds and recent-entry preservation under eviction.
+- Full production database lane: 52/52 files and 468/468 tests passed.
+- Full unit lane: 98/98 files and 1086/1086 tests passed.
+- Full scenario-service lane: 16/16 files and 128/128 tests passed.
+- Scenario, DB and scenario-service package typechecks passed.
+- `verify:test-routing` passed at 185 files: unit 98, production DB 52,
+  dev-host 11, scenario-service 19 and x5 joint 5.
+- Parent-communication artifact and formal-ingress gates passed at the frozen
+  digest, four operations, nine positive/eight invalid fixtures, 23 controller
+  routes and seven formal routes. Persistence-boundary verification passed.
+- Final cross-repo pin verification passed at My-Chat revision `84914f2`,
+  unchanged workflow contract `85cf56e2…`, `x5_joint_api` `09aa42ed…`,
+  `wave4_binding_host` `65d6b0a0…` and resealed Nurture scenario source
+  `621948e6…` across 322 files.
+- `pnpm build` passed pinned-source preparation, root typecheck,
+  scenario-service build and the production Next.js build. Final `pnpm lint`
+  passed pin verification plus frontend ESLint/stylelint.
+- `git diff --check` passed and no debug instrumentation or disposable source
+  artifact remained.
+
+Verdict: `W3_1_LOCAL_OWNER_QUALIFIED / CANONICAL_G2_WRITE_REUSED /
+CURRENT_AUTHORITY_REREAD / EXACT_REPLAY / DEFAULT_OFF / W3_2_NOT_AUTHORIZED`.

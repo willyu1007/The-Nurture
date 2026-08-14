@@ -535,7 +535,7 @@ export class PrismaEnrollmentTrialLifecycleRepository
       UPDATE "nurture_institution_workflow"
       SET "child_care_process_id" = ${childCareProcessId},
           "workflow_head" = "workflow_head" + 1,
-          "updated_at" = CURRENT_TIMESTAMP
+          "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
       WHERE "id" = ${loaded.workflow.id}
         AND "workspace_id" = ${loaded.workflow.workspaceId}
         AND "institution_id" = ${loaded.workflow.institutionId}

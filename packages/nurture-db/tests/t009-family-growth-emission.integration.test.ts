@@ -641,10 +641,10 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
       revision: 1,
       command_request_id: `cmd:${randomUUID()}`,
       trigger: "immediate",
-      family_growth: {
-        ...preparedEmission(world),
-        target: { child_id: "mc-child-2", family_id: "mc-family-2" },
-      },
+      // Both local targets deliberately point at the same family binding.
+      // Their prepared canonical target must therefore remain identical; the
+      // queue still has to discriminate the two release rows by target key.
+      family_growth: preparedEmission(world),
     });
     expect(committedB.status).toBe("committed");
 

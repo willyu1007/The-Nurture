@@ -108,3 +108,32 @@
   `verify:formal-ingress-contract`; retain one canonical JSON implementation.
 - Prevention: every published owner artifact validator must be reachable from
   a maintained top-level gate with its actual runtime declared.
+
+## 2026-08-14 — Raw Prisma dates need an explicit UTC convention
+
+- Symptom: valid family-growth authorizations were reported unavailable and
+  Enrollment Journey workflow updates failed their monotonicity trigger when
+  PostgreSQL ran in `Asia/Shanghai`.
+- Root cause: Prisma raw `Date` parameters are `timestamptz`, while canonical
+  columns are UTC-convention `timestamp without time zone`; one raw update also
+  wrote local-wall-clock `CURRENT_TIMESTAMP`. PostgreSQL compared different
+  wall-clock interpretations.
+- Fix: convert raw parameters and transaction timestamps explicitly with
+  `AT TIME ZONE 'UTC'`. The same audit renamed the PostgreSQL 17 reserved alias
+  `authorization` to `authz` and updated its shape assertion.
+- Prevention: raw SQL crossing `DateTime` fields must state its timezone and be
+  exercised under a non-UTC session in the full database lane.
+
+## 2026-08-14 — Workspace idempotency is not actor idempotency
+
+- Symptom: the generic command ledger keys a replay by workspace and command
+  id; without an actor value in the canonical payload, another authorized
+  guardian who knew the tuple could receive the first guardian's replay before
+  confirmation ownership was checked.
+- Root cause: replay short-circuits before operation preconditions by design.
+- Fix: bind the parent-communication command payload to an actor-scoped HMAC;
+  keep the external response free of raw participant ids and retain exact
+  same-actor replay after thread-head movement.
+- Prevention: every command built on a broader idempotency namespace must bind
+  the narrower actor/scope in its canonical payload and carry a negative
+  cross-actor replay test.

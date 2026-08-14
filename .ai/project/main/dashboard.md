@@ -47,7 +47,8 @@ Project: `main`
 - Cross-repo contract supply order (decided 2026-08-11): parent-context
   presenter and IR-C01 parent-communication P0 are now exact-pin adopted and
   default-off; the director presenter is the next contract-supply item. W3 live
-  qualification still requires real Nurture ports and deployed/native evidence.
+  local owner ports are qualified; deployment/current-context secrets/private
+  path and native/accessibility evidence remain W3.2 gates.
   This supply line and
   the guardian-decision callback joint design (transport 1.0.0 has none;
   teacher queue stops at `pending`) are now owned by T-011; the callback
@@ -58,9 +59,10 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **W3 live-port qualification or W4 director supply** after My-Chat T-039
+1. **W3.2 deployment qualification or W4 director supply** after My-Chat T-039
    completed W3 P0 adoption of `nurture.parent-communication-owner@1.0.0`
-   (`sha256:b1dce3a7…`) at `30a14d0`. Keep provider and consumer flags false;
+   (`sha256:b1dce3a7…`) and Nurture closed W3.1 local owner qualification. Keep
+   provider and consumer flags false; W3.2 requires separate authorization;
    use the W5-hardened settlement surface as the base for the separate W1
    callback implementation batch (all default-off).
 2. **Candidate shared-input closure** with the completed W2 adoption, then schedule the

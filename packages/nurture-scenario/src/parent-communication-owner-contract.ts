@@ -35,3 +35,174 @@ export type ParentCommunicationOwnerOperation =
   | "detail_query"
   | "media_access_query"
   | "send_text_exchange";
+
+export type ParentCommunicationIdentityV1 = Readonly<{
+  workspace_id: string;
+  my_chat_user_id: string;
+  host_request_id: string;
+  context_ref: string;
+}>;
+
+export type ParentCommunicationSummaryRequestV1 = ParentCommunicationIdentityV1;
+
+export type ParentCommunicationDetailRequestV1 = ParentCommunicationIdentityV1 &
+  Readonly<{
+    segment: "teachers" | "class_group";
+    page_size: number;
+    cursor?: string;
+  }>;
+
+export type ParentCommunicationMediaAccessRequestV1 =
+  ParentCommunicationIdentityV1 &
+    Readonly<{
+      presentation_version: string;
+      segment: "teachers" | "class_group";
+      message_ref: string;
+      media_ref: string;
+      purpose: "family_teacher_communication";
+    }>;
+
+export type ParentCommunicationSendTextPrepareRequestV1 =
+  ParentCommunicationIdentityV1 &
+    Readonly<{
+      kind: "prepare";
+      presentation_version: string;
+      segment: "teachers";
+      command_request_id: string;
+      body: string;
+      purpose: "family_teacher_communication";
+    }>;
+
+export type ParentCommunicationSendTextConfirmRequestV1 =
+  ParentCommunicationIdentityV1 &
+    Readonly<{
+      kind: "confirm";
+      presentation_version: string;
+      segment: "teachers";
+      command_request_id: string;
+      confirmation_ref: string;
+      prepared_preview_digest: string;
+      purpose: "family_teacher_communication";
+    }>;
+
+export type ParentCommunicationSendTextRequestV1 =
+  | ParentCommunicationSendTextPrepareRequestV1
+  | ParentCommunicationSendTextConfirmRequestV1;
+
+export type ParentCommunicationOwnerRequestV1 =
+  | ParentCommunicationSummaryRequestV1
+  | ParentCommunicationDetailRequestV1
+  | ParentCommunicationMediaAccessRequestV1
+  | ParentCommunicationSendTextRequestV1;
+
+/**
+ * Host context resolution is routing input only. Implementations must return
+ * one current Enrollment candidate and must not claim Nurture authority.
+ */
+export type ParentCommunicationContextSelectionPortV1 = Readonly<{
+  resolveCurrent(input: ParentCommunicationIdentityV1): Promise<
+    | Readonly<{
+        status: "resolved";
+        enrollment_ref: string;
+        context_version: string;
+      }>
+    | Readonly<{
+        status:
+          | "revoked"
+          | "stale_context_ref"
+          | "ambiguous_enrollment"
+          | "temporarily_unavailable";
+      }>
+  >;
+}>;
+
+/** Internal-only exact heads used to prevent read/write TOCTOU drift. */
+export type ParentCommunicationResolvedAuthorityV1 = Readonly<{
+  participant_id: string;
+  participant_version: number;
+  guardian_role_assignment_id: string;
+  guardian_role_version: number;
+  association_ref: string;
+  association_version: number;
+  enrollment_ref: string;
+  enrollment_version: number;
+  care_group_ref: string;
+  care_group_version: number;
+  institution_ref: string;
+  institution_version: number;
+  family_ref: string;
+  family_version: number;
+  child_care_process_ref: string;
+  child_care_process_version: number;
+  thread_ref: string;
+  thread_version: number;
+  membership_ref: string;
+  membership_version: number;
+  grant_ref: string;
+  grant_version: number;
+  context_version: string;
+  resolution_ref: string;
+  scope_ref: string;
+  scope_version: number;
+  context_ref: string;
+}>;
+
+export type ParentCommunicationAuthorityResultV1 =
+  | Readonly<{
+      status: "resolved";
+      authority: ParentCommunicationResolvedAuthorityV1;
+    }>
+  | Readonly<{
+      status:
+        | "scope_loss"
+        | "revoked"
+        | "stale_context_ref"
+        | "ambiguous_enrollment"
+        | "protected_display_denial";
+    }>
+  | Readonly<{ status: "temporarily_unavailable" }>;
+
+export type ParentCommunicationAuthorityResolverV1 = Readonly<{
+  resolve(input: {
+    operation: ParentCommunicationOwnerOperation;
+    workspace_id: string;
+    my_chat_user_id: string;
+    host_request_id: string;
+    context_ref: string;
+  }): Promise<ParentCommunicationAuthorityResultV1>;
+}>;
+
+export type ParentCommunicationOwnerV1 = Readonly<{
+  execute(input: {
+    operation: ParentCommunicationOwnerOperation;
+    request: ParentCommunicationOwnerRequestV1;
+    authority: ParentCommunicationResolvedAuthorityV1;
+  }): Promise<unknown>;
+}>;
+
+export type ParentCommunicationAsyncBoundaryV1 = Readonly<{
+  capture(input: {
+    operation: ParentCommunicationOwnerOperation;
+    workspace_id: string;
+    my_chat_user_id: string;
+    host_request_id: string;
+    context_ref: string;
+  }): Promise<Readonly<{ response_generation: number }>>;
+  current(input: {
+    operation: ParentCommunicationOwnerOperation;
+    workspace_id: string;
+    my_chat_user_id: string;
+    host_request_id: string;
+  }): Promise<
+    Readonly<{
+      active_generation: number;
+      active_context_ref: string;
+    }>
+  >;
+}>;
+
+export type ParentCommunicationOwnerBindingV1 = Readonly<{
+  authorityResolver: ParentCommunicationAuthorityResolverV1;
+  owner: ParentCommunicationOwnerV1;
+  asyncBoundary: ParentCommunicationAsyncBoundaryV1;
+}>;

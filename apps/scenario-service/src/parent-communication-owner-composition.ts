@@ -2,7 +2,13 @@ import { createHash } from "node:crypto";
 import {
   nurtureCanonicalJson,
   PARENT_COMMUNICATION_OWNER_INTERFACE,
+  type ParentCommunicationAsyncBoundaryV1,
+  type ParentCommunicationAuthorityResolverV1,
+  type ParentCommunicationAuthorityResultV1,
+  type ParentCommunicationOwnerRequestV1,
+  type ParentCommunicationOwnerV1,
   type ParentCommunicationOwnerOperation,
+  type ParentCommunicationResolvedAuthorityV1,
 } from "@the-nurture/scenario";
 import type {
   ParentCommunicationDetailRequestV1,
@@ -16,78 +22,14 @@ import {
   ParentCommunicationOwnerResponseContractError,
 } from "./parent-communication-owner-response-validator.js";
 
-export type ParentCommunicationOwnerRequestV1 =
-  | ParentCommunicationSummaryRequestV1
-  | ParentCommunicationDetailRequestV1
-  | ParentCommunicationMediaAccessRequestV1
-  | ParentCommunicationSendTextRequestV1;
-
-export type ParentCommunicationResolvedAuthorityV1 = Readonly<{
-  participant_id: string;
-  guardian_role_assignment_id: string;
-  association_ref: string;
-  enrollment_ref: string;
-  care_group_ref: string;
-  grant_ref: string;
-  resolution_ref: string;
-  scope_ref: string;
-  scope_version: number;
-  context_ref: string;
-}>;
-
-export type ParentCommunicationAuthorityResultV1 =
-  | Readonly<{
-      status: "resolved";
-      authority: ParentCommunicationResolvedAuthorityV1;
-    }>
-  | Readonly<{
-      status:
-        | "scope_loss"
-        | "revoked"
-        | "stale_context_ref"
-        | "ambiguous_enrollment"
-        | "protected_display_denial";
-    }>
-  | Readonly<{ status: "temporarily_unavailable" }>;
-
-export type ParentCommunicationAuthorityResolverV1 = Readonly<{
-  resolve(input: {
-    operation: ParentCommunicationOwnerOperation;
-    workspace_id: string;
-    my_chat_user_id: string;
-    host_request_id: string;
-    context_ref: string;
-  }): Promise<ParentCommunicationAuthorityResultV1>;
-}>;
-
-export type ParentCommunicationOwnerV1 = Readonly<{
-  execute(input: {
-    operation: ParentCommunicationOwnerOperation;
-    request: ParentCommunicationOwnerRequestV1;
-    authority: ParentCommunicationResolvedAuthorityV1;
-  }): Promise<unknown>;
-}>;
-
-export type ParentCommunicationAsyncBoundaryV1 = Readonly<{
-  capture(input: {
-    operation: ParentCommunicationOwnerOperation;
-    workspace_id: string;
-    my_chat_user_id: string;
-    host_request_id: string;
-    context_ref: string;
-  }): Promise<Readonly<{ response_generation: number }>>;
-  current(input: {
-    operation: ParentCommunicationOwnerOperation;
-    workspace_id: string;
-    my_chat_user_id: string;
-    host_request_id: string;
-  }): Promise<
-    Readonly<{
-      active_generation: number;
-      active_context_ref: string;
-    }>
-  >;
-}>;
+export type {
+  ParentCommunicationAsyncBoundaryV1,
+  ParentCommunicationAuthorityResolverV1,
+  ParentCommunicationAuthorityResultV1,
+  ParentCommunicationOwnerRequestV1,
+  ParentCommunicationOwnerV1,
+  ParentCommunicationResolvedAuthorityV1,
+} from "@the-nurture/scenario";
 
 const FORBIDDEN_RESPONSE_FIELDS = new Set([
   "participant_id",

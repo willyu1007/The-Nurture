@@ -186,34 +186,34 @@ export const familyGrowthPreparedBindingHeadsAreCurrent = async (
       INNER JOIN "nurture_family_binding_anchor" family_anchor
         ON family_anchor."id" = family_association."family_anchor_id"
       INNER JOIN LATERAL (
-        SELECT authorization."id", authorization."status",
-          authorization."expires_at", authorization."revoked_at",
-          authorization."aggregate_version", authorization."owner_ref",
-          authorization."owner_version", authorization."purpose",
-          authorization."authorization_source_ref",
-          authorization."authorization_source_version"
-        FROM "nurture_scenario_binding_authorization" authorization
-        WHERE authorization."workspace_id" = family_association."workspace_id"
-          AND authorization."subject_type" = 'child'
-          AND authorization."child_anchor_id" = child_anchor."id"
-        ORDER BY authorization."verified_at" DESC, authorization."id" DESC
+        SELECT authz."id", authz."status",
+          authz."expires_at", authz."revoked_at",
+          authz."aggregate_version", authz."owner_ref",
+          authz."owner_version", authz."purpose",
+          authz."authorization_source_ref",
+          authz."authorization_source_version"
+        FROM "nurture_scenario_binding_authorization" authz
+        WHERE authz."workspace_id" = family_association."workspace_id"
+          AND authz."subject_type" = 'child'
+          AND authz."child_anchor_id" = child_anchor."id"
+        ORDER BY authz."verified_at" DESC, authz."id" DESC
         LIMIT 1
-        FOR SHARE OF authorization
+        FOR SHARE OF authz
       ) child_authorization ON TRUE
       INNER JOIN LATERAL (
-        SELECT authorization."id", authorization."status",
-          authorization."expires_at", authorization."revoked_at",
-          authorization."aggregate_version", authorization."owner_ref",
-          authorization."owner_version", authorization."purpose",
-          authorization."authorization_source_ref",
-          authorization."authorization_source_version"
-        FROM "nurture_scenario_binding_authorization" authorization
-        WHERE authorization."workspace_id" = family_association."workspace_id"
-          AND authorization."subject_type" = 'family'
-          AND authorization."family_anchor_id" = family_anchor."id"
-        ORDER BY authorization."verified_at" DESC, authorization."id" DESC
+        SELECT authz."id", authz."status",
+          authz."expires_at", authz."revoked_at",
+          authz."aggregate_version", authz."owner_ref",
+          authz."owner_version", authz."purpose",
+          authz."authorization_source_ref",
+          authz."authorization_source_version"
+        FROM "nurture_scenario_binding_authorization" authz
+        WHERE authz."workspace_id" = family_association."workspace_id"
+          AND authz."subject_type" = 'family'
+          AND authz."family_anchor_id" = family_anchor."id"
+        ORDER BY authz."verified_at" DESC, authz."id" DESC
         LIMIT 1
-        FOR SHARE OF authorization
+        FOR SHARE OF authz
       ) family_authorization ON TRUE
       INNER JOIN "nurture_care_role_assignment" child_role
         ON child_authorization."authorization_source_ref" = 'nurture-care-role:' || child_role."id"
@@ -256,8 +256,8 @@ export const familyGrowthPreparedBindingHeadsAreCurrent = async (
         AND child_authorization."aggregate_version" = ${heads.childAuthorization.aggregateVersion}
         AND child_authorization."status" = 'active'
         AND child_authorization."revoked_at" IS NULL
-        AND child_authorization."expires_at" = ${childExpiresAt}
-        AND child_authorization."expires_at" > ${at}
+        AND child_authorization."expires_at" = (${childExpiresAt}::timestamptz AT TIME ZONE 'UTC')
+        AND child_authorization."expires_at" > (${at}::timestamptz AT TIME ZONE 'UTC')
         AND child_authorization."owner_ref" = ${heads.childAuthorization.ownerRef}
         AND child_authorization."owner_version" = ${heads.childAuthorization.ownerVersion}
         AND child_authorization."owner_ref" = 'nurture_child_binding_anchor_v1:' || child_anchor."id"
@@ -272,11 +272,11 @@ export const familyGrowthPreparedBindingHeadsAreCurrent = async (
         AND child_role."aggregate_version" = child_authorization."authorization_source_version"
         AND child_role."role" = 'guardian'
         AND child_role."status" = 'active'
-        AND child_role."starts_at" IS NOT DISTINCT FROM ${childRoleStartsAt}
-        AND child_role."ends_at" IS NOT DISTINCT FROM ${childRoleEndsAt}
+        AND child_role."starts_at" IS NOT DISTINCT FROM (${childRoleStartsAt}::timestamptz AT TIME ZONE 'UTC')
+        AND child_role."ends_at" IS NOT DISTINCT FROM (${childRoleEndsAt}::timestamptz AT TIME ZONE 'UTC')
         AND child_role."deleted_at" IS NULL
-        AND (child_role."starts_at" IS NULL OR child_role."starts_at" <= ${at})
-        AND (child_role."ends_at" IS NULL OR child_role."ends_at" > ${at})
+        AND (child_role."starts_at" IS NULL OR child_role."starts_at" <= (${at}::timestamptz AT TIME ZONE 'UTC'))
+        AND (child_role."ends_at" IS NULL OR child_role."ends_at" > (${at}::timestamptz AT TIME ZONE 'UTC'))
         AND child_participant."id" = ${heads.childAuthorization.participant.participantId}
         AND child_participant."aggregate_version" = ${heads.childAuthorization.participant.aggregateVersion}
         AND child_participant."status" = 'active'
@@ -285,8 +285,8 @@ export const familyGrowthPreparedBindingHeadsAreCurrent = async (
         AND family_authorization."aggregate_version" = ${heads.familyAuthorization.aggregateVersion}
         AND family_authorization."status" = 'active'
         AND family_authorization."revoked_at" IS NULL
-        AND family_authorization."expires_at" = ${familyExpiresAt}
-        AND family_authorization."expires_at" > ${at}
+        AND family_authorization."expires_at" = (${familyExpiresAt}::timestamptz AT TIME ZONE 'UTC')
+        AND family_authorization."expires_at" > (${at}::timestamptz AT TIME ZONE 'UTC')
         AND family_authorization."owner_ref" = ${heads.familyAuthorization.ownerRef}
         AND family_authorization."owner_version" = ${heads.familyAuthorization.ownerVersion}
         AND family_authorization."owner_ref" = 'nurture_family_binding_anchor_v1:' || family_anchor."id"
@@ -301,11 +301,11 @@ export const familyGrowthPreparedBindingHeadsAreCurrent = async (
         AND family_role."aggregate_version" = family_authorization."authorization_source_version"
         AND family_role."role" = 'guardian'
         AND family_role."status" = 'active'
-        AND family_role."starts_at" IS NOT DISTINCT FROM ${familyRoleStartsAt}
-        AND family_role."ends_at" IS NOT DISTINCT FROM ${familyRoleEndsAt}
+        AND family_role."starts_at" IS NOT DISTINCT FROM (${familyRoleStartsAt}::timestamptz AT TIME ZONE 'UTC')
+        AND family_role."ends_at" IS NOT DISTINCT FROM (${familyRoleEndsAt}::timestamptz AT TIME ZONE 'UTC')
         AND family_role."deleted_at" IS NULL
-        AND (family_role."starts_at" IS NULL OR family_role."starts_at" <= ${at})
-        AND (family_role."ends_at" IS NULL OR family_role."ends_at" > ${at})
+        AND (family_role."starts_at" IS NULL OR family_role."starts_at" <= (${at}::timestamptz AT TIME ZONE 'UTC'))
+        AND (family_role."ends_at" IS NULL OR family_role."ends_at" > (${at}::timestamptz AT TIME ZONE 'UTC'))
         AND family_participant."id" = ${heads.familyAuthorization.participant.participantId}
         AND family_participant."aggregate_version" = ${heads.familyAuthorization.participant.aggregateVersion}
         AND family_participant."status" = 'active'
