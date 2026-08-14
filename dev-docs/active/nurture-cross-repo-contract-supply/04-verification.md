@@ -1,5 +1,35 @@
 # Verification
 
+## 2026-08-15 — W10-5 consumer adoption and cross-repo pin reseal
+
+- My-Chat `3693e8f` (T-039) adopts the W10 contract as a dormant strict
+  client: exact pin `nurture.teacher-assistant-query-owner@1.0.0` /
+  `sha256:d4010661…`; the client recomputes the five-kind partition and
+  `missing_count`, requires the typed handoff exactly when kinds are
+  missing (never executable), derives the weekly query key from the
+  answered `week_start`, recomputes class totals inside the seven-day
+  window, and accepts the duplicate-week `already_satisfied` only as a
+  well-formed committed echo; sanitized snapshot with provenance at
+  Nurture `c3f174a`; consumer suite 7/7 under `NURTURE_REPO_ROOT`
+  (11 fixtures accepted, all response mutations rejected); package suite
+  32 files / 191 tests and package typecheck green. T-H02 and T-H04 moved
+  to `contract-ready`; contract-axis recount 62 ready / 4 blocked /
+  22 partial / 17 local. The My-Chat commit hook was bypassed once for
+  the same recorded reason as W7-5/W8-5/W9-5.
+- The deferred cross-repo pin reseal ran: W10 had moved pinned tooling
+  entry points (root `package.json`, scenario-service registration), so
+  `verify:workflow-contract-pin` failed CI from `732df20` onward.
+  `reseal:pins apply` reseals `nurtureScenario` at `62b45420…`, My-Chat
+  at `3693e8f` and the three revision literals; the reseal tooling gained
+  `RESEAL_MY_CHAT_ROOT` so verification can run against a clean secondary
+  worktree while the shared sibling checkout carries another session's
+  WIP. Pin verify, g2-exit, c30-i3-upstream and the reseal script test
+  (3/3) are green; the owner-adoption lock is minted in the follow-up
+  commit per the script's two-step flow.
+
+Verdict: `W10_CLOSED_END_TO_END / CONSUMER_ADOPTED_3693E8F /
+TWO_ROWS_CONTRACT_READY / PINS_RESEALED / DEFAULT_OFF`.
+
 ## 2026-08-15 — W10-4 assistant-query registration
 
 - `candidate-core.test.mjs` 7/7 green after the fixture-list addition;

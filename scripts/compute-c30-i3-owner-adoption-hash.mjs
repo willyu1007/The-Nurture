@@ -182,11 +182,10 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-14 reseal: My-Chat afb25b5 threads the original intake instant
-      // through receipts (T-031) and Nurture aligns replay settlement plus the
-      // t009 provenance seed; wire receipt semantics converge on the frozen
-      // contract, no capability or activation change.
-      head_revision: "afb25b57d89c9bf98e3eb2ec9259d22643e538af",
+      // 2026-08-14 reseal: W10 assistant-query supply moved the pinned tooling
+      // entry points and the My-Chat consumer advanced through the W7-W10
+      // adoptions to 3693e8f
+      head_revision: "3693e8f794c47569f9e425f5456a02e5064449f1",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },

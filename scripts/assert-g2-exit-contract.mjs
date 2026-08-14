@@ -155,11 +155,10 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-14 reseal: My-Chat afb25b5 threads the original intake instant
-  // through receipts (T-031) and Nurture aligns replay settlement plus the
-  // t009 provenance seed; wire receipt semantics converge on the frozen
-  // contract, no capability or activation change.
-  "afb25b57d89c9bf98e3eb2ec9259d22643e538af",
+  // 2026-08-14 reseal: W10 assistant-query supply moved the pinned tooling
+  // entry points and the My-Chat consumer advanced through the W7-W10
+  // adoptions to 3693e8f
+  "3693e8f794c47569f9e425f5456a02e5064449f1",
   "My-Chat revision",
 );
 assertEqual(

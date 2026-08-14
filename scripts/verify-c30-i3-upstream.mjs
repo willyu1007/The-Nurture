@@ -4,7 +4,11 @@ import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const baseRoot = resolve(repositoryRoot, "../My-Workflow-Base");
-const hostRoot = resolve(repositoryRoot, "../My-Chat");
+// RESEAL_MY_CHAT_ROOT points a reseal-time verification at a clean secondary
+// worktree when the shared sibling checkout carries another session's WIP.
+const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
+  ? resolve(process.env.RESEAL_MY_CHAT_ROOT)
+  : resolve(repositoryRoot, "../My-Chat");
 
 // Base and My-Chat independently committed and sealed the dedicated trusted
 // invocation handler registry before Nurture adoption. Later My-Chat default-off
@@ -12,11 +16,10 @@ const hostRoot = resolve(repositoryRoot, "../My-Chat");
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-14 reseal: My-Chat afb25b5 threads the original intake instant
-  // through receipts (T-031) and Nurture aligns replay settlement plus the
-  // t009 provenance seed; wire receipt semantics converge on the frozen
-  // contract, no capability or activation change.
-  hostHead: "afb25b57d89c9bf98e3eb2ec9259d22643e538af",
+  // 2026-08-14 reseal: W10 assistant-query supply moved the pinned tooling
+  // entry points and the My-Chat consumer advanced through the W7-W10
+  // adoptions to 3693e8f
+  hostHead: "3693e8f794c47569f9e425f5456a02e5064449f1",
 };
 
 const run = (command, args, cwd) =>

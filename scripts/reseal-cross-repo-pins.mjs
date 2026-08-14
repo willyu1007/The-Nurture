@@ -28,7 +28,13 @@ import { computeContractHash } from "./verify-workflow-contract-pin.mjs";
 
 const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptsDir, "..");
-const myChatRoot = path.resolve(repoRoot, "..", "My-Chat");
+// The sibling checkout is shared by concurrent agent sessions and is often
+// dirty with another session's work-in-progress. RESEAL_MY_CHAT_ROOT lets a
+// reseal run against a clean secondary worktree (`git worktree add`) of the
+// exact pushed head instead; the clean-tree guard still applies to it.
+const myChatRoot = process.env.RESEAL_MY_CHAT_ROOT
+  ? path.resolve(process.env.RESEAL_MY_CHAT_ROOT)
+  : path.resolve(repoRoot, "..", "My-Chat");
 const baseRoot = path.resolve(repoRoot, "..", "My-Workflow-Base");
 const pinPath = path.join(repoRoot, "docs/project/integrations/my-chat-workflow-contract.json");
 const ownerLockPath = path.join(
