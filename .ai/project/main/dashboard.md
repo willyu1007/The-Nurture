@@ -9,7 +9,8 @@ Project: `main`
 ### Current Focus
 
 - Active tasks: T-002 (institution-mode owner gates, holding after C30), T-008
-  (G5-0 complete; final shared-input revision reconciliation next) and T-011
+  (G5-0 and final shared-input revision reconciliation complete; G5-A awaits
+  separate authorization) and T-011
   (cross-repo contract supply and guardian-decision callback). T-007
   and T-010 are archived with their exact default-off exits retained.
   2026-08-13 owner decision: authorizations and quota budgets released for the
@@ -62,17 +63,13 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Final shared-input revision reconciliation before Candidate Freeze** after
-   My-Chat T-039 completed W2/W3/W4 exact-pin adoption and Nurture completed
-   W4 read-only source supply. Keep
+1. **Pre-Freeze source facts are closed** at My-Chat
+   `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4
+   `d5df447ff0ab33911396531e47775364e62b0e4f`. Keep
    provider and consumer flags false; W3.2 requires separate authorization;
    use the W5-hardened settlement surface as the base for the separate W1
    callback implementation batch (all default-off).
-2. **Separately authorize G5-A Candidate Freeze** only after the final green
-   source revisions and exact W2/W3/W4 digests are recorded. Do not drag the
-   later deployment/device window into Freeze prerequisites or treat Freeze as
-   activation.
-3. **G5-A Candidate Freeze** stays strictly serial and separately
+2. **G5-A Candidate Freeze** stays strictly serial and separately
    authorized; W1 frozen design and profile v1.0.0 satisfy its design
    preconditions. Synthetic token, Q3 live qualification and dual-platform
    devices belong to G5-D; Q3 live only gates scoped internal-test enablement.

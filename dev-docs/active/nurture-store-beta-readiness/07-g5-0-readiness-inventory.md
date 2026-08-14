@@ -16,9 +16,11 @@ implemented in this phase.
 | T-006 G3 Exit | `G3_EXIT_PASS_RESTORED` at `nurture.surface-contract@1.15.0` | `dev-docs/archive/nurture-child-care-boards/08-g3-exit-qualification-and-beta-profile-handoff.md` |
 | T-007 G4 Exit | `G4_F_EXIT_PASS_DEFAULT_OFF / T007_BETA_PROFILE_HANDOFF_ISSUED`; final evidence 41 migrations / 444 production-DB / 1050 unit / three consecutive 37/37 x5 | T-007 records 95/96 |
 | Current surface identity | `nurture.surface-contract@1.20.0` (65 capabilities / 6 surfaces) | T-007 record for G4-E I2-A; project dashboard |
-| T-002 owner/source subset | `C30_CURRENT_PIN_REQUAL_PASS`; the pin file is authoritative for current values (My-Chat `b90cce2` after the 2026-08-13 T-042 content reseal; contract parity `85cf56e2…` and wave4 `65d6b0a0…` unchanged) | T-002 record 26 + 2026-08-13 addenda; `docs/project/integrations/my-chat-workflow-contract.json` |
+| T-002 owner/source subset | `C30_CURRENT_PIN_REQUAL_PASS`; record 26 plus the 2026-08-14 W3.1 reseal is authoritative (My-Chat `84914f2`; contract parity `85cf56e2…` and wave4 `65d6b0a0…` unchanged) | T-002 record 26 + addenda; `docs/project/integrations/my-chat-workflow-contract.json`; T-011 W3.1 verification |
 | T-009 provider | `REQUAL_PASS` at checkpoint `860f73f` / `nurture.surface-contract@1.17.0` | archived T-009 bundle |
 | T-010 owner | `I4_C4_EXIT_PASS_DEFAULT_OFF / EXACT_OWNER_CONSUMER_AND_CLEANUP_QUALIFIED`; My-Chat pins `nurture.family-sharing-eligibility@1.0.0` at `sha256:0cc3ccc8df55b1c6060c5b39af02fb1026c260dae53727f5fdeff72f2b08f5d8` | archived T-010 `04-verification.md` |
+| T-011 contract supply | W2 `nurture.parent-context-presenter@1.0.0` / `sha256:3ac0906c…`; W3 `nurture.parent-communication-owner@1.0.0` / `sha256:b1dce3a7…` with W3.1 local owner qualification; W4 read-only `nurture.director-presenter@1.0.0` / `sha256:6ce74306c0fc976feecb5f530cd1a43f5986e9c982cdb12a3b4b5a2a568c7ac1` | T-011 accepted digest records, contract fixtures and exact-pin My-Chat consumer tests; all gates default false |
+| Final green shared-input sources | My-Chat `e0e5e937cb16b6b49e918656a4af214ddea41a48`; Nurture W4 `d5df447ff0ab33911396531e47775364e62b0e4f` | Exact committed revisions after joint W4 verification; they are Freeze inputs, not a Candidate identity or activation |
 
 Truncated hashes above are convenience references only; the linked records
 hold the full values and remain authoritative.
@@ -34,6 +36,7 @@ hold the full values and remain authoritative.
 | D5 | T-002 pin resealed 2026-08-13 to My-Chat `1db3f03` (revision-only, zero content drift) | Record 26 remains the authoritative requalification; no evidence invalidated |
 | D6 | Same-day follow-up reseals: My-Chat `b90cce2` (T-042 authorization hardening rotated `x5_joint_api`) and Nurture self-pin rotations through the W5 hardening and W2 publication batches | Record 26 addenda + changelog `pin-reseal`/`fix-batch` entries; C30 Host profiles unchanged; W1 frozen design and W2 publication close the D3/D4 dispositions |
 | D7 | W2 P0 closing audit removed the superseded scope draft, regenerated both Prisma clients before root typecheck, pinned the landed My-Chat consumer at `1f306cb…` / `x5_joint_api=561614f0…`, and rotated the Nurture scenario self-hash to `976cd876…` | Exact Base `536638a…` / My-Chat `1f306cb…` detached-worktree verification passed; owner contract digest and default-off posture are unchanged; no successor Candidate is required |
+| D8 | W3.1 qualified real local owner ports without changing the W3 digest; W4 then published the missing director contract and My-Chat exact-pin private consumer. The current product SSOT also corrects D-O13 from a Mobile prepare/confirm action to read-only `web_workbench_required`. | W3.1 database evidence is `evidence_only`; W3 and W4 contracts/fixtures/strict consumers are `g5_shared`. This closes source semantics before G5-A without widening profile v1 or authorizing deployment. |
 
 ## 3. Pilot carry-forward census (read-only, categories fixed)
 
@@ -50,6 +53,10 @@ Categories: `g5_shared` | `complete_pilot_only` | `evidence_only` | `unknown`.
 | Nurture dev-host harness | `evidence_only` |
 | W1 frozen callback design record (T-011) | `g5_shared` |
 | W2 presenter conformance environment (`parent-context-presenter/v1`) | `g5_shared` |
+| W3 parent-communication exact contract/strict consumer (`parent-communication-owner/v1`) | `g5_shared` |
+| W3.1 disposable real-owner qualification | `evidence_only` |
+| W4 read-only director contract/fixtures/strict consumer (`director-presenter/v1`) | `g5_shared` |
+| W3.2 deployed carrier/secrets/private path and native evidence | `evidence_only` |
 | T-011 N3 qualification runner + artifacts | `evidence_only` |
 
 The census is a working list; entries move categories only with an
@@ -62,6 +69,11 @@ Ledger:
   W2 conformance environment added as `g5_shared` (direct G5-A/G5-C
   inputs). N3 runner artifacts added as `evidence_only`. Census complete —
   no `unknown` entries remain.
+- 2026-08-14: added W3 exact contract/consumer and W4 director
+  contract/fixtures/consumer as `g5_shared`; W3.1 and future W3.2 execution
+  evidence remain `evidence_only`. D-O13 was aligned to the existing
+  Institution Mobile read-only SSOT. No required-set change and no `unknown`
+  entry were introduced.
 
 ## 4. G5-0 remaining duties
 
@@ -72,10 +84,11 @@ Ledger:
    DB/migration compatibility all carry current green evidence (see the
    T-011 W5 closure and W2 publication records).
 3. DONE 2026-08-13 — census complete, ledgered above.
-4. SATISFIED 2026-08-13 — T-011 W1 is frozen, so the G5-A precondition is
-   met. G5-A itself remains strictly serial, unauthorized and outside this
-   phase. W2 P0 consumer adoption closed in My-Chat T-039 on 2026-08-13;
-   scheduling should now close the resulting Candidate shared-input alignment.
+4. SATISFIED 2026-08-14 — T-011 W1 is frozen and W2/W3.1/W4 source closure is
+   exact-pin/default-off. G5-A itself remains strictly serial, unauthorized and
+   outside this phase. Final green source revisions are recorded above; the next
+   gate requires separate authorization before minting an identity, and this
+   document does not mint one.
    Synthetic token, Q3 live qualification
    and devices belong to the later G5-D operator/device window; Q3 live is a
    prerequisite for the scoped internal-test enablement, not for G5-A Freeze.

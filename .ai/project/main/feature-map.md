@@ -418,8 +418,9 @@ Project: `main`
   `nurture.director-presenter@1.0.0` exact artifact and three default-off
   private routes; Institution Mobile remains action-free. Real W4 owner ports,
   public API/Mobile composition, deployment and device evidence remain later
-  gates. W2/W3/W4 inputs are ready for final revision reconciliation and
-  Candidate shared-input closure without activation. Q3 live
+  gates. W2/W3/W4 shared inputs and final green source revisions are reconciled
+  at My-Chat `e0e5e93…` and Nurture W4 `d5df447…`, without activation. G5-A
+  Candidate Freeze remains a separate authorization. Q3 live
   qualification gates G5-D scoped internal-test enablement, not G5-A Freeze.
   Candidate Freeze, durable apply, deployment,
   activation and external traffic remain closed.

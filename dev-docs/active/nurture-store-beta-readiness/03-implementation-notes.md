@@ -39,6 +39,18 @@
 - 双平台最小设备/OS 矩阵。
 - 商店内部测试证据如何回链到当前任务而不复制敏感资料。
 
+## 2026-08-14 — Pre-Freeze shared-input fact closure
+
+- G5-0 remains complete and G5-A remains a separate, not-yet-executed gate.
+- T-011 W2, W3/W3.1 and W4 now form the closed source-side shared-input set for
+  this reconciliation. W4 is the read-only director presenter; it contributes
+  no Mobile command, deployment, activation or device claim.
+- Final green source revisions are My-Chat
+  `e0e5e937cb16b6b49e918656a4af214ddea41a48` and Nurture W4
+  `d5df447ff0ab33911396531e47775364e62b0e4f`; the exact W2/W3/W4 identities
+  are recorded in the readiness inventory. Candidate Freeze starts only after
+  this completed reconciliation and separate authorization.
+
 ## 2026-07-30 — Stage G5 delivery structure accepted
 
 - G5 复用 T-008，交付结构固定为 G5-0 Readiness/Profile、G5-A Candidate Freeze、
