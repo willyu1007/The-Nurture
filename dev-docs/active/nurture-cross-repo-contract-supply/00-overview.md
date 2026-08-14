@@ -12,13 +12,14 @@
   artifact (digest `sha256:00a84945…`, 12 fixtures / 12 invalid probes) and
   the W6-2 default-off runtime (four mounted routes, censuses expanded,
   env key registered, e2e green, built-process smoke green) are complete
-  and committed. The next executable step is W6-3: real Prisma owner ports
-  per the freeze (scenario domain service + nurture-db composition and
-  repositories + unit and production-DB lanes, reusing
-  `PrismaCaregiverBoardReadPort` and the three-layer schedule models),
-  then W6-4 governance sync and the W6-5 digest-pin handoff with the
-  My-Chat sanitized snapshot refresh. All batches remain default-off
-  contract supply with no activation, durable apply, deployment or traffic.
+  and committed. W6-3 real owner ports are complete and disposable-DB
+  qualified (domain service + Prisma binding, 9/9 unit + 4/4 integration,
+  full DB lane 53/472; observations/focus sections stay honestly
+  `unavailable` pending W9/W10 sources). The next executable step is W6-4/
+  W6-5: governance/feature-map sync, the standalone digest-pin handoff
+  artifact and the My-Chat sanitized snapshot refresh with a dormant strict
+  consumer. All batches remain default-off contract supply with no
+  activation, durable apply, deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,

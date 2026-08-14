@@ -132,4 +132,5 @@ export * from "./director-presenter-contract.js";
 export * from "./teacher-class-stream-contract.js";
 export * from "./parent-communication-owner-contract.js";
 export * from "./parent-communication-owner-service.js";
+export * from "./teacher-class-stream-service.js";
 export type * from "@my-chat/workflow-contracts";

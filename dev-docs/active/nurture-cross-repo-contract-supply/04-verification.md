@@ -1,5 +1,36 @@
 # Verification
 
+## 2026-08-14 — W6-3 teacher class-stream real owner ports
+
+- Unit lane: the new service suite passes 9/9 (participant/class scope
+  resolution, purging masks for missing authority and foreign/stale refs,
+  published-schema conformance of every ready response through the runtime
+  response validator, attention aggregation with count-consistent text
+  alternatives, five ordered detail sections with honest reserved sections,
+  not-expected-to-empty arrival mapping, schedule none/malformed handling,
+  read-error fail-closed). Repository unit total: 99 files / 1095 tests.
+- Production-DB lane: the new integration suite passes 4/4 against real
+  PostgreSQL through `createPrismaTeacherClassStreamBinding` — live class
+  context, strip/detail/schedule from seeded canonical rows (daily care log,
+  attention item, attendance submission + entry, family-care instruction
+  item, schedule day override), guardian/foreign-ref/revoked-assignment
+  fail-closed, and owner-confirmed schedule absence plus malformed-payload
+  closure. Full lane total: 53 files / 472 tests. The local disposable
+  postgres volume was recreated first because a prior session left a failed
+  migration row; migrations then applied cleanly (42 directories).
+- `pnpm verify:test-routing` passes at 189 files (unit 99, production-db 53);
+  `pnpm verify:persistence-boundaries` passes; root `pnpm typecheck` passes;
+  scenario-service suite remains 18 files / 142 tests.
+- Timezone posture: all class-day reads anchor on `@db.Date` columns through
+  Prisma query builders (no raw SQL), and the single timestamp window
+  (family instructions) uses the documented UTC day-window limitation, so the
+  raw-SQL non-UTC pitfall does not apply to this increment.
+- No route change, activation, durable environment apply or consumer change
+  occurred; production `main.ts` still constructs no owner binding.
+
+Verdict: `W6_3_REAL_OWNER_PORTS_PASS / DISPOSABLE_DB_QUALIFIED /
+HONEST_RESERVED_SECTIONS / DEFAULT_OFF / HANDOFF_PENDING`.
+
 ## 2026-08-14 — W6-2 teacher class-stream default-off runtime
 
 - `pnpm verify:formal-ingress-contract` passed with the W6 validator and the

@@ -1,5 +1,35 @@
 # Implementation notes
 
+## 2026-08-14 — W6-3 teacher class-stream real owner ports
+
+- Added the DB-free domain owner
+  `packages/nurture-scenario/src/teacher-class-stream-service.ts`: the
+  authority resolver rereads the caller's current caregiver context per call
+  (participant from workspace + My-Chat user, live caregiver/lead_caregiver
+  care-group assignments); owner reads echo the resolved authority verbatim
+  and fetch payload facts only. Opaque class/child refs are deterministic
+  workspace-bound HMACs resolved by candidate matching, so foreign or stale
+  refs purge without existence leaks.
+- Added the Prisma read port
+  `packages/nurture-db/src/repositories/teacher-class-stream.repository.ts`
+  and `teacher-class-stream.composition.ts`
+  (`createPrismaTeacherClassStreamBinding`). Reads anchor on canonical
+  `@db.Date` class-day columns (daily care logs, attendance submission and
+  entries, schedule day override) and the three-layer schedule resolution
+  (day override -> class standing -> institution default) with strict
+  slots-payload parsing that reports malformed data as
+  `content_unavailable` instead of guessing.
+- Honesty boundaries implemented per the scope freeze: observations and
+  focus-link sections return `unavailable` because no caregiver-visible
+  child-associated observation source or granted focus projection exists yet
+  (W9/W10 own those); `not_expected` attendance reports the arrival section
+  `empty`; no slot is ever marked current because no institution timezone is
+  canonical; family-instruction timestamps use the documented UTC day-window
+  limitation shared with the G3 board.
+- Production `main.ts` intentionally does not construct the binding; like
+  W3.1, real-owner presence is not activation and the deployed carrier
+  remains a separate W3.2-class gate.
+
 ## 2026-08-14 — W6-2 teacher class-stream default-off runtime
 
 - Mounted the four class-stream routes in `apps/scenario-service` with the
