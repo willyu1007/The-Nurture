@@ -158,7 +158,7 @@ assertEqual(
   // Resealed on 2026-08-14 after My-Chat adopted the W4 read-only director
   // presenter. x5_joint_api rotated because scenario-integrations changed;
   // the shared Base/My-Chat workflow contract and wave4 profile are unchanged.
-  "e0e5e937cb16b6b49e918656a4af214ddea41a48",
+  "4db80c91a15859b51b193110efa45acaf019deb5",
   "My-Chat revision",
 );
 assertEqual(

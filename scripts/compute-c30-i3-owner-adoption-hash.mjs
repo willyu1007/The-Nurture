@@ -192,7 +192,7 @@ const computeLock = () => {
       // My-Chat's independently verified adoption lock. 2026-08-14: W4
       // read-only presenter adoption rotated the broad x5 pin while the C30
       // Host runtime source profiles remained unchanged.
-      head_revision: "e0e5e937cb16b6b49e918656a4af214ddea41a48",
+      head_revision: "4db80c91a15859b51b193110efa45acaf019deb5",
       runtime_revision: "149424c9a05a28aa8c1654258bb919a434208732",
       aggregate_source_hash: "aac525c4f13953671040ce759da8eadf0f55dee9063db8b6389282f78635617d",
     },

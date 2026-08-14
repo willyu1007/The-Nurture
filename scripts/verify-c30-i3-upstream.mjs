@@ -14,7 +14,7 @@ const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
   // 2026-08-14 W4 reseal: the read-only director presenter rotates the broad
   // x5 pin but does not change the C30 Host runtime source profiles.
-  hostHead: "e0e5e937cb16b6b49e918656a4af214ddea41a48",
+  hostHead: "4db80c91a15859b51b193110efa45acaf019deb5",
 };
 
 const run = (command, args, cwd) =>
