@@ -93,18 +93,42 @@ type StoredFamilyGrowthReceipt = Readonly<{
   receiptPayload: Prisma.JsonValue;
 }>;
 
+/**
+ * The frozen wire contract answers an exact replay of an applied release with
+ * `status: "duplicate"` (same companion refs, same original processed_at), so
+ * that one asymmetric status pair is replay-equivalent; every other field must
+ * match exactly.
+ */
+const replayStatusMatches = (stored: string, incoming: string): boolean =>
+  stored === incoming || (stored === "applied" && incoming === "duplicate");
+
+const replayPayloadMatches = (
+  stored: Prisma.JsonValue,
+  incoming: Prisma.InputJsonValue,
+): boolean => {
+  if (canonicalJson(stored) === canonicalJson(incoming)) return true;
+  return (
+    stored !== null
+    && typeof stored === "object"
+    && !Array.isArray(stored)
+    && (stored as Record<string, unknown>).status === "applied"
+    && canonicalJson({ ...(stored as Record<string, unknown>), status: "duplicate" })
+      === canonicalJson(incoming)
+  );
+};
+
 const receiptReplayMatches = (
   stored: StoredFamilyGrowthReceipt,
   input: FamilyGrowthReceiptRecordInputV1,
   receiptPayload: Prisma.InputJsonValue,
 ): boolean =>
-  stored.status === input.status
+  replayStatusMatches(stored.status, input.status)
   && stored.admissionRef === (input.admissionRef ?? null)
   && stored.materialRef === (input.materialRef ?? null)
   && stored.suppressionRef === (input.suppressionRef ?? null)
   && stored.reasonCode === (input.reasonCode ?? null)
   && stored.processedAt.getTime() === input.processedAt.getTime()
-  && canonicalJson(stored.receiptPayload) === canonicalJson(receiptPayload);
+  && replayPayloadMatches(stored.receiptPayload, receiptPayload);
 
 const parsedReceiptMatchesInput = (
   receipt: ReturnType<typeof parseAdmissionReceiptV1>,

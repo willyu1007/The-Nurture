@@ -261,7 +261,13 @@ class MyChatConsumerServer {
             response.statusCode = 200;
             response.setHeader("content-type", "application/json");
             response.end(
-              JSON.stringify(buildFamilyGrowthWireReceipt(route, consumed, new Date())),
+              JSON.stringify(
+                buildFamilyGrowthWireReceipt(
+                  route,
+                  consumed,
+                  consumed.result.processedAt ?? new Date(),
+                ),
+              ),
             );
           } catch {
             response.statusCode = 500;
@@ -491,6 +497,27 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
         currentKey: "current",
       },
     });
+    // W5 N1 provenance: the authorization must chain to a live guardian
+    // RoleAssignment through `nurture-care-role:<id>` with exact versions.
+    const guardianParticipant = await prisma.nurtureParticipant.create({
+      data: {
+        workspaceId,
+        myChatUserId: `guardian:${workspaceId}:${spec.tag}`,
+        displayName: "家长",
+        status: "active",
+      },
+    });
+    const guardianRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId,
+        participantId: guardianParticipant.id,
+        role: "guardian",
+        scopeType: "family",
+        scopeId: family.id,
+        status: "active",
+        aggregateVersion: 1,
+      },
+    });
     for (const [subjectType, anchorId] of [
       ["child", childAnchor.id],
       ["family", familyAnchor.id],
@@ -508,8 +535,8 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
           userEvidenceHash: hash("user"),
           actorEvidenceHash: hash("actor"),
           purpose: "scenario_binding_write",
-          authorizationSourceRef: "my_chat_child_identity",
-          authorizationSourceVersion: 1,
+          authorizationSourceRef: `nurture-care-role:${guardianRole.id}`,
+          authorizationSourceVersion: guardianRole.aggregateVersion,
           status: "active",
           verifiedAt: new Date("2026-08-05T08:00:00.000Z"),
           expiresAt: new Date("2099-01-01T00:00:00.000Z"),

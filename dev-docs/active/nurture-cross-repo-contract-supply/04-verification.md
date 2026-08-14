@@ -1,5 +1,28 @@
 # Verification
 
+## 2026-08-14 — x5 joint repair round one (t009 + t007 green)
+
+- On a fresh disposable pair (both migration sets applied cleanly): the
+  repaired t009 joint suite passes 8/8 including the response-loss replay
+  (`J1+J3`), guardian-confirmation pending (`J2`), conflict (`J4`) and the
+  tampered-rendition hardening case; both t007 joint suites pass. Lane state:
+  30/37 — remaining reds are the t010 authorization suite (5) and two
+  x5-acceptance cases, queued for the next repair round.
+- Nurture gates after the settlement-matcher change: root typecheck passes;
+  unit 99 files / 1095; production-DB 53 files / 473 (the W5 N2/N6 hardening
+  suite gained the contract-legal duplicate-replay positive case and keeps
+  three genuinely conflicting variants red-path); test routing 189 files.
+- My-Chat gates after the receipt-instant threading (`afb25b5`): typecheck
+  17 workspaces, unit 175 files / 1225, lint clean, family-growth suites
+  15 files / 110.
+- Method note recorded in 05-pitfalls: joint-lane verification of
+  `@the-nurture/db` root imports requires rebuilding the binding-owner
+  runtime first (dist masking), and probe instrumentation must be removed by
+  inverse edits when the file carries uncommitted work.
+
+Verdict: `X5_T009_T007_JOINT_GREEN / REPLAY_SETTLEMENT_CONTRACT_ALIGNED /
+T010_AND_ACCEPTANCE_REPAIR_QUEUED`.
+
 ## 2026-08-14 — Cross-repo pin reseal and inherited-red diagnosis
 
 - Mainline CI had been red since the G5-A freeze chain: the workflow contract

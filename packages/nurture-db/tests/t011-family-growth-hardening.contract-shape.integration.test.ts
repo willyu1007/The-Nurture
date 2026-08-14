@@ -327,10 +327,26 @@ describe("T-011 N2/N6 family-growth settlement hardening", () => {
     expect(harness.receipts()).toHaveLength(1);
   });
 
+  it("answers the contract-legal duplicate replay of an applied receipt as settled", async () => {
+    // The frozen wire contract re-answers an applied release with
+    // `status: "duplicate"` and the same refs/original processed_at; that
+    // pair settles instead of conflicting (proven joint by T-009 J1+J3).
+    const original = receiptInput();
+    const harness = outboxHarness({
+      receipts: [storedReceipt(original)],
+      hideFirstReceiptRead: true,
+    });
+    expect(
+      await harness.port.recordReceipt(receiptInput({ status: "duplicate" as const })),
+    ).toBe("settled");
+    expect(harness.outbox()).toMatchObject({ deliveryState: "delivered" });
+    expect(harness.receipts()).toHaveLength(1);
+  });
+
   it("rolls back settlement when a duplicate receipt identity has different content", async () => {
     const original = receiptInput();
     for (const changed of [
-      receiptInput({ status: "duplicate" as const }),
+      receiptInput({ status: "duplicate" as const, admissionRef: "admission-other" }),
       receiptInput({ materialRef: "material-other" }),
       receiptInput({ processedAt: new Date("2026-08-13T02:00:01.000Z") }),
     ]) {

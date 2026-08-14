@@ -1,5 +1,25 @@
 # Pitfalls
 
+## 2026-08-14 — Root-import dist masking swallowed source-level fixes and probes
+
+- Symptom: a repaired `receiptReplayMatches` in `packages/nurture-db/src` had
+  no effect on the joint suite, and console probes added to the same source
+  file never printed, while probes inside the test file always did.
+- Root cause: the joint tests import `@the-nurture/db` by its package root,
+  whose runtime export maps to `dist/index.js`; every source edit was invisible
+  until `pnpm build:binding-owner-runtime` regenerated the dist output.
+- What was tried: three rounds of increasingly wide source-level probes, all
+  silent, before the export map was rechecked.
+- Fix: rebuild the binding-owner runtime before interpreting any joint-lane
+  result that involves `@the-nurture/db` or `@the-nurture/scenario` root
+  imports.
+- Prevention: when a source change appears to have no effect under the x5/DB
+  lanes, check the import form first — root imports execute dist, subpath
+  source aliases execute TypeScript. The same session also lost an uncommitted
+  fixture repair to a `git checkout --` used to strip probes; instrumentation
+  on files carrying uncommitted work must be removed by inverse edits, never
+  by checkout.
+
 ## 2026-08-13 — Real-route tests need listener-free HTTP and explicit filter DI
 
 - Symptom: the replacement Nest route suite first failed before collection on

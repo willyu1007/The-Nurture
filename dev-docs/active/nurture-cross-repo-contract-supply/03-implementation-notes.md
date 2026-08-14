@@ -1,5 +1,31 @@
 # Implementation notes
 
+## 2026-08-14 — x5 joint repair: t009 provenance seed and replay settlement
+
+- Repaired the T-009 joint fixture to the W5 N1 provenance model: the seed now
+  creates a guardian Participant + RoleAssignment per family and chains each
+  `NurtureScenarioBindingAuthorization` through
+  `nurture-care-role:<roleAssignmentId>` with exact versions, replacing the
+  pre-W5 `my_chat_child_identity` source ref that had made every prepare fail
+  `authorization_provenance_invalid` since 2026-08-13.
+- Diagnosed and fixed a real cross-owner settlement regression introduced by
+  the `170edd4` hardening: the frozen wire contract re-answers an applied
+  release replay with `status: "duplicate"` (same companion refs, same
+  original `processed_at`), but the hardened matcher demanded byte-identical
+  receipts, so every response-loss recovery rolled back its settlement as
+  `receipt_conflict` and the outbox row spun in `delivering`. The matcher now
+  treats exactly the stored-`applied` -> incoming-`duplicate` pair (with all
+  other fields equal and payloads equal modulo that status) as
+  replay-equivalent; My-Chat's consumer (its `T-031` companion commit
+  `afb25b5`) now echoes the intake row's original `processedAt` on every
+  answer so replayed receipts really are byte-stable.
+- Updated the W5 N2/N6 hardening suite accordingly: the pure status-swap
+  variant is now a positive settled case, and the conflicting-variant loop
+  keeps the boundary honest with a `duplicate`-plus-foreign-`admission_ref`
+  probe. Joint state after the repair: t009 8/8 and both t007 joint suites
+  green (30/37 lane-wide); the t010 suite (5) and two x5-acceptance cases
+  remain red and queued next.
+
 ## 2026-08-14 — Reseal tooling consolidation
 
 - Consolidated the manual reseal chain into
