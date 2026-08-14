@@ -1182,3 +1182,19 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
 - No owner business port, public API/Mobile composition, schema/migration,
   database operation, deployment, activation, traffic, Candidate identity or
   device claim was added.
+
+## 2026-08-15 — Joint gray-release readiness assessment (planning only)
+
+- Assessed both repos against the "complete gray release" goal and froze
+  the result in `artifacts/gray-release-readiness-v1.md` (gap list G1-G9,
+  three parallel tracks, risk-ascending ramp order, pre-ramp checklist).
+- Code-verified the three load-bearing facts: production `bootstrap()`
+  constructs the application with no owner bindings injected (assembly is
+  real pending work, doable before authorization while staying
+  default-off); My-Chat has no rollout/feature-flag infrastructure (a
+  minimal per-surface gate + allowlist control plane must be built
+  host-side); both sides observe through structured logs only, so the
+  three ramp metrics need a minimal aggregation answer.
+- No code, schema, dependency, environment, deployment, activation or
+  traffic change was made in this round; both heads and CIs are unchanged
+  at assessment time (Nurture `4b388d1` / My-Chat `1cd1888`, green).

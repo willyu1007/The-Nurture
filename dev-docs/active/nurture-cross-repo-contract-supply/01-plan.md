@@ -125,3 +125,23 @@ produces a standalone digest-pin handoff artifact, and triggers the My-Chat
 sanitized fixture-snapshot refresh duty. `P-G03`/`P-H03` are routed to
 My-Chat; `T-C08` waits on product decision I-Q1; voice input and media
 upload ingress are explicitly out of first versions.
+
+## Post-schedule — gray-release readiness tracks (2026-08-15)
+
+With the W6-W11 schedule closed and the T-039 matrix free of
+contract-blocked rows, the forward plan targets a complete gray release.
+The joint assessment, gap list (G1-G9), three parallel tracks and
+risk-ascending ramp order are frozen in
+`artifacts/gray-release-readiness-v1.md`. Summary:
+
+- Only the activation spine is serial (authorization → staging deployment →
+  joint rehearsal → per-surface ramp). Production assembly (a gate-guarded
+  binding factory for `main.ts`), the My-Chat wiring/ramp-control/UI track
+  and the remaining contract supply (director composition layer, media
+  ingress, W1 callback runtime, stragglers) are authorization-independent
+  and run in parallel now.
+- Ramp order is risk-ascending: read-only presenters (W2/W6) → director
+  reads (W4) → teacher commands (W7/W8/W10) → media association (W9) →
+  parent redaction extension (W11, smallest allowlist, longest observation).
+- Activation, deployment and traffic still require the explicit
+  authorization gate; nothing in this plan changes the default-off posture.

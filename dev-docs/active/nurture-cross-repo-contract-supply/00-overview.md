@@ -262,3 +262,8 @@ conformance fixtures, all default-off.
 - [x] W11: `nurture.parent-communication-owner@1.1.0` additive extensions
   for redaction prepare and delivery receipts; the frozen 1.0.0 artifact is
   not mutated.
+- [ ] Post-schedule: gray-release readiness tracks are frozen in
+  `artifacts/gray-release-readiness-v1.md` (2026-08-15). The activation
+  spine waits on explicit authorization; production assembly, the My-Chat
+  wiring/ramp/UI track and the remaining contract supply proceed in
+  parallel without it.
