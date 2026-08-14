@@ -25,6 +25,12 @@ implemented in this phase.
 Truncated hashes above are convenience references only; the linked records
 hold the full values and remain authoritative.
 
+Cross-repo naming note (2026-08-14): this identity table, and specifically
+the "Final green shared-input sources" row, is the artifact My-Chat
+governance documents refer to as the "G5 shared-input ledger". No separate
+ledger file exists in either repository; My-Chat's pointer lives in its
+`dev-docs/active/mobile-uiux-delivery/08-g5-companion-readiness.md`.
+
 ## 2. Beta Profile v0 drift ledger (explicit, append-only)
 
 | # | Drift vs the 2026-08-01 freeze | Disposition |
