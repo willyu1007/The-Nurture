@@ -51,6 +51,12 @@ test("candidate identity drift invalidates the digest", () => {
   assert.throws(() => assertCandidateIntegrity(candidate), /digest mismatch/u);
 });
 
+test("frozen manifest metadata drift invalidates the digest", () => {
+  const candidate = fixtureCandidate();
+  candidate.frozen_on = "2026-08-15";
+  assert.throws(() => assertCandidateIntegrity(candidate), /digest mismatch/u);
+});
+
 test("qualification and deployment claims are forbidden during Freeze", () => {
   const qualified = fixtureCandidate();
   qualified.qualification_state = "passed";
@@ -66,6 +72,7 @@ test("qualification and deployment claims are forbidden during Freeze", () => {
 test("authorization boundary drift fails closed", () => {
   const candidate = fixtureCandidate();
   candidate.boundaries.authorizes_activation = true;
+  candidate.candidate_digest = candidateDigest(candidate);
   assert.throws(() => assertCandidateIntegrity(candidate), /boundary flags/u);
 });
 

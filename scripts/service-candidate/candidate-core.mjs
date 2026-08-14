@@ -29,6 +29,12 @@ const standaloneContractFixtures = [
 
 const sha256Hex = (value) => createHash("sha256").update(value).digest("hex");
 
+const compareText = (left, right) => {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
+};
+
 export const sha256Ref = (value) => `sha256:${sha256Hex(value)}`;
 
 export const canonicalJson = (value) => {
@@ -43,19 +49,18 @@ export const canonicalJson = (value) => {
     return `[${value.map((entry) => canonicalJson(entry)).join(",")}]`;
   }
   if (typeof value === "object" && value !== undefined) {
-    const entries = Object.entries(value).sort(([left], [right]) => left.localeCompare(right));
+    const entries = Object.entries(value).sort(([left], [right]) => compareText(left, right));
     return `{${entries.map(([key, entry]) =>
       `${JSON.stringify(key)}:${canonicalJson(entry)}`).join(",")}}`;
   }
   throw new TypeError(`canonical JSON rejects ${typeof value}`);
 };
 
-export const candidateDigest = (candidate) => sha256Ref(Buffer.from(canonicalJson({
-  schema_version: candidate.schema_version,
-  candidate_kind: candidate.candidate_kind,
-  candidate_ref: candidate.candidate_ref,
-  identity_inputs: candidate.identity_inputs,
-}), "utf8"));
+export const candidateDigest = (candidate) => {
+  const digestInput = { ...candidate };
+  delete digestInput.candidate_digest;
+  return sha256Ref(Buffer.from(canonicalJson(digestInput), "utf8"));
+};
 
 const toRepoPath = (repoRoot, absolutePath) =>
   relative(repoRoot, absolutePath).split(sep).join("/");
@@ -68,7 +73,7 @@ const collectPath = (repoRoot, path, output) => {
   }
   if (metadata.isDirectory()) {
     for (const entry of readdirSync(absolutePath, { withFileTypes: true })
-      .sort((left, right) => left.name.localeCompare(right.name))) {
+      .sort((left, right) => compareText(left.name, right.name))) {
       collectPath(repoRoot, resolve(absolutePath, entry.name), output);
     }
     return;
@@ -87,7 +92,7 @@ const collectPath = (repoRoot, path, output) => {
 export const fileInventory = (repoRoot, paths) => {
   const files = [];
   for (const path of paths) collectPath(repoRoot, path, files);
-  files.sort((left, right) => left.path.localeCompare(right.path));
+  files.sort((left, right) => compareText(left.path, right.path));
   const seen = new Set();
   for (const file of files) {
     if (seen.has(file.path)) throw new Error(`Candidate inventory duplicates ${file.path}`);
@@ -126,7 +131,7 @@ const assertDefaultOff = (manifest, envContract, prismaSchema) => {
   const boolDefaults = Object.entries(envContract.variables ?? {})
     .filter(([, variable]) => variable?.type === "bool")
     .map(([key, variable]) => ({ key, default: variable.default }))
-    .sort((left, right) => left.key.localeCompare(right.key));
+    .sort((left, right) => compareText(left.key, right.key));
   const enabledBoolDefaults = boolDefaults.filter(({ default: value }) => value !== false);
   const contracts = manifest.scenario_contracts ?? {};
   const actionOfferCount = (contracts.product_surfaces ?? [])
