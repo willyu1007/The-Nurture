@@ -1,5 +1,29 @@
 # Verification
 
+## 2026-08-14 — W8-5 consumer adoption closes W8
+
+- My-Chat `967342e` (T-039) adopts the W8 contract as a dormant strict
+  client: exact pin `nurture.teacher-communication-owner@1.0.0` /
+  `sha256:e4a831cd…`; the client asserts command-identity echo,
+  prepare/confirm pairing, withdraw/mark-read echoes, the W4 cursor-echo
+  rule and unread-summary consistency; sanitized snapshot with provenance
+  at Nurture `d2f7b02`; consumer suite 7/7 under `NURTURE_REPO_ROOT`
+  (18 fixtures accepted, all published invalid response mutations
+  rejected); package suite 30 files / 178 tests and package typecheck
+  green. Seven T-039 matrix rows moved to `contract-ready` (T-S04, T-C02,
+  T-C03, T-C04, T-C05, T-C07, T-C09); contract axis is now 58 ready /
+  9 blocked / 21 partial / 17 local. Live remains blocked on the W8
+  runtime gate plus deployment; no activation occurred.
+- The My-Chat commit hook was bypassed once for the same recorded reason
+  as W7-5 (concurrent session's untracked detox artifacts; staged files
+  lint clean). Pin reseal remains deferred on the same sibling WIP.
+- W8 is closed end to end (scope freeze, contract artifact, default-off
+  runtime, ledger-qualified real owner ports, registration, digest-pin
+  handoff, consumer adoption). Next batch: W9 media association.
+
+Verdict: `W8_CLOSED_END_TO_END / CONSUMER_ADOPTED_967342E /
+SEVEN_ROWS_CONTRACT_READY / DEFAULT_OFF / PIN_RESEAL_STILL_DEFERRED`.
+
 ## 2026-08-14 — W8-4 communication-owner registration
 
 - `candidate-core.test.mjs` green after the fixture-list addition;

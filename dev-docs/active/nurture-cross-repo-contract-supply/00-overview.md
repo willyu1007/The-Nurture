@@ -26,10 +26,18 @@
   registration and the W7-5 digest-pin handoff with the My-Chat dormant
   strict consumer (`33686a8`; matrix rows
   T-F02/T-F05/T-F08/T-F09/T-F10/T-F11/T-F15 contract-ready, axis
-  51/14/23/17). The next executable step is the W8
-  teacher-communication-owner scope freeze. All batches remain default-off
-  contract supply with no activation, durable apply, deployment or
-  traffic.
+  51/14/23/17). W8 (`nurture.teacher-communication-owner@1.0.0`)
+  is also closed end to end: scope freeze, W8-1 contract artifact (digest
+  `sha256:e4a831cd…`, 18 fixtures / 14 invalid probes / 20-scenario
+  census, first-run strict compile), W8-2 default-off runtime (six mounted
+  routes, controller-routes 42), W8-3 real owner ports on the command
+  ledger (unit 7, W8 DB lane 5, full battery 55/484; new thread-message
+  and read-cursor owner writes), W8-4 registration and the W8-5 digest-pin
+  handoff with the My-Chat dormant strict consumer (`967342e`; matrix rows
+  T-S04/T-C02/T-C03/T-C04/T-C05/T-C07/T-C09 contract-ready, axis
+  58/9/21/17). The next executable step is the W9 media-association scope
+  design. All batches remain default-off contract supply with no
+  activation, durable apply, deployment or traffic.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
