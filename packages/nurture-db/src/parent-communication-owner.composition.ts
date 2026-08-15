@@ -4,7 +4,6 @@ import {
   NurtureCommandRunner,
   NurtureInteractionContextService,
   NurtureParentCommunicationOwner,
-  type ParentCommunicationContextSelectionPortV1,
   type ParentCommunicationOwnerBindingV1,
   type ProtectedContentWritePort,
 } from "@the-nurture/scenario";
@@ -19,7 +18,6 @@ import {
 
 export const createPrismaParentCommunicationOwnerBinding = (input: {
   prisma: PrismaClient;
-  contextSelection: ParentCommunicationContextSelectionPortV1;
   protectedContent: ProtectedContentWritePort;
   integrityKey: string;
   now?: () => Date;
@@ -27,7 +25,6 @@ export const createPrismaParentCommunicationOwnerBinding = (input: {
   const now = input.now ?? (() => new Date());
   const authorityResolver = new PrismaParentCommunicationAuthorityResolver(
     input.prisma,
-    input.contextSelection,
     input.integrityKey,
     now,
   );

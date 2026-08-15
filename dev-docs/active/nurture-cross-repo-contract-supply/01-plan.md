@@ -101,7 +101,7 @@ activation. Execute the carrier cutover as six independently reviewed commits:
    mapper without changing either frozen owner body.
 2. [x] Parse the shared selection header once in W3/W11 controllers and pass
    the parsed carrier into authority resolution; remove the obsolete ingress.
-3. [ ] Make W3 resolve current association first, local Enrollment selection
+3. [x] Make W3 resolve current association first, local Enrollment selection
    second and operation authority last; make W11 reuse the same resolver.
 4. [ ] Make My-Chat resolve the exact current parent context per request and
    have both strict v1/v1.1 clients emit the existing carrier.

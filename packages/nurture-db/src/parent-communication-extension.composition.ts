@@ -3,7 +3,6 @@ import {
   NurtureCommandRunner,
   NurtureInteractionContextService,
   createParentCommunicationExtensionService,
-  type ParentCommunicationContextSelectionPortV1,
   type ParentCommunicationExtensionServiceBindingV1,
 } from "@the-nurture/scenario";
 import {
@@ -26,7 +25,6 @@ import { PrismaParentCommunicationExtensionReadPort } from "./repositories/paren
  */
 export const createPrismaParentCommunicationExtensionBinding = (input: {
   prisma: PrismaClient;
-  contextSelection: ParentCommunicationContextSelectionPortV1;
   integrityKey: string;
   now?: () => Date;
 }): ParentCommunicationExtensionServiceBindingV1 => {
@@ -34,7 +32,6 @@ export const createPrismaParentCommunicationExtensionBinding = (input: {
   return createParentCommunicationExtensionService({
     authority: new PrismaParentCommunicationAuthorityResolver(
       input.prisma,
-      input.contextSelection,
       input.integrityKey,
       now,
     ),

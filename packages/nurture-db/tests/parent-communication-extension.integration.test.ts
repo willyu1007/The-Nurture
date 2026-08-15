@@ -109,26 +109,14 @@ const seedWorld = async () => {
     },
   });
   const contextRef = `context-${base.runId}`;
-  const contextSelection = {
-    resolveCurrent: async (input: { context_ref: string }) =>
-      input.context_ref === contextRef
-        ? {
-            status: "resolved" as const,
-            enrollment_ref: base.enrollmentId,
-            context_version: "host-context-v1",
-          }
-        : { status: "stale_context_ref" as const },
-  };
   const v1 = createPrismaParentCommunicationOwnerBinding({
     prisma,
     protectedContent,
     integrityKey: INTEGRITY_KEY,
-    contextSelection,
   });
   const extension = createPrismaParentCommunicationExtensionBinding({
     prisma,
     integrityKey: INTEGRITY_KEY,
-    contextSelection,
   });
   const identity = {
     workspace_id: base.workspaceId,
@@ -222,6 +210,23 @@ const seedWorld = async () => {
 
 type World = Awaited<ReturnType<typeof seedWorld>>;
 
+const authorityFor = (
+  world: World,
+  request: Readonly<{
+    workspace_id: string;
+    my_chat_user_id: string;
+    host_request_id: string;
+    context_ref: string;
+  }>,
+) => ({
+  presentation_role: "parent" as const,
+  scope_kind: "parent_communication" as const,
+  context_ref: request.context_ref,
+  resolution_ref: "test-resolution",
+  scope_version: 1,
+  context_selection: world.selectionFor(request),
+});
+
 const previewFor = async (world: World, commandRequestId: string) => {
   const request = {
     ...world.identity,
@@ -232,7 +237,7 @@ const previewFor = async (world: World, commandRequestId: string) => {
   };
   const response = requireRecord(await world.extension.owner.redactionPreview({
     request,
-    authority: {} as never,
+    authority: authorityFor(world, request),
   }));
   return { request, response };
 };
@@ -262,7 +267,7 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
     };
     const committed = requireRecord(await world.extension.owner.redact({
       request: confirm,
-      authority: {} as never,
+      authority: authorityFor(world, confirm),
     }));
     expect(committed).toMatchObject({
       status: "committed",
@@ -283,9 +288,10 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
       where: { workspaceId: world.base.workspaceId },
     })).resolves.toBeGreaterThan(0);
 
+    const replayRequest = { ...confirm, host_request_id: `host-${randomUUID()}` };
     const replay = requireRecord(await world.extension.owner.redact({
-      request: { ...confirm, host_request_id: `host-${randomUUID()}` },
-      authority: {} as never,
+      request: replayRequest,
+      authority: authorityFor(world, replayRequest),
     }));
     expect(replay).toMatchObject({
       status: "committed",
@@ -298,25 +304,27 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
   it("answers already_satisfied for a fresh command against the redacted message", async () => {
     const world = await seedWorld();
     const first = await previewFor(world, `redact-${randomUUID()}`);
-    await world.extension.owner.redact({
-      request: {
+    const firstConfirm = {
         ...first.request,
         host_request_id: `host-${randomUUID()}`,
         confirmation_ref: String(first.response.confirmation_ref),
         prepared_preview_digest: String(first.response.prepared_preview_digest),
-      },
-      authority: {} as never,
+    };
+    await world.extension.owner.redact({
+      request: firstConfirm,
+      authority: authorityFor(world, firstConfirm),
     });
 
     const second = await previewFor(world, `redact-${randomUUID()}`);
-    const satisfied = requireRecord(await world.extension.owner.redact({
-      request: {
+    const secondConfirm = {
         ...second.request,
         host_request_id: `host-${randomUUID()}`,
         confirmation_ref: String(second.response.confirmation_ref),
         prepared_preview_digest: String(second.response.prepared_preview_digest),
-      },
-      authority: {} as never,
+    };
+    const satisfied = requireRecord(await world.extension.owner.redact({
+      request: secondConfirm,
+      authority: authorityFor(world, secondConfirm),
     }));
     expect(satisfied).toMatchObject({
       status: "committed",
@@ -331,28 +339,30 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
     const world = await seedWorld();
     const commandRequestId = `redact-${randomUUID()}`;
     const first = await previewFor(world, commandRequestId);
-    const committed = requireRecord(await world.extension.owner.redact({
-      request: {
+    const firstConfirm = {
         ...first.request,
         host_request_id: `host-${randomUUID()}`,
         confirmation_ref: String(first.response.confirmation_ref),
         prepared_preview_digest: String(first.response.prepared_preview_digest),
-      },
-      authority: {} as never,
+    };
+    const committed = requireRecord(await world.extension.owner.redact({
+      request: firstConfirm,
+      authority: authorityFor(world, firstConfirm),
     }));
     expect(committed.status).toBe("committed");
 
     // Same command id, different confirmation → different canonical
     // payload → the ledger denies the divergence.
     const second = await previewFor(world, commandRequestId);
-    const divergent = requireRecord(await world.extension.owner.redact({
-      request: {
+    const secondConfirm = {
         ...second.request,
         host_request_id: `host-${randomUUID()}`,
         confirmation_ref: String(second.response.confirmation_ref),
         prepared_preview_digest: String(second.response.prepared_preview_digest),
-      },
-      authority: {} as never,
+    };
+    const divergent = requireRecord(await world.extension.owner.redact({
+      request: secondConfirm,
+      authority: authorityFor(world, secondConfirm),
     }));
     expect(divergent).toMatchObject({
       status: "not_committed",
@@ -371,7 +381,7 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
     // The v1 confirm lands the receipt as delivered in the same commit.
     const delivered = requireRecord(await world.extension.owner.deliveryReceipt({
       request,
-      authority: {} as never,
+      authority: authorityFor(world, request),
     }));
     expect(delivered).toMatchObject({
       status: "ready",
@@ -387,9 +397,10 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
       },
       data: { status: "read", readAt: new Date("2026-08-15T08:59:00.000Z") },
     });
+    const readRequest = { ...request, host_request_id: `host-${randomUUID()}` };
     const read = requireRecord(await world.extension.owner.deliveryReceipt({
-      request: { ...request, host_request_id: `host-${randomUUID()}` },
-      authority: {} as never,
+      request: readRequest,
+      authority: authorityFor(world, readRequest),
     }));
     expect(read).toMatchObject({
       status: "ready",
@@ -403,13 +414,14 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
 
   it("masks foreign refs and stale contexts through the v1 boundary", async () => {
     const world = await seedWorld();
-    const foreign = requireRecord(await world.extension.owner.deliveryReceipt({
-      request: {
+    const foreignRequest = {
         ...world.identity,
         host_request_id: `host-${randomUUID()}`,
         message_ref: "0".repeat(64),
-      },
-      authority: {} as never,
+    };
+    const foreign = requireRecord(await world.extension.owner.deliveryReceipt({
+      request: foreignRequest,
+      authority: authorityFor(world, foreignRequest),
     }));
     expect(foreign).toMatchObject({
       status: "masked",

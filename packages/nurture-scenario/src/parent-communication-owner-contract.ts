@@ -95,27 +95,6 @@ export type ParentCommunicationOwnerRequestV1 =
   | ParentCommunicationMediaAccessRequestV1
   | ParentCommunicationSendTextRequestV1;
 
-/**
- * Host context resolution is routing input only. Implementations must return
- * one current Enrollment candidate and must not claim Nurture authority.
- */
-export type ParentCommunicationContextSelectionPortV1 = Readonly<{
-  resolveCurrent(input: ParentCommunicationIdentityV1): Promise<
-    | Readonly<{
-        status: "resolved";
-        enrollment_ref: string;
-        context_version: string;
-      }>
-    | Readonly<{
-        status:
-          | "revoked"
-          | "stale_context_ref"
-          | "ambiguous_enrollment"
-          | "temporarily_unavailable";
-      }>
-  >;
-}>;
-
 /** Internal-only exact heads used to prevent read/write TOCTOU drift. */
 export type ParentCommunicationResolvedAuthorityV1 = Readonly<{
   participant_id: string;
@@ -124,6 +103,11 @@ export type ParentCommunicationResolvedAuthorityV1 = Readonly<{
   guardian_role_version: number;
   association_ref: string;
   association_version: number;
+  child_anchor_ref: string;
+  child_anchor_version: number;
+  family_anchor_ref: string;
+  family_anchor_version: number;
+  parent_context_selection_version: number;
   enrollment_ref: string;
   enrollment_version: number;
   care_group_ref: string;

@@ -8,12 +8,15 @@ import {
 import { Prisma, type PrismaClient } from "@prisma/client";
 import type {
   ParentCommunicationAuthorityResolverV1,
-  ParentCommunicationContextSelectionPortV1,
   ParentCommunicationOwnerReadPortV1,
   ParentCommunicationReadSnapshotV1,
   ParentCommunicationResolvedAuthorityV1,
 } from "@the-nurture/scenario";
 import { FAMILY_CARE_PURPOSE } from "@the-nurture/scenario";
+import {
+  mapParentContextEnrollmentSelection,
+  resolveParentContextSelectionRoute,
+} from "./parent-context-selection.repository.js";
 
 type PrismaReader = PrismaClient | Prisma.TransactionClient;
 
@@ -21,7 +24,6 @@ export class PrismaParentCommunicationAuthorityResolver
 implements ParentCommunicationAuthorityResolverV1 {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly contextSelection: ParentCommunicationContextSelectionPortV1,
     private readonly integrityKey: string,
     private readonly now: () => Date = () => new Date(),
   ) {
@@ -31,20 +33,24 @@ implements ParentCommunicationAuthorityResolverV1 {
   async resolve(
     input: Parameters<ParentCommunicationAuthorityResolverV1["resolve"]>[0],
   ): ReturnType<ParentCommunicationAuthorityResolverV1["resolve"]> {
-    let selected;
-    try {
-      selected = await this.contextSelection.resolveCurrent(input);
-    } catch {
-      return { status: "temporarily_unavailable" };
-    }
-    if (selected.status !== "resolved") {
-      return selected.status === "temporarily_unavailable"
-        ? { status: "temporarily_unavailable" }
-        : { status: selected.status };
-    }
+    const route = resolveParentContextSelectionRoute(input);
+    if (route.status !== "resolved") return route;
     try {
       return await this.prisma.$transaction(
         async (transaction) => {
+          const at = this.now();
+          const mappedSelection = await mapParentContextEnrollmentSelection(
+            transaction,
+            { workspace_id: input.workspace_id, route },
+            at,
+          );
+          if (mappedSelection.status !== "resolved") return mappedSelection;
+          const association = mappedSelection.association;
+          const currentSelection = mappedSelection.selection;
+          const enrollment = currentSelection.enrollment;
+          const family = association.family;
+          const childCareProcess = association.childCareProcess;
+
           const participants = await transaction.nurtureParticipant.findMany({
             where: {
               workspaceId: input.workspace_id,
@@ -55,84 +61,12 @@ implements ParentCommunicationAuthorityResolverV1 {
             orderBy: { id: "asc" },
             take: 2,
           });
+          if (participants.length === 0) return { status: "scope_loss" as const };
           if (participants.length !== 1) {
             return { status: "ambiguous_enrollment" as const };
           }
           const participant = participants[0]!;
-          const at = this.now();
-          const enrollment = await transaction.nurtureEnrollment.findFirst({
-            where: {
-              id: selected.enrollment_ref,
-              workspaceId: input.workspace_id,
-              status: "active",
-              deletedAt: null,
-              OR: [{ leftAt: null }, { leftAt: { gt: at } }],
-            },
-            include: {
-              childCareProcess: true,
-              careGroup: { include: { institution: true } },
-            },
-          });
-          if (!enrollment
-            || enrollment.childCareProcess.status !== "active"
-            || enrollment.childCareProcess.deletedAt
-            || enrollment.careGroup.status !== "active"
-            || enrollment.careGroup.deletedAt
-            || enrollment.careGroup.institution.status !== "active"
-            || enrollment.careGroup.institution.deletedAt
-            || enrollment.institutionId !== enrollment.careGroup.institutionId) {
-            return { status: "scope_loss" as const };
-          }
-          const primaryFamilyId = enrollment.childCareProcess.primaryFamilyId;
-          if (!primaryFamilyId) return { status: "scope_loss" as const };
-          const [family, associations, roles, threads, grants] = await Promise.all([
-            transaction.nurtureFamily.findFirst({
-              where: {
-                id: primaryFamilyId,
-                workspaceId: input.workspace_id,
-                childCareProcessId: enrollment.childCareProcessId,
-                status: "active",
-                deletedAt: null,
-              },
-            }),
-            transaction.nurtureFamilyAnchorAssociation.findMany({
-              where: {
-                workspaceId: input.workspace_id,
-                childCareProcessId: enrollment.childCareProcessId,
-                familyId: primaryFamilyId,
-                status: "active",
-                currentKey: "current",
-                currentChildAssociationId: { not: null },
-                revokedAt: null,
-                quarantinedAt: null,
-                familyAnchor: {
-                  status: "associated",
-                  revokedAt: null,
-                  quarantinedAt: null,
-                },
-                childAnchor: {
-                  status: "associated",
-                  revokedAt: null,
-                  quarantinedAt: null,
-                },
-                childAssociation: {
-                  status: "active",
-                  currentKey: "current",
-                  revokedAt: null,
-                  quarantinedAt: null,
-                },
-                currentChildAssociation: {
-                  is: {
-                    status: "active",
-                    currentKey: "current",
-                    revokedAt: null,
-                    quarantinedAt: null,
-                  },
-                },
-              },
-              take: 2,
-              orderBy: { id: "asc" },
-            }),
+          const [roles, threads, grants] = await Promise.all([
             transaction.nurtureCareRoleAssignment.findMany({
               where: {
                 workspaceId: input.workspace_id,
@@ -144,7 +78,7 @@ implements ParentCommunicationAuthorityResolverV1 {
                   { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
                   { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
                   { OR: [
-                    { scopeType: "family", scopeId: primaryFamilyId },
+                    { scopeType: "family", scopeId: association.familyId },
                     { scopeType: "child_care_process", scopeId: enrollment.childCareProcessId },
                     { scopeType: "enrollment", scopeId: enrollment.id },
                   ] },
@@ -157,7 +91,7 @@ implements ParentCommunicationAuthorityResolverV1 {
               where: {
                 workspaceId: input.workspace_id,
                 childCareProcessId: enrollment.childCareProcessId,
-                familyId: primaryFamilyId,
+                familyId: association.familyId,
                 enrollmentId: enrollment.id,
                 careGroupId: enrollment.careGroupId,
                 visibilityScope: { in: ["family_private", "enrollment_private"] },
@@ -192,15 +126,9 @@ implements ParentCommunicationAuthorityResolverV1 {
               orderBy: { id: "asc" },
             }),
           ]);
-          if (!family
-            || associations.length !== 1
-            || roles.length !== 1
+          if (roles.length !== 1
             || threads.length !== 1
             || grants.length !== 1) {
-            return { status: "scope_loss" as const };
-          }
-          const association = associations[0]!;
-          if (association.childAssociationId !== association.currentChildAssociationId) {
             return { status: "scope_loss" as const };
           }
           const role = roles[0]!;
@@ -225,15 +153,22 @@ implements ParentCommunicationAuthorityResolverV1 {
             participant.id, participant.aggregateVersion,
             role.id, role.aggregateVersion,
             association.id, association.aggregateVersion,
+            association.childAnchor.id, association.childAnchor.aggregateVersion,
+            association.familyAnchor.id, association.familyAnchor.aggregateVersion,
+            currentSelection.aggregateVersion,
             enrollment.id, enrollment.aggregateVersion,
             enrollment.careGroup.id, enrollment.careGroup.aggregateVersion,
             enrollment.careGroup.institution.id, enrollment.careGroup.institution.aggregateVersion,
             family.id, family.aggregateVersion,
-            enrollment.childCareProcess.id, enrollment.childCareProcess.aggregateVersion,
+            childCareProcess.id, childCareProcess.aggregateVersion,
             thread.id, thread.aggregateVersion,
             membership.id, membership.aggregateVersion,
             grant.id, grant.aggregateVersion,
-            selected.context_version,
+            route.selection.context_version,
+            route.selection.child_binding.owner_ref,
+            route.selection.child_binding.owner_version,
+            route.selection.family_binding.owner_ref,
+            route.selection.family_binding.owner_version,
           ].join("\0");
           const scopeVersion = Number.parseInt(
             createHash("sha256").update(headSeed, "utf8").digest("hex").slice(0, 12),
@@ -251,6 +186,11 @@ implements ParentCommunicationAuthorityResolverV1 {
               guardian_role_version: role.aggregateVersion,
               association_ref: association.id,
               association_version: association.aggregateVersion,
+              child_anchor_ref: association.childAnchor.id,
+              child_anchor_version: association.childAnchor.aggregateVersion,
+              family_anchor_ref: association.familyAnchor.id,
+              family_anchor_version: association.familyAnchor.aggregateVersion,
+              parent_context_selection_version: currentSelection.aggregateVersion,
               enrollment_ref: enrollment.id,
               enrollment_version: enrollment.aggregateVersion,
               care_group_ref: enrollment.careGroup.id,
@@ -259,15 +199,15 @@ implements ParentCommunicationAuthorityResolverV1 {
               institution_version: enrollment.careGroup.institution.aggregateVersion,
               family_ref: family.id,
               family_version: family.aggregateVersion,
-              child_care_process_ref: enrollment.childCareProcess.id,
-              child_care_process_version: enrollment.childCareProcess.aggregateVersion,
+              child_care_process_ref: childCareProcess.id,
+              child_care_process_version: childCareProcess.aggregateVersion,
               thread_ref: thread.id,
               thread_version: thread.aggregateVersion,
               membership_ref: membership.id,
               membership_version: membership.aggregateVersion,
               grant_ref: grant.id,
               grant_version: grant.aggregateVersion,
-              context_version: selected.context_version,
+              context_version: route.selection.context_version,
               resolution_ref: tag("resolution"),
               scope_ref: tag("scope"),
               scope_version: scopeVersion,
@@ -442,6 +382,7 @@ async function exactAuthorityIsCurrent(
     participant,
     role,
     association,
+    selection,
     enrollment,
     group,
     institution,
@@ -486,14 +427,28 @@ async function exactAuthorityIsCurrent(
         workspaceId,
         childCareProcessId: authority.child_care_process_ref,
         familyId: authority.family_ref,
+        childAnchorId: authority.child_anchor_ref,
+        familyAnchorId: authority.family_anchor_ref,
         aggregateVersion: authority.association_version,
         status: "active",
         currentKey: "current",
         currentChildAssociationId: { not: null },
         revokedAt: null,
         quarantinedAt: null,
-        familyAnchor: { status: "associated", revokedAt: null, quarantinedAt: null },
-        childAnchor: { status: "associated", revokedAt: null, quarantinedAt: null },
+        familyAnchor: {
+          id: authority.family_anchor_ref,
+          aggregateVersion: authority.family_anchor_version,
+          status: "associated",
+          revokedAt: null,
+          quarantinedAt: null,
+        },
+        childAnchor: {
+          id: authority.child_anchor_ref,
+          aggregateVersion: authority.child_anchor_version,
+          status: "associated",
+          revokedAt: null,
+          quarantinedAt: null,
+        },
         childAssociation: {
           status: "active",
           currentKey: "current",
@@ -510,6 +465,14 @@ async function exactAuthorityIsCurrent(
         },
       },
       select: { childAssociationId: true, currentChildAssociationId: true },
+    }),
+    transaction.nurtureParentContextEnrollmentSelection.count({
+      where: {
+        workspaceId,
+        childCareProcessId: authority.child_care_process_ref,
+        enrollmentId: authority.enrollment_ref,
+        aggregateVersion: authority.parent_context_selection_version,
+      },
     }),
     transaction.nurtureEnrollment.count({
       where: {
@@ -557,7 +520,6 @@ async function exactAuthorityIsCurrent(
       where: {
         id: authority.child_care_process_ref,
         workspaceId,
-        primaryFamilyId: authority.family_ref,
         aggregateVersion: authority.child_care_process_version,
         status: "active",
         deletedAt: null,
@@ -619,6 +581,7 @@ async function exactAuthorityIsCurrent(
     && role === 1
     && association !== null
     && association.childAssociationId === association.currentChildAssociationId
+    && selection === 1
     && enrollment === 1
     && group === 1
     && institution === 1

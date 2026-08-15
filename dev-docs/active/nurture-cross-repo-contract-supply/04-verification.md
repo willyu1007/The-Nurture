@@ -1308,3 +1308,22 @@ NO_SECOND_TRACK / NO_SCHEMA_OR_RUNTIME_CHANGE`.
 
 Verdict: `W3_CARRIER_STEP_2_PASS / ONE_STRICT_INGRESS_PARSER /
 SEVEN_ROUTES_CARRIER_REQUIRED / FROZEN_BODIES_UNCHANGED / DEFAULT_OFF`.
+
+## 2026-08-15 — W3 carrier cutover step 3
+
+- Root `pnpm typecheck` — pass after deleting the obsolete port and adding the
+  exact anchor/selection authority heads.
+- Focused scenario owner/extension suites — pass, 2 files / 12 tests.
+- Focused W3/W11 real-route suites — pass, 2 files / 20 tests.
+- Source census — zero `ParentCommunicationContextSelectionPortV1`,
+  `selected.enrollment_ref` or `contextSelection` production occurrences;
+  one shared association/selection query implementation remains.
+- The focused real-PostgreSQL W3/W11 tests are updated to use canonical
+  carrier fixtures and no Enrollment-returning adapter. Execution remains
+  assigned to step 6's fresh disposable database so this intermediate commit
+  does not mutate the stale shared local database.
+- Frozen v1/v1.1 artifact validators, `git diff --check`, task-doc strict lint
+  and project-governance lint — pass.
+
+Verdict: `W3_CARRIER_STEP_3_PASS / ASSOCIATION_THEN_LOCAL_SELECTION /
+OLD_ENROLLMENT_PORT_REMOVED / W11_SHARED_AUTHORITY / EXACT_HEAD_REREADS`.

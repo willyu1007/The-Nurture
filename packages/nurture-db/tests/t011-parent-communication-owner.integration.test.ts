@@ -101,15 +101,6 @@ const seedScope = async () => {
     prisma,
     protectedContent,
     integrityKey: INTEGRITY_KEY,
-    contextSelection: {
-      resolveCurrent: async (input) => input.context_ref === contextRef
-        ? {
-            status: "resolved" as const,
-            enrollment_ref: base.enrollmentId,
-            context_version: "host-context-v1",
-          }
-        : { status: "stale_context_ref" as const },
-    },
   });
   return { ...base, caregiver, grant, thread, guardianMembership, contextRef, binding };
 };

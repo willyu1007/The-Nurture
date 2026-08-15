@@ -1405,3 +1405,26 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   intermediate state.
 - No schema, migration, environment default, production binding, deployment,
   activation or traffic change was made.
+
+## 2026-08-15 — W3 carrier cutover step 3
+
+- Removed `ParentCommunicationContextSelectionPortV1` and every
+  `contextSelection` factory parameter/test stub. No Nurture-local Enrollment
+  id can now enter W3/W11 from My-Chat or another host adapter.
+- W3 resolves the carrier's exact current child-family association and binding
+  versions through the step-1 mapper, then reads the Nurture-owned selection,
+  then resolves Participant, Guardian role, family-care thread membership and
+  bidirectional family-care Grant. Zero/multiple/missing/stale states fail
+  closed with bounded cardinality.
+- W11 still composes the same v1 resolver and read repository. Its internal
+  resolution carries the already-validated carrier so every owner-side
+  redaction/receipt reread uses the same route without changing a frozen body.
+- Added child/family anchor heads and local selection version to the internal
+  exact authority. Every read and command reread now checks association,
+  anchors, selection, Enrollment, CareGroup, institution, family, process,
+  role, thread, membership and Grant before using facts.
+- Removed the former primary-family shortcut. The exact current family binding
+  and Nurture association are the routing fact; My-Chat family identity still
+  grants no scenario permission.
+- No schema, migration, contract artifact, gate default, production binding,
+  deployment, activation or traffic setting changed.
