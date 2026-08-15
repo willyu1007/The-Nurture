@@ -41,6 +41,7 @@ import { PrismaInstitutionKnowledgeConflictCandidateRepository } from "./institu
 import { isPrismaWriteConflict } from "./prisma-error.js";
 import { nurtureCommandAdvisoryKey } from "./nurture-command-advisory-key.js";
 import { PrismaNurtureWorkflowRunSettlementTransaction } from "./workflow-run-settlement.repository.js";
+import { PrismaParentContextPresenterTransaction } from "./parent-context-presenter.repository.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -148,6 +149,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly institutionKnowledgeConflicts: PrismaInstitutionKnowledgeConflictCandidateRepository;
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
+  /** W2 parent notice read confirmation, in the same command-ledger tx. */
+  readonly parentContextPresenter: PrismaParentContextPresenterTransaction;
   /**
    * The G3-A inline board mutations write their own fact owners inside this
    * same command transaction, so the board never becomes a second writer.
@@ -219,6 +222,10 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
       new PrismaInstitutionKnowledgeConflictCandidateRepository(transaction);
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction, now);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
+    this.parentContextPresenter = new PrismaParentContextPresenterTransaction(
+      transaction,
+      now,
+    );
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
     this.publishProcess = new PrismaPublishProcessTransaction(transaction);
     this.mediaAttribution = new PrismaMediaAttributionTransaction(transaction);

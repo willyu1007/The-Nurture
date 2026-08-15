@@ -1,5 +1,32 @@
 # Verification
 
+## 2026-08-15 — W2 mapping contract and implementation quality
+
+- Prisma: `pnpm exec prisma format`, `validate` and `generate` green; DB context
+  refreshed with `ctl-db-ssot sync-to-context`; database feature suite green.
+- Disposable PostgreSQL: all 43 migrations applied to isolated databases; the
+  focused W2 + Enrollment lifecycle lane passed 2 files / 14 tests and the
+  final full production-DB lane passed 59 files / 502 tests. Both disposable
+  databases were dropped.
+- Nurture: DB and scenario-service typechecks green; full unit passed 104 files
+  / 1137 tests and scenario-service passed 26 files / 205 tests. Header
+  absence/drift, canonical ingress,
+  multi-Enrollment explicit selection, binding-version drift, missing
+  selection, post-resolution role revocation, notice commit/replay and blocked-
+  receipt exclusion are covered.
+- My-Chat: domain, DB, scenario-integrations and API typechecks plus root lint
+  green; full unit passed 184 files / 1284 tests (25 files / 148 tests skipped
+  by their environment gates). The focused selection artifact/codec, strict W2
+  client, canonical parent-context repository and BFF lane passed 4 files / 27
+  tests with one conditional sibling-snapshot case skipped. Duplicate current
+  child/family bindings now withhold routing evidence instead of choosing the
+  first row.
+- `git diff --check` green at review time. No migration was applied to the
+  existing local development database or any shared/staging/prod database.
+
+Verdict: `W2_EXPLICIT_SELECTION_READY / NO_CROSS_REPO_ENROLLMENT_ID /
+FROZEN_W2_BODY_UNCHANGED / W3_IMPLEMENTABLE_NOT_ACTIVATABLE`.
+
 ## 2026-08-15 — End-of-schedule deep review
 
 - Three adversarial review lanes ran over the delivered schedule: the W10
@@ -1192,3 +1219,58 @@ HUMAN_STAGING_EXECUTION_PENDING`.
 
 Verdict: `W6_LOCAL_READ_CHAIN_CLOSED / STRICT_HTTP_CONFORMANCE /
 CANONICAL_OWNER_PORTS_GREEN / DEFAULT_OFF / HUMAN_STAGING_PENDING`.
+
+## 2026-08-15 — W2 parent-context production owner qualification
+
+- Direct source TypeScript checks passed without a production build:
+  `pnpm exec tsc --noEmit -p packages/nurture-scenario/tsconfig.build.json`,
+  `pnpm exec tsc --noEmit -p packages/nurture-db/tsconfig.json`, and
+  `pnpm exec tsc --noEmit -p apps/scenario-service/tsconfig.json`.
+- `pnpm verify:formal-ingress-contract` passed after registering the W2
+  validator as a named maintained gate. The frozen digest remains
+  `sha256:3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196`
+  with five operations, 16 fixtures, eight invalid fixtures, 11 consistency
+  probes and 10 strict probes.
+- Focused scenario-service suites passed 2 files / 27 tests: all 12 real-route
+  W2 controller cases plus 15 production-assembly cases. The latter now pins
+  six ready Prisma factories, three explicit unready surfaces, the all-off
+  zero-construction path and one shared client.
+- The complete scenario-service lane passed 26 files / 205 tests after the
+  shared HTTP type cleanup and final privacy repairs.
+- The real canonical PostgreSQL W2 lane passed 1 file / 3 tests. It covers
+  shared day/care/activity facts, canonical attendance, five unique care cards,
+  notice list/prepare/commit/exact replay, receipt version 2 to 3, ambiguous
+  enrollment masking, foreign context binding, exclusion of a newer blocked
+  receipt and post-resolution guardian-role revocation.
+- The complete non-DB unit lane passed 104 files / 1,137 tests. Persistence
+  boundaries, port topology and test routing passed; the maintained census is
+  208 files (104 unit, 59 production DB, 11 dev-host, 29 scenario-service and
+  five X5 joint).
+- `pnpm reseal:pins apply --note "W2 parent-context production owner composition
+  and qualification"` refreshed only the changed Nurture scenario hash and
+  passed `verify:workflow-contract-pin`, `verify:g2-exit-contract` and
+  `verify:c30-i3-upstream`. The commit-bound C30 owner-adoption lock is
+  intentionally not minted before this work unit has a committed revision.
+- Project-governance lint passed and sync dry-run reported only the expected
+  generated hub refresh. `git diff --check` passed. Ignored `dist/` directories
+  produced by an earlier package pretypecheck were moved to Trash; no generated
+  build output remains in the repository.
+- Final strict document-format lint is green across all 31 task files. The one
+  pre-existing vague-reference warning in the W10 digest-pin artifact was
+  repaired during the semantic-cleanup pass. Project-governance strict lint is
+  green.
+- Known baseline: the package-level scenario `typecheck` wrapper still reaches
+  the pre-existing TS6059 root-dir error where
+  `teacher-class-stream-service.test.ts` imports a scenario-service source
+  file. The production scenario build config above is green; W2 adds no such
+  cross-package import. A root `pnpm lint` attempt stopped at the expected stale
+  scenario hash before frontend lint; that hash is now resealed and verified,
+  and no frontend file changed in W2.
+
+Verdict: `W2_OWNER_IMPLEMENTATION_PASS / CANONICAL_POSTGRES /
+EXACT_AUTHORITY_AND_REPLAY / FORMAL_GATE_MAINTAINED / DEFAULT_OFF /
+NO_SCHEMA_OR_MIGRATION / VERIFIED_UNCOMMITTED`.
+
+Superseded by the mapping-contract qualification at the top of this document:
+the final W2 implementation intentionally adds the local selection migration
+and no longer has the `NO_SCHEMA_OR_MIGRATION` property.

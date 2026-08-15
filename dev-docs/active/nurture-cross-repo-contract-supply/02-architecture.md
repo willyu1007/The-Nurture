@@ -4,14 +4,16 @@
 
 ```text
 My-Chat current parent context
-  -> verified current-context selection port (routing only)
+  -> pinned child/family binding selection carrier (routing only)
+  -> Nurture current association + local Enrollment selection
   -> Nurture current-authority resolver
   -> canonical Nurture family-care owner
   -> published parent-communication DTO
 ```
 
-The selection port may identify one exact Enrollment candidate, but it is not
-authorization. The resolver must reread current Nurture Participant, Guardian
+The carrier never identifies an Enrollment. Nurture maps the exact current
+binding anchors to its ChildCareProcess and explicit local Enrollment
+selection; neither is authorization. The resolver must reread Participant, Guardian
 role, family/child-care association, Enrollment/CareGroup, thread membership,
 grant, purpose and lifecycle before every summary, detail, media or send
 subexchange. Zero, duplicate, revoked or changed facts fail closed.
@@ -77,6 +79,34 @@ validation, revocation, expiry and conflict failures return closed
 `not_committed` reasons. No path tells the caller to mint a replacement command
 for an unknown outcome.
 
+## W2 parent-context owner boundary
+
+```text
+My-Chat current child-membership context (routing and request binding only)
+  -> pinned current child/family binding refs + versions
+  -> exact Nurture association + explicit local Enrollment selection
+  -> current guardian/grant/thread path
+  -> exact version-head reread per operation
+  -> shared daily-care | attendance | grant receipt presentation
+  -> notice prepare/confirm through InteractionContext + CommandExecution
+```
+
+The host `context_ref` has no provider-side foreign-key meaning. My-Chat checks
+that it is still the selected canonical context before its BFF call; Nurture
+independently authorizes provider-owned facts. The pinned carrier maps only to
+Nurture anchors; the Enrollment choice remains a Nurture-owned row. Missing or
+changed selection, binding mismatch, association drift and authority loss all
+mask rather than guessing. This preserves database ownership and prevents a
+routing value from becoming an authorization grant.
+
+Reads and notice commits bind the exact Participant, guardian role,
+family/child association, Enrollment, CareGroup, Institution, Family,
+ChildCareProcess, Grant, private Thread and guardian membership heads. Notice
+confirmation reuses the generic Nurture command transaction; it does not add a
+second idempotency ledger or a workflow outbox. The process-local async
+generation boundary remains presentation race control, while My-Chat retains
+its consumer-side generation check.
+
 ## W4 director presenter boundary
 
 ```text
@@ -99,17 +129,18 @@ deployment and device evidence remain separate increments.
 
 `apps/scenario-service/src/production-assembly.ts` is the production bootstrap
 adapter for the nine supplied contract surfaces. It does not reimplement
-owner behavior: the five ready teacher gates select the existing Prisma
-binding factories in `@the-nurture/db`, and `application.ts` continues to use
-its existing runtime factories to create route compositions.
+owner behavior: the W2 parent-context gate and five ready teacher gates select
+the existing Prisma binding factories in `@the-nurture/db`, and
+`application.ts` continues to use its existing runtime factories to create
+route compositions.
 
-The five bindings share one Prisma client and one protected-content port where
+The six bindings share one Prisma client and one protected-content port where
 needed. No client or binding is created when all nine gates are false. Before
 constructing Prisma, the adapter rejects an enabled surface if service auth,
 database configuration, integrity material or required protected-content
-material is incomplete. Parent context, parent communication owner/extension
-and director gates reject startup with an explicit missing-owner dependency;
-they cannot degrade into mounted-but-dead production surfaces.
+material is incomplete. Parent communication owner/extension and director
+gates reject startup with an explicit missing-owner dependency; they cannot
+degrade into mounted-but-dead production surfaces.
 
 `main.ts` owns lifecycle assembly: it passes the resulting bindings into the
 application and disconnects the shared Prisma client on server close or

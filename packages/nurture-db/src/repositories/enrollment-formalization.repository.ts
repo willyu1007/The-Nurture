@@ -134,6 +134,26 @@ export class PrismaEnrollmentFormalizationRepository
       if (enrollmentWrite.count !== 1 || grantWrite.count !== 1) {
         return conflict("formalization_entity_write_conflict");
       }
+      const selectedAt = this.now();
+      await this.prisma.nurtureParentContextEnrollmentSelection.upsert({
+        where: {
+          workspaceId_childCareProcessId: {
+            workspaceId: mutation.workspace_id,
+            childCareProcessId: loaded.enrollment.childCareProcessId,
+          },
+        },
+        create: {
+          workspaceId: mutation.workspace_id,
+          childCareProcessId: loaded.enrollment.childCareProcessId,
+          enrollmentId: loaded.enrollment.id,
+          selectedAt,
+        },
+        update: {
+          enrollmentId: loaded.enrollment.id,
+          selectedAt,
+          aggregateVersion: { increment: 1 },
+        },
+      });
 
       const addedMilestones = [
         "guardian_formal_acceptance_recorded",

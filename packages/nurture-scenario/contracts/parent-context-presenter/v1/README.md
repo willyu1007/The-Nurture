@@ -17,7 +17,7 @@ owner interface.
 Run the contract and fixture validator from the repository root:
 
 ```bash
-node --import tsx packages/nurture-scenario/contracts/parent-context-presenter/v1/validate-contract.mjs
+pnpm verify:parent-context-presenter-contract
 ```
 
 A pass verifies the computed digest, all five strict request/response schema
@@ -37,5 +37,21 @@ published-response rejection, replay and application ASYNC-12 rejection:
 pnpm --dir apps/scenario-service exec vitest run -c vitest.config.ts tests/parent-context-presenter-controller.e2e.test.ts
 ```
 
-This remains default-off provider evidence; it does not claim a database owner
-adapter, My-Chat adoption, deployment activation or traffic.
+The production owner composition is qualified against canonical PostgreSQL
+rows. My-Chat sends its separately pinned binding-only selection carrier; the
+provider resolves those opaque anchors to one current association and reads the
+Nurture-owned current Enrollment selection. It then rereads the exact selection,
+anchor, guardian, enrollment, grant and thread heads for every operation,
+projects shared daily-care and attendance facts, and commits notice-read
+confirmation through the generic command ledger transaction:
+
+```bash
+node scripts/run-with-local-env.mjs pnpm exec vitest run -c vitest.db.config.ts packages/nurture-db/tests/t011-parent-context-presenter.integration.test.ts
+```
+
+The local selection schema/migration backfills only unambiguous current rows;
+missing or changed selection masks. The opaque My-Chat `context_ref` and
+binding refs are routing evidence, never Nurture authorization or shared
+database identifiers. This remains default-off provider evidence. The exact-
+pin My-Chat consumer is adopted, but no shared migration, deployment activation
+or traffic is claimed here.

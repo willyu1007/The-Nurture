@@ -9,6 +9,21 @@
 4. W4 publishes the director presenter after W2/W3 contract supply.
 5. W5 hardens the shared settlement surfaces before callback implementation.
 
+## W2 current Enrollment selection closure
+
+- [x] Freeze one My-Chat-owned selection carrier containing only current
+  context version and opaque child/family binding owner refs + versions.
+- [x] Add one Nurture-owned current Enrollment selection per ChildCareProcess,
+  with conservative migration backfill and lifecycle maintenance.
+- [x] Resolve W2 association first and local selection second; reread exact
+  selection/anchor/authority heads on every read and notice confirm.
+- [x] Wire My-Chat BFF and strict client without changing the frozen W2 body.
+- [x] Qualify canonical encoding, strict ingress, multi-Enrollment selection,
+  revocation and lifecycle behavior against a disposable PostgreSQL database.
+
+Exit: source implementation ready to land; migration has not been applied to
+any shared environment and all runtime gates remain false.
+
 ## W3 increments
 
 ### W3.0 — Contract and dormant vertical
@@ -27,10 +42,10 @@ qualified; no live owner ports, deployment or activation are claimed.
 
 1. Reuse the existing family-care thread, message, item, receipt,
    InteractionContext and CommandExecution owners; create no parallel facts.
-2. Add a current-context selection port whose output is routing input only,
-   then reread the exact Nurture Participant, Guardian role, association,
-   Enrollment, CareGroup, thread membership, grant, purpose and lifecycle on
-   every operation.
+2. Consume the shared current-context selection carrier, map its exact opaque
+   binding anchors to the Nurture-owned local Enrollment selection, then reread
+   Participant, Guardian role, association, Enrollment, CareGroup, thread
+   membership, grant, purpose and lifecycle on every operation.
 3. Implement minimized summary and explicit bounded teacher detail over the
    canonical family-care rows. Keep `class_group` unavailable in P0 and keep
    protected media access unavailable.
@@ -68,7 +83,9 @@ W3.2 remains separately authorized work.
 
 ### W3.2 — Deployment qualification and controlled activation
 
-- Supply the deployed current-context carrier and secrets through approved
+- First replace the obsolete host-selected Enrollment port and complete the
+  implementation sequence in the W3 readiness review artifact.
+- Supply the deployed shared selection carrier and secrets through approved
   environment workflows.
 - Qualify the private service path with My-Chat, then native and accessibility
   behavior.
@@ -150,15 +167,17 @@ risk-ascending ramp order are frozen in
 
 - [x] Inject the five existing teacher Prisma owner bindings through the
   scenario-service production bootstrap, sharing one shutdown-managed client.
-- [x] Refuse startup with structured reasons for the four surfaces whose
+- [x] Add the W2 parent-context Prisma owner binding to that same production
+  assembly and shared-client lifecycle.
+- [x] Refuse startup with structured reasons for the three surfaces whose
   production owner dependencies are incomplete.
 - [x] Preserve all default-false gates and the zero-construction all-off path.
 - [x] Qualify with focused factory tests, root typecheck and the full unit lane.
 
-Remaining owner-supply gaps are W2 parent-context Prisma composition, W4
-director Prisma composition, and the host-owned production
-`ParentCommunicationContextSelectionPortV1` adapter for parent communication
-owner and extension. Deployment and activation remain separate decisions.
+Remaining owner-supply gaps are W4 director Prisma composition and the W3/W11
+cutover from the obsolete host-selected Enrollment port to the shared binding
+carrier plus Nurture local selection mapper. Deployment and activation remain
+separate decisions.
 
 ### G7/G8 — W6 current-main gray preparation (2026-08-15)
 

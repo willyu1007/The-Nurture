@@ -6,6 +6,10 @@ import { Test } from "@nestjs/testing";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import inject from "light-my-request";
 import {
+  encodeMyChatParentContextSelection,
+  MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER,
+} from "@my-chat/scenario-integrations/parent-context-selection";
+import {
   nurtureCanonicalJson,
   PARENT_CONTEXT_PRESENTER_ACTIVITY_DETAIL_PATH,
   PARENT_CONTEXT_PRESENTER_DAILY_CARE_PATH,
@@ -79,13 +83,20 @@ async function post(
   requestPath: string,
   body: unknown,
   token = TOKEN,
+  selectionHeaderOverride?: string | null,
 ): Promise<TestHttpResponse> {
+  const selectionHeader = selectionHeaderOverride === undefined
+    ? parentContextSelectionHeader(body)
+    : selectionHeaderOverride;
   const response = await inject(application, {
     method: "POST",
     url: requestPath,
     headers: {
       authorization: `Bearer ${token}`,
       "content-type": "application/json",
+      ...(selectionHeader === null
+        ? {}
+        : { [MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER]: selectionHeader }),
     },
     payload: JSON.stringify(body),
   });
@@ -102,6 +113,25 @@ async function post(
     headers,
     json: async () => response.json<unknown>(),
   };
+}
+
+function parentContextSelectionHeader(body: unknown): string {
+  const request = requireRecord(body);
+  return encodeMyChatParentContextSelection({
+    workspaceId: String(request.workspace_id),
+    myChatUserId: String(request.my_chat_user_id),
+    hostRequestId: String(request.host_request_id),
+    contextRef: String(request.context_ref),
+    contextVersion: "pcv1:test-context-version",
+    childBinding: {
+      ownerRef: "nurture_child_binding_anchor_v1:11111111-1111-4111-8111-111111111111",
+      ownerVersion: 4,
+    },
+    familyBinding: {
+      ownerRef: "nurture_family_binding_anchor_v1:22222222-2222-4222-8222-222222222222",
+      ownerVersion: 5,
+    },
+  });
 }
 
 function fixture(fixtureId: string): Fixture {
@@ -314,6 +344,25 @@ describe("parent-context presenter formal ingress", () => {
     const interfaceContract = requireRecord(drifted.interface_contract);
     interfaceContract.digest = `sha256:${"0".repeat(64)}`;
     expect((await post(application, PARENT_CONTEXT_PRESENTER_DAY_PATH, drifted)).status).toBe(400);
+    expect((await post(
+      application,
+      PARENT_CONTEXT_PRESENTER_DAY_PATH,
+      fixture("w2-day-ready").request,
+      TOKEN,
+      null,
+    )).status).toBe(400);
+    const selectionDrift = JSON.parse(Buffer.from(
+      parentContextSelectionHeader(fixture("w2-day-ready").request),
+      "base64url",
+    ).toString("utf8")) as Record<string, unknown>;
+    requireRecord(selectionDrift.interface_contract).digest = `sha256:${"0".repeat(64)}`;
+    expect((await post(
+      application,
+      PARENT_CONTEXT_PRESENTER_DAY_PATH,
+      fixture("w2-day-ready").request,
+      TOKEN,
+      Buffer.from(nurtureCanonicalJson(selectionDrift), "utf8").toString("base64url"),
+    )).status).toBe(400);
     expect(runtime.authorityResolver.resolve).not.toHaveBeenCalled();
     expect(runtime.owner.present).not.toHaveBeenCalled();
   });

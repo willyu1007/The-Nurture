@@ -35,11 +35,13 @@ exchange echoes `context_ref` + exact `command_request_id`.
 - Cross-actor or divergent reuse of a command id lands
   `command_payload_conflict` (actor identity is folded into the canonical
   payload). `command_actor_mismatch` is reserved vocabulary in v1.0.0:
-  render it if it ever arrives, but the current owner cannot distinguish
-  the actor from any other payload divergence, so it is never emitted.
+  render `command_actor_mismatch` if that token ever arrives, but the current
+  owner cannot distinguish the actor from any other payload divergence, so the
+  token is never emitted.
 - Requests never carry week boundaries — the owner computes the
-  Monday-Sunday window from `local_date` and echoes it. Rendering must use
-  the echoed `week_start`/`week_end`, never a client-computed week.
+  Monday-Sunday window from `local_date` and echoes the computed window.
+  Rendering must use the echoed `week_start`/`week_end`, never a
+  client-computed week.
 
 ## Adoption notes for the My-Chat consumer
 
@@ -48,8 +50,9 @@ exchange echoes `context_ref` + exact `command_request_id`.
 - The supplement handoff is a typed descriptor
   (`nurture.teacher-organization-owner@1.0.0` / `supplement_exchange` /
   `child_ref` / `availability`) and is present exactly when a child has
-  missing kinds. It is never executable: the handoff target re-runs its
-  own current-authority prepare; nothing in this contract writes on reads.
+  missing kinds. The descriptor is never executable: the handoff target
+  re-runs its own current-authority prepare; nothing in this contract writes
+  on reads.
 - The generation boundary is engine-ready: responses carry deterministic
   facts only (counts, kinds, safe labels) — any prose is the Host engine's
   concern and never rides this interface.

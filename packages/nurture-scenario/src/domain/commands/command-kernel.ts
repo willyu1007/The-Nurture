@@ -24,6 +24,7 @@ import type { NurtureEnrollmentFormalizationTransaction } from "../institution/e
 import type { NurtureWorkflowRunSettlementTransactionV1 } from "../institution/workflow-run-settlement.js";
 import type { NurtureInstitutionKnowledgeTransaction } from "../institution/institution-knowledge-commands.js";
 import type { NurtureInstitutionKnowledgeConflictCandidateTransaction } from "../institution/institution-knowledge-conflict-candidate.js";
+import type { NurtureParentContextPresenterTransaction } from "../institution/parent-context-presenter-transaction.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
   buildNurtureHandoffRequestSnapshots,
@@ -113,6 +114,8 @@ export type NurtureCommandTransaction = {
   institutionKnowledgeConflicts?: NurtureInstitutionKnowledgeConflictCandidateTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
+  /** Present when W2 parent notice confirmation is wired. */
+  parentContextPresenter?: NurtureParentContextPresenterTransaction;
   /** Present when the G4-D I3 enrollment prepared-command ledger is wired. */
   enrollmentPreparedCommands?: NurtureEnrollmentJourneyPreparedCommandLedgerV1;
   /** Present when Host Run settlement must commit with the Nurture command. */

@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-15 reseal: W6 local class-to-child-detail closure and current-main
-  // gray preparation
-  "4cc607c4547869b6cd4dab74b242300ac2d72031",
+  // 2026-08-15 reseal: W2 explicit parent-context enrollment selection and
+  // carrier
+  "0c7215f9c620b4009e575aeb594bbfe3f3b52a46",
   "My-Chat revision",
 );
 assertEqual(

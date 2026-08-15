@@ -2,7 +2,13 @@ import { createHash } from "node:crypto";
 import {
   nurtureCanonicalJson,
   PARENT_CONTEXT_PRESENTER_INTERFACE,
+  type ParentContextPresenterAsyncBoundaryV1,
+  type ParentContextPresenterAuthorityResolverV1,
   type ParentContextPresenterOperation,
+  type ParentContextPresenterOwnerV1,
+  type ParentContextPresenterRequestV1,
+  type ParentContextPresenterResolvedAuthorityV1,
+  type ParentContextSelectionV1,
 } from "@the-nurture/scenario";
 import type {
   ParentContextPresenterActivityDetailRequestV1,
@@ -15,78 +21,13 @@ import {
   ParentContextPresenterResponseContractError,
 } from "./parent-context-presenter-response-validator.js";
 
-type ParentContextPresenterRequestV1 =
-  | ParentContextPresenterDateRequestV1
-  | ParentContextPresenterActivityDetailRequestV1
-  | ParentContextPresenterNoticeRequestV1;
-
-export type ParentContextPresenterResolvedAuthorityV1 = Readonly<{
-  participant_id: string;
-  guardian_role_assignment_id: string;
-  association_ref: string;
-  enrollment_ref: string;
-  care_group_ref: string;
-  grant_ref: string;
-  resolution_ref: string;
-  scope_ref: string;
-  scope_version: number;
-  context_ref: string;
-}>;
-
-export type ParentContextPresenterAuthorityResultV1 =
-  | Readonly<{
-      status: "resolved";
-      authority: ParentContextPresenterResolvedAuthorityV1;
-    }>
-  | Readonly<{
-      status:
-        | "scope_loss"
-        | "revoked"
-        | "stale_context_ref"
-        | "ambiguous_enrollment"
-        | "protected_display_denial"
-        | "non_retryable_refresh";
-    }>
-  | Readonly<{ status: "temporarily_unavailable" }>;
-
-export type ParentContextPresenterAuthorityResolverV1 = Readonly<{
-  resolve(input: {
-    operation: ParentContextPresenterOperation;
-    workspace_id: string;
-    my_chat_user_id: string;
-    host_request_id: string;
-    context_ref: string;
-  }): Promise<ParentContextPresenterAuthorityResultV1>;
-}>;
-
-export type ParentContextPresenterOwnerV1 = Readonly<{
-  present(input: {
-    operation: ParentContextPresenterOperation;
-    request: ParentContextPresenterRequestV1;
-    authority: ParentContextPresenterResolvedAuthorityV1;
-  }): Promise<unknown>;
-}>;
-
-export type ParentContextPresenterAsyncBoundaryV1 = Readonly<{
-  capture(input: {
-    operation: ParentContextPresenterOperation;
-    workspace_id: string;
-    my_chat_user_id: string;
-    host_request_id: string;
-    context_ref: string;
-  }): Promise<Readonly<{ response_generation: number }>>;
-  current(input: {
-    operation: ParentContextPresenterOperation;
-    workspace_id: string;
-    my_chat_user_id: string;
-    host_request_id: string;
-  }): Promise<
-    Readonly<{
-      active_generation: number;
-      active_context_ref: string;
-    }>
-  >;
-}>;
+export type {
+  ParentContextPresenterAsyncBoundaryV1,
+  ParentContextPresenterAuthorityResultV1,
+  ParentContextPresenterAuthorityResolverV1,
+  ParentContextPresenterOwnerV1,
+  ParentContextPresenterResolvedAuthorityV1,
+} from "@the-nurture/scenario";
 
 const FORBIDDEN_RESPONSE_FIELDS = new Set([
   "participant_id",
@@ -125,33 +66,45 @@ export class ParentContextPresenterComposition {
     private readonly now: () => Date = () => new Date(),
   ) {}
 
-  day(request: ParentContextPresenterDateRequestV1): Promise<unknown> {
-    return this.execute("day_query", request);
+  day(
+    request: ParentContextPresenterDateRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("day_query", request, selection);
   }
 
-  dailyCare(request: ParentContextPresenterDateRequestV1): Promise<unknown> {
-    return this.execute("daily_care_cards_query", request);
+  dailyCare(
+    request: ParentContextPresenterDateRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("daily_care_cards_query", request, selection);
   }
 
   activityDetail(
     request: ParentContextPresenterActivityDetailRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
-    return this.execute("activity_detail_query", request);
+    return this.execute("activity_detail_query", request, selection);
   }
 
-  notices(request: ParentContextPresenterNoticeRequestV1): Promise<unknown> {
-    return this.execute("notice_list_and_confirmation", request);
+  notices(
+    request: ParentContextPresenterNoticeRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("notice_list_and_confirmation", request, selection);
   }
 
   freshnessAttendance(
     request: ParentContextPresenterDateRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
-    return this.execute("freshness_attendance_projection", request);
+    return this.execute("freshness_attendance_projection", request, selection);
   }
 
   private async execute(
     operation: ParentContextPresenterOperation,
     request: ParentContextPresenterRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
     let responseGeneration: number;
     try {
@@ -172,6 +125,7 @@ export class ParentContextPresenterComposition {
       my_chat_user_id: request.my_chat_user_id,
       host_request_id: request.host_request_id,
       context_ref: request.context_ref,
+      context_selection: selection,
     });
     if (resolved.status === "temporarily_unavailable") {
       return this.applyAsyncBoundary(

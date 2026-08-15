@@ -220,3 +220,57 @@
 - Prevention: treat the three cross-repository pin checks and the two-phase
   reseal as part of every current-main release-preparation work unit, before
   publication.
+
+## 2026-08-15 — An opaque host context reference is not a provider lookup key
+
+- Symptom: W2 receives My-Chat's canonical current-context reference, but the
+  two repositories intentionally share neither ORM nor database identity.
+- Risk: deriving a Nurture enrollment from that opaque value, or accepting it
+  as authorization, would couple owner databases and turn routing input into a
+  permission grant.
+- What was tried: inspected the My-Chat BFF current-context check and both
+  repositories' canonical identity models; no shared, contract-backed lookup
+  from the host reference to a Nurture enrollment exists.
+- Fix: My-Chat rechecks its current context before the BFF owner call; Nurture
+  independently resolves current guardian authority and proceeds only when
+  exactly one eligible enrollment path exists. Ambiguity masks the response.
+- Prevention: cross-owner context references may bind request/replay/cache
+  identity, but provider facts must always come from provider-owned authority
+  and exact current heads. Add an explicit mapping contract only if product
+  requirements later need multiple simultaneous eligible enrollments.
+
+## 2026-08-15 — A terminal delivery receipt was not necessarily family-visible
+
+- Symptom: the first W2 notice query admitted `failed` and `blocked` receipts
+  and mapped both to an expired display state.
+- Root cause: terminal delivery states were grouped by lifecycle completion
+  instead of by whether the family had ever received the item.
+- What was tried: compared the receipt revocation cascade and the existing
+  parent-communication delivery projection. A blocked receipt is explicitly
+  the branch where content was not visible; `revoked_after_delivery` is the
+  separate branch for content that had been visible.
+- Fix: query and type only delivered, read, acknowledged and
+  revoked-after-delivery receipts. A real PostgreSQL negative fixture inserts a
+  newer blocked receipt and proves that the parent list still contains only the
+  delivered notice.
+- Prevention: presenter eligibility must be derived from visibility history,
+  not merely from whether a delivery state is terminal.
+
+## 2026-08-15 — Interim uniqueness scanning was not a multi-Enrollment contract
+
+- Symptom: the first real W2 resolver scanned all active Enrollments and only
+  proceeded when exactly one path happened to exist. That fails a valid child
+  with concurrent formal/trial history and gave W3's old host-selected
+  Enrollment seam an apparent reason to survive.
+- Root cause: an opaque My-Chat `context_ref` cannot identify a Nurture row,
+  but absence of a cross-owner Enrollment id does not require guessing or a
+  cross-owner Enrollment mapping. The missing fact was a Nurture-owned local
+  current selection anchored by existing opaque scenario bindings.
+- Fix: freeze one binding-only routing carrier and add one explicit local
+  selection per ChildCareProcess. Resolve association first, local selection
+  second, then reread authority. This supersedes the interim ambiguity-scan
+  fix documented above; the earlier entry remains as history, not current
+  guidance.
+- Prevention: do not solve owner-boundary gaps by leaking provider ids or by
+  relying on accidental row cardinality. Put the smallest missing decision in
+  the repository that owns it, version it, and make absence fail closed.

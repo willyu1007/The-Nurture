@@ -2259,7 +2259,7 @@ model NurtureChildCareProcess {
   updatedAt          DateTime                      @updatedAt @map("updated_at")
   deletedAt          DateTime?                     @map("deleted_at")
 
-  child                    NurtureChild                     @relation(fields: [childId], references: [id], onDelete: Restrict)
+  child                    NurtureChild                             @relation(fields: [childId], references: [id], onDelete: Restrict)
   families                 NurtureFamily[]
   enrollments              NurtureEnrollment[]
   grants                   NurtureChildLinkGrant[]
@@ -2279,6 +2279,7 @@ model NurtureChildCareProcess {
   attendanceEntries        NurtureAttendanceEntry[]
   familySharingAuthorities NurtureFamilySharingAuthority[]
   familySharingPolicies    NurtureFamilySharingPolicy[]
+  parentContextSelection   NurtureParentContextEnrollmentSelection?
 
   @@unique([workspaceId, id, childId], map: "uq_nurture_child_process_integrity")
   @@unique([workspaceId, id], map: "uq_nurture_child_care_process_workspace_id")
@@ -2500,9 +2501,9 @@ model NurtureEnrollment {
   updatedAt            DateTime                             @updatedAt @map("updated_at")
   deletedAt            DateTime?                            @map("deleted_at")
 
-  childCareProcess         NurtureChildCareProcess           @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  institution              NurtureCareInstitution            @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  careGroup                NurtureCareGroup                  @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  childCareProcess         NurtureChildCareProcess                   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  institution              NurtureCareInstitution                    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup                NurtureCareGroup                          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
   grants                   NurtureChildLinkGrant[]
   receipts                 NurtureChildLinkReceipt[]
   threads                  NurtureFamilyCareThread[]
@@ -2513,11 +2514,31 @@ model NurtureEnrollment {
   formalProposals          NurtureEnrollmentFormalProposal[]
   familySharingAuthorities NurtureFamilySharingAuthority[]
   familySharingPolicies    NurtureFamilySharingPolicy[]
+  parentContextSelections  NurtureParentContextEnrollmentSelection[]
 
   @@unique([workspaceId, childCareProcessId, id], map: "uq_nurture_enrollment_workspace_process_id")
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
   @@index([workspaceId, careGroupId, status, participationPhase], map: "ix_nurture_enrollment_group_phase")
   @@map("nurture_enrollment")
+}
+
+// Nurture-owned current Enrollment for parent-facing scenario surfaces.
+// My-Chat binding refs may route to the care process, but never name or
+// authorize this local selection. A missing row fails closed.
+model NurtureParentContextEnrollmentSelection {
+  workspaceId        String   @map("workspace_id")
+  childCareProcessId String   @map("child_care_process_id")
+  enrollmentId       String   @map("enrollment_id")
+  aggregateVersion   Int      @default(1) @map("aggregate_version")
+  selectedAt         DateTime @default(now()) @map("selected_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  childCareProcess NurtureChildCareProcess @relation(fields: [workspaceId, childCareProcessId], references: [workspaceId, id], onDelete: Restrict, map: "nurture_parent_context_selection_process_fkey")
+  enrollment       NurtureEnrollment       @relation(fields: [workspaceId, childCareProcessId, enrollmentId], references: [workspaceId, childCareProcessId, id], onDelete: Restrict, map: "nurture_parent_context_selection_enrollment_fkey")
+
+  @@id([workspaceId, childCareProcessId], map: "nurture_parent_context_selection_pkey")
+  @@index([workspaceId, enrollmentId], map: "ix_nurture_parent_context_selection_enrollment")
+  @@map("nurture_parent_context_enrollment_selection")
 }
 
 model NurtureCareRoleAssignment {

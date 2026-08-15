@@ -4,6 +4,18 @@
 
 - State: in-progress
 - Updated: 2026-08-15
+- W2 current implementation: My-Chat now emits the pinned
+  `my-chat.parent-context-selection@1.0.0` carrier from current canonical
+  family-child + child/family scenario bindings. Nurture maps those opaque
+  anchors through its current association to one explicit local
+  `NurtureParentContextEnrollmentSelection`, then rereads every authority head.
+  No Enrollment id crosses repositories and the frozen W2 body contract is
+  unchanged. Source migration and disposable-PostgreSQL qualification are
+  complete; no shared/staging/prod database was migrated.
+- W3 readiness verdict: implementation can proceed, activation cannot. The
+  exact blocker/sequence is recorded in
+  `artifacts/w3-parent-communication-implementation-readiness-review-2026-08-15.md`.
+  The old host-selected Enrollment port must be replaced, not implemented.
 - Supply extension (2026-08-14): the owner directed the main effort to the
   teacher-side contract gaps. The batch schedule W6-W11 is frozen in
   `artifacts/w6-teacher-supply-schedule.md` and summarized in `01-plan.md`.
@@ -82,10 +94,15 @@
   canonical PostgreSQL owner tests. W6 still defaults false until the release
   operator supplies the reviewed staging organization allowlist and executes
   the runbook; no remote operation has run. Keep the other eight provider
-  gates false. Parent context still needs its W2 Prisma owner composition,
-  director needs its W4 Prisma owner composition, and parent communication
-  owner plus extension still need a production
-  `ParentCommunicationContextSelectionPortV1` host adapter.
+  gates false. W2 parent context now has its production Prisma owner
+  composition and canonical PostgreSQL qualification, without changing its
+  frozen contract or default-false gate. Director still needs its W4 Prisma
+  owner composition, and parent communication owner plus extension still need
+  the shared binding-carrier-to-local-selection mapper and production wiring.
+  The W2 implementation and first-phase scenario hash reseal are verified but
+  remain uncommitted in the current worktree. After that work unit is committed,
+  mint the C30 owner-adoption lock at the committed revision and commit the lock
+  separately; do not describe W2 as landed before both commits exist.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
@@ -236,10 +253,14 @@ conformance fixtures, all default-off.
   strict DTO schemas, safe-code policy, protected-cache semantics and joint
   conformance environment passed adoption-readiness review on 2026-08-13.
   My-Chat T-039 adopted the dormant consumer against the exact pin on
-  2026-08-13 and passed joint conformance. The five Nurture routes
-  remain mounted default-off and require the explicit gate, service auth,
-  complete Q6 owner ports and the active consumer-generation boundary port;
-  their presence is not activation.
+  2026-08-13 and passed joint conformance. The production Prisma owner now
+  resolves one exact current guardian/enrollment/grant/thread scope, serves
+  canonical shared-care and attendance rows, and confirms notice-read state
+  atomically through the generic command ledger. Its real PostgreSQL lane
+  covers replay, ambiguity and post-resolution revocation. The five Nurture
+  routes remain mounted default-off and require the explicit gate, service
+  auth and active consumer-generation boundary; their presence is not
+  activation.
 - [x] W3.0 P0: parent-communication owner contracts, four default-off private
   routes, response-schema enforcement, negative-path fixtures and exact My-Chat
   consumer adoption are implemented.
@@ -281,8 +302,9 @@ conformance fixtures, all default-off.
   spine waits on explicit authorization; production assembly, the My-Chat
   wiring/ramp/UI track and the remaining contract supply proceed in
   parallel without it.
-  - [x] A2 production assembly: the five existing teacher Prisma bindings are
-    injected by `main.ts` only when their unchanged default-false gates and
-    required secrets are present, sharing one shutdown-managed Prisma client.
-    The four surfaces without complete production owner dependencies refuse
-    startup with a structured reason instead of remaining silently dead.
+  - [x] A2 production assembly: the five teacher Prisma bindings and the W2
+    parent-context binding are injected by `main.ts` only when their unchanged
+    default-false gates and required secrets are present, sharing one
+    shutdown-managed Prisma client. The three surfaces without complete
+    production owner dependencies refuse startup with a structured reason
+    instead of remaining silently dead.

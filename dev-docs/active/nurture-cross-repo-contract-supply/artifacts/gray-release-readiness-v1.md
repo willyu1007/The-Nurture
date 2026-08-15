@@ -109,13 +109,14 @@ the five teacher surfaces (W6-W10) have production-ready Prisma
 compositions in `@the-nurture/db`. Three supply gaps join Track C and
 gate the affected ramp waves:
 
-1. W2 parent-context presenter — no Prisma owner composition exists;
-   wave 1b waits on it.
+1. W2 parent-context presenter — source composition and explicit local
+   selection are complete; wave 1b now waits on the reviewed migration,
+   cross-service configuration and gray execution evidence.
 2. W4 director presenter — no Prisma owner composition exists; wave 2
    waits on it in addition to the director composition layer (C1).
-3. Parent-communication owner + extension — missing a production
-   `ParentCommunicationContextSelectionPortV1` host adapter; wave 5
-   waits on it.
+3. Parent-communication owner + extension — the old host-selected Enrollment
+   port must be replaced by the shared binding carrier plus Nurture local
+   selection mapper and then wired in production; wave 5 waits on it.
 
 Until each gap closes, its gate fails fast at startup by design (the
 assembly refuses with a structured log naming the missing piece), so a

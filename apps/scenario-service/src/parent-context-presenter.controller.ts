@@ -11,6 +11,7 @@ import {
   Inject,
   Injectable,
   Post,
+  Req,
   ServiceUnavailableException,
   UnauthorizedException,
   UseFilters,
@@ -24,12 +25,14 @@ import {
   PARENT_CONTEXT_PRESENTER_DAY_PATH,
   PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH,
   PARENT_CONTEXT_PRESENTER_NOTICES_PATH,
+  MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER,
   ParentContextPresenterRequestParseError,
   parseParentContextPresenterActivityDetailRequestV1,
   parseParentContextPresenterDailyCareRequestV1,
   parseParentContextPresenterDayRequestV1,
   parseParentContextPresenterFreshnessAttendanceRequestV1,
   parseParentContextPresenterNoticeRequestV1,
+  parseParentContextSelectionV1,
 } from "./parent-context-presenter-http.js";
 import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
 
@@ -76,29 +79,37 @@ export class ParentContextPresenterController {
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  day(@Body() body: unknown): Promise<unknown> {
-    return this.composition().day(
-      this.parse(() => parseParentContextPresenterDayRequestV1(body)),
-    );
+  day(@Body() body: unknown, @Req() httpRequest: IncomingMessage): Promise<unknown> {
+    const request = this.parse(() => parseParentContextPresenterDayRequestV1(body));
+    return this.composition().day(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_CONTEXT_PRESENTER_DAILY_CARE_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  dailyCare(@Body() body: unknown): Promise<unknown> {
-    return this.composition().dailyCare(
-      this.parse(() => parseParentContextPresenterDailyCareRequestV1(body)),
-    );
+  dailyCare(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() => parseParentContextPresenterDailyCareRequestV1(body));
+    return this.composition().dailyCare(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_CONTEXT_PRESENTER_ACTIVITY_DETAIL_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  activityDetail(@Body() body: unknown): Promise<unknown> {
+  activityDetail(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() =>
+      parseParentContextPresenterActivityDetailRequestV1(body)
+    );
     return this.composition().activityDetail(
-      this.parse(() => parseParentContextPresenterActivityDetailRequestV1(body)),
+      request,
+      this.selection(httpRequest, request),
     );
   }
 
@@ -106,21 +117,28 @@ export class ParentContextPresenterController {
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  notices(@Body() body: unknown): Promise<unknown> {
-    return this.composition().notices(
-      this.parse(() => parseParentContextPresenterNoticeRequestV1(body)),
-    );
+  notices(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() => parseParentContextPresenterNoticeRequestV1(body));
+    return this.composition().notices(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  freshnessAttendance(@Body() body: unknown): Promise<unknown> {
+  freshnessAttendance(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() =>
+      parseParentContextPresenterFreshnessAttendanceRequestV1(body)
+    );
     return this.composition().freshnessAttendance(
-      this.parse(() =>
-        parseParentContextPresenterFreshnessAttendanceRequestV1(body)
-      ),
+      request,
+      this.selection(httpRequest, request),
     );
   }
 
@@ -143,5 +161,17 @@ export class ParentContextPresenterController {
       }
       throw error;
     }
+  }
+
+  private selection(
+    httpRequest: IncomingMessage,
+    identity: Parameters<typeof parseParentContextSelectionV1>[1],
+  ) {
+    return this.parse(() =>
+      parseParentContextSelectionV1(
+        httpRequest.headers[MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER],
+        identity,
+      )
+    );
   }
 }

@@ -606,6 +606,15 @@ export class PrismaEnrollmentTrialLifecycleRepository
       enrollmentUpdate.count !== 1 ||
       grantUpdate.count !== 1
     ) return conflict("trial_start_write_conflict");
+    await this.prisma.nurtureParentContextEnrollmentSelection.createMany({
+      data: [{
+        workspaceId: loaded.workflow.workspaceId,
+        childCareProcessId: loaded.enrollment!.childCareProcessId,
+        enrollmentId: loaded.enrollment!.id,
+        selectedAt: now,
+      }],
+      skipDuplicates: true,
+    });
     const after = await this.updateWorkflow({
       workflow: loaded.workflow,
       data: {
@@ -797,6 +806,13 @@ export class PrismaEnrollmentTrialLifecycleRepository
       grantUpdate.count !== 1 ||
       reservationUpdate.count !== 1
     ) return conflict("trial_end_write_conflict");
+    await this.prisma.nurtureParentContextEnrollmentSelection.deleteMany({
+      where: {
+        workspaceId: mutation.workspace_id,
+        childCareProcessId: loaded.enrollment!.childCareProcessId,
+        enrollmentId: loaded.enrollment!.id,
+      },
+    });
     const after = await this.updateWorkflow({
       workflow: loaded.workflow,
       data: {

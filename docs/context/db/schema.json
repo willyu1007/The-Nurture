@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-13T02:38:20.183Z",
+  "updatedAt": "2026-08-15T10:01:20.855Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -7450,6 +7450,15 @@
           "references": []
         },
         {
+          "field": "parentContextSelection",
+          "to": "NurtureParentContextEnrollmentSelection",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "publishTargets",
           "to": "NurturePublishProcessTarget",
           "optional": false,
@@ -11558,6 +11567,15 @@
         {
           "field": "messages",
           "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "parentContextSelections",
+          "to": "NurtureParentContextEnrollmentSelection",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -24585,6 +24603,133 @@
           ],
           "name": null,
           "map": "ix_7"
+        }
+      ]
+    },
+    {
+      "name": "NurtureParentContextEnrollmentSelection",
+      "dbName": "nurture_parent_context_enrollment_selection",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "selectedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "selected_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workspaceId",
+            "childCareProcessId"
+          ],
+          "references": [
+            "workspaceId",
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "enrollmentId"
+          ],
+          "references": [
+            "workspaceId",
+            "childCareProcessId",
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "enrollmentId"
+          ],
+          "name": null,
+          "map": "ix_nurture_parent_context_selection_enrollment"
+        },
+        {
+          "type": "primary",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId"
+          ],
+          "name": null,
+          "map": "nurture_parent_context_selection_pkey"
         }
       ]
     },

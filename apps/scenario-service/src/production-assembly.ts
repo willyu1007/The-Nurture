@@ -1,5 +1,6 @@
 import {
   createAesGcmProtectedContentPort,
+  createPrismaParentContextPresenterBinding,
   createPrismaClient,
   createPrismaTeacherAssistantQueryBinding,
   createPrismaTeacherClassStreamBinding,
@@ -15,6 +16,7 @@ import {
   type ScenarioStructuredLogSink,
 } from "./structured-logger.js";
 import type { TeacherAssistantQueryOwnerBindingV1 } from "./teacher-assistant-query-owner-runtime.js";
+import type { ParentContextPresenterOwnerBindingV1 } from "./parent-context-presenter-runtime.js";
 import type { TeacherClassStreamOwnerBindingV1 } from "./teacher-class-stream-runtime.js";
 import type { TeacherCommunicationOwnerBindingV1 } from "./teacher-communication-owner-runtime.js";
 import type { TeacherMediaAssociationOwnerBindingV1 } from "./teacher-media-association-owner-runtime.js";
@@ -35,6 +37,7 @@ type ProductionSurface =
   | "teacher_assistant_query_owner";
 
 export type ScenarioServiceProductionBindings = Readonly<{
+  parentContextPresenterOwnerBinding?: ParentContextPresenterOwnerBindingV1;
   teacherClassStreamOwnerBinding?: TeacherClassStreamOwnerBindingV1;
   teacherOrganizationOwnerBinding?: TeacherOrganizationOwnerBindingV1;
   teacherCommunicationOwnerBinding?: TeacherCommunicationOwnerBindingV1;
@@ -50,6 +53,7 @@ export type ScenarioServiceProductionAssembly = Readonly<{
 export type ScenarioServiceProductionAssemblyDependencies = Readonly<{
   createPrismaClient: typeof createPrismaClient;
   createProtectedContent: typeof createAesGcmProtectedContentPort;
+  createParentContextPresenterBinding: typeof createPrismaParentContextPresenterBinding;
   createTeacherClassStreamBinding: typeof createPrismaTeacherClassStreamBinding;
   createTeacherOrganizationBinding: typeof createPrismaTeacherOrganizationBinding;
   createTeacherCommunicationBinding: typeof createPrismaTeacherCommunicationBinding;
@@ -60,6 +64,7 @@ export type ScenarioServiceProductionAssemblyDependencies = Readonly<{
 const productionDependencies: ScenarioServiceProductionAssemblyDependencies = {
   createPrismaClient,
   createProtectedContent: createAesGcmProtectedContentPort,
+  createParentContextPresenterBinding: createPrismaParentContextPresenterBinding,
   createTeacherClassStreamBinding: createPrismaTeacherClassStreamBinding,
   createTeacherOrganizationBinding: createPrismaTeacherOrganizationBinding,
   createTeacherCommunicationBinding: createPrismaTeacherCommunicationBinding,
@@ -134,6 +139,15 @@ export function createScenarioServiceProductionAssembly(input: {
     : undefined;
 
   const bindings: ScenarioServiceProductionBindings = {
+    ...(input.config.parentContextPresenterEnabled
+      ? {
+          parentContextPresenterOwnerBinding:
+            dependencies.createParentContextPresenterBinding({
+              prisma,
+              integrityKey,
+            }),
+        }
+      : {}),
     ...(input.config.teacherClassStreamPresenterEnabled
       ? {
           teacherClassStreamOwnerBinding:
@@ -193,19 +207,14 @@ function assertUnavailableSurfacesDisabled(
 ): void {
   const unavailable = [
     {
-      enabled: config.parentContextPresenterEnabled,
-      surface: "parent_context_presenter" as const,
-      reason: "no Prisma owner composition exists yet for this surface",
-    },
-    {
       enabled: config.parentCommunicationOwnerEnabled,
       surface: "parent_communication_owner" as const,
-      reason: "missing production ParentCommunicationContextSelectionPortV1 host adapter",
+      reason: "parent communication has not cut over to Nurture-owned enrollment selection",
     },
     {
       enabled: config.parentCommunicationExtensionEnabled,
       surface: "parent_communication_extension" as const,
-      reason: "missing production ParentCommunicationContextSelectionPortV1 host adapter",
+      reason: "parent communication has not cut over to Nurture-owned enrollment selection",
     },
     {
       enabled: config.directorPresenterEnabled,
@@ -222,6 +231,9 @@ function assertUnavailableSurfacesDisabled(
 function firstEnabledReadySurface(
   config: ScenarioServiceConfig,
 ): ProductionSurface | undefined {
+  if (config.parentContextPresenterEnabled) {
+    return "parent_context_presenter";
+  }
   if (config.teacherClassStreamPresenterEnabled) {
     return "teacher_class_stream_presenter";
   }

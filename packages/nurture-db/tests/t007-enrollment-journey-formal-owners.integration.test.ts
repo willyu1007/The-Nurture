@@ -330,6 +330,14 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
     await expect(prisma.nurtureEnrollment.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId, childCareProcessId: seeded.processId },
     })).resolves.toMatchObject({ status: "active", participationPhase: "trial" });
+    await expect(prisma.nurtureParentContextEnrollmentSelection.findUniqueOrThrow({
+      where: {
+        workspaceId_childCareProcessId: {
+          workspaceId: scope.workspaceId,
+          childCareProcessId: seeded.processId,
+        },
+      },
+    })).resolves.toMatchObject({ aggregateVersion: 1 });
   });
 
   it("formalizes through current Guardian mobile authority and exact replay", async () => {
@@ -481,6 +489,14 @@ describe("T-007 Prisma formal Enrollment Journey owners", () => {
     await expect(prisma.nurtureEnrollment.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId, childCareProcessId: seeded.processId },
     })).resolves.toMatchObject({ status: "active", participationPhase: "formal" });
+    await expect(prisma.nurtureParentContextEnrollmentSelection.findUniqueOrThrow({
+      where: {
+        workspaceId_childCareProcessId: {
+          workspaceId: scope.workspaceId,
+          childCareProcessId: seeded.processId,
+        },
+      },
+    })).resolves.toMatchObject({ aggregateVersion: 2 });
     await expect(prisma.nurtureEnrollmentJourneyPreparedCommand.findUniqueOrThrow({
       where: { commandRequestId: formalized.commandRequestId },
     })).resolves.toMatchObject({

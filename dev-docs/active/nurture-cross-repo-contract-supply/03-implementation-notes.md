@@ -1,5 +1,31 @@
 # Implementation notes
 
+## 2026-08-15 — W2 explicit Enrollment selection and W3 readiness review
+
+- Added the owner contract `my-chat.parent-context-selection@1.0.0`: canonical
+  base64url JSON in `x-morethan-parent-context-selection`, exact pin and closed
+  keys, carrying current context version plus opaque child/family owner refs and
+  versions. The frozen W2 request/response contract did not change.
+- Added the Nurture-owned `nurture_parent_context_enrollment_selection` table.
+  The migration backfills only a unique formal Enrollment or a sole active
+  Enrollment; ambiguity deliberately remains absent/fail-closed. Trial start
+  creates only the first selection, formal acceptance advances it, and trial
+  end clears its own selection.
+- Reworked W2 authority to resolve exact binding anchors/association before the
+  local selection, select the Guardian role through the exact thread
+  membership, bound grant queries, and sequentially reread all heads inside
+  interactive transactions. Multi-Enrollment is now deterministic without a
+  cross-owner Enrollment id.
+- My-Chat parent contexts include internal-only current Nurture binding
+  evidence; public DTOs still map only canonical context fields. The BFF
+  refuses W2 when either binding is absent and the strict client sends the
+  shared carrier on every subrequest.
+- W3 readiness review found the pre-carrier host-selected Enrollment port,
+  direct caller-context forwarding, resolver cardinality/transaction issues
+  and missing production composition. They are retained only as an explicit
+  not-ready implementation seam and must be replaced in one cutover; see the
+  readiness artifact. No staging/prod operation ran.
+
 ## 2026-08-15 — End-of-schedule deep review repairs (W7-W11)
 
 Three adversarial review lanes (W10 stack, W11 stack, cross-batch closure
@@ -1209,10 +1235,10 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
 - All enabled teacher bindings share one Prisma client. `main.ts` disconnects
   it on HTTP-server close and on application startup failure; the all-off path
   constructs neither a binding nor a Prisma client and emits no new log.
-- Enabling parent context or director now refuses startup with the exact
-  missing-Prisma-composition reason. Enabling parent communication owner or
-  its extension refuses startup with the exact missing production
-  `ParentCommunicationContextSelectionPortV1` adapter reason.
+- At that point, enabling parent context or director refused startup with the
+  missing-Prisma-composition reason. Parent context is now assembled; parent
+  communication owner and extension still refuse until they cut over from the
+  obsolete host-selected Enrollment seam to Nurture-owned selection.
 - Enabled teacher surfaces fail startup before Prisma construction when
   service auth, `DATABASE_URL`, integrity-key material or required protected-
   content key material is absent. Refusals use the structured
@@ -1297,3 +1323,51 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
 - Updated G7 aggregation so both `class_stream_query` and
   `child_detail_query` are composite requests. Detail composites no longer
   inflate owner-call or timeout-rate denominators.
+
+## 2026-08-15 — W2 parent-context production owner closure
+
+- Added one shared scenario-layer W2 owner model and removed the service
+  composition, runtime and HTTP parser's parallel local type definitions. The frozen
+  `nurture.parent-context-presenter@1.0.0` JSON artifact and digest are
+  unchanged.
+- Added a conservative Prisma authority resolver. It requires exactly one
+  current guardian participant path, current family/child association,
+  enrollment, eligible `org_to_family` daily-care grant, private thread and
+  guardian membership. Zero or multiple eligible enrollment paths mask the
+  surface; the opaque host `context_ref` is never queried as a Nurture key or
+  accepted as permission.
+- Added exact-head rereads for every repository read and command commit.
+  Shared `NurtureDailyCareLog` rows supply the day, care-card and activity
+  views; canonical attendance submission/entry rows supply attendance; grant-
+  bound link receipts supply notices. No media stream, diagnosis, prescription
+  or raw domain-enum payload is synthesized.
+- Notification projection excludes `failed` and `blocked` receipts that never
+  became family-visible. Only delivered/read/acknowledged and previously
+  delivered-but-revoked rows may produce a notice. The owner also masks a
+  direct call whose resolved authority is bound to a different `context_ref`.
+- Implemented notice-read prepare/confirm on the existing interaction-context
+  and generic command-ledger machinery. The transaction rechecks the complete
+  authority head, binds actor/scope/action/version/preview digest, advances an
+  eligible delivered receipt to read, and preserves exact same-command replay.
+  Busy or technical commit outcomes remain `outcome_unknown` and are safe to
+  reconcile with the same command.
+- Added the Prisma composition to scenario-service production assembly. W2 now
+  shares the existing shutdown-managed client with the five teacher bindings;
+  the all-off path still constructs no client and the gate remains false by
+  default. Production refusals are now limited to W4 director and the two
+  parent-communication surfaces that still require the shared carrier and
+  Nurture-owned selection cutover.
+- Registered the W2 validator as the named
+  `verify:parent-context-presenter-contract` command and included it in the
+  maintained formal-ingress gate; the production-DB routing census advances by
+  exactly the new W2 integration file.
+- Added no Prisma schema, migration, dependency, contract version, gate
+  default, deployment, activation or traffic change.
+- Handoff state: all W2 source, tests, docs and the first-phase
+  `nurtureScenario.contractSha256` reseal are verified but uncommitted. Next:
+  (1) commit this work unit with `Task: T-011`; (2) from the resulting clean
+  HEAD run `pnpm reseal:pins lock`; (3) verify and commit the regenerated C30
+  owner-adoption lock separately. W4 composition and the production
+  parent-communication carrier cutover remains later, independent work.
+  Superseded on 2026-08-15: W2 now adds the explicit local selection migration;
+  W3 must replace, not implement, the old host-selected Enrollment adapter.

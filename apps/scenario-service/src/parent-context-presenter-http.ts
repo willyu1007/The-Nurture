@@ -5,6 +5,13 @@ import {
   PARENT_CONTEXT_PRESENTER_FRESHNESS_ATTENDANCE_PATH,
   PARENT_CONTEXT_PRESENTER_INTERFACE,
   PARENT_CONTEXT_PRESENTER_NOTICES_PATH,
+  MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE,
+  nurtureCanonicalJson,
+  type ParentContextSelectionV1,
+  type ParentContextPresenterActivityDetailRequestV1,
+  type ParentContextPresenterDateRequestV1,
+  type ParentContextPresenterIdentityV1,
+  type ParentContextPresenterNoticeRequestV1,
 } from "@the-nurture/scenario";
 
 export {
@@ -15,6 +22,21 @@ export {
   PARENT_CONTEXT_PRESENTER_INTERFACE,
   PARENT_CONTEXT_PRESENTER_NOTICES_PATH,
 };
+
+export type {
+  ParentContextPresenterActivityDetailRequestV1,
+  ParentContextPresenterDateRequestV1,
+  ParentContextPresenterIdentityV1,
+  ParentContextPresenterNoticeConfirmRequestV1,
+  ParentContextPresenterNoticeListRequestV1,
+  ParentContextPresenterNoticePrepareRequestV1,
+  ParentContextPresenterNoticeRequestV1,
+} from "@the-nurture/scenario";
+
+export {
+  MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER,
+  MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE,
+} from "@the-nurture/scenario";
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/u;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._~:/+@=-]{0,2047}$/u;
@@ -29,64 +51,78 @@ const COMMON_KEYS = [
   "context_ref",
 ] as const;
 
-export type ParentContextPresenterIdentityV1 = Readonly<{
-  workspace_id: string;
-  my_chat_user_id: string;
-  host_request_id: string;
-  context_ref: string;
-}>;
-
-export type ParentContextPresenterDateRequestV1 =
-  ParentContextPresenterIdentityV1 & Readonly<{ local_date: string }>;
-
-export type ParentContextPresenterActivityDetailRequestV1 =
-  ParentContextPresenterDateRequestV1 & Readonly<{ activity_ref: string }>;
-
-export type ParentContextPresenterNoticeListRequestV1 =
-  ParentContextPresenterIdentityV1 &
-  Readonly<{
-    kind: "list";
-    page_size?: number;
-    cursor?: string;
-  }>;
-
-export type ParentContextPresenterNoticePrepareRequestV1 =
-  ParentContextPresenterIdentityV1 &
-  Readonly<{
-    kind: "prepare_confirmation";
-    notice_ref: string;
-    action_ref: string;
-    action_version: number;
-    expected_notice_version: number;
-  }>;
-
-export type ParentContextPresenterNoticeConfirmRequestV1 =
-  ParentContextPresenterIdentityV1 &
-  Readonly<{
-    kind: "confirm";
-    invocation_request_id: string;
-    command_request_id: string;
-    confirmation_ref: string;
-    action_ref: string;
-    action_version: number;
-    prepared_preview_digest: string;
-  }>;
-
-export type ParentContextPresenterNoticeRequestV1 =
-  | ParentContextPresenterNoticeListRequestV1
-  | ParentContextPresenterNoticePrepareRequestV1
-  | ParentContextPresenterNoticeConfirmRequestV1;
-
 export class ParentContextPresenterRequestParseError extends Error {
   constructor(
     readonly code:
       | "invalid_parent_context_presenter_request"
-      | "parent_context_presenter_contract_mismatch",
+      | "parent_context_presenter_contract_mismatch"
+      | "parent_context_selection_contract_mismatch",
   ) {
     super(code);
     this.name = "ParentContextPresenterRequestParseError";
   }
 }
+
+export const parseParentContextSelectionV1 = (
+  header: string | string[] | undefined,
+  identity: ParentContextPresenterIdentityV1,
+): ParentContextSelectionV1 => {
+  if (
+    typeof header !== "string"
+    || header.length === 0
+    || header.length > 8_192
+    || !/^[A-Za-z0-9_-]+$/u.test(header)
+  ) {
+    throw invalidRequest();
+  }
+  const bytes = Buffer.from(header, "base64url");
+  if (bytes.length === 0 || bytes.length > 4_096 || bytes.toString("base64url") !== header) {
+    throw invalidRequest();
+  }
+  let value: unknown;
+  try {
+    value = JSON.parse(bytes.toString("utf8"));
+  } catch {
+    throw invalidRequest();
+  }
+  if (bytes.toString("utf8") !== nurtureCanonicalJson(value)) {
+    throw invalidRequest();
+  }
+  if (!isRecord(value)) throw invalidRequest();
+  if (
+    !hasExactKeys(value, [
+      "interface_contract",
+      "workspace_id",
+      "my_chat_user_id",
+      "host_request_id",
+      "context_ref",
+      "context_version",
+      "child_binding",
+      "family_binding",
+    ])
+    || !isRecord(value.interface_contract)
+    || !hasExactKeys(value.interface_contract, ["key", "version", "digest"])
+    || value.interface_contract.key !== MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE.key
+    || value.interface_contract.version !== MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE.version
+    || value.interface_contract.digest !== MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE.digest
+  ) {
+    throw new ParentContextPresenterRequestParseError(
+      "parent_context_selection_contract_mismatch",
+    );
+  }
+  if (
+    value.workspace_id !== identity.workspace_id
+    || value.my_chat_user_id !== identity.my_chat_user_id
+    || value.host_request_id !== identity.host_request_id
+    || value.context_ref !== identity.context_ref
+    || !isRef(value.context_version)
+    || !isBindingSelection(value.child_binding)
+    || !isBindingSelection(value.family_binding)
+  ) {
+    throw invalidRequest();
+  }
+  return value as ParentContextSelectionV1;
+};
 
 export const parseParentContextPresenterDayRequestV1 = (
   body: unknown,
@@ -242,6 +278,18 @@ const parseIdentity = (
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
+
+const hasExactKeys = (
+  value: Record<string, unknown>,
+  keys: readonly string[],
+): boolean =>
+  Object.keys(value).length === keys.length && keys.every((key) => key in value);
+
+const isBindingSelection = (value: unknown): boolean =>
+  isRecord(value)
+  && hasExactKeys(value, ["owner_ref", "owner_version"])
+  && isRef(value.owner_ref)
+  && isBoundedVersion(value.owner_version, 1);
 
 const isId = (value: unknown): value is string =>
   typeof value === "string" && ID_PATTERN.test(value);

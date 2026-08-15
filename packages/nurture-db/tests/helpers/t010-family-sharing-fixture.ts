@@ -181,6 +181,15 @@ export async function seedT010FamilySharingFixture(
       aggregateVersion: 13,
     },
   });
+  await database.nurtureParentContextEnrollmentSelection.create({
+    data: {
+      workspaceId: item.workspaceId,
+      childCareProcessId: item.processId,
+      enrollmentId: item.enrollmentId,
+      aggregateVersion: 1,
+      selectedAt: new Date("2026-08-12T07:59:00.000Z"),
+    },
+  });
   await database.nurtureFamilyAnchorAssociation.create({
     data: {
       id: item.familyAssociationId,
@@ -296,6 +305,9 @@ export async function removeT010FamilySharingFixture(
   });
   await database.nurtureChildAnchorAssociation.deleteMany({
     where: { id: item.childAssociationId },
+  });
+  await database.nurtureParentContextEnrollmentSelection.deleteMany({
+    where: { workspaceId: item.workspaceId },
   });
   await database.nurtureEnrollment.deleteMany({ where: { id: item.enrollmentId } });
   await database.nurtureCareRoleAssignment.deleteMany({
