@@ -100,12 +100,15 @@
   W2 parent context now has its production Prisma owner
   composition and canonical PostgreSQL qualification, without changing its
   frozen contract or default-false gate. W4.1 director Prisma composition is
-  active at step 2 of 6: the DB-free presenter service and bounded Prisma
+  active at step 3 of 6: the DB-free presenter service and bounded Prisma
   authority/read repository now implement the frozen source matrix, including
   current exact-head rereads, honest partial sections, signed drilldown refs,
   protected-material denial and reuse of the configured-load signal owner.
-  Next wire the one production Prisma binding through the shared client and
-  remove only the stale director startup refusal. W3/W11 carrier
+  One production binding now composes those reads plus the existing support-
+  signal policy owner through the shutdown-managed shared Prisma client; the
+  stale director-only startup refusal is gone and the gate still defaults
+  false. Next harden cache/ref lifetime, per-open authority, protected denial
+  and D-O13 invariants through focused adversarial tests. W3/W11 carrier
   cutover is now closed at step 6 of 6: the
   shared mapper, seven carrier-protected routes, association-first authority,
   exact My-Chat current-context emission, default-off production/family-ramp

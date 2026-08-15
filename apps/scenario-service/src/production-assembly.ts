@@ -1,5 +1,6 @@
 import {
   createAesGcmProtectedContentPort,
+  createPrismaDirectorPresenterBinding,
   createPrismaParentCommunicationExtensionBinding,
   createPrismaParentCommunicationOwnerBinding,
   createPrismaParentContextPresenterBinding,
@@ -25,6 +26,7 @@ import type { TeacherClassStreamOwnerBindingV1 } from "./teacher-class-stream-ru
 import type { TeacherCommunicationOwnerBindingV1 } from "./teacher-communication-owner-runtime.js";
 import type { TeacherMediaAssociationOwnerBindingV1 } from "./teacher-media-association-owner-runtime.js";
 import type { TeacherOrganizationOwnerBindingV1 } from "./teacher-organization-owner-runtime.js";
+import type { DirectorPresenterOwnerBindingV1 } from "./director-presenter-runtime.js";
 
 const PROTECTED_CONTENT_KEY_REF = "nurture-protected-content-v1";
 const MINIMUM_SECRET_LENGTH = 32;
@@ -44,6 +46,7 @@ export type ScenarioServiceProductionBindings = Readonly<{
   parentContextPresenterOwnerBinding?: ParentContextPresenterOwnerBindingV1;
   parentCommunicationOwnerBinding?: ParentCommunicationOwnerBindingV1;
   parentCommunicationExtensionBinding?: ParentCommunicationExtensionBindingV1;
+  directorPresenterOwnerBinding?: DirectorPresenterOwnerBindingV1;
   teacherClassStreamOwnerBinding?: TeacherClassStreamOwnerBindingV1;
   teacherOrganizationOwnerBinding?: TeacherOrganizationOwnerBindingV1;
   teacherCommunicationOwnerBinding?: TeacherCommunicationOwnerBindingV1;
@@ -62,6 +65,7 @@ export type ScenarioServiceProductionAssemblyDependencies = Readonly<{
   createParentContextPresenterBinding: typeof createPrismaParentContextPresenterBinding;
   createParentCommunicationOwnerBinding: typeof createPrismaParentCommunicationOwnerBinding;
   createParentCommunicationExtensionBinding: typeof createPrismaParentCommunicationExtensionBinding;
+  createDirectorPresenterBinding: typeof createPrismaDirectorPresenterBinding;
   createTeacherClassStreamBinding: typeof createPrismaTeacherClassStreamBinding;
   createTeacherOrganizationBinding: typeof createPrismaTeacherOrganizationBinding;
   createTeacherCommunicationBinding: typeof createPrismaTeacherCommunicationBinding;
@@ -76,6 +80,7 @@ const productionDependencies: ScenarioServiceProductionAssemblyDependencies = {
   createParentCommunicationOwnerBinding: createPrismaParentCommunicationOwnerBinding,
   createParentCommunicationExtensionBinding:
     createPrismaParentCommunicationExtensionBinding,
+  createDirectorPresenterBinding: createPrismaDirectorPresenterBinding,
   createTeacherClassStreamBinding: createPrismaTeacherClassStreamBinding,
   createTeacherOrganizationBinding: createPrismaTeacherOrganizationBinding,
   createTeacherCommunicationBinding: createPrismaTeacherCommunicationBinding,
@@ -96,7 +101,6 @@ export function createScenarioServiceProductionAssembly(input: {
   dependencies?: ScenarioServiceProductionAssemblyDependencies;
 }): ScenarioServiceProductionAssembly {
   const logger = new ScenarioStructuredLogger(input.logSink);
-  assertUnavailableSurfacesDisabled(input.config, logger);
 
   const enabledSurface = firstEnabledReadySurface(input.config);
   if (!enabledSurface) {
@@ -179,6 +183,15 @@ export function createScenarioServiceProductionAssembly(input: {
             }),
         }
       : {}),
+    ...(input.config.directorPresenterEnabled
+      ? {
+          directorPresenterOwnerBinding:
+            dependencies.createDirectorPresenterBinding({
+              prisma,
+              integrityKey,
+            }),
+        }
+      : {}),
     ...(input.config.teacherClassStreamPresenterEnabled
       ? {
           teacherClassStreamOwnerBinding:
@@ -232,23 +245,6 @@ export function createScenarioServiceProductionAssembly(input: {
   return createAssembly(bindings, prisma);
 }
 
-function assertUnavailableSurfacesDisabled(
-  config: ScenarioServiceConfig,
-  logger: ScenarioStructuredLogger,
-): void {
-  const unavailable = [
-    {
-      enabled: config.directorPresenterEnabled,
-      surface: "director_presenter" as const,
-      reason: "no Prisma owner composition exists yet for this surface",
-    },
-  ].find(({ enabled }) => enabled);
-
-  if (unavailable) {
-    refuse(unavailable.surface, unavailable.reason, logger);
-  }
-}
-
 function firstEnabledReadySurface(
   config: ScenarioServiceConfig,
 ): ProductionSurface | undefined {
@@ -260,6 +256,9 @@ function firstEnabledReadySurface(
   }
   if (config.parentCommunicationExtensionEnabled) {
     return "parent_communication_extension";
+  }
+  if (config.directorPresenterEnabled) {
+    return "director_presenter";
   }
   if (config.teacherClassStreamPresenterEnabled) {
     return "teacher_class_stream_presenter";

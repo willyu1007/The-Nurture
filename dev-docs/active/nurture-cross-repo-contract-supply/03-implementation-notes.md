@@ -1534,3 +1534,29 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   numerator.
 - Added no schema, migration, frozen contract, gate default, production
   assembly, deployment, activation, public API or Mobile business rendering.
+
+## 2026-08-15 — W4 Prisma composition step 3
+
+- Added one `createPrismaDirectorPresenterBinding` factory. It composes the
+  step-2 Prisma read repository, the DB-free presenter and the existing
+  configured-load support-signal repository plus institution authority chain.
+  The same integrity key protects presenter refs and exact-owner support refs;
+  no second threshold or support projection was added.
+- Added the director binding to the scenario-service production assembly. It
+  uses the same lazily constructed, shutdown-managed Prisma client as all eight
+  existing production bindings and flows through the application input that
+  already creates the published composition.
+- Removed the sole obsolete production refusal stating that the director had
+  no Prisma composition. No generic refusal layer or compatibility branch was
+  retained because every declared production surface now has a concrete
+  factory.
+- Reused the scenario package's `DirectorPresenterOwnerBindingV1` in the
+  scenario-service runtime instead of keeping a second structurally identical
+  binding type.
+- The director gate still parses only the exact `true` literal and remains
+  false in the environment SSOT/defaults. Director composition needs service
+  auth, `DATABASE_URL` and the existing integrity key, but correctly does not
+  require the protected-content key because W4.1 never opens protected
+  material.
+- Added no schema, migration, environment value, contract, deployment,
+  activation, public API or Mobile business rendering.

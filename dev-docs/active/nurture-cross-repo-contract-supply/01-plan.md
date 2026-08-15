@@ -146,7 +146,7 @@ commits without changing its digest or default-off posture:
    authority precedence and service/repository boundary.
 2. [x] Implement current institution-director authority and the DB-free
    presenter over bounded Prisma read ports.
-3. [ ] Supply one production Prisma binding through the shared-client assembly
+3. [x] Supply one production Prisma binding through the shared-client assembly
    and remove only the stale director startup refusal.
 4. [ ] Harden opaque refs, cache lifetime, pagination, per-open authority,
    protected-material denial and the action-free D-O13 invariant.

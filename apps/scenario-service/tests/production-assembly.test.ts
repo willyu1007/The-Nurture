@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  createPrismaDirectorPresenterBinding,
   createPrismaParentContextPresenterBinding,
   createPrismaParentCommunicationExtensionBinding,
   createPrismaParentCommunicationOwnerBinding,
@@ -31,13 +32,12 @@ type ReadyGate =
   | "parentContextPresenterEnabled"
   | "parentCommunicationOwnerEnabled"
   | "parentCommunicationExtensionEnabled"
+  | "directorPresenterEnabled"
   | "teacherClassStreamPresenterEnabled"
   | "teacherOrganizationOwnerEnabled"
   | "teacherCommunicationOwnerEnabled"
   | "teacherMediaAssociationOwnerEnabled"
   | "teacherAssistantQueryOwnerEnabled";
-
-type UnreadyGate = "directorPresenterEnabled";
 
 const readyCases = [
   {
@@ -56,6 +56,12 @@ const readyCases = [
     gate: "parentCommunicationExtensionEnabled",
     factory: "createParentCommunicationExtensionBinding",
     binding: "parentCommunicationExtensionBinding",
+    needsProtectedContent: false,
+  },
+  {
+    gate: "directorPresenterEnabled",
+    factory: "createDirectorPresenterBinding",
+    binding: "directorPresenterOwnerBinding",
     needsProtectedContent: false,
   },
   {
@@ -93,18 +99,6 @@ const readyCases = [
   factory: keyof ScenarioServiceProductionAssemblyDependencies;
   binding: string;
   needsProtectedContent: boolean;
-}>[];
-
-const unreadyCases = [
-  {
-    gate: "directorPresenterEnabled",
-    surface: "director_presenter",
-    reason: "no Prisma owner composition exists yet for this surface",
-  },
-] as const satisfies readonly Readonly<{
-  gate: UnreadyGate;
-  surface: string;
-  reason: string;
 }>[];
 
 describe("scenario-service production assembly", () => {
@@ -159,34 +153,6 @@ describe("scenario-service production assembly", () => {
 
       await assembly.disconnect();
       expect(fixture.disconnect).toHaveBeenCalledOnce();
-    },
-  );
-
-  it.each(unreadyCases)(
-    "refuses $surface because its production owner dependency is unavailable",
-    ({ gate, surface, reason }) => {
-      const fixture = createDependencies();
-      const logs: ScenarioStructuredLogRecord[] = [];
-
-      expect(() =>
-        createScenarioServiceProductionAssembly({
-          config: enable(defaultConfig, gate),
-          serviceAuth: configuredServiceAuth,
-          env: completeEnvironment(),
-          logSink: (record) => logs.push(record),
-          dependencies: fixture.dependencies,
-        }),
-      ).toThrow(reason);
-
-      expect(logs).toEqual([
-        {
-          schema: "nurture_scenario_service_log_v1",
-          event: "scenario_service_production_assembly_refused",
-          surface,
-          reason,
-        },
-      ]);
-      expect(fixture.createPrisma).not.toHaveBeenCalled();
     },
   );
 
@@ -262,7 +228,7 @@ describe("scenario-service production assembly", () => {
     expect(fixture.createPrisma).not.toHaveBeenCalled();
   });
 
-  it("shares one Prisma client across all eight bindings and disconnects it once", async () => {
+  it("shares one Prisma client across all nine bindings and disconnects it once", async () => {
     const fixture = createDependencies();
     const allReadyConfig = readyCases.reduce(
       (config, { gate }) => enable(config, gate),
@@ -276,7 +242,7 @@ describe("scenario-service production assembly", () => {
     });
 
     expect(fixture.createPrisma).toHaveBeenCalledOnce();
-    expect(fixture.bindingPrisma).toEqual(Array(8).fill(fixture.prisma));
+    expect(fixture.bindingPrisma).toEqual(Array(9).fill(fixture.prisma));
 
     await assembly.disconnect();
     await assembly.disconnect();
@@ -286,7 +252,7 @@ describe("scenario-service production assembly", () => {
 
 function enable(
   config: ScenarioServiceConfig,
-  gate: ReadyGate | UnreadyGate,
+  gate: ReadyGate,
 ): ScenarioServiceConfig {
   return Object.freeze({ ...config, [gate]: true });
 }
@@ -322,6 +288,9 @@ function createDependencies() {
   const parentCommunicationExtensionBinding = Object.freeze(
     {},
   ) as ReturnType<typeof createPrismaParentCommunicationExtensionBinding>;
+  const directorPresenterBinding = Object.freeze(
+    {},
+  ) as ReturnType<typeof createPrismaDirectorPresenterBinding>;
   const organizationBinding = Object.freeze(
     {},
   ) as ReturnType<typeof createPrismaTeacherOrganizationBinding>;
@@ -352,6 +321,12 @@ function createDependencies() {
   ) => {
     bindingPrisma.push(input.prisma);
     return parentCommunicationExtensionBinding;
+  });
+  const createDirectorPresenterBinding = vi.fn((
+    input: Parameters<typeof createPrismaDirectorPresenterBinding>[0],
+  ) => {
+    bindingPrisma.push(input.prisma);
+    return directorPresenterBinding;
   });
   const createTeacherClassStreamBinding = vi.fn((
     input: Parameters<typeof createPrismaTeacherClassStreamBinding>[0],
@@ -389,6 +364,7 @@ function createDependencies() {
     createParentContextPresenterBinding,
     createParentCommunicationOwnerBinding,
     createParentCommunicationExtensionBinding,
+    createDirectorPresenterBinding,
     createTeacherClassStreamBinding,
     createTeacherOrganizationBinding,
     createTeacherCommunicationBinding,
@@ -407,6 +383,7 @@ function createDependencies() {
       createParentContextPresenterBinding,
       createParentCommunicationOwnerBinding,
       createParentCommunicationExtensionBinding,
+      createDirectorPresenterBinding,
       createTeacherClassStreamBinding,
       createTeacherOrganizationBinding,
       createTeacherCommunicationBinding,

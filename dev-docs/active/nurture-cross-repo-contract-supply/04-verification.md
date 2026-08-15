@@ -1452,3 +1452,26 @@ DEFAULT_OFF`.
 Verdict: `W4_PRISMA_STEP_2_PASS / DB_FREE_PRESENTER /
 EXACT_PRISMA_AUTHORITY / BOUNDED_CURRENT_READS / SIGNED_REFS /
 HONEST_PARTIALS / CONTRACT_UNCHANGED / DEFAULT_OFF`.
+
+## 2026-08-15 — W4 Prisma composition step 3
+
+- Root `pnpm typecheck` passed with the new DB composition factory, canonical
+  binding type and production assembly path.
+- Focused scenario-service tests passed 2 files / 21 tests: all nine production
+  factories are independently selected, all-off creates no Prisma client,
+  all-on shares one client across nine bindings and disconnects once, and the
+  five formal director ingress tests remain green.
+- The director contract validator passed the unchanged digest, 12 fixtures and
+  11 invalid probes.
+- Source census found one director Prisma factory and one production binding
+  path. The obsolete `no Prisma owner composition exists yet` refusal and its
+  unavailable-surface branch have zero occurrences.
+- Gate/default census and an empty diff over `env/`, `prisma/` and generated DB
+  context confirm the step changed no activation value, schema, migration or
+  environment contract. `git diff --check` passed.
+- Strict task-doc and project-governance lint passed; package clean scripts
+  removed the ignored scenario/DB build outputs created by verification.
+
+Verdict: `W4_PRISMA_STEP_3_PASS / ONE_PRODUCTION_BINDING /
+SHARED_PRISMA_CLIENT / OBSOLETE_REFUSAL_REMOVED / NO_PROTECTED_KEY /
+DEFAULT_OFF / NO_SCHEMA_OR_ENV_CHANGE`.
