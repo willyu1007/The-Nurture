@@ -1227,3 +1227,36 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   source, focused test, routing census and T-011 docs, then commit as
   `feat(service): assemble teacher bindings` with trailer `Task: T-011`;
   preserve the unrelated untracked `codex-run.log` and `codex-task.md`.
+
+## 2026-08-15 — Wave 1 parallel closure (gray-release tracks)
+
+- Closed the first parallel wave of the gray-release plan across both
+  repos with four concurrent agents and a serial merge queue. Landed in
+  this repo: the A2 production assembly (`dc92d97`, five teacher surfaces
+  assembled, four unready gates fail fast), the `deploy/scenario-service/`
+  preparation artifacts (`1fca2de`: Dockerfile with the two-checkout build
+  context the `link:../My-Chat` workspace requires, full env manifest
+  mapped to ramp waves, token issuance/rotation runbook), the cross-repo
+  pin reseal pair (`1614037`/`834e360`) and the ramp-plan amendment
+  (`3b95698`). Landed in My-Chat: the minimal ramp control plane
+  (per-surface gate + allowlist, request-time env reads) and the first
+  two BFF wirings (W2 parent-context routes migrated into a dedicated
+  `nurture-bff` module, W6 teacher class-stream added), `83274e1`.
+- The reseal surfaced a latent cross-repo debt: the P-G03 milestone
+  migration had changed `prisma/schema.prisma`, a locked byte source in
+  My-Chat's scenario-host-adoption lock, without the lock refresh. Fixed
+  in My-Chat by advancing the compute script's pinned `sourceRevision`
+  to the P-G03 head and regenerating the lock (`99fe4d2` + `99be59c`);
+  the refresh procedure is three coupled steps in one commit.
+- Gap progress: G2 (assembly), G5 (first wiring), G6 (control plane)
+  closed; G3/G4 preparation artifacts done, their deployment halves wait
+  on authorization. Open: G1 (authorization), G7 (metrics aggregation),
+  G8 (joint rehearsal, needs G1+G3), G9 (UI batch — four mock files
+  with A/B/C variants were delivered outside the repo; variant selection
+  is deferred because a concurrent effort owns the UI line).
+- Next queue (Wave 2, all authorization-independent): C1 director
+  composition layer, the remaining seven client wirings on the My-Chat
+  side, G7 minimal log aggregation, and the three supply gaps recorded
+  in the ramp-plan amendment (W2/W4 real Prisma owner ports, production
+  parent-communication context-selection adapter).
+- Both heads closed green: this repo `3b95698`, My-Chat `99be59c`.
