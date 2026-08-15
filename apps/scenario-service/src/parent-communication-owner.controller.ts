@@ -11,11 +11,13 @@ import {
   Inject,
   Injectable,
   Post,
+  Req,
   ServiceUnavailableException,
   UnauthorizedException,
   UseFilters,
   UseGuards,
 } from "@nestjs/common";
+import { MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER } from "@the-nurture/scenario";
 import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
 import type { ParentCommunicationOwnerComposition } from "./parent-communication-owner-composition.js";
 import {
@@ -30,6 +32,10 @@ import {
   parseParentCommunicationSummaryRequestV1,
 } from "./parent-communication-owner-http.js";
 import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
+import {
+  ParentContextSelectionHeaderParseError,
+  parseParentContextSelectionHeaderV1,
+} from "./parent-context-selection-http.js";
 
 export const PARENT_COMMUNICATION_OWNER_CONFIG = Symbol(
   "PARENT_COMMUNICATION_OWNER_CONFIG",
@@ -74,40 +80,39 @@ export class ParentCommunicationOwnerController {
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  summary(@Body() body: unknown): Promise<unknown> {
-    return this.composition().summary(
-      this.parse(() => parseParentCommunicationSummaryRequestV1(body)),
-    );
+  summary(@Body() body: unknown, @Req() httpRequest: IncomingMessage): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationSummaryRequestV1(body));
+    return this.composition().summary(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_COMMUNICATION_OWNER_DETAIL_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  detail(@Body() body: unknown): Promise<unknown> {
-    return this.composition().detail(
-      this.parse(() => parseParentCommunicationDetailRequestV1(body)),
-    );
+  detail(@Body() body: unknown, @Req() httpRequest: IncomingMessage): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationDetailRequestV1(body));
+    return this.composition().detail(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_COMMUNICATION_OWNER_MEDIA_ACCESS_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  mediaAccess(@Body() body: unknown): Promise<unknown> {
-    return this.composition().mediaAccess(
-      this.parse(() => parseParentCommunicationMediaAccessRequestV1(body)),
-    );
+  mediaAccess(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationMediaAccessRequestV1(body));
+    return this.composition().mediaAccess(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_COMMUNICATION_OWNER_SEND_TEXT_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  sendText(@Body() body: unknown): Promise<unknown> {
-    return this.composition().sendText(
-      this.parse(() => parseParentCommunicationSendTextRequestV1(body)),
-    );
+  sendText(@Body() body: unknown, @Req() httpRequest: IncomingMessage): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationSendTextRequestV1(body));
+    return this.composition().sendText(request, this.selection(httpRequest, request));
   }
 
   private composition(): ParentCommunicationOwnerComposition {
@@ -124,10 +129,23 @@ export class ParentCommunicationOwnerController {
     try {
       return run();
     } catch (error) {
-      if (error instanceof ParentCommunicationOwnerRequestParseError) {
+      if (
+        error instanceof ParentCommunicationOwnerRequestParseError
+        || error instanceof ParentContextSelectionHeaderParseError
+      ) {
         throw new BadRequestException({ error: error.code });
       }
       throw error;
     }
+  }
+
+  private selection(
+    httpRequest: IncomingMessage,
+    identity: Parameters<typeof parseParentContextSelectionHeaderV1>[1],
+  ) {
+    return this.parse(() => parseParentContextSelectionHeaderV1(
+      httpRequest.headers[MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER],
+      identity,
+    ));
   }
 }

@@ -1,4 +1,7 @@
-import type { ParentCommunicationExtensionOperation } from "@the-nurture/scenario";
+import type {
+  ParentCommunicationExtensionOperation,
+  ParentContextSelectionV1,
+} from "@the-nurture/scenario";
 import { PARENT_COMMUNICATION_EXTENSION_INTERFACE } from "@the-nurture/scenario";
 import type {
   ParentCommunicationDeliveryReceiptRequestV1,
@@ -13,6 +16,7 @@ export type ParentCommunicationExtensionResolutionV1 = Readonly<{
   context_ref: string;
   resolution_ref: string;
   scope_version: number;
+  context_selection: ParentContextSelectionV1;
 }>;
 
 type ParentCommunicationExtensionIdentityV1 = Readonly<{
@@ -22,6 +26,7 @@ type ParentCommunicationExtensionIdentityV1 = Readonly<{
   context_ref: string;
   operation: ParentCommunicationExtensionOperation;
   message_ref: string;
+  context_selection: ParentContextSelectionV1;
 }>;
 
 export type ParentCommunicationExtensionAuthorityResultV1 =
@@ -68,26 +73,32 @@ export class ParentCommunicationExtensionComposition {
 
   redactionPreview(
     request: ParentCommunicationRedactionPreviewRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
-    return this.execute("redaction_preview_query", request, (authority) =>
+    return this.execute("redaction_preview_query", request, selection, (authority) =>
       this.owner.redactionPreview({ request, authority }));
   }
 
-  redact(request: ParentCommunicationRedactRequestV1): Promise<unknown> {
-    return this.execute("redact_exchange", request, (authority) =>
+  redact(
+    request: ParentCommunicationRedactRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("redact_exchange", request, selection, (authority) =>
       this.owner.redact({ request, authority }));
   }
 
   deliveryReceipt(
     request: ParentCommunicationDeliveryReceiptRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
-    return this.execute("delivery_receipt_query", request, (authority) =>
+    return this.execute("delivery_receipt_query", request, selection, (authority) =>
       this.owner.deliveryReceipt({ request, authority }));
   }
 
   private async execute(
     operation: ParentCommunicationExtensionOperation,
     request: AnyParentCommunicationExtensionRequestV1,
+    selection: ParentContextSelectionV1,
     run: (
       authority: ParentCommunicationExtensionResolutionV1,
     ) => Promise<unknown>,
@@ -99,6 +110,7 @@ export class ParentCommunicationExtensionComposition {
       context_ref: request.context_ref,
       operation,
       message_ref: request.message_ref,
+      context_selection: selection,
     });
     const response = authority.status === "closed"
       ? authority.response

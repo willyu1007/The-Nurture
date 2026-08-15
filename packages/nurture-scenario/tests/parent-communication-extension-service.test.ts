@@ -13,6 +13,10 @@ import {
 } from "../src/parent-communication-extension-service.js";
 import type { ParentCommunicationResolvedAuthorityV1 } from "../src/parent-communication-owner-contract.js";
 import { presentationVersionFor } from "../src/parent-communication-owner-service.js";
+import {
+  MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE,
+  type ParentContextSelectionV1,
+} from "../src/parent-context-selection-contract.js";
 import { createHmac } from "node:crypto";
 
 const INTEGRITY_KEY = "parent-communication-extension-unit-key-01";
@@ -74,6 +78,20 @@ const identity = (host: string) => ({
   my_chat_user_id: USER,
   host_request_id: host,
   context_ref: CONTEXT,
+});
+
+const contextSelection = (host: string): ParentContextSelectionV1 => ({
+  interface_contract: MY_CHAT_PARENT_CONTEXT_SELECTION_INTERFACE,
+  ...identity(host),
+  context_version: "pcv1:unit",
+  child_binding: {
+    owner_ref: "nurture_child_binding_anchor_v1:11111111-1111-4111-8111-111111111111",
+    owner_version: 1,
+  },
+  family_binding: {
+    owner_ref: "nurture_family_binding_anchor_v1:22222222-2222-4222-8222-222222222222",
+    owner_version: 1,
+  },
 });
 
 const baseFacts = (): G2MessageChangeFacts =>
@@ -605,6 +623,7 @@ describe("W11 parent-communication extension owner service", () => {
       ...identity("host-receipt-3"),
       operation: "delivery_receipt_query",
       message_ref: messageRef(identity("host-receipt-3")),
+      context_selection: contextSelection("host-receipt-3"),
     })) as { status: string; response: Record<string, unknown> };
     expect(closed.status).toBe("closed");
     expect(closed.response).toMatchObject({

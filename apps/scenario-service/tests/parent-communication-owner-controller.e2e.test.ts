@@ -25,6 +25,7 @@ import {
 } from "../src/parent-communication-owner-composition.js";
 import { SafeExceptionFilter } from "../src/safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "../src/structured-logger.js";
+import { parentContextSelectionHeaderFor } from "./helpers/parent-context-selection-header.js";
 
 const TOKEN = "parent-communication-owner-token-32";
 const closes: Array<() => Promise<void>> = [];
@@ -76,6 +77,7 @@ async function post(
   requestPath: string,
   body: unknown,
   token = TOKEN,
+  selectionHeader?: string | null,
 ) {
   return inject(application, {
     method: "POST",
@@ -83,6 +85,12 @@ async function post(
     headers: {
       authorization: `Bearer ${token}`,
       "content-type": "application/json",
+      ...(selectionHeader === null
+        ? {}
+        : {
+            "x-morethan-parent-context-selection": selectionHeader
+              ?? parentContextSelectionHeaderFor(isRecord(body) ? body : {}),
+          }),
     },
     payload: JSON.stringify(body),
   });
@@ -190,6 +198,35 @@ function fixtureComposition(fixtureIds: readonly string[]) {
 }
 
 describe("parent-communication owner formal ingress", () => {
+  it("requires one identity-bound canonical selection carrier", async () => {
+    const selected = fixture("summary-ready-minimized");
+    const runtime = fixtureComposition([selected.fixture_id]);
+    const application = await start(runtime.composition);
+    const missing = await post(
+      application,
+      PARENT_COMMUNICATION_OWNER_SUMMARY_PATH,
+      selected.request,
+      TOKEN,
+      null,
+    );
+    expect(missing.statusCode).toBe(400);
+    expect(missing.json()).toEqual({ error: "invalid_request" });
+
+    const foreignHeader = parentContextSelectionHeaderFor({
+      ...selected.request,
+      context_ref: "foreign-context",
+    });
+    const foreign = await post(
+      application,
+      PARENT_COMMUNICATION_OWNER_SUMMARY_PATH,
+      selected.request,
+      TOKEN,
+      foreignHeader,
+    );
+    expect(foreign.statusCode).toBe(400);
+    expect(runtime.authorityResolver.resolve).not.toHaveBeenCalled();
+  });
+
   it("mounts the four private operations and resolves current authority every time", async () => {
     const ids = [
       "summary-ready-minimized",
@@ -228,6 +265,9 @@ describe("parent-communication owner formal ingress", () => {
     expect(runtime.owner.execute).toHaveBeenCalledTimes(requests.length - 1);
     for (const call of vi.mocked(runtime.owner.execute).mock.calls) {
       expect(call[0].authority.participant_id).toBe("internal-participant-current");
+    }
+    for (const call of vi.mocked(runtime.authorityResolver.resolve).mock.calls) {
+      expect(call[0].context_selection.context_ref).toBe("context-a");
     }
   });
 

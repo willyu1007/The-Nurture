@@ -1291,3 +1291,20 @@ and no longer has the `NO_SCHEMA_OR_MIGRATION` property.
 
 Verdict: `W3_CARRIER_STEP_1_PASS / SHARED_DB_MAPPER / W2_SEMANTICS_PRESERVED /
 NO_SECOND_TRACK / NO_SCHEMA_OR_RUNTIME_CHANGE`.
+
+## 2026-08-15 — W3 carrier cutover step 2
+
+- Root `pnpm typecheck` — pass, including scenario, DB, scenario-service and
+  maintained test sources.
+- Focused real-route suites — pass, 3 files / 32 tests: W2 remains green and
+  W3/W11 require identity-bound carriers before authority resolution.
+- Frozen contract validators — pass for W2
+  (`sha256:3ac0906c…`), W3 v1 (`sha256:b1dce3a7…`) and W11 v1.1
+  (`sha256:d705146e…`, base v1 digest proven unmoved).
+- Parser census — one canonical carrier parser under scenario-service; the W2
+  wrapper only preserves its existing error vocabulary and contains no parser
+  logic.
+- `git diff --check`, task-doc strict lint and project-governance lint — pass.
+
+Verdict: `W3_CARRIER_STEP_2_PASS / ONE_STRICT_INGRESS_PARSER /
+SEVEN_ROUTES_CARRIER_REQUIRED / FROZEN_BODIES_UNCHANGED / DEFAULT_OFF`.

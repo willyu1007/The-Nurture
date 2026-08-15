@@ -11,11 +11,13 @@ import {
   Inject,
   Injectable,
   Post,
+  Req,
   ServiceUnavailableException,
   UnauthorizedException,
   UseFilters,
   UseGuards,
 } from "@nestjs/common";
+import { MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER } from "@the-nurture/scenario";
 import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
 import type { ParentCommunicationExtensionComposition } from "./parent-communication-extension-composition.js";
 import {
@@ -28,6 +30,10 @@ import {
   parseParentCommunicationRedactionPreviewRequestV1,
 } from "./parent-communication-extension-http.js";
 import { PrivateResponseExceptionFilter } from "./private-response-exception.filter.js";
+import {
+  ParentContextSelectionHeaderParseError,
+  parseParentContextSelectionHeaderV1,
+} from "./parent-context-selection-http.js";
 
 export const PARENT_COMMUNICATION_EXTENSION_CONFIG = Symbol(
   "PARENT_COMMUNICATION_EXTENSION_CONFIG",
@@ -72,9 +78,14 @@ export class ParentCommunicationExtensionController {
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  redactionPreview(@Body() body: unknown): Promise<unknown> {
+  redactionPreview(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationRedactionPreviewRequestV1(body));
     return this.composition().redactionPreview(
-      this.parse(() => parseParentCommunicationRedactionPreviewRequestV1(body)),
+      request,
+      this.selection(httpRequest, request),
     );
   }
 
@@ -82,19 +93,23 @@ export class ParentCommunicationExtensionController {
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  redact(@Body() body: unknown): Promise<unknown> {
-    return this.composition().redact(
-      this.parse(() => parseParentCommunicationRedactRequestV1(body)),
-    );
+  redact(@Body() body: unknown, @Req() httpRequest: IncomingMessage): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationRedactRequestV1(body));
+    return this.composition().redact(request, this.selection(httpRequest, request));
   }
 
   @Post(PARENT_COMMUNICATION_EXTENSION_DELIVERY_RECEIPTS_PATH)
   @HttpCode(HttpStatus.OK)
   @Header("Cache-Control", "private, no-store")
   @Header("Pragma", "no-cache")
-  deliveryReceipt(@Body() body: unknown): Promise<unknown> {
+  deliveryReceipt(
+    @Body() body: unknown,
+    @Req() httpRequest: IncomingMessage,
+  ): Promise<unknown> {
+    const request = this.parse(() => parseParentCommunicationDeliveryReceiptRequestV1(body));
     return this.composition().deliveryReceipt(
-      this.parse(() => parseParentCommunicationDeliveryReceiptRequestV1(body)),
+      request,
+      this.selection(httpRequest, request),
     );
   }
 
@@ -112,10 +127,23 @@ export class ParentCommunicationExtensionController {
     try {
       return run();
     } catch (error) {
-      if (error instanceof ParentCommunicationExtensionRequestParseError) {
+      if (
+        error instanceof ParentCommunicationExtensionRequestParseError
+        || error instanceof ParentContextSelectionHeaderParseError
+      ) {
         throw new BadRequestException({ error: error.code });
       }
       throw error;
     }
+  }
+
+  private selection(
+    httpRequest: IncomingMessage,
+    identity: Parameters<typeof parseParentContextSelectionHeaderV1>[1],
+  ) {
+    return this.parse(() => parseParentContextSelectionHeaderV1(
+      httpRequest.headers[MY_CHAT_PARENT_CONTEXT_SELECTION_HEADER],
+      identity,
+    ));
   }
 }

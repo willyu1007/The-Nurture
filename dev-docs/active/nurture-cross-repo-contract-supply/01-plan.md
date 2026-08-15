@@ -99,7 +99,7 @@ activation. Execute the carrier cutover as six independently reviewed commits:
 
 1. [x] Extract W2's binding-to-local-selection query into one shared Nurture DB
    mapper without changing either frozen owner body.
-2. [ ] Parse the shared selection header once in W3/W11 controllers and pass
+2. [x] Parse the shared selection header once in W3/W11 controllers and pass
    the parsed carrier into authority resolution; remove the obsolete ingress.
 3. [ ] Make W3 resolve current association first, local Enrollment selection
    second and operation authority last; make W11 reuse the same resolver.

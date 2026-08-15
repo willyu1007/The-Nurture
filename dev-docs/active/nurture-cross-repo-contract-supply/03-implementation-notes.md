@@ -1386,3 +1386,22 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   package; no compatibility adapter or second mapping track was retained.
 - No W3/W11 request parsing, authority behavior, schema, migration, contract,
   gate, deployment or traffic setting changed in this step.
+
+## 2026-08-15 — W3 carrier cutover step 2
+
+- Extracted the canonical base64url/JSON carrier parser from the W2-specific
+  HTTP module into one shared scenario-service ingress parser. W2 retains its
+  existing public 400 semantics through a thin error adapter; W3 and W11 now
+  use the same bytes, contract pin, exact-key and identity-binding checks.
+- All four v1 and all three v1.1 controllers require the carrier after body
+  validation and before composition execution. Missing, malformed, foreign or
+  contract-drifted carriers fail as private `invalid_request`; authority and
+  owner ports are not called.
+- Passed the parsed carrier through the v1 authority resolver input and the
+  v1.1 resolver/owner-internal resolution. The frozen v1/v1.1 request and
+  response bodies, paths and digests are unchanged.
+- Retained the obsolete DB context-selection port only until step 3 replaces
+  its authority implementation; no production binding can be enabled in this
+  intermediate state.
+- No schema, migration, environment default, production binding, deployment,
+  activation or traffic change was made.

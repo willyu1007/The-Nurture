@@ -25,6 +25,7 @@ import type {
   ParentCommunicationAuthorityResolverV1,
   ParentCommunicationResolvedAuthorityV1,
 } from "./parent-communication-owner-contract.js";
+import type { ParentContextSelectionV1 } from "./parent-context-selection-contract.js";
 import {
   presentationVersionFor,
   type ParentCommunicationOwnerReadPortV1,
@@ -69,6 +70,7 @@ export type ParentCommunicationExtensionServiceResolutionV1 = Readonly<{
   context_ref: string;
   resolution_ref: string;
   scope_version: number;
+  context_selection: ParentContextSelectionV1;
 }>;
 
 export type ParentCommunicationExtensionAuthorityDecisionV1 =
@@ -87,6 +89,7 @@ export interface ParentCommunicationExtensionAuthorityPortV1 {
       context_ref: string;
       operation: ParentCommunicationExtensionOperation;
       message_ref: string;
+      context_selection: ParentContextSelectionV1;
     }>,
   ): Promise<ParentCommunicationExtensionAuthorityDecisionV1>;
 }
@@ -323,6 +326,7 @@ export const createParentCommunicationExtensionService = (
       my_chat_user_id: string;
       host_request_id: string;
       context_ref: string;
+      context_selection: ParentContextSelectionV1;
     }>,
   ): Promise<ResolvedWorld | { closed: unknown }> => {
     let resolved;
@@ -335,6 +339,7 @@ export const createParentCommunicationExtensionService = (
         my_chat_user_id: request.my_chat_user_id,
         host_request_id: request.host_request_id,
         context_ref: request.context_ref,
+        context_selection: request.context_selection,
       });
     } catch {
       return { closed: unavailable(request.context_ref, "temporarily_unavailable") };
@@ -425,14 +430,18 @@ export const createParentCommunicationExtensionService = (
           context_ref: input.context_ref,
           resolution_ref: world.authority.resolution_ref,
           scope_version: world.authority.scope_version,
+          context_selection: input.context_selection,
         },
       };
     },
   };
 
   const owner: ParentCommunicationExtensionOwnerPortV1 = {
-    async redactionPreview({ request }) {
-      const world = await resolveWorld(request);
+    async redactionPreview({ request, authority }) {
+      const world = await resolveWorld({
+        ...request,
+        context_selection: authority.context_selection,
+      });
       if ("closed" in world) return world.closed;
       if (world.presentation_version !== request.presentation_version) {
         // A stale presentation cannot anchor an irreversible prepare; the
@@ -505,8 +514,11 @@ export const createParentCommunicationExtensionService = (
       };
     },
 
-    async redact({ request }) {
-      const world = await resolveWorld(request);
+    async redact({ request, authority }) {
+      const world = await resolveWorld({
+        ...request,
+        context_selection: authority.context_selection,
+      });
       if ("closed" in world) return world.closed;
       const participantId = world.authority.participant_id;
       const messageId = await resolveMessageId(request, world.authority);
@@ -745,8 +757,11 @@ export const createParentCommunicationExtensionService = (
       return unavailable(request.context_ref, "content_unavailable");
     },
 
-    async deliveryReceipt({ request }) {
-      const world = await resolveWorld(request);
+    async deliveryReceipt({ request, authority }) {
+      const world = await resolveWorld({
+        ...request,
+        context_selection: authority.context_selection,
+      });
       if ("closed" in world) return world.closed;
       const messageId = await resolveMessageId(request, world.authority);
       if (!messageId) return masked(request.context_ref, "access_changed");

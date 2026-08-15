@@ -24,6 +24,7 @@ import {
   type ParentCommunicationExtensionOwnerV1,
   type ParentCommunicationExtensionResolutionV1,
 } from "../src/parent-communication-extension-composition.js";
+import { parentContextSelectionHeaderFor } from "./helpers/parent-context-selection-header.js";
 
 const TOKEN = "parent-communication-extension-service-token";
 const closes: Array<() => Promise<void>> = [];
@@ -41,6 +42,22 @@ afterEach(async () => {
 });
 
 describe("parent-communication extension formal ingress", () => {
+  it("requires the shared canonical selection carrier before authority", async () => {
+    const selected = fixture("w11-delivery-receipt-ready-read");
+    const runtime = fixtureComposition([selected]);
+    const application = await start(runtime.composition);
+    const response = await post(
+      application,
+      PARENT_COMMUNICATION_EXTENSION_DELIVERY_RECEIPTS_PATH,
+      selected.request,
+      TOKEN,
+      null,
+    );
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ error: "invalid_request" });
+    expect(runtime.authorityResolver.resolve).not.toHaveBeenCalled();
+  });
+
   it("mounts all three operations with private headers and no receipt leakage", async () => {
     const selected = [
       fixture("w11-redaction-preview-ready"),
@@ -313,6 +330,7 @@ const post = (
   path: string,
   body: unknown,
   token = TOKEN,
+  selectionHeader?: string | null,
 ) =>
   inject(application, {
     method: "POST",
@@ -320,6 +338,12 @@ const post = (
     headers: {
       authorization: `Bearer ${token}`,
       "content-type": "application/json",
+      ...(selectionHeader === null
+        ? {}
+        : {
+            "x-morethan-parent-context-selection": selectionHeader
+              ?? parentContextSelectionHeaderFor(isRecord(body) ? body : {}),
+          }),
     },
     payload: JSON.stringify(body),
   });
@@ -352,7 +376,10 @@ function fixtureComposition(
       if (isEnvelope(item.response)) {
         return {
           status: "resolved",
-          owner_resolution: item.response.owner_resolution,
+          owner_resolution: {
+            ...item.response.owner_resolution,
+            context_selection: input.context_selection,
+          },
         } as const;
       }
       return {
@@ -363,6 +390,7 @@ function fixtureComposition(
           context_ref: String(item.request.context_ref),
           resolution_ref: "resolution:parent:e2e",
           scope_version: 5,
+          context_selection: input.context_selection,
         },
       } as const;
     }),

@@ -5,6 +5,7 @@ import { createPrismaClient } from "../src/client.js";
 import { createAesGcmProtectedContentPort } from "../src/protected-content.js";
 import { createPrismaParentCommunicationOwnerBinding } from "../src/parent-communication-owner.composition.js";
 import { seedT010FamilySharingFixture } from "./helpers/t010-family-sharing-fixture.js";
+import { parentContextSelectionFor } from "./helpers/parent-context-selection.js";
 import { assertPublishedParentCommunicationOwnerResponse } from "../../../apps/scenario-service/src/parent-communication-owner-response-validator.js";
 
 const prisma = createPrismaClient();
@@ -120,6 +121,25 @@ const requireRecord = (value: unknown): Record<string, unknown> => {
   return value as Record<string, unknown>;
 };
 
+const selectionFor = (
+  scope: Awaited<ReturnType<typeof seedScope>>,
+  identity: Readonly<{
+    workspace_id: string;
+    my_chat_user_id: string;
+    host_request_id: string;
+    context_ref: string;
+  }>,
+) => parentContextSelectionFor({
+  workspaceId: identity.workspace_id,
+  myChatUserId: identity.my_chat_user_id,
+  hostRequestId: identity.host_request_id,
+  contextRef: identity.context_ref,
+  childAnchorId: scope.childAnchorId,
+  familyAnchorId: scope.familyAnchorId,
+  childOwnerVersion: 4,
+  familyOwnerVersion: 5,
+});
+
 describe("T-011 W3.1 parent communication owner", () => {
   it("qualifies current reads, atomic send, exact replay and protected content", async () => {
     const scope = await seedScope();
@@ -132,6 +152,7 @@ describe("T-011 W3.1 parent communication owner", () => {
     const resolved = await scope.binding.authorityResolver.resolve({
       operation: "summary_query",
       ...identity,
+      context_selection: selectionFor(scope, identity),
     });
     expect(resolved.status).toBe("resolved");
     if (resolved.status !== "resolved") throw new Error("authority did not resolve");
@@ -229,6 +250,7 @@ describe("T-011 W3.1 parent communication owner", () => {
     const replayAuthority = await scope.binding.authorityResolver.resolve({
       operation: "send_text_exchange",
       ...identity,
+      context_selection: selectionFor(scope, identity),
     });
     expect(replayAuthority.status).toBe("resolved");
     if (replayAuthority.status !== "resolved") throw new Error("replay authority did not resolve");
@@ -291,6 +313,7 @@ describe("T-011 W3.1 parent communication owner", () => {
     const otherAuthority = await scope.binding.authorityResolver.resolve({
       operation: "send_text_exchange",
       ...otherIdentity,
+      context_selection: selectionFor(scope, otherIdentity),
     });
     expect(otherAuthority.status).toBe("resolved");
     if (otherAuthority.status !== "resolved") {
@@ -319,7 +342,11 @@ describe("T-011 W3.1 parent communication owner", () => {
       host_request_id: `host-${randomUUID()}`,
       context_ref: scope.contextRef,
     };
-    const resolved = await scope.binding.authorityResolver.resolve({ operation: "summary_query", ...identity });
+    const resolved = await scope.binding.authorityResolver.resolve({
+      operation: "summary_query",
+      ...identity,
+      context_selection: selectionFor(scope, identity),
+    });
     if (resolved.status !== "resolved") throw new Error("authority did not resolve");
     const summary = requireRecord(await scope.binding.owner.execute({
       operation: "summary_query",

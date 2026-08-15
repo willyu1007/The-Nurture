@@ -169,6 +169,7 @@ export type ParentCommunicationAuthorityResolverV1 = Readonly<{
     my_chat_user_id: string;
     host_request_id: string;
     context_ref: string;
+    context_selection: ParentContextSelectionV1;
   }): Promise<ParentCommunicationAuthorityResultV1>;
 }>;
 
@@ -206,3 +207,4 @@ export type ParentCommunicationOwnerBindingV1 = Readonly<{
   owner: ParentCommunicationOwnerV1;
   asyncBoundary: ParentCommunicationAsyncBoundaryV1;
 }>;
+import type { ParentContextSelectionV1 } from "./parent-context-selection-contract.js";

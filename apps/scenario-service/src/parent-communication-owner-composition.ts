@@ -9,6 +9,7 @@ import {
   type ParentCommunicationOwnerV1,
   type ParentCommunicationOwnerOperation,
   type ParentCommunicationResolvedAuthorityV1,
+  type ParentContextSelectionV1,
 } from "@the-nurture/scenario";
 import type {
   ParentCommunicationDetailRequestV1,
@@ -67,27 +68,38 @@ export class ParentCommunicationOwnerComposition {
     private readonly now: () => Date = () => new Date(),
   ) {}
 
-  summary(request: ParentCommunicationSummaryRequestV1): Promise<unknown> {
-    return this.execute("summary_query", request);
+  summary(
+    request: ParentCommunicationSummaryRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("summary_query", request, selection);
   }
 
-  detail(request: ParentCommunicationDetailRequestV1): Promise<unknown> {
-    return this.execute("detail_query", request);
+  detail(
+    request: ParentCommunicationDetailRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("detail_query", request, selection);
   }
 
   mediaAccess(
     request: ParentCommunicationMediaAccessRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
-    return this.execute("media_access_query", request);
+    return this.execute("media_access_query", request, selection);
   }
 
-  sendText(request: ParentCommunicationSendTextRequestV1): Promise<unknown> {
-    return this.execute("send_text_exchange", request);
+  sendText(
+    request: ParentCommunicationSendTextRequestV1,
+    selection: ParentContextSelectionV1,
+  ): Promise<unknown> {
+    return this.execute("send_text_exchange", request, selection);
   }
 
   private async execute(
     operation: ParentCommunicationOwnerOperation,
     request: ParentCommunicationOwnerRequestV1,
+    selection: ParentContextSelectionV1,
   ): Promise<unknown> {
     let responseGeneration: number;
     try {
@@ -111,6 +123,7 @@ export class ParentCommunicationOwnerComposition {
         my_chat_user_id: request.my_chat_user_id,
         host_request_id: request.host_request_id,
         context_ref: request.context_ref,
+        context_selection: selection,
       });
     } catch {
       return this.applyAsyncBoundary(

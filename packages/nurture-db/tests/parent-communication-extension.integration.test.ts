@@ -5,6 +5,7 @@ import { createAesGcmProtectedContentPort } from "../src/protected-content.js";
 import { createPrismaParentCommunicationOwnerBinding } from "../src/parent-communication-owner.composition.js";
 import { createPrismaParentCommunicationExtensionBinding } from "../src/parent-communication-extension.composition.js";
 import { seedT010FamilySharingFixture } from "./helpers/t010-family-sharing-fixture.js";
+import { parentContextSelectionFor } from "./helpers/parent-context-selection.js";
 
 // W11-3 owner-side proof: the guardian redaction preview/commit pair and
 // the delivery aggregate over real v1-sent messages, receipts and the
@@ -135,9 +136,20 @@ const seedWorld = async () => {
     host_request_id: `host-${randomUUID()}`,
     context_ref: contextRef,
   };
+  const selectionFor = (request: typeof identity) => parentContextSelectionFor({
+    workspaceId: request.workspace_id,
+    myChatUserId: request.my_chat_user_id,
+    hostRequestId: request.host_request_id,
+    contextRef: request.context_ref,
+    childAnchorId: base.childAnchorId,
+    familyAnchorId: base.familyAnchorId,
+    childOwnerVersion: 4,
+    familyOwnerVersion: 5,
+  });
   const resolved = await v1.authorityResolver.resolve({
     operation: "summary_query",
     ...identity,
+    context_selection: selectionFor(identity),
   });
   if (resolved.status !== "resolved") throw new Error("v1 authority did not resolve");
   const summary = requireRecord(await v1.owner.execute({
@@ -182,10 +194,11 @@ const seedWorld = async () => {
   });
   // The extension answers the CURRENT presentation; re-resolve and re-read
   // after the send moved the heads.
+  const postIdentity = { ...identity, host_request_id: `host-${randomUUID()}` };
   const postResolved = await v1.authorityResolver.resolve({
     operation: "summary_query",
-    ...identity,
-    host_request_id: `host-${randomUUID()}`,
+    ...postIdentity,
+    context_selection: selectionFor(postIdentity),
   });
   if (postResolved.status !== "resolved") {
     throw new Error("post-send authority did not resolve");
@@ -203,6 +216,7 @@ const seedWorld = async () => {
     messageId: message.id,
     messageRef: String(committed.message_ref),
     presentationVersion: String(postSummary.presentation_version),
+    selectionFor,
   };
 };
 
@@ -407,6 +421,10 @@ describe("W11 parent-communication extension on real Prisma facts", () => {
       context_ref: "context-foreign",
       operation: "delivery_receipt_query",
       message_ref: world.messageRef,
+      context_selection: world.selectionFor({
+        ...world.identity,
+        context_ref: `stale-${world.identity.context_ref}`,
+      }),
     });
     expect(stale.status).toBe("closed");
     expect(
