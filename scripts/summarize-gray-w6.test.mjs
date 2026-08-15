@@ -24,6 +24,8 @@ test("summarizes W6 provider and host logs without retaining identifiers", () =>
   const host = [
     hostCompletion("class_context_query", "unavailable", 44, "owner_timeout"),
     hostCompletion("class_stream_query", "unavailable", 45, "temporarily_unavailable"),
+    hostCompletion("child_day_detail_query", "ready", 20),
+    hostCompletion("child_detail_query", "ready", 24),
   ];
 
   const summary = summarizeGrayW6(provider, host);
@@ -31,8 +33,13 @@ test("summarizes W6 provider and host logs without retaining identifiers", () =>
   assert.equal(summary.provider.requests_total, 2);
   assert.deepEqual(summary.provider.reasons, { request_timeout: 1 });
   assert.equal(summary.provider.duration_ms_p95, 42);
-  assert.equal(summary.host.owner_timeout_rate, 1);
-  assert.deepEqual(summary.host.composite_outcomes, { unavailable: 1 });
+  assert.equal(summary.host.owner_calls_total, 2);
+  assert.equal(summary.host.composite_requests_total, 2);
+  assert.equal(summary.host.owner_timeout_rate, 0.5);
+  assert.deepEqual(summary.host.composite_outcomes, {
+    ready: 1,
+    unavailable: 1,
+  });
   assert.deepEqual(summary.reconciliation, {
     mode: "not_applicable_read_only",
     commands_total: 0,

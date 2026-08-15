@@ -443,8 +443,11 @@ Project: `main`
   My-Chat T-043 now provide W6-only secret-file startup, internal Compose/BWS
   wiring, bounded provider/host telemetry, aggregate G7 evidence and a
   human-run migration/rehearsal/gate-off procedure. Repository preparation is
-  green and default-off; BWS verification, dedicated Nurture migration, three
-  canary reads and the one-minute gate-off drill remain human-executed. This
+  green and default-off. The local W6 path now also proves current class →
+  current child → day detail across the real My-Chat strict-client/Nurture HTTP
+  boundary and canonical PostgreSQL owner ports. BWS verification, dedicated
+  Nurture migration, three class/detail request-pair canaries and the one-minute
+  gate-off drill remain human-executed. This
   path does not deploy or qualify T-008 Candidate 1.0, whose G5-B/C/D/E gates
   remain unchanged. Other provider activation and external traffic remain
   closed.

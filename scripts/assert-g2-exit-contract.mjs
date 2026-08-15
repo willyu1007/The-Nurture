@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-15 reseal: A2 production assembly: teacher bindings factory in
-  // scenario-service
-  "99be59c52f8efec6917a4a1081e8e104fa539a26",
+  // 2026-08-15 reseal: W6 local class-to-child-detail closure and current-main
+  // gray preparation
+  "4cc607c4547869b6cd4dab74b242300ac2d72031",
   "My-Chat revision",
 );
 assertEqual(

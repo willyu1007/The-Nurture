@@ -15,7 +15,8 @@ The provider emits `nurture_scenario_service_log_v1`:
 The host emits `my_chat_nurture_ramp_log_v1/surface_request_completed`:
 
 - one event per owner call with operation, outcome, safe reason and duration;
-- one `class_stream_query` event for the composite BFF outcome;
+- one `class_stream_query` or `child_detail_query` event for the relevant
+  composite BFF outcome;
 - `owner_timeout` distinguishes the configured transport deadline from other temporary failures.
 
 ## G7 aggregate
@@ -33,12 +34,12 @@ Do not retain or attach raw container logs as release evidence. Keep only the ag
 
 ## Initial staging gate
 
-For the three-request W6 rehearsal:
+For the three class-stream plus three child-detail request pairs:
 
 - provider failed outcomes: `0`;
 - host failed outcomes: `0`;
 - owner timeout rate: `0`;
-- composite ready results: at least `3`;
+- composite ready results: at least `6`;
 - p95 owner/composite duration: below the configured `5000 ms` deadline;
 - reconciliation: `not_applicable_read_only`, all counts `0`.
 

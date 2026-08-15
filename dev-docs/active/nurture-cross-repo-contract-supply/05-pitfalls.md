@@ -190,3 +190,33 @@
 - Prevention: in isolated worktrees, validate sibling paths before running
   root scripts. Keep any topology workaround temporary and verify that package
   manifests, lockfiles and scripts are unchanged before committing.
+
+## 2026-08-15 — Scenario-service test census lagged W6 test additions
+
+- Symptom: `pnpm verify:test-routing` reported `scenarioService=29/27` after
+  the new joint HTTP test was added.
+- Root cause: the earlier W6 runtime-secret test had increased the maintained
+  scenario-service lane without advancing its expected census; the joint test
+  exposed both increments together.
+- What was tried: first confirmed all 29 files were classified into the
+  intended scenario-service lane and that no file belonged in DB or X5.
+- Fix: advance the maintained scenario-service census to 29 and rerun the
+  routing gate.
+- Prevention: every added or removed `*.test.ts` file must update and run
+  `verify:test-routing` in the same verified work unit.
+
+## 2026-08-15 — Current-main preparation moved without resealing cross-repo pins
+
+- Symptom: the workflow-contract and C30 upstream gates still expected My-Chat
+  `99be59c` after the already-committed W6 gray preparation had advanced its
+  main checkout.
+- Root cause: the prior current-main preparation commit did not finish the
+  repository's two-phase pin apply and owner-lock remint workflow.
+- What was tried: first ran every pin verifier independently to distinguish an
+  exact revision mismatch from an actual workflow-runtime contract change.
+- Fix: use `pnpm reseal:pins apply` against the clean committed My-Chat head,
+  commit the managed pins/literals, then run `pnpm reseal:pins lock` and commit
+  the regenerated owner-adoption lock.
+- Prevention: treat the three cross-repository pin checks and the two-phase
+  reseal as part of every current-main release-preparation work unit, before
+  publication.

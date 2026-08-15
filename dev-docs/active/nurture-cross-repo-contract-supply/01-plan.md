@@ -172,9 +172,12 @@ owner and extension. Deployment and activation remain separate decisions.
   and one-shot migration images, health check and one-minute gate-off path.
 - [x] Statically qualify type safety, focused W6 tests, environment/
   observability/deployment contracts, BWS dry-run and Compose invariants.
+- [x] Qualify the local class → child → day-detail chain through the real
+  My-Chat strict client over Nurture TCP/HTTP and real Prisma owner ports.
 - [ ] Human-execute BWS verification, dedicated Nurture staging migration,
-  W6-only deployment, three-read rehearsal and gate-off drill. Keep only the
-  G7 aggregate plus immutable release identity as evidence.
+  W6-only deployment, three class/detail request-pair rehearsal and gate-off
+  drill. Keep only the G7 aggregate plus immutable release identity as
+  evidence.
 
 This path deliberately uses the current-main source pair. It does not deploy,
 mutate or qualify T-008's frozen `nurture.service-candidate@1.0.0`.

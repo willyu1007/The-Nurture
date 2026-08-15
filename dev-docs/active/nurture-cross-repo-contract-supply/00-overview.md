@@ -77,7 +77,9 @@
   class-stream progression. Repository preparation is complete: W6-only
   secret-file startup, provider refusal logs, G7 aggregation contracts/tool,
   My-Chat Compose overlay/BWS manifest and the human-run migration/rehearsal/
-  gate-off runbook are in place. W6 still defaults false until the release
+  gate-off runbook are in place. The local class → child → day-detail path is
+  now closed through real My-Chat strict-client/Nurture HTTP conformance and
+  canonical PostgreSQL owner tests. W6 still defaults false until the release
   operator supplies the reviewed staging organization allowlist and executes
   the runbook; no remote operation has run. Keep the other eight provider
   gates false. Parent context still needs its W2 Prisma owner composition,

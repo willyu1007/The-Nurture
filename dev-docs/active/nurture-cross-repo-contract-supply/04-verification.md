@@ -1152,6 +1152,7 @@ ONE_PRISMA_CLIENT / FOUR_EXPLICIT_STARTUP_REFUSALS / DEFAULT_OFF`.
 ## 2026-08-15 — W6 current-main gray preparation
 
 - Direct scenario-service TypeScript check — pass.
+- Full non-DB scenario-service lane — pass, 26 files / 205 tests.
 - Focused scenario-service suites — pass, 5 files / 30 tests, including W6
   formal ingress, production assembly, security boundary, safe exception and
   secret-file loading.
@@ -1171,3 +1172,23 @@ ONE_PRISMA_CLIENT / FOUR_EXPLICIT_STARTUP_REFUSALS / DEFAULT_OFF`.
 
 Verdict: `W6_GRAY_REPO_PREP_PASS / CURRENT_MAIN / DEFAULT_OFF /
 HUMAN_STAGING_EXECUTION_PENDING`.
+
+## 2026-08-15 W6 local class-to-child-detail closure
+
+- Direct scenario-service TypeScript check — pass.
+- Nurture formal-ingress plus joint TCP/HTTP suites — pass, 2 files / 6 tests.
+  The joint test uses the linked My-Chat strict client and validates all four
+  W6 reads through real HTTP and bearer auth.
+- Real canonical PostgreSQL owner suite — pass, 1 file / 4 tests, including
+  current class/child detail/schedule reads and revoked/foreign fail-closed
+  cases.
+- G7 summarizer Node suite — pass, 2/2; child-detail composites are separated
+  from owner calls and request identifiers remain absent from the aggregate.
+- `pnpm verify:test-routing` — pass after reconciling the maintained census at
+  207 files: unit 104, production DB 58, dev-host 11, scenario-service 29 and
+  X5 joint 5.
+- No database migration, image build, deployment, gate activation, traffic or
+  external secret access ran.
+
+Verdict: `W6_LOCAL_READ_CHAIN_CLOSED / STRICT_HTTP_CONFORMANCE /
+CANONICAL_OWNER_PORTS_GREEN / DEFAULT_OFF / HUMAN_STAGING_PENDING`.

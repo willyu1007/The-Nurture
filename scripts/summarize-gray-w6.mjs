@@ -11,6 +11,11 @@ const providerOperations = new Map([
   ["teacher_class_stream_schedule", "schedule_query"],
 ]);
 
+const compositeOperations = new Set([
+  "class_stream_query",
+  "child_detail_query",
+]);
+
 export function summarizeGrayW6(providerRecords, hostRecords) {
   const refusals = new Map(
     providerRecords
@@ -39,10 +44,10 @@ export function summarizeGrayW6(providerRecords, hostRecords) {
       durationMs: record.duration_ms,
     }));
   const ownerSamples = hostSamples.filter(
-    (sample) => sample.operation !== "class_stream_query",
+    (sample) => !compositeOperations.has(sample.operation),
   );
   const compositeSamples = hostSamples.filter(
-    (sample) => sample.operation === "class_stream_query",
+    (sample) => compositeOperations.has(sample.operation),
   );
 
   return {

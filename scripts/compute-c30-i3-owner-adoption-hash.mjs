@@ -182,9 +182,9 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-15 reseal: A2 production assembly: teacher bindings factory in
-      // scenario-service
-      head_revision: "99be59c52f8efec6917a4a1081e8e104fa539a26",
+      // 2026-08-15 reseal: W6 local class-to-child-detail closure and current-main
+      // gray preparation
+      head_revision: "4cc607c4547869b6cd4dab74b242300ac2d72031",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "b7a9d3e156092ee2758b3d01039d1f26d45bdbe963e52b5f8cf1adb8fa8b8cc3",
     },

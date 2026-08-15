@@ -1282,3 +1282,18 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   My-Chat's overlay gives it only the private Compose network.
 - The release choice is current-main, not the older T-008 Candidate 1.0.
   Candidate identity/evidence remains immutable and untouched.
+
+## 2026-08-15 — W6 local My-Chat class-to-child-detail closure
+
+- Added a maintained joint HTTP test in scenario-service that runs the actual
+  My-Chat strict client through TCP, service bearer auth, Nurture request
+  parsing, all four ingress operations and strict response validation.
+- Kept the provider contract, digest, owner implementation and schema
+  unchanged; the new test uses the frozen conformance fixtures and therefore
+  detects cross-repository transport drift without creating a second contract.
+- Re-ran the real Prisma W6 owner-port suite against the healthy local
+  PostgreSQL service. Class context, strip, child day detail, schedule and
+  fail-closed authority cases remain green on canonical rows.
+- Updated G7 aggregation so both `class_stream_query` and
+  `child_detail_query` are composite requests. Detail composites no longer
+  inflate owner-call or timeout-rate denominators.
