@@ -141,3 +141,4 @@ export * from "./teacher-media-association-owner.composition.js";
 export * from "./teacher-assistant-query-owner.composition.js";
 export * from "./parent-communication-extension.composition.js";
 export * from "./repositories/teacher-class-stream.repository.js";
+export * from "./repositories/director-presenter.repository.js";

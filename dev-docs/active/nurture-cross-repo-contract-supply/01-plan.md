@@ -144,7 +144,7 @@ commits without changing its digest or default-off posture:
 
 1. [x] Freeze the exact Prisma data sources, honest unavailable sections,
    authority precedence and service/repository boundary.
-2. [ ] Implement current institution-director authority and the DB-free
+2. [x] Implement current institution-director authority and the DB-free
    presenter over bounded Prisma read ports.
 3. [ ] Supply one production Prisma binding through the shared-client assembly
    and remove only the stale director startup refusal.

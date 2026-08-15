@@ -3,6 +3,9 @@ import {
   DIRECTOR_PRESENTER_INTERFACE,
   DIRECTOR_PRESENTER_MATERIALS_PATH,
   DIRECTOR_PRESENTER_OVERVIEW_PATH,
+  type DirectorPresenterDrilldownRequestV1,
+  type DirectorPresenterMaterialRequestV1,
+  type DirectorPresenterOverviewRequestV1,
 } from "@the-nurture/scenario";
 
 export {
@@ -11,24 +14,11 @@ export {
   DIRECTOR_PRESENTER_MATERIALS_PATH,
   DIRECTOR_PRESENTER_OVERVIEW_PATH,
 };
-
-type DirectorPresenterIdentityV1 = Readonly<{
-  interface_contract: typeof DIRECTOR_PRESENTER_INTERFACE;
-  workspace_id: string;
-  my_chat_user_id: string;
-  host_request_id: string;
-  context_ref: string;
-}>;
-
-export type DirectorPresenterOverviewRequestV1 =
-  DirectorPresenterIdentityV1 & Readonly<{ local_date: string }>;
-
-export type DirectorPresenterDrilldownRequestV1 =
-  DirectorPresenterIdentityV1 & Readonly<{ drilldown_ref: string }>;
-
-export type DirectorPresenterMaterialRequestV1 =
-  DirectorPresenterIdentityV1 &
-    Readonly<{ collection_ref: string; cursor?: string }>;
+export type {
+  DirectorPresenterDrilldownRequestV1,
+  DirectorPresenterMaterialRequestV1,
+  DirectorPresenterOverviewRequestV1,
+};
 
 export class DirectorPresenterRequestParseError extends Error {
   readonly code:
@@ -79,7 +69,7 @@ export const parseDirectorPresenterMaterialRequestV1 = (
 
 const identity = (
   body: Record<string, unknown>,
-): DirectorPresenterIdentityV1 =>
+): Omit<DirectorPresenterOverviewRequestV1, "local_date"> =>
   Object.freeze({
     interface_contract: DIRECTOR_PRESENTER_INTERFACE,
     workspace_id: requiredString(body.workspace_id, 256),

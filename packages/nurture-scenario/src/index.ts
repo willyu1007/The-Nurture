@@ -134,6 +134,7 @@ export * from "./parent-context-presenter-contract.js";
 export * from "./parent-context-selection-contract.js";
 export * from "./parent-context-presenter-service.js";
 export * from "./director-presenter-contract.js";
+export * from "./director-presenter-service.js";
 export * from "./teacher-class-stream-contract.js";
 export * from "./teacher-organization-owner-contract.js";
 export * from "./teacher-communication-owner-contract.js";

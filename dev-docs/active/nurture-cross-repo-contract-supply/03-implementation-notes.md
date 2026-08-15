@@ -1500,3 +1500,37 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
 - Added no product code, schema, migration, environment default, deployment,
   activation, traffic, public API, or Mobile business composition in this
   freeze step.
+
+## 2026-08-15 — W4 Prisma composition step 2
+
+- Added one database-free director presenter service. It resolves exactly one
+  current Participant, institution-scoped Admin role and active Institution,
+  keeps the exact heads private, and emits only opaque owner/cache/navigation
+  refs. Overview composition has exactly the published eleven sections;
+  philosophy insight and organized materials remain honestly unavailable and
+  D-O13 remains `web_workbench_required` without an action surface.
+- Added one Prisma read repository in `@the-nurture/db`. Overview and
+  drilldown reads rerun exact Participant/role/Institution predicates inside
+  repeatable-read transactions, use only the step-1 source matrix and bound
+  classes, Enrollments, response items, messages, focus scopes and drilldown
+  rows. No presenter projection, cache table, threshold or storage-ref read was
+  introduced.
+- Reused the existing institution support-signal query structurally for
+  `configured_load_threshold`; the presenter does not import its repository,
+  duplicate policy evaluation or rank staff. Missing policy/source data marks
+  only that section unavailable.
+- Centralized the request/authority/owner types in the scenario package and
+  made scenario-service retain only parsing, composition binding and published
+  response enforcement. An attempted package subpath added no behavioral
+  value and failed the maintained runtime resolver, so it was removed rather
+  than retained as a second package entry.
+- Focused negative testing found that Node's hex decoder tolerates a trailing
+  half-byte. Drilldown signatures now require exactly 64 lowercase hex digits
+  before constant-time comparison; appended-character, workspace-switch and
+  expiry probes all mask the ref.
+- Invalid counts, impossible ratios and malformed seven-day series fail to an
+  unavailable section instead of being clamped or rendered. Attendance counts
+  unique child-care processes so duplicate joined rows cannot inflate the
+  numerator.
+- Added no schema, migration, frozen contract, gate default, production
+  assembly, deployment, activation, public API or Mobile business rendering.

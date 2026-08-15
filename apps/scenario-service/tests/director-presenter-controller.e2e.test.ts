@@ -311,7 +311,17 @@ function fixtureComposition(
       if (isReady(item.response)) {
         return {
           status: "resolved",
-          owner_resolution: item.response.owner_resolution,
+          owner_resolution: {
+            ...item.response.owner_resolution,
+            exact: {
+              participant_id: "fixture-participant",
+              participant_version: 1,
+              role_assignment_id: "fixture-role",
+              role_version: 1,
+              institution_id: "fixture-institution",
+              institution_version: 1,
+            },
+          },
         } as const;
       }
       return { status: "closed", response: item.response } as const;

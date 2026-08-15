@@ -1,4 +1,11 @@
-import type { DirectorPresenterOperation } from "@the-nurture/scenario";
+import type {
+  DirectorPresenterAuthorityResolverV1,
+  DirectorPresenterAuthorityResultV1,
+  DirectorPresenterExactAuthorityV1,
+  DirectorPresenterOperation,
+  DirectorPresenterOwnerV1,
+  DirectorPresenterPublicOwnerResolutionV1,
+} from "@the-nurture/scenario";
 import type {
   DirectorPresenterDrilldownRequestV1,
   DirectorPresenterMaterialRequestV1,
@@ -6,54 +13,11 @@ import type {
 } from "./director-presenter-http.js";
 import { assertPublishedDirectorPresenterResponse } from "./director-presenter-response-validator.js";
 
-export type DirectorPresenterOwnerResolutionV1 = Readonly<{
-  resolution_ref: string;
-  presentation_role: "institution_director";
-  scope_kind: "institution";
-  scope_ref: string;
-  context_ref: string;
-  scope_version: number;
-  resolved_at: string;
-}>;
-
-type DirectorPresenterIdentityV1 = Readonly<{
-  workspace_id: string;
-  my_chat_user_id: string;
-  host_request_id: string;
-  context_ref: string;
-  operation: DirectorPresenterOperation;
-}>;
-
-export type DirectorPresenterAuthorityResultV1 =
-  | Readonly<{
-      status: "resolved";
-      owner_resolution: DirectorPresenterOwnerResolutionV1;
-    }>
-  | Readonly<{
-      status: "closed";
-      response: unknown;
-    }>;
-
-export interface DirectorPresenterAuthorityResolverV1 {
-  resolve(
-    input: DirectorPresenterIdentityV1,
-  ): Promise<DirectorPresenterAuthorityResultV1>;
-}
-
-export interface DirectorPresenterOwnerV1 {
-  overview(input: Readonly<{
-    request: DirectorPresenterOverviewRequestV1;
-    authority: DirectorPresenterOwnerResolutionV1;
-  }>): Promise<unknown>;
-  drilldown(input: Readonly<{
-    request: DirectorPresenterDrilldownRequestV1;
-    authority: DirectorPresenterOwnerResolutionV1;
-  }>): Promise<unknown>;
-  materials(input: Readonly<{
-    request: DirectorPresenterMaterialRequestV1;
-    authority: DirectorPresenterOwnerResolutionV1;
-  }>): Promise<unknown>;
-}
+export type {
+  DirectorPresenterAuthorityResolverV1,
+  DirectorPresenterOwnerV1,
+  DirectorPresenterPublicOwnerResolutionV1 as DirectorPresenterOwnerResolutionV1,
+};
 
 export class DirectorPresenterComposition {
   constructor(
@@ -82,9 +46,10 @@ export class DirectorPresenterComposition {
       | DirectorPresenterOverviewRequestV1
       | DirectorPresenterDrilldownRequestV1
       | DirectorPresenterMaterialRequestV1,
-    read: (authority: DirectorPresenterOwnerResolutionV1) => Promise<unknown>,
+    read: (authority: DirectorPresenterExactAuthorityV1) => Promise<unknown>,
   ): Promise<unknown> {
     const authority = await this.authorityResolver.resolve({
+      interface_contract: request.interface_contract,
       workspace_id: request.workspace_id,
       my_chat_user_id: request.my_chat_user_id,
       host_request_id: request.host_request_id,

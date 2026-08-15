@@ -1424,3 +1424,31 @@ REMOTE_AND_TRAFFIC_NOT_EXECUTED`.
 Verdict: `W4_PRISMA_STEP_1_PASS / SOURCE_MATRIX_FROZEN /
 NO_SYNTHETIC_FACTS / LAYER_BOUNDARY_FIXED / CONTRACT_UNCHANGED /
 DEFAULT_OFF`.
+
+## 2026-08-15 — W4 Prisma composition step 2
+
+- Root `pnpm typecheck` passed after the maintained pinned-contract and Prisma
+  generation prerequisites; the scenario-service package typecheck also
+  passed after building its declared runtime dependencies.
+- The new DB-free presenter suite passed 1 file / 4 tests. It covers the exact
+  eleven-section response, honest missing-source behavior, configured-load
+  reuse, opaque exact-head output, signed-ref tamper/workspace/expiry closure,
+  ambiguous authority and per-open protected-material denial.
+- The existing formal director ingress suite passed 1 file / 5 tests after
+  adapting its private fixture authority to the new exact-head shape. All
+  three service-authenticated routes, response-schema enforcement, private
+  headers, fail-closed paths and the D-O13 action ban remain green.
+- `pnpm verify:director-presenter-contract` passed the unchanged digest
+  `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`,
+  12 fixtures and 11 invalid probes.
+- Direct strict TypeScript checks passed for the isolated presenter service,
+  its focused tests and the Prisma repository. `git diff --check`, the
+  no-Prisma-outside-DB census and the schema/context diff check passed; no
+  schema, migration or generated DB-context artifact changed.
+- Ignored scenario/DB `dist/` outputs created by the maintained package checks
+  were removed through the package clean scripts; no generated build artifact
+  remains in this work unit.
+
+Verdict: `W4_PRISMA_STEP_2_PASS / DB_FREE_PRESENTER /
+EXACT_PRISMA_AUTHORITY / BOUNDED_CURRENT_READS / SIGNED_REFS /
+HONEST_PARTIALS / CONTRACT_UNCHANGED / DEFAULT_OFF`.
