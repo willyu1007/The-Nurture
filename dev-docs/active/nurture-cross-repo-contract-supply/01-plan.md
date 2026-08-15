@@ -93,6 +93,28 @@ W3.2 remains separately authorized work.
 
 W3.2 is not authorized by the W3.1 implementation request.
 
+The 2026-08-15 owner instruction supersedes that authorization note for
+implementation and restricted-staging qualification, but not traffic
+activation. Execute the carrier cutover as six independently reviewed commits:
+
+1. [x] Extract W2's binding-to-local-selection query into one shared Nurture DB
+   mapper without changing either frozen owner body.
+2. [ ] Parse the shared selection header once in W3/W11 controllers and pass
+   the parsed carrier into authority resolution; remove the obsolete ingress.
+3. [ ] Make W3 resolve current association first, local Enrollment selection
+   second and operation authority last; make W11 reuse the same resolver.
+4. [ ] Make My-Chat resolve the exact current parent context per request and
+   have both strict v1/v1.1 clients emit the existing carrier.
+5. [ ] Supply W3/W11 production bindings behind default-false provider gates
+   and add family-scoped default-off My-Chat ramp/telemetry.
+6. [ ] Qualify cross-repo conformance, disposable-PostgreSQL
+   read/prepare/confirm/replay/revocation, then rehearse staging migration and
+   gate-off behavior without activating traffic.
+
+Each step exits only after focused verification, architecture/privacy review,
+single-track scanning, cleanup and its own commit. Gate activation remains a
+separate rollout decision.
+
 ## W4 — Read-only director presenter
 
 1. Publish `nurture.director-presenter@1.0.0` with sectioned overview,

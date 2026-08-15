@@ -1,12 +1,15 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { Prisma, type PrismaClient } from "@prisma/client";
 import {
-  parseNurtureBindingOwnerRef,
   type NurtureParentContextPresenterTransaction,
   type ParentContextPresenterAuthorityResolverV1,
   type ParentContextPresenterExactAuthorityV1,
   type ParentContextPresenterReadPortV1,
 } from "@the-nurture/scenario";
+import {
+  mapParentContextEnrollmentSelection,
+  resolveParentContextSelectionRoute,
+} from "./parent-context-selection.repository.js";
 
 type PrismaReader = PrismaClient | Prisma.TransactionClient;
 
@@ -33,30 +36,12 @@ export class PrismaParentContextPresenterAuthorityResolver
     input: Parameters<ParentContextPresenterAuthorityResolverV1["resolve"]>[0],
   ): ReturnType<ParentContextPresenterAuthorityResolverV1["resolve"]> {
     const selection = input.context_selection;
-    if (
-      selection.workspace_id !== input.workspace_id
-      || selection.my_chat_user_id !== input.my_chat_user_id
-      || selection.host_request_id !== input.host_request_id
-      || selection.context_ref !== input.context_ref
-    ) {
-      return { status: "stale_context_ref" };
-    }
-    let childAnchorId: string;
-    let familyAnchorId: string;
-    try {
-      const child = parseNurtureBindingOwnerRef(selection.child_binding.owner_ref);
-      const family = parseNurtureBindingOwnerRef(selection.family_binding.owner_ref);
-      if (child.subjectType !== "child" || family.subjectType !== "family") {
-        return { status: "stale_context_ref" };
-      }
-      childAnchorId = child.anchorId;
-      familyAnchorId = family.anchorId;
-    } catch {
-      return { status: "stale_context_ref" };
-    }
+    const route = resolveParentContextSelectionRoute(input);
+    if (route.status !== "resolved") return route;
     try {
       return await this.prisma.$transaction(
         async (transaction) => {
+          const at = this.now();
           const participants = await transaction.nurtureParticipant.findMany({
             where: {
               workspaceId: input.workspace_id,
@@ -72,94 +57,15 @@ export class PrismaParentContextPresenterAuthorityResolver
             return { status: "ambiguous_enrollment" as const };
           }
           const participant = participants[0]!;
-          const at = this.now();
-
-          const associations = await transaction.nurtureFamilyAnchorAssociation.findMany({
-            where: {
-              workspaceId: input.workspace_id,
-              childAnchorId,
-              familyAnchorId,
-              status: "active",
-              currentKey: "current",
-              currentChildAssociationId: { not: null },
-              revokedAt: null,
-              quarantinedAt: null,
-              familyAnchor: {
-                status: "associated",
-                aggregateVersion: selection.family_binding.owner_version,
-                revokedAt: null,
-                quarantinedAt: null,
-              },
-              childAnchor: {
-                status: "associated",
-                aggregateVersion: selection.child_binding.owner_version,
-                revokedAt: null,
-                quarantinedAt: null,
-              },
-              childAssociation: {
-                status: "active",
-                currentKey: "current",
-                revokedAt: null,
-                quarantinedAt: null,
-              },
-              currentChildAssociation: {
-                is: {
-                  status: "active",
-                  currentKey: "current",
-                  revokedAt: null,
-                  quarantinedAt: null,
-                },
-              },
-              family: { status: "active", deletedAt: null },
-              childCareProcess: { status: "active", deletedAt: null },
-            },
-            include: {
-              family: true,
-              childCareProcess: true,
-              childAnchor: true,
-              familyAnchor: true,
-            },
-            orderBy: { id: "asc" },
-            take: 2,
-          });
-          if (associations.length !== 1) {
-            return { status: "stale_context_ref" as const };
-          }
-          const association = associations[0]!;
-          if (association.childAssociationId !== association.currentChildAssociationId) {
-            return { status: "stale_context_ref" as const };
-          }
-
-          const currentSelection = await transaction.nurtureParentContextEnrollmentSelection.findUnique({
-            where: {
-              workspaceId_childCareProcessId: {
-                workspaceId: input.workspace_id,
-                childCareProcessId: association.childCareProcessId,
-              },
-            },
-            include: {
-              enrollment: {
-                include: { careGroup: { include: { institution: true } } },
-              },
-            },
-          });
-          if (!currentSelection) return { status: "ambiguous_enrollment" as const };
+          const mappedSelection = await mapParentContextEnrollmentSelection(
+            transaction,
+            { workspace_id: input.workspace_id, route },
+            at,
+          );
+          if (mappedSelection.status !== "resolved") return mappedSelection;
+          const association = mappedSelection.association;
+          const currentSelection = mappedSelection.selection;
           const enrollment = currentSelection.enrollment;
-          if (
-            enrollment.status !== "active"
-            || enrollment.deletedAt
-            || (enrollment.leftAt && enrollment.leftAt <= at)
-            || enrollment.childCareProcessId !== association.childCareProcessId
-            || enrollment.careGroup.status !== "active"
-            || enrollment.careGroup.deletedAt
-            || enrollment.careGroup.institution.status !== "active"
-            || enrollment.careGroup.institution.deletedAt
-          ) {
-            return { status: "scope_loss" as const };
-          }
-          if (enrollment.institutionId !== enrollment.careGroup.institutionId) {
-            return { status: "scope_loss" as const };
-          }
 
           const grantScope = {
             workspaceId: input.workspace_id,

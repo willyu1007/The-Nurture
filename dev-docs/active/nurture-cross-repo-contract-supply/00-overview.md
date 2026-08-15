@@ -97,12 +97,13 @@
   gates false. W2 parent context now has its production Prisma owner
   composition and canonical PostgreSQL qualification, without changing its
   frozen contract or default-false gate. Director still needs its W4 Prisma
-  owner composition, and parent communication owner plus extension still need
-  the shared binding-carrier-to-local-selection mapper and production wiring.
-  The W2 implementation and first-phase scenario hash reseal are verified but
-  remain uncommitted in the current worktree. After that work unit is committed,
-  mint the C30 owner-adoption lock at the committed revision and commit the lock
-  separately; do not describe W2 as landed before both commits exist.
+  owner composition. W3/W11 carrier cutover is now the active six-step work
+  unit. Step 1 is complete in source: W2's binding-carrier-to-local-selection
+  query is one shared DB mapper, with its former inline implementation removed.
+  The remaining steps add W3/W11 ingress, authority reuse, exact My-Chat current
+  context, default-off production/ramp wiring and joint database/staging
+  qualification. The W2 implementation and C30 lock are already landed; no
+  task status should describe them as uncommitted.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,

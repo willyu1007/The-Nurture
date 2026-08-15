@@ -1371,3 +1371,18 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   parent-communication carrier cutover remains later, independent work.
   Superseded on 2026-08-15: W2 now adds the explicit local selection migration;
   W3 must replace, not implement, the old host-selected Enrollment adapter.
+
+## 2026-08-15 — W3 carrier cutover step 1
+
+- Extracted W2's carrier identity/binding validation, exact current
+  child-family association lookup and local Enrollment selection lookup into
+  one Nurture DB mapper. The mapper returns routing facts only and explicitly
+  requires each consumer to perform its own operation authority checks.
+- W2 now consumes that mapper inside the same repeatable-read transaction. Its
+  Participant-first authority precedence, local selection version, bounded
+  cardinality, lifecycle checks and exact authority head remain unchanged.
+- Removed the former inline association/selection implementation. A source
+  census finds one binding parser and one local-selection query in the DB
+  package; no compatibility adapter or second mapping track was retained.
+- No W3/W11 request parsing, authority behavior, schema, migration, contract,
+  gate, deployment or traffic setting changed in this step.

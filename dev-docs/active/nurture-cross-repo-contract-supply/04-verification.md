@@ -1274,3 +1274,20 @@ NO_SCHEMA_OR_MIGRATION / VERIFIED_UNCOMMITTED`.
 Superseded by the mapping-contract qualification at the top of this document:
 the final W2 implementation intentionally adds the local selection migration
 and no longer has the `NO_SCHEMA_OR_MIGRATION` property.
+
+## 2026-08-15 — W3 carrier cutover step 1
+
+- `pnpm build:pinned-workflow-contracts` — pass; restored only ignored
+  generated type artifacts required by the linked workspace.
+- `pnpm --filter @the-nurture/db typecheck` — pass.
+- `git diff --check` — pass.
+- Single-track census — pass: one binding-owner-ref parser and one
+  `NurtureParentContextEnrollmentSelection.findUnique` query remain under
+  `packages/nurture-db/src`.
+- Existing W2 PostgreSQL suite was discovered but the shared local database is
+  intentionally not migrated to the W2 selection table. The full real-DB lane
+  is therefore deferred to step 6's disposable target; no shared database was
+  changed to make this intermediate refactor pass.
+
+Verdict: `W3_CARRIER_STEP_1_PASS / SHARED_DB_MAPPER / W2_SEMANTICS_PRESERVED /
+NO_SECOND_TRACK / NO_SCHEMA_OR_RUNTIME_CHANGE`.
