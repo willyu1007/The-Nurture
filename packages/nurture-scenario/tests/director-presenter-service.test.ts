@@ -173,6 +173,42 @@ describe("director presenter service", () => {
     expect(attendance).not.toHaveProperty("drilldown_ref");
   });
 
+  it("starts cache lifetime after independent support reads and resists clock rollback", async () => {
+    let clock = NOW;
+    let delaySupport = true;
+    const supportFinishedAt = new Date(NOW.getTime() + 120_000);
+    const service = createDirectorPresenterService({
+      reads: reads(),
+      supportSignals: {
+        compose: vi.fn(async () => {
+          if (delaySupport) clock = supportFinishedAt;
+          return { status: "unavailable" as const };
+        }),
+      },
+      integrityKey: KEY,
+      now: () => clock,
+    });
+    const authority = await resolve(service);
+    const response = await service.owner.overview({
+      authority,
+      request: { ...identity, local_date: "2026-08-15" },
+    }) as Record<string, unknown>;
+    const cache = response.cache_partition as Record<string, unknown>;
+
+    expect(response.generated_at).toBe(supportFinishedAt.toISOString());
+    expect(cache.expires_at).toBe(
+      new Date(supportFinishedAt.getTime() + 60_000).toISOString(),
+    );
+
+    delaySupport = false;
+    clock = new Date(NOW.getTime() - 1_000);
+    const rollbackResponse = await service.owner.overview({
+      authority,
+      request: { ...identity, local_date: "2026-08-15" },
+    }) as Record<string, unknown>;
+    expect(rollbackResponse.generated_at).toBe(authority.resolved_at);
+  });
+
   it("binds signed drilldown refs to workspace, authority and cache lifetime", async () => {
     let clock = NOW;
     const readPort = reads();
@@ -258,5 +294,81 @@ describe("director presenter service", () => {
         mask_signal: { reason_code: "access_changed" },
       });
     expect(readPort.authorityIsCurrent).toHaveBeenCalledTimes(2);
+  });
+
+  it("fails closed on context replacement and owner-side scope changes", async () => {
+    const readPort = reads();
+    const service = createDirectorPresenterService({
+      reads: readPort,
+      integrityKey: KEY,
+      now: () => NOW,
+    });
+    const authority = await resolve(service);
+
+    await expect(service.owner.overview({
+      authority,
+      request: {
+        ...identity,
+        context_ref: "context-b",
+        local_date: "2026-08-15",
+      },
+    })).resolves.toMatchObject({
+      status: "masked",
+      context_ref: "context-b",
+      mask_signal: { reason_code: "context_changed" },
+    });
+    expect(readPort.loadOverviewFacts).not.toHaveBeenCalled();
+
+    readPort.loadOverviewFacts = vi.fn(async () => ({
+      status: "scope_changed" as const,
+    }));
+    await expect(service.owner.overview({
+      authority,
+      request: { ...identity, local_date: "2026-08-15" },
+    })).resolves.toMatchObject({
+      status: "masked",
+      mask_signal: { reason_code: "access_changed" },
+    });
+  });
+
+  it("rechecks authority before reopening a class-load support drilldown", async () => {
+    const readPort = reads();
+    const supportSignals = {
+      compose: vi.fn(async () => ({
+        status: "ok" as const,
+        output: {
+          signals: [{
+            category: "configured_load_threshold",
+            sourceRef: "support-a",
+            safeReason: "The configured pending-work threshold is reached.",
+            currentCount: 6,
+          }],
+        },
+      })),
+    };
+    const service = createDirectorPresenterService({
+      reads: readPort,
+      supportSignals,
+      integrityKey: KEY,
+      now: () => NOW,
+    });
+    const authority = await resolve(service);
+    const overview = await service.owner.overview({
+      authority,
+      request: { ...identity, local_date: "2026-08-15" },
+    }) as Record<string, unknown>;
+    const section = (overview.sections as Array<Record<string, unknown>>)
+      .find((candidate) => candidate.section_key === "class_load_attention");
+    readPort.authorityIsCurrent = vi.fn(async () => false);
+
+    await expect(service.owner.drilldown({
+      authority,
+      request: { ...identity, drilldown_ref: String(section?.drilldown_ref) },
+    })).resolves.toMatchObject({
+      status: "masked",
+      mask_signal: { reason_code: "access_changed" },
+    });
+    expect(readPort.authorityIsCurrent).toHaveBeenCalledOnce();
+    expect(supportSignals.compose).toHaveBeenCalledOnce();
   });
 });

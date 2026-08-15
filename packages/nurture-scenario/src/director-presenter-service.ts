@@ -300,7 +300,9 @@ export const createDirectorPresenterService = (
     operation: DirectorPresenterOperation,
     queryKey: string,
   ) => {
-    const generatedAt = now();
+    const measuredAt = now();
+    const resolvedAt = new Date(authority.resolved_at);
+    const generatedAt = measuredAt < resolvedAt ? resolvedAt : measuredAt;
     const expiresAt = new Date(generatedAt.getTime() + RESPONSE_TTL_MS);
     return {
       status: "ready" as const,
@@ -404,6 +406,9 @@ export const createDirectorPresenterService = (
 
   const owner: DirectorPresenterOwnerV1 = {
     async overview({ request, authority }) {
+      if (request.context_ref !== authority.context_ref) {
+        return masked(request.context_ref, "context_changed");
+      }
       let read: DirectorOwnerReadV1<DirectorOverviewFactsV1>;
       try {
         read = await deps.reads.loadOverviewFacts({
@@ -422,13 +427,6 @@ export const createDirectorPresenterService = (
         return unavailable(request.context_ref, "temporarily_unavailable");
       }
 
-      const envelope = readyEnvelope(
-        request,
-        authority,
-        "overview_query",
-        request.local_date,
-      );
-      const expiresAt = envelope.expires_at;
       const facts = read.value;
       const support = await loadClassLoadSupport(
         deps.supportSignals,
@@ -436,6 +434,13 @@ export const createDirectorPresenterService = (
         authority,
         now,
       );
+      const envelope = readyEnvelope(
+        request,
+        authority,
+        "overview_query",
+        request.local_date,
+      );
+      const expiresAt = envelope.expires_at;
       const sections = [
         ratioSection(
           "attendance",
@@ -567,6 +572,9 @@ export const createDirectorPresenterService = (
     },
 
     async drilldown({ request, authority }) {
+      if (request.context_ref !== authority.context_ref) {
+        return masked(request.context_ref, "context_changed");
+      }
       const target = decodeDrilldownRef(
         deps.integrityKey,
         request.workspace_id,
@@ -678,6 +686,9 @@ export const createDirectorPresenterService = (
     },
 
     async materials({ request, authority }) {
+      if (request.context_ref !== authority.context_ref) {
+        return masked(request.context_ref, "context_changed");
+      }
       try {
         if (!await deps.reads.authorityIsCurrent({
           workspace_id: request.workspace_id,

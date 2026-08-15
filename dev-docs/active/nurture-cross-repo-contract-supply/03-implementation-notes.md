@@ -1560,3 +1560,32 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   material.
 - Added no schema, migration, environment value, contract, deployment,
   activation, public API or Mobile business rendering.
+
+## 2026-08-15 — W4 Prisma composition step 4
+
+- Moved overview `generated_at` and cache-expiry creation after the independent
+  configured-load source finishes. A slow support read can no longer consume
+  the advertised response lifetime before the response is composed.
+- Made ready-response time monotonic against the resolved authority instant.
+  If the process clock moves backward, `generated_at` is clamped to
+  `resolved_at` and the cache still receives a fresh bounded lifetime rather
+  than violating the published ordering invariant.
+- Added explicit context replacement checks at the start of overview,
+  drilldown and material operations. A mismatched owner invocation masks with
+  `context_changed` before any source or authority read.
+- Added generated-owner conformance coverage through the real scenario-service
+  composition and published response validator. The test exercises overview,
+  signed drilldown and protected-material denial, pins cache operation/query
+  binding and proves that exact Participant/role/Institution ids and action
+  fields do not escape.
+- Expanded focused adversarial coverage for slow sources, clock rollback,
+  owner-side scope loss, class-load reopen after revocation, material per-open
+  authority, signature suffix tampering, cross-Workspace reuse and expiry.
+  Existing formal-ingress fixtures continue to cover ready material cursor
+  binding and reject cursor drift even though W4.1 issues no material
+  collection ref.
+- D-O12 still never reads a storage ref or protected body and always returns
+  `protected_material_denied` after current authority. D-O13 still emits only
+  an unavailable `web_workbench_required` section with no operation command.
+- Added no schema, migration, contract, gate, production assembly, deployment,
+  activation, public API or Mobile business rendering.

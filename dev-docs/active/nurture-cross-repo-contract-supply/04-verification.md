@@ -1475,3 +1475,28 @@ HONEST_PARTIALS / CONTRACT_UNCHANGED / DEFAULT_OFF`.
 Verdict: `W4_PRISMA_STEP_3_PASS / ONE_PRODUCTION_BINDING /
 SHARED_PRISMA_CLIENT / OBSOLETE_REFUSAL_REMOVED / NO_PROTECTED_KEY /
 DEFAULT_OFF / NO_SCHEMA_OR_ENV_CHANGE`.
+
+## 2026-08-15 — W4 Prisma composition step 4
+
+- Root `pnpm typecheck` passed after the cache-time and context-replacement
+  hardening plus new integration test.
+- The DB-free presenter suite passed 1 file / 7 tests. It covers exact section
+  semantics, honest missing sources, slow-source TTL start, clock rollback,
+  signed-ref tamper/workspace/expiry, ambiguous authority, context replacement,
+  owner scope loss, material per-open checks and class-load reopen revocation.
+- Generated real-owner plus formal-route suites passed 2 files / 6 tests. All
+  real overview/drilldown/material responses satisfy the published schema and
+  semantic validator; the fixture route lane continues to reject hidden data,
+  action fields, pin drift, authority drift and material cursor drift.
+- The unchanged director contract passed 12 fixtures and 11 invalid probes at
+  digest `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`.
+- Source census found no `any`, transaction `Promise.all`, protected storage
+  field, URL or command/action field in the real owner. Schema/context/env
+  diffs are empty and `git diff --check` passed.
+- Strict task-doc and project-governance lint passed; package clean scripts
+  removed ignored scenario/DB build outputs created by verification.
+
+Verdict: `W4_PRISMA_STEP_4_PASS / POST_READ_CACHE_LIFETIME /
+SIGNED_REF_FAIL_CLOSED / CONTEXT_REPLACEMENT_MASKED /
+PER_OPEN_AUTHORITY / PROTECTED_ALWAYS_DENIED / D_O13_ACTION_FREE /
+CONTRACT_UNCHANGED`.
