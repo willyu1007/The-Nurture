@@ -1327,3 +1327,40 @@ SEVEN_ROUTES_CARRIER_REQUIRED / FROZEN_BODIES_UNCHANGED / DEFAULT_OFF`.
 
 Verdict: `W3_CARRIER_STEP_3_PASS / ASSOCIATION_THEN_LOCAL_SELECTION /
 OLD_ENROLLMENT_PORT_REMOVED / W11_SHARED_AUTHORITY / EXACT_HEAD_REREADS`.
+
+## 2026-08-15 — W3 carrier cutover step 4
+
+- My-Chat commit `7f2da94` injects its canonical parent-context repository into
+  W3 and rereads the exact actor context plus both current Nurture bindings for
+  summary, detail, prepare and confirm.
+- The strict v1 and v1.1 clients use the one existing canonical carrier codec
+  and header while preserving their frozen JSON bodies and digests.
+- My-Chat root typecheck passed all 17 participating workspaces; scenario-
+  integrations passed 34 files / 192 tests, Dashboard passed 5 files / 28
+  tests, and the current cross-repository strict-client run passed all 15
+  tests. Source census found no caller-context-only route or second codec.
+
+Verdict: `W3_CARRIER_STEP_4_PASS / EXACT_HOST_CONTEXT /
+ONE_SHARED_CARRIER / FROZEN_BODIES_UNCHANGED / DEFAULT_OFF`.
+
+## 2026-08-15 — W3 carrier cutover step 5
+
+- Root `pnpm typecheck` passed after rebuilding the pinned My-Chat workflow
+  contracts and both Prisma clients.
+- Full Nurture unit suite passed 104 files / 1137 tests. The focused production
+  and real-route set passed 3 files / 36 tests: eight production-ready binding
+  factories share one Prisma client; W3 protected-content dependency refusal,
+  W3 four-route behavior and W11 three-route behavior remain green.
+- Production-source census finds exactly one W3 and one W11 Prisma binding
+  factory wired into scenario-service. The obsolete carrier-cutover refusal is
+  absent; the director-only refusal remains accurate.
+- My-Chat paired evidence: all 17 workspace typechecks and 184 files / 1288
+  tests passed; API ramp/dashboard focused tests passed 8 files / 45 tests;
+  environment SSOT validation and generation suite passed. Dev, staging and
+  prod consumer gates remain false and an empty allowlist admits nobody.
+- Root ESLint is not a maintained Nurture gate (no ESLint 9 flat config); the
+  attempt stopped before source analysis. TypeScript, focused/full tests,
+  diff checks and repository governance remain the applicable checks.
+
+Verdict: `W3_CARRIER_STEP_5_PASS / REAL_PRODUCTION_BINDINGS /
+FAMILY_SCOPED_RAMP / IDENTITY_FREE_TELEMETRY / ALL_GATES_FALSE`.

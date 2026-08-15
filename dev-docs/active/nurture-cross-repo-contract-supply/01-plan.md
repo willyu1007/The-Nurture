@@ -103,9 +103,9 @@ activation. Execute the carrier cutover as six independently reviewed commits:
    the parsed carrier into authority resolution; remove the obsolete ingress.
 3. [x] Make W3 resolve current association first, local Enrollment selection
    second and operation authority last; make W11 reuse the same resolver.
-4. [ ] Make My-Chat resolve the exact current parent context per request and
+4. [x] Make My-Chat resolve the exact current parent context per request and
    have both strict v1/v1.1 clients emit the existing carrier.
-5. [ ] Supply W3/W11 production bindings behind default-false provider gates
+5. [x] Supply W3/W11 production bindings behind default-false provider gates
    and add family-scoped default-off My-Chat ramp/telemetry.
 6. [ ] Qualify cross-repo conformance, disposable-PostgreSQL
    read/prepare/confirm/replay/revocation, then rehearse staging migration and

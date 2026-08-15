@@ -1,5 +1,7 @@
 import {
   createAesGcmProtectedContentPort,
+  createPrismaParentCommunicationExtensionBinding,
+  createPrismaParentCommunicationOwnerBinding,
   createPrismaParentContextPresenterBinding,
   createPrismaClient,
   createPrismaTeacherAssistantQueryBinding,
@@ -16,6 +18,8 @@ import {
   type ScenarioStructuredLogSink,
 } from "./structured-logger.js";
 import type { TeacherAssistantQueryOwnerBindingV1 } from "./teacher-assistant-query-owner-runtime.js";
+import type { ParentCommunicationExtensionBindingV1 } from "./parent-communication-extension-runtime.js";
+import type { ParentCommunicationOwnerBindingV1 } from "./parent-communication-owner-runtime.js";
 import type { ParentContextPresenterOwnerBindingV1 } from "./parent-context-presenter-runtime.js";
 import type { TeacherClassStreamOwnerBindingV1 } from "./teacher-class-stream-runtime.js";
 import type { TeacherCommunicationOwnerBindingV1 } from "./teacher-communication-owner-runtime.js";
@@ -38,6 +42,8 @@ type ProductionSurface =
 
 export type ScenarioServiceProductionBindings = Readonly<{
   parentContextPresenterOwnerBinding?: ParentContextPresenterOwnerBindingV1;
+  parentCommunicationOwnerBinding?: ParentCommunicationOwnerBindingV1;
+  parentCommunicationExtensionBinding?: ParentCommunicationExtensionBindingV1;
   teacherClassStreamOwnerBinding?: TeacherClassStreamOwnerBindingV1;
   teacherOrganizationOwnerBinding?: TeacherOrganizationOwnerBindingV1;
   teacherCommunicationOwnerBinding?: TeacherCommunicationOwnerBindingV1;
@@ -54,6 +60,8 @@ export type ScenarioServiceProductionAssemblyDependencies = Readonly<{
   createPrismaClient: typeof createPrismaClient;
   createProtectedContent: typeof createAesGcmProtectedContentPort;
   createParentContextPresenterBinding: typeof createPrismaParentContextPresenterBinding;
+  createParentCommunicationOwnerBinding: typeof createPrismaParentCommunicationOwnerBinding;
+  createParentCommunicationExtensionBinding: typeof createPrismaParentCommunicationExtensionBinding;
   createTeacherClassStreamBinding: typeof createPrismaTeacherClassStreamBinding;
   createTeacherOrganizationBinding: typeof createPrismaTeacherOrganizationBinding;
   createTeacherCommunicationBinding: typeof createPrismaTeacherCommunicationBinding;
@@ -65,6 +73,9 @@ const productionDependencies: ScenarioServiceProductionAssemblyDependencies = {
   createPrismaClient,
   createProtectedContent: createAesGcmProtectedContentPort,
   createParentContextPresenterBinding: createPrismaParentContextPresenterBinding,
+  createParentCommunicationOwnerBinding: createPrismaParentCommunicationOwnerBinding,
+  createParentCommunicationExtensionBinding:
+    createPrismaParentCommunicationExtensionBinding,
   createTeacherClassStreamBinding: createPrismaTeacherClassStreamBinding,
   createTeacherOrganizationBinding: createPrismaTeacherOrganizationBinding,
   createTeacherCommunicationBinding: createPrismaTeacherCommunicationBinding,
@@ -113,7 +124,8 @@ export function createScenarioServiceProductionAssembly(input: {
   );
 
   const protectedContentRequired =
-    input.config.teacherOrganizationOwnerEnabled
+    input.config.parentCommunicationOwnerEnabled
+    || input.config.teacherOrganizationOwnerEnabled
     || input.config.teacherCommunicationOwnerEnabled
     || input.config.teacherAssistantQueryOwnerEnabled;
   if (protectedContentRequired) {
@@ -143,6 +155,25 @@ export function createScenarioServiceProductionAssembly(input: {
       ? {
           parentContextPresenterOwnerBinding:
             dependencies.createParentContextPresenterBinding({
+              prisma,
+              integrityKey,
+            }),
+        }
+      : {}),
+    ...(input.config.parentCommunicationOwnerEnabled
+      ? {
+          parentCommunicationOwnerBinding:
+            dependencies.createParentCommunicationOwnerBinding({
+              prisma,
+              integrityKey,
+              protectedContent: requireProtectedContent(protectedContent),
+            }),
+        }
+      : {}),
+    ...(input.config.parentCommunicationExtensionEnabled
+      ? {
+          parentCommunicationExtensionBinding:
+            dependencies.createParentCommunicationExtensionBinding({
               prisma,
               integrityKey,
             }),
@@ -207,16 +238,6 @@ function assertUnavailableSurfacesDisabled(
 ): void {
   const unavailable = [
     {
-      enabled: config.parentCommunicationOwnerEnabled,
-      surface: "parent_communication_owner" as const,
-      reason: "parent communication has not cut over to Nurture-owned enrollment selection",
-    },
-    {
-      enabled: config.parentCommunicationExtensionEnabled,
-      surface: "parent_communication_extension" as const,
-      reason: "parent communication has not cut over to Nurture-owned enrollment selection",
-    },
-    {
       enabled: config.directorPresenterEnabled,
       surface: "director_presenter" as const,
       reason: "no Prisma owner composition exists yet for this surface",
@@ -233,6 +254,12 @@ function firstEnabledReadySurface(
 ): ProductionSurface | undefined {
   if (config.parentContextPresenterEnabled) {
     return "parent_context_presenter";
+  }
+  if (config.parentCommunicationOwnerEnabled) {
+    return "parent_communication_owner";
+  }
+  if (config.parentCommunicationExtensionEnabled) {
+    return "parent_communication_extension";
   }
   if (config.teacherClassStreamPresenterEnabled) {
     return "teacher_class_stream_presenter";
@@ -255,6 +282,9 @@ function firstEnabledReadySurface(
 function firstEnabledProtectedContentSurface(
   config: ScenarioServiceConfig,
 ): ProductionSurface {
+  if (config.parentCommunicationOwnerEnabled) {
+    return "parent_communication_owner";
+  }
   if (config.teacherOrganizationOwnerEnabled) {
     return "teacher_organization_owner";
   }

@@ -1,5 +1,23 @@
 # Implementation notes
 
+## 2026-08-15 — W3 carrier cutover step 5
+
+- Scenario-service production assembly now exposes the existing real W3 v1
+  and W11 v1.1 Prisma binding factories. They share the shutdown-managed
+  Prisma client and exact integrity key with the other owner surfaces; W3 also
+  requires the existing protected-content key used by encrypted prepare.
+- Removed the obsolete startup refusal that claimed Nurture-owned Enrollment
+  selection was absent. The only intentionally unassembled published surface
+  remains the director presenter, whose Prisma composition is still missing.
+- Both provider gates remain exact-literal, default-false and independent.
+  All-off startup still creates no Prisma client, and an enabled W3/W11 gate
+  still refuses missing service auth, database URL or integrity key; W3 also
+  refuses a missing protected-content key.
+- My-Chat completed the paired consumer half at `7f2da94` plus the current
+  step: canonical-family allowlist, request-time gate reread and bounded
+  identity-free outcome telemetry. No deployment, migration or traffic change
+  occurred.
+
 ## 2026-08-15 — W2 explicit Enrollment selection and W3 readiness review
 
 - Added the owner contract `my-chat.parent-context-selection@1.0.0`: canonical

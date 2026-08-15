@@ -93,16 +93,16 @@
   now closed through real My-Chat strict-client/Nurture HTTP conformance and
   canonical PostgreSQL owner tests. W6 still defaults false until the release
   operator supplies the reviewed staging organization allowlist and executes
-  the runbook; no remote operation has run. Keep the other eight provider
-  gates false. W2 parent context now has its production Prisma owner
+  the runbook; no remote operation has run. Keep every provider gate false.
+  W2 parent context now has its production Prisma owner
   composition and canonical PostgreSQL qualification, without changing its
   frozen contract or default-false gate. Director still needs its W4 Prisma
-  owner composition. W3/W11 carrier cutover is now the active six-step work
-  unit. Step 1 is complete in source: W2's binding-carrier-to-local-selection
-  query is one shared DB mapper, with its former inline implementation removed.
-  The remaining steps add W3/W11 ingress, authority reuse, exact My-Chat current
-  context, default-off production/ramp wiring and joint database/staging
-  qualification. The W2 implementation and C30 lock are already landed; no
+  owner composition. W3/W11 carrier cutover is now at step 5 of 6: the shared
+  mapper, seven carrier-protected routes, association-first authority, exact
+  My-Chat current-context emission and default-off production/family-ramp
+  wiring are complete. The remaining step is joint conformance, disposable-DB
+  behavioral qualification and staging gate-off rehearsal. The W2
+  implementation and C30 lock are already landed; no
   task status should describe them as uncommitted.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
@@ -303,9 +303,10 @@ conformance fixtures, all default-off.
   spine waits on explicit authorization; production assembly, the My-Chat
   wiring/ramp/UI track and the remaining contract supply proceed in
   parallel without it.
-  - [x] A2 production assembly: the five teacher Prisma bindings and the W2
-    parent-context binding are injected by `main.ts` only when their unchanged
+  - [x] A2 production assembly: the five teacher Prisma bindings, W2
+    parent-context binding and W3/W11 communication bindings are injected by
+    `main.ts` only when their unchanged
     default-false gates and required secrets are present, sharing one
-    shutdown-managed Prisma client. The three surfaces without complete
-    production owner dependencies refuse startup with a structured reason
+    shutdown-managed Prisma client. The director surface without a complete
+    production owner dependency refuses startup with a structured reason
     instead of remaining silently dead.

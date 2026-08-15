@@ -1,5 +1,19 @@
 # Pitfalls
 
+## 2026-08-15 — A qualified binding can remain blocked by stale assembly policy
+
+- Symptom: W3/W11 had complete Prisma composition factories and carrier-based
+  authority, but production startup still rejected both with the obsolete
+  reason that local Enrollment selection had not cut over.
+- Root cause: owner qualification and the production assembly readiness list
+  landed in separate batches; the refusal was correct when written and became
+  semantic drift after steps 1-3.
+- Fix: promote both existing factories into the single production assembly,
+  add their real secret dependencies and remove only their stale refusals.
+- Prevention: after an authority cutover, census startup refusal text and
+  production dependency maps together; a default-false gate is not evidence
+  that an impossible-to-assemble runtime is rollout-ready.
+
 ## 2026-08-14 — Root-import dist masking swallowed source-level fixes and probes
 
 - Symptom: a repaired `receiptReplayMatches` in `packages/nurture-db/src` had
