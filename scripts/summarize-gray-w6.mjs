@@ -190,7 +190,7 @@ function usage() {
     "Usage:",
     "  node scripts/summarize-gray-w6.mjs --provider <provider.log> --host <host.log>",
     "",
-    "The inputs may be JSONL or uncolored Docker Compose logs. Output contains", 
+    "The inputs may be JSONL or uncolored Docker Compose logs. Output contains",
     "aggregate counts and latency only; identifiers and request bodies are omitted.",
   ].join("\n");
 }
