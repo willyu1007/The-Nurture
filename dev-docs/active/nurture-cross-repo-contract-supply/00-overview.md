@@ -72,6 +72,11 @@
   see `03-implementation-notes.md` / `04-verification.md` (2026-08-15
   deep-review entries). All batches remain default-off contract supply
   with no activation, durable apply, deployment or traffic.
+- Current next step: keep all nine provider gates false. Parent context needs
+  its W2 Prisma owner composition, director needs its W4 Prisma owner
+  composition, and parent communication owner plus extension need a production
+  `ParentCommunicationContextSelectionPortV1` host adapter. Staging deployment,
+  secret delivery and any gate change remain separately authorized work.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,
@@ -267,3 +272,8 @@ conformance fixtures, all default-off.
   spine waits on explicit authorization; production assembly, the My-Chat
   wiring/ramp/UI track and the remaining contract supply proceed in
   parallel without it.
+  - [x] A2 production assembly: the five existing teacher Prisma bindings are
+    injected by `main.ts` only when their unchanged default-false gates and
+    required secrets are present, sharing one shutdown-managed Prisma client.
+    The four surfaces without complete production owner dependencies refuse
+    startup with a structured reason instead of remaining silently dead.

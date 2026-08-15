@@ -145,3 +145,17 @@ risk-ascending ramp order are frozen in
   parent redaction extension (W11, smallest allowlist, longest observation).
 - Activation, deployment and traffic still require the explicit
   authorization gate; nothing in this plan changes the default-off posture.
+
+### A2 — Production assembly
+
+- [x] Inject the five existing teacher Prisma owner bindings through the
+  scenario-service production bootstrap, sharing one shutdown-managed client.
+- [x] Refuse startup with structured reasons for the four surfaces whose
+  production owner dependencies are incomplete.
+- [x] Preserve all default-false gates and the zero-construction all-off path.
+- [x] Qualify with focused factory tests, root typecheck and the full unit lane.
+
+Remaining owner-supply gaps are W2 parent-context Prisma composition, W4
+director Prisma composition, and the host-owned production
+`ParentCommunicationContextSelectionPortV1` adapter for parent communication
+owner and extension. Deployment and activation remain separate decisions.

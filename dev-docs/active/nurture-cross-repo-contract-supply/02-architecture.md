@@ -94,3 +94,24 @@ uses owner-issued opaque refs. Section failures are independent, missing never
 means zero or normal, attention never ranks staff, and family-private content
 is absent by default. Real owner ports, public API/Mobile composition,
 deployment and device evidence remain separate increments.
+
+## A2 production assembly boundary
+
+`apps/scenario-service/src/production-assembly.ts` is the production bootstrap
+adapter for the nine supplied contract surfaces. It does not reimplement
+owner behavior: the five ready teacher gates select the existing Prisma
+binding factories in `@the-nurture/db`, and `application.ts` continues to use
+its existing runtime factories to create route compositions.
+
+The five bindings share one Prisma client and one protected-content port where
+needed. No client or binding is created when all nine gates are false. Before
+constructing Prisma, the adapter rejects an enabled surface if service auth,
+database configuration, integrity material or required protected-content
+material is incomplete. Parent context, parent communication owner/extension
+and director gates reject startup with an explicit missing-owner dependency;
+they cannot degrade into mounted-but-dead production surfaces.
+
+`main.ts` owns lifecycle assembly: it passes the resulting bindings into the
+application and disconnects the shared Prisma client on server close or
+startup failure. Provider gates remain the activation boundary and retain
+their default-false values.

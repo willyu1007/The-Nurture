@@ -1126,3 +1126,25 @@ DEFAULT_OFF / CANDIDATE_NOT_FROZEN / LIVE_OWNER_AND_MOBILE_PENDING`.
 Verdict: `W4_QUALITY_CLOSED / PAGE_AND_LIFETIME_BOUND /
 FAIL_CLOSED_NON_RETRYABLE_DRIFT / GENERATED_ARTIFACTS_CLEANED /
 DEFAULT_OFF / CANDIDATE_NOT_FROZEN`.
+
+## 2026-08-15 — A2 scenario-service production assembly
+
+- Root `pnpm typecheck` passed. In the isolated worktree, its hard-coded
+  `../My-Chat` compiler input was temporarily redirected to the pinned sibling
+  checkout and emitted into `/private/tmp`; `package.json` was restored before
+  the final diff.
+- Focused production-assembly suite: 1 file / 15 tests passed. Coverage pins
+  the all-off zero-construction path, each of five ready factory selections,
+  all four unready startup refusals with exact structured reasons, missing
+  service-auth/database/integrity/protected-content dependencies, one shared
+  Prisma client and idempotent disconnect. Direct scenario-service TypeScript
+  compilation also passed after the final test update.
+- `pnpm test:unit:ci` passed 1,137/1,137 tests; the population gate passed
+  above its required floor of 1,133.
+- `pnpm verify:test-routing` passed at 205 files: unit 104, production DB 58,
+  dev-host 11, scenario-service 27 and X5 joint 5.
+- `git diff --check` passed. No scenario-service e2e or production build was
+  run; this assembly-only change did not modify route behavior or contracts.
+
+Verdict: `A2_PRODUCTION_ASSEMBLY_PASS / FIVE_TEACHER_BINDINGS /
+ONE_PRISMA_CLIENT / FOUR_EXPLICIT_STARTUP_REFUSALS / DEFAULT_OFF`.

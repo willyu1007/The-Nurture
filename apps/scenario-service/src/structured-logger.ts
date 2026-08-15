@@ -32,6 +32,12 @@ export type ScenarioStructuredLogRecord =
       service_name: string;
       port: number;
     }>
+  | Readonly<{
+      schema: "nurture_scenario_service_log_v1";
+      event: "scenario_service_production_assembly_refused";
+      surface: string;
+      reason: string;
+    }>
   | Readonly<
       {
         schema: "nurture_scenario_service_log_v1";
@@ -113,6 +119,18 @@ export class ScenarioStructuredLogger {
       app_env: input.appEnv,
       service_name: input.serviceName,
       port: input.port,
+    });
+  }
+
+  productionAssemblyRefused(input: {
+    surface: string;
+    reason: string;
+  }): void {
+    this.sink({
+      schema: "nurture_scenario_service_log_v1",
+      event: "scenario_service_production_assembly_refused",
+      surface: input.surface,
+      reason: input.reason,
     });
   }
 }
