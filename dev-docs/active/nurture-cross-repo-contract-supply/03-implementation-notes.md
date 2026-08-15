@@ -1198,3 +1198,32 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
 - No code, schema, dependency, environment, deployment, activation or
   traffic change was made in this round; both heads and CIs are unchanged
   at assessment time (Nurture `4b388d1` / My-Chat `1cd1888`, green).
+
+## 2026-08-15 — A2 scenario-service production assembly
+
+- Added a production-only binding factory at the scenario-service bootstrap
+  boundary. It delegates to the five existing `@the-nurture/db` Prisma
+  composition factories for teacher class stream, organization,
+  communication, media association and assistant query, then supplies those
+  bindings to the existing application runtime factories.
+- All enabled teacher bindings share one Prisma client. `main.ts` disconnects
+  it on HTTP-server close and on application startup failure; the all-off path
+  constructs neither a binding nor a Prisma client and emits no new log.
+- Enabling parent context or director now refuses startup with the exact
+  missing-Prisma-composition reason. Enabling parent communication owner or
+  its extension refuses startup with the exact missing production
+  `ParentCommunicationContextSelectionPortV1` adapter reason.
+- Enabled teacher surfaces fail startup before Prisma construction when
+  service auth, `DATABASE_URL`, integrity-key material or required protected-
+  content key material is absent. Refusals use the structured
+  `nurture_scenario_service_log_v1` schema without exposing secret values.
+- No enrollment-journey composition, schema, migration, dependency, package
+  script, environment default, deployment, activation or traffic setting was
+  changed.
+- Handoff state: the verified A2 changes remain uncommitted because this
+  worktree session cannot create the parent repository's
+  `.git/worktrees/agent-a0e941a653300dd46/index.lock`. No file was partially
+  staged. The next actor with Git metadata write access should stage the A2
+  source, focused test, routing census and T-011 docs, then commit as
+  `feat(service): assemble teacher bindings` with trailer `Task: T-011`;
+  preserve the unrelated untracked `codex-run.log` and `codex-task.md`.

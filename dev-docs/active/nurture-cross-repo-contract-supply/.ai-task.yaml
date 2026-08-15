@@ -3,7 +3,7 @@ task_id: T-011
 project: main
 slug: nurture-cross-repo-contract-supply
 status: in-progress
-updated: "2026-08-13"
+updated: "2026-08-15"
 keywords:
   - guardian-decision-callback
   - parent-context-presenter

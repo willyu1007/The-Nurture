@@ -169,3 +169,24 @@
   resolve TypeScript while built runtime exports remain unchanged.
 - Prevention: when a workspace exposes both root and subpath exports, test the
   exact production import forms in a clean source-only runner.
+
+## 2026-08-15 — Root verification assumes the main-checkout sibling layout
+
+- Symptom: `pnpm typecheck` stopped before local compilation because its
+  pinned workflow-contract build resolves `../My-Chat`, which does not exist
+  beside an isolated `.claude/worktrees/<id>` checkout. A subsequent external
+  absolute path could read My-Chat but could not emit there under the worktree
+  sandbox.
+- Root cause: repository scripts and pnpm link dependencies encode the main
+  checkout's sibling topology, while Codex worktrees are four levels deeper
+  and have write permission only inside the Nurture worktree and temp space.
+- What was tried: an offline pnpm relink was rejected because the local store
+  lacked several tarballs; the unchanged locked dependency tree was restored
+  from the main checkout's installed modules.
+- Fix: point the build step temporarily at the pinned sibling source, redirect
+  TypeScript output to `/private/tmp`, and restore `package.json` before the
+  final diff. Package-local My-Chat links were resolved to that same checkout
+  only in ignored `node_modules`.
+- Prevention: in isolated worktrees, validate sibling paths before running
+  root scripts. Keep any topology workaround temporary and verify that package
+  manifests, lockfiles and scripts are unchanged before committing.
