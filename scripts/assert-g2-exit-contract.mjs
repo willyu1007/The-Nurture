@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-14 reseal: End-of-schedule deep-review repairs moved the pinned
-  // runtime/tooling paths; My-Chat closure head 046e9f3
-  "046e9f321bc4d5a6c40efbf4330e96e4c15ca74e",
+  // 2026-08-15 reseal: A2 production assembly: teacher bindings factory in
+  // scenario-service
+  "99be59c52f8efec6917a4a1081e8e104fa539a26",
   "My-Chat revision",
 );
 assertEqual(

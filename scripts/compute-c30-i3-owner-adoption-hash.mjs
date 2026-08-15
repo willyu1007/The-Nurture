@@ -182,11 +182,11 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-14 reseal: End-of-schedule deep-review repairs moved the pinned
-      // runtime/tooling paths; My-Chat closure head 046e9f3
-      head_revision: "046e9f321bc4d5a6c40efbf4330e96e4c15ca74e",
+      // 2026-08-15 reseal: A2 production assembly: teacher bindings factory in
+      // scenario-service
+      head_revision: "99be59c52f8efec6917a4a1081e8e104fa539a26",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
-      aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
+      aggregate_source_hash: "b7a9d3e156092ee2758b3d01039d1f26d45bdbe963e52b5f8cf1adb8fa8b8cc3",
     },
     host: {
       // Step-5 requalification binds the current clean Host head while the
@@ -195,7 +195,7 @@ const computeLock = () => {
       // child-identity merge rotated that lock; fixture localization and the
       // curated api export keep the C30 Host runtime source profiles unchanged.
       head_revision: "a9281feb13a055061e6ed39a05fa83c4bede8044",
-      runtime_revision: "53e62c5175aec1cea20a6e3f8999731dd839875d",
+      runtime_revision: "89e80119deb97da258a956b58d4299b9998249ad",
       aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
     source_hash: sha256(
