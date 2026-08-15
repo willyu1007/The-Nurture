@@ -99,8 +99,11 @@
   the runbook; no remote operation has run. Keep every provider gate false.
   W2 parent context now has its production Prisma owner
   composition and canonical PostgreSQL qualification, without changing its
-  frozen contract or default-false gate. Director still needs its W4 Prisma
-  owner composition. W3/W11 carrier cutover is now closed at step 6 of 6: the
+  frozen contract or default-false gate. W4.1 director Prisma composition is
+  active at step 1 of 6: its exact source/authority matrix is frozen in
+  `artifacts/w4-director-prisma-source-freeze.md`; next implement the DB-free
+  presenter service and current Prisma authority/read ports. W3/W11 carrier
+  cutover is now closed at step 6 of 6: the
   shared mapper, seven carrier-protected routes, association-first authority,
   exact My-Chat current-context emission, default-off production/family-ramp
   wiring, joint conformance, disposable-DB behavior and local staging gate-off

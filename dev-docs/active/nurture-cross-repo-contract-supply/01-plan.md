@@ -137,6 +137,31 @@ Exit: complete on 2026-08-14 at digest
 All provider/consumer behavior remains dormant; no Candidate, deployment,
 activation, traffic or device claim was created.
 
+### W4.1 — Real Prisma owner composition
+
+Advance the already-published W4 contract through six independently verified
+commits without changing its digest or default-off posture:
+
+1. [x] Freeze the exact Prisma data sources, honest unavailable sections,
+   authority precedence and service/repository boundary.
+2. [ ] Implement current institution-director authority and the DB-free
+   presenter over bounded Prisma read ports.
+3. [ ] Supply one production Prisma binding through the shared-client assembly
+   and remove only the stale director startup refusal.
+4. [ ] Harden opaque refs, cache lifetime, pagination, per-open authority,
+   protected-material denial and the action-free D-O13 invariant.
+5. [ ] Qualify current reads, revocation, ambiguity and isolation on a fresh
+   disposable PostgreSQL database.
+6. [ ] Re-run contract/routes/cross-repo/full quality gates, repair all
+   findings, remove generated or parallel artifacts, and close handoff docs.
+
+Source SSOT:
+`artifacts/w4-director-prisma-source-freeze.md`.
+
+Exit requires a production-assemblable but still default-false provider. The
+My-Chat public API/Mobile business composition, deployment, activation and
+traffic remain later, separately authorized work.
+
 ## W6+ — Teacher-side supply extension (2026-08-14)
 
 Owner decision: after G5-A, the main supply effort targets the remaining

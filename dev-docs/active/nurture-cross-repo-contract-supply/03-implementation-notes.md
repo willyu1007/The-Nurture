@@ -1480,3 +1480,23 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   grants no scenario permission.
 - No schema, migration, contract artifact, gate default, production binding,
   deployment, activation or traffic setting changed.
+
+## 2026-08-15 — W4 Prisma composition step 1
+
+- Froze one maintained source matrix for D-O01 through D-O14. It binds each
+  ready section to current canonical rows and records why philosophy insight
+  and protected material access must remain explicitly unavailable rather
+  than be inferred from free-form JSON or storage metadata.
+- Required Participant -> institution Admin role -> active Institution
+  cardinality and exact-head reread on every operation. Host `context_ref`
+  remains routing/cache input only; every emitted navigation/page ref will be
+  owner-issued and integrity protected.
+- Reused the existing configured-load support-signal owner as the sole D-O09
+  threshold source. No director projection table, policy, threshold, cache,
+  identity mapping, or protected-material access track was introduced.
+- Fixed the implementation boundary: scenario owns presentation semantics,
+  DB owns bounded canonical facts, and scenario-service retains transport,
+  schema enforcement, and the unchanged default-false gate.
+- Added no product code, schema, migration, environment default, deployment,
+  activation, traffic, public API, or Mobile business composition in this
+  freeze step.
