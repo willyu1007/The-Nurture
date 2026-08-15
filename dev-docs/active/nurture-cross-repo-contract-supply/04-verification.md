@@ -1500,3 +1500,33 @@ Verdict: `W4_PRISMA_STEP_4_PASS / POST_READ_CACHE_LIFETIME /
 SIGNED_REF_FAIL_CLOSED / CONTEXT_REPLACEMENT_MASKED /
 PER_OPEN_AUTHORITY / PROTECTED_ALWAYS_DENIED / D_O13_ACTION_FREE /
 CONTRACT_UNCHANGED`.
+
+## 2026-08-15 — W4 Prisma composition step 5
+
+- Root `pnpm typecheck` passed with the real PostgreSQL integration lane.
+- Exact target `t011_w4_director_disposable_20260815` was proven absent before
+  creation. Prisma replayed all 44 migrations and reported the database schema
+  up to date.
+- The focused real-owner lane passed 1 file / 3 tests. It validates the
+  published overview, drilldown and material response shapes against canonical
+  PostgreSQL facts; current configured-load support; revocation closure for an
+  issued authority and a new resolve; cross-Workspace isolation; and fail-
+  closed multiple-Institution authority.
+- The initial fixture attempt correctly failed `ck_nurture_item_g2_complete_graph`;
+  a second attempt exposed the schema's unique Participant/role mapping. Both
+  synthetic-invalid models were removed. The final fixture uses complete G2
+  source/Grant graphs and a genuine second Institution scope.
+- `prisma migrate diff` returned `No difference detected.` between the replayed
+  target and `prisma/schema.prisma`.
+- `pnpm verify:test-routing` passed all 211 test files: unit 105, production DB
+  60, dev host 11, scenario service 30 and x5 joint 5.
+- The exact disposable database was dropped after Prisma disconnected and its
+  absence was proven with an exact-name catalog query. No shared, staging or
+  production database was changed.
+- Strict task-doc lint passed 43/43 files with zero warnings; project-
+  governance lint and `git diff --check` passed.
+
+Verdict: `W4_PRISMA_STEP_5_PASS / 44_MIGRATIONS_REPLAYED /
+REAL_OWNER_3_OF_3 / REVOCATION_AND_AMBIGUITY_CLOSED /
+WORKSPACE_ISOLATED / ZERO_SCHEMA_DRIFT / DISPOSABLE_REMOVED /
+DEFAULT_OFF`.

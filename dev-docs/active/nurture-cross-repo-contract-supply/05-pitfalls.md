@@ -334,3 +334,23 @@
 - Prevention: do not solve owner-boundary gaps by leaking provider ids or by
   relying on accidental row cardinality. Put the smallest missing decision in
   the repository that owns it, version it, and make absence fail closed.
+
+## 2026-08-15 — Synthetic W4 fixtures cannot bypass canonical G2 graphs
+
+- Symptom: the first W4 real-owner qualification failed the database's
+  `ck_nurture_item_g2_complete_graph` guard; a later ambiguity probe failed the
+  canonical Participant/role unique constraints before reaching the owner.
+- Root cause: the draft fixture modeled presenter outputs directly instead of
+  respecting the persisted contracts that make those outputs authoritative.
+  One responded item lacked its source Message/Grant, and the ambiguity case
+  attempted duplicate identity rows that the schema already forbids.
+- What was tried: replayed the fixture only against a fresh disposable
+  PostgreSQL target and followed each named database constraint back to its
+  canonical owner semantics.
+- Fix: give every G2 item a complete, distinct source Message/Grant graph with
+  explicit Institution Admin disclosure, and model ambiguity as two legitimate
+  current Institution scopes for one Participant.
+- Prevention: real-owner presenter tests must seed valid upstream domain
+  graphs and create ambiguity only at cardinalities the canonical schema
+  admits. Never weaken a constraint or invent a legacy row to make a read test
+  pass.

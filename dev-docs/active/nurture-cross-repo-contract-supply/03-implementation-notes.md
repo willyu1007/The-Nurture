@@ -1589,3 +1589,32 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   an unavailable `web_workbench_required` section with no operation command.
 - Added no schema, migration, contract, gate, production assembly, deployment,
   activation, public API or Mobile business rendering.
+
+## 2026-08-15 — W4 Prisma composition step 5
+
+- Added one real PostgreSQL integration lane for the production Prisma
+  director binding. Its canonical fixture exercises all currently available
+  overview sources, the reused configured-load policy owner, signed attendance
+  drilldown and the deliberately denied protected-material open.
+- The first disposable run rejected an incomplete G2 care-item fixture at the
+  database constraint. The fixture now carries a distinct canonical source
+  message and Grant for each item rather than bypassing the complete-graph
+  invariant. Institution Admin disclosure is represented by the existing
+  policy-snapshot contract, so the configured-load result comes through its
+  real protected business-communication owner.
+- The schema also proved that duplicate Participant identities and duplicate
+  identical role assignments cannot be fabricated. Ambiguity coverage now
+  models the valid risk: one My-Chat user with two current Institution Admin
+  scopes. The exact authority resolver closes it as `ambiguous_institution`.
+- The same owner lane proves current canonical counts, honest unavailable
+  sections, cross-Workspace isolation, stale-authority masking and both old-
+  token and new-resolution closure after role revocation.
+- Replayed all 44 repository migrations into the exact disposable database,
+  confirmed migration status and zero Prisma schema diff, then dropped that
+  database and proved its absence. No shared, staging or production database
+  was contacted.
+- Reconciled the maintained test-routing census for the W4 unit, scenario-
+  service owner-validator and PostgreSQL integration files. No test is left
+  unclassified or silently admitted to the wrong lane.
+- Added no schema, migration, contract, gate, environment value, deployment,
+  activation, public API or Mobile business rendering.

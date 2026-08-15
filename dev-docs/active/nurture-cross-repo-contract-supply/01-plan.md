@@ -150,7 +150,7 @@ commits without changing its digest or default-off posture:
    and remove only the stale director startup refusal.
 4. [x] Harden opaque refs, cache lifetime, pagination, per-open authority,
    protected-material denial and the action-free D-O13 invariant.
-5. [ ] Qualify current reads, revocation, ambiguity and isolation on a fresh
+5. [x] Qualify current reads, revocation, ambiguity and isolation on a fresh
    disposable PostgreSQL database.
 6. [ ] Re-run contract/routes/cross-repo/full quality gates, repair all
    findings, remove generated or parallel artifacts, and close handoff docs.
