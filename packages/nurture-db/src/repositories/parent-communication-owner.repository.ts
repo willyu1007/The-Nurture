@@ -66,66 +66,65 @@ implements ParentCommunicationAuthorityResolverV1 {
             return { status: "ambiguous_enrollment" as const };
           }
           const participant = participants[0]!;
-          const [roles, threads, grants] = await Promise.all([
-            transaction.nurtureCareRoleAssignment.findMany({
-              where: {
-                workspaceId: input.workspace_id,
-                participantId: participant.id,
-                role: "guardian",
-                status: "active",
-                deletedAt: null,
-                AND: [
-                  { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
-                  { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
-                  { OR: [
-                    { scopeType: "family", scopeId: association.familyId },
-                    { scopeType: "child_care_process", scopeId: enrollment.childCareProcessId },
-                    { scopeType: "enrollment", scopeId: enrollment.id },
-                  ] },
-                ],
-              },
-              take: 2,
-              orderBy: { id: "asc" },
-            }),
-            transaction.nurtureFamilyCareThread.findMany({
-              where: {
-                workspaceId: input.workspace_id,
-                childCareProcessId: enrollment.childCareProcessId,
-                familyId: association.familyId,
-                enrollmentId: enrollment.id,
-                careGroupId: enrollment.careGroupId,
-                visibilityScope: { in: ["family_private", "enrollment_private"] },
-                status: "active",
-                deletedAt: null,
-              },
-              take: 2,
-              orderBy: { id: "asc" },
-            }),
-            transaction.nurtureChildLinkGrant.findMany({
-              where: {
-                workspaceId: input.workspace_id,
-                childCareProcessId: enrollment.childCareProcessId,
-                enrollmentId: enrollment.id,
-                status: "active",
-                revokedAt: null,
-                deletedAt: null,
-                directions: { hasEvery: ["family_to_org", "org_to_family"] },
-                dataClasses: { has: "family_care_question" },
-                purposes: { has: FAMILY_CARE_PURPOSE },
-                AND: [
-                  { OR: [{ effectiveFrom: null }, { effectiveFrom: { lte: at } }] },
-                  { OR: [{ expiresAt: null }, { expiresAt: { gt: at } }] },
-                  { OR: [
-                    { grantedToScopeType: "care_group", grantedToScopeId: enrollment.careGroupId },
-                    { grantedToScopeType: "enrollment", grantedToScopeId: enrollment.id },
-                    { grantedToScopeType: "institution", grantedToScopeId: enrollment.institutionId },
-                  ] },
-                ],
-              },
-              take: 2,
-              orderBy: { id: "asc" },
-            }),
-          ]);
+          // An interactive transaction owns one connection; keep head reads serial.
+          const roles = await transaction.nurtureCareRoleAssignment.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              participantId: participant.id,
+              role: "guardian",
+              status: "active",
+              deletedAt: null,
+              AND: [
+                { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
+                { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
+                { OR: [
+                  { scopeType: "family", scopeId: association.familyId },
+                  { scopeType: "child_care_process", scopeId: enrollment.childCareProcessId },
+                  { scopeType: "enrollment", scopeId: enrollment.id },
+                ] },
+              ],
+            },
+            take: 2,
+            orderBy: { id: "asc" },
+          });
+          const threads = await transaction.nurtureFamilyCareThread.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              childCareProcessId: enrollment.childCareProcessId,
+              familyId: association.familyId,
+              enrollmentId: enrollment.id,
+              careGroupId: enrollment.careGroupId,
+              visibilityScope: { in: ["family_private", "enrollment_private"] },
+              status: "active",
+              deletedAt: null,
+            },
+            take: 2,
+            orderBy: { id: "asc" },
+          });
+          const grants = await transaction.nurtureChildLinkGrant.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              childCareProcessId: enrollment.childCareProcessId,
+              enrollmentId: enrollment.id,
+              status: "active",
+              revokedAt: null,
+              deletedAt: null,
+              directions: { hasEvery: ["family_to_org", "org_to_family"] },
+              dataClasses: { has: "family_care_question" },
+              purposes: { has: FAMILY_CARE_PURPOSE },
+              AND: [
+                { OR: [{ effectiveFrom: null }, { effectiveFrom: { lte: at } }] },
+                { OR: [{ expiresAt: null }, { expiresAt: { gt: at } }] },
+                { OR: [
+                  { grantedToScopeType: "care_group", grantedToScopeId: enrollment.careGroupId },
+                  { grantedToScopeType: "enrollment", grantedToScopeId: enrollment.id },
+                  { grantedToScopeType: "institution", grantedToScopeId: enrollment.institutionId },
+                ] },
+              ],
+            },
+            take: 2,
+            orderBy: { id: "asc" },
+          });
           if (roles.length !== 1
             || threads.length !== 1
             || grants.length !== 1) {
@@ -378,205 +377,191 @@ async function exactAuthorityIsCurrent(
   authority: ParentCommunicationResolvedAuthorityV1,
   at: Date,
 ): Promise<boolean> {
-  const [
-    participant,
-    role,
-    association,
-    selection,
-    enrollment,
-    group,
-    institution,
-    family,
-    process,
-    thread,
-    membership,
-    grant,
-  ] = await Promise.all([
-    transaction.nurtureParticipant.count({
-      where: {
-        id: authority.participant_id,
-        workspaceId,
-        aggregateVersion: authority.participant_version,
-        status: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureCareRoleAssignment.count({
-      where: {
-        id: authority.guardian_role_assignment_id,
-        workspaceId,
-        participantId: authority.participant_id,
-        aggregateVersion: authority.guardian_role_version,
-        role: "guardian",
-        status: "active",
-        deletedAt: null,
-        AND: [
-          { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
-          { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
-          { OR: [
-            { scopeType: "family", scopeId: authority.family_ref },
-            { scopeType: "child_care_process", scopeId: authority.child_care_process_ref },
-            { scopeType: "enrollment", scopeId: authority.enrollment_ref },
-          ] },
-        ],
-      },
-    }),
-    transaction.nurtureFamilyAnchorAssociation.findFirst({
-      where: {
-        id: authority.association_ref,
-        workspaceId,
-        childCareProcessId: authority.child_care_process_ref,
-        familyId: authority.family_ref,
-        childAnchorId: authority.child_anchor_ref,
-        familyAnchorId: authority.family_anchor_ref,
-        aggregateVersion: authority.association_version,
-        status: "active",
-        currentKey: "current",
-        currentChildAssociationId: { not: null },
+  // Preserve deterministic ordering on the transaction's single connection.
+  const participant = await transaction.nurtureParticipant.count({
+    where: {
+      id: authority.participant_id,
+      workspaceId,
+      aggregateVersion: authority.participant_version,
+      status: "active",
+      deletedAt: null,
+    },
+  });
+  const role = await transaction.nurtureCareRoleAssignment.count({
+    where: {
+      id: authority.guardian_role_assignment_id,
+      workspaceId,
+      participantId: authority.participant_id,
+      aggregateVersion: authority.guardian_role_version,
+      role: "guardian",
+      status: "active",
+      deletedAt: null,
+      AND: [
+        { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
+        { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
+        { OR: [
+          { scopeType: "family", scopeId: authority.family_ref },
+          { scopeType: "child_care_process", scopeId: authority.child_care_process_ref },
+          { scopeType: "enrollment", scopeId: authority.enrollment_ref },
+        ] },
+      ],
+    },
+  });
+  const association = await transaction.nurtureFamilyAnchorAssociation.findFirst({
+    where: {
+      id: authority.association_ref,
+      workspaceId,
+      childCareProcessId: authority.child_care_process_ref,
+      familyId: authority.family_ref,
+      childAnchorId: authority.child_anchor_ref,
+      familyAnchorId: authority.family_anchor_ref,
+      aggregateVersion: authority.association_version,
+      status: "active",
+      currentKey: "current",
+      currentChildAssociationId: { not: null },
+      revokedAt: null,
+      quarantinedAt: null,
+      familyAnchor: {
+        id: authority.family_anchor_ref,
+        aggregateVersion: authority.family_anchor_version,
+        status: "associated",
         revokedAt: null,
         quarantinedAt: null,
-        familyAnchor: {
-          id: authority.family_anchor_ref,
-          aggregateVersion: authority.family_anchor_version,
-          status: "associated",
-          revokedAt: null,
-          quarantinedAt: null,
-        },
-        childAnchor: {
-          id: authority.child_anchor_ref,
-          aggregateVersion: authority.child_anchor_version,
-          status: "associated",
-          revokedAt: null,
-          quarantinedAt: null,
-        },
-        childAssociation: {
+      },
+      childAnchor: {
+        id: authority.child_anchor_ref,
+        aggregateVersion: authority.child_anchor_version,
+        status: "associated",
+        revokedAt: null,
+        quarantinedAt: null,
+      },
+      childAssociation: {
+        status: "active",
+        currentKey: "current",
+        revokedAt: null,
+        quarantinedAt: null,
+      },
+      currentChildAssociation: {
+        is: {
           status: "active",
           currentKey: "current",
           revokedAt: null,
           quarantinedAt: null,
         },
-        currentChildAssociation: {
-          is: {
-            status: "active",
-            currentKey: "current",
-            revokedAt: null,
-            quarantinedAt: null,
-          },
-        },
       },
-      select: { childAssociationId: true, currentChildAssociationId: true },
-    }),
-    transaction.nurtureParentContextEnrollmentSelection.count({
-      where: {
-        workspaceId,
-        childCareProcessId: authority.child_care_process_ref,
-        enrollmentId: authority.enrollment_ref,
-        aggregateVersion: authority.parent_context_selection_version,
-      },
-    }),
-    transaction.nurtureEnrollment.count({
-      where: {
-        id: authority.enrollment_ref,
-        workspaceId,
-        childCareProcessId: authority.child_care_process_ref,
-        careGroupId: authority.care_group_ref,
-        institutionId: authority.institution_ref,
-        aggregateVersion: authority.enrollment_version,
-        status: "active",
-        deletedAt: null,
-        OR: [{ leftAt: null }, { leftAt: { gt: at } }],
-      },
-    }),
-    transaction.nurtureCareGroup.count({
-      where: {
-        id: authority.care_group_ref,
-        workspaceId,
-        institutionId: authority.institution_ref,
-        aggregateVersion: authority.care_group_version,
-        status: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureCareInstitution.count({
-      where: {
-        id: authority.institution_ref,
-        workspaceId,
-        aggregateVersion: authority.institution_version,
-        status: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureFamily.count({
-      where: {
-        id: authority.family_ref,
-        workspaceId,
-        childCareProcessId: authority.child_care_process_ref,
-        aggregateVersion: authority.family_version,
-        status: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureChildCareProcess.count({
-      where: {
-        id: authority.child_care_process_ref,
-        workspaceId,
-        aggregateVersion: authority.child_care_process_version,
-        status: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureFamilyCareThread.count({
-      where: {
-        id: authority.thread_ref,
-        workspaceId,
-        childCareProcessId: authority.child_care_process_ref,
-        familyId: authority.family_ref,
-        enrollmentId: authority.enrollment_ref,
-        careGroupId: authority.care_group_ref,
-        aggregateVersion: authority.thread_version,
-        visibilityScope: { in: ["family_private", "enrollment_private"] },
-        status: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureFamilyCareThreadParticipant.count({
-      where: {
-        id: authority.membership_ref,
-        workspaceId,
-        threadId: authority.thread_ref,
-        participantId: authority.participant_id,
-        roleAssignmentId: authority.guardian_role_assignment_id,
-        aggregateVersion: authority.membership_version,
-        participantKind: "guardian",
-        visibilityStatus: "active",
-        deletedAt: null,
-      },
-    }),
-    transaction.nurtureChildLinkGrant.count({
-      where: {
-        id: authority.grant_ref,
-        workspaceId,
-        childCareProcessId: authority.child_care_process_ref,
-        enrollmentId: authority.enrollment_ref,
-        aggregateVersion: authority.grant_version,
-        status: "active",
-        revokedAt: null,
-        deletedAt: null,
-        directions: { hasEvery: ["family_to_org", "org_to_family"] },
-        dataClasses: { has: "family_care_question" },
-        purposes: { has: FAMILY_CARE_PURPOSE },
-        AND: [
-          { OR: [{ effectiveFrom: null }, { effectiveFrom: { lte: at } }] },
-          { OR: [{ expiresAt: null }, { expiresAt: { gt: at } }] },
-          { OR: [
-            { grantedToScopeType: "care_group", grantedToScopeId: authority.care_group_ref },
-            { grantedToScopeType: "enrollment", grantedToScopeId: authority.enrollment_ref },
-            { grantedToScopeType: "institution", grantedToScopeId: authority.institution_ref },
-          ] },
-        ],
-      },
-    }),
-  ]);
+    },
+    select: { childAssociationId: true, currentChildAssociationId: true },
+  });
+  const selection = await transaction.nurtureParentContextEnrollmentSelection.count({
+    where: {
+      workspaceId,
+      childCareProcessId: authority.child_care_process_ref,
+      enrollmentId: authority.enrollment_ref,
+      aggregateVersion: authority.parent_context_selection_version,
+    },
+  });
+  const enrollment = await transaction.nurtureEnrollment.count({
+    where: {
+      id: authority.enrollment_ref,
+      workspaceId,
+      childCareProcessId: authority.child_care_process_ref,
+      careGroupId: authority.care_group_ref,
+      institutionId: authority.institution_ref,
+      aggregateVersion: authority.enrollment_version,
+      status: "active",
+      deletedAt: null,
+      OR: [{ leftAt: null }, { leftAt: { gt: at } }],
+    },
+  });
+  const group = await transaction.nurtureCareGroup.count({
+    where: {
+      id: authority.care_group_ref,
+      workspaceId,
+      institutionId: authority.institution_ref,
+      aggregateVersion: authority.care_group_version,
+      status: "active",
+      deletedAt: null,
+    },
+  });
+  const institution = await transaction.nurtureCareInstitution.count({
+    where: {
+      id: authority.institution_ref,
+      workspaceId,
+      aggregateVersion: authority.institution_version,
+      status: "active",
+      deletedAt: null,
+    },
+  });
+  const family = await transaction.nurtureFamily.count({
+    where: {
+      id: authority.family_ref,
+      workspaceId,
+      childCareProcessId: authority.child_care_process_ref,
+      aggregateVersion: authority.family_version,
+      status: "active",
+      deletedAt: null,
+    },
+  });
+  const process = await transaction.nurtureChildCareProcess.count({
+    where: {
+      id: authority.child_care_process_ref,
+      workspaceId,
+      aggregateVersion: authority.child_care_process_version,
+      status: "active",
+      deletedAt: null,
+    },
+  });
+  const thread = await transaction.nurtureFamilyCareThread.count({
+    where: {
+      id: authority.thread_ref,
+      workspaceId,
+      childCareProcessId: authority.child_care_process_ref,
+      familyId: authority.family_ref,
+      enrollmentId: authority.enrollment_ref,
+      careGroupId: authority.care_group_ref,
+      aggregateVersion: authority.thread_version,
+      visibilityScope: { in: ["family_private", "enrollment_private"] },
+      status: "active",
+      deletedAt: null,
+    },
+  });
+  const membership = await transaction.nurtureFamilyCareThreadParticipant.count({
+    where: {
+      id: authority.membership_ref,
+      workspaceId,
+      threadId: authority.thread_ref,
+      participantId: authority.participant_id,
+      roleAssignmentId: authority.guardian_role_assignment_id,
+      aggregateVersion: authority.membership_version,
+      participantKind: "guardian",
+      visibilityStatus: "active",
+      deletedAt: null,
+    },
+  });
+  const grant = await transaction.nurtureChildLinkGrant.count({
+    where: {
+      id: authority.grant_ref,
+      workspaceId,
+      childCareProcessId: authority.child_care_process_ref,
+      enrollmentId: authority.enrollment_ref,
+      aggregateVersion: authority.grant_version,
+      status: "active",
+      revokedAt: null,
+      deletedAt: null,
+      directions: { hasEvery: ["family_to_org", "org_to_family"] },
+      dataClasses: { has: "family_care_question" },
+      purposes: { has: FAMILY_CARE_PURPOSE },
+      AND: [
+        { OR: [{ effectiveFrom: null }, { effectiveFrom: { lte: at } }] },
+        { OR: [{ expiresAt: null }, { expiresAt: { gt: at } }] },
+        { OR: [
+          { grantedToScopeType: "care_group", grantedToScopeId: authority.care_group_ref },
+          { grantedToScopeType: "enrollment", grantedToScopeId: authority.enrollment_ref },
+          { grantedToScopeType: "institution", grantedToScopeId: authority.institution_ref },
+        ] },
+      ],
+    },
+  });
   return participant === 1
     && role === 1
     && association !== null

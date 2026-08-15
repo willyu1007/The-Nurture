@@ -1,5 +1,28 @@
 # Pitfalls
 
+## 2026-08-15 — Interactive-transaction queries must not be fanned out
+
+- Symptom: W3 authority resolution and exact-current verification used
+  `Promise.all` over one Prisma interactive-transaction client even though the
+  resulting predicates and tests were correct.
+- Risk: pg@9 compatibility does not make concurrent work on one transaction
+  connection a safe or useful optimization; it can create driver-ordering
+  failures and contradicts the required sequential authority reread.
+- Fix: keep every bounded query explicit and sequential inside the transaction.
+- Prevention: include changed transaction repositories in the `Promise.all`
+  census during final architecture review.
+
+## 2026-08-15 — Do not rebuild a sibling package while its consumers collect tests
+
+- Symptom: an intentionally parallel final check produced 22 Nurture
+  collection failures while My-Chat's workflow-contract build replaced its
+  exported `dist`; the same full unit lane passed 104/104 files immediately
+  when rerun serially.
+- Fix: run the pinned workflow-contract build/typecheck before Nurture tests,
+  never concurrently with them. Only the serial result is valid evidence.
+- Prevention: parallelize independent read-only suites, not commands that
+  clean/regenerate a package imported by another running suite.
+
 ## 2026-08-15 — Successful migration status does not prove Prisma SSOT parity
 
 - Symptom: all 43 migrations replayed successfully and `migrate status` was

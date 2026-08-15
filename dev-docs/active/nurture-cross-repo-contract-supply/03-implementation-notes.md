@@ -1,5 +1,21 @@
 # Implementation notes
 
+## 2026-08-15 — W3 final deep review
+
+- Reviewed the complete six-commit cutover rather than only the final staging
+  increment: one carrier codec/parser, seven protected routes, one shared
+  association-to-selection mapper, exact authority-head rereads, production
+  bindings, family ramp and the single staging path all remain intact.
+- Found two `Promise.all` blocks issuing queries through the same Prisma
+  interactive-transaction client in the W3 authority repository. Replaced
+  them with explicit sequential awaits, matching the repository's pg@9 safety
+  rule and the documented sequential-head-read semantics without changing any
+  predicate or owner response.
+- Replayed all 44 migrations into a second fresh disposable database after the
+  repair and reran W3/W11 current-read, prepare/confirm, replay, cross-actor
+  refusal, revocation rollback, redaction and receipt behavior. The target was
+  destroyed after the green run.
+
 ## 2026-08-15 — W3 carrier cutover step 6
 
 - Joint v1/v1.1 conformance, the seven private routes and production assembly
