@@ -1618,3 +1618,35 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   unclassified or silently admitted to the wrong lane.
 - Added no schema, migration, contract, gate, environment value, deployment,
   activation, public API or Mobile business rendering.
+
+## 2026-08-15 — W4 Prisma composition step 6
+
+- Replaced the director repository's UTC-midnight shortcut with the existing
+  Institution publication-policy local-day owner. Attendance/activity keep the
+  canonical storage date; response, flow, authorization, focus and seven-day
+  trend windows use timezone-correct instants, including non-24-hour days.
+  Missing or invalid policy now makes date-bound sections honestly unavailable
+  instead of guessing UTC.
+- Capped request-time rows at the exact owner snapshot, required canonical G2
+  writer graphs for response/message metrics, restricted authorization-change
+  counts to current active Enrollments, and rejected a child process with two
+  active class Enrollments from the aggregate attendance ratio. Drilldowns use
+  the same predicates as their overview sections.
+- Reused the shared active-role window helper and retained one repository,
+  presenter, production factory and response-enforcement path. No compatibility
+  lane, projection table, material reader or director action path was added.
+- Expanded the real PostgreSQL lane with policy-timezone boundaries, a future
+  canonical row beyond the snapshot, pre-G2 default axes and a revoked Grant
+  attached to an inactive Enrollment. Those rows no longer change W4 metrics.
+- The full scenario-service DB lane exposed a stale N8 fixture that still used
+  `my_chat_child_identity` as binding authorization provenance. It now creates
+  the current Guardian role and binds both owner authorizations to that exact
+  role/version; no legacy acceptance branch was introduced.
+- Updated the maintained gray-readiness artifact: G2 production assembly and
+  W4 provider owner supply are closed, while the My-Chat director composition,
+  deployment and activation gates remain explicitly separate.
+- Resealed current clean My-Chat `main` pins after its already-landed parent
+  carrier/ramp work. The W4 contract digest remains byte-identical and all
+  provider gates remain false.
+- Added no schema, migration, contract, environment value, deployment,
+  activation, public API or Mobile business rendering.

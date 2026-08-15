@@ -30,7 +30,7 @@ contract.
 | Row | Presenter section/operation | Canonical source | W4.1 behavior |
 | --- | --- | --- | --- |
 | D-O01 | Organization/day header | `NurtureCareInstitution` plus the exact authority heads | Ready after exact authority resolution. |
-| D-O02 | Attendance pulse | Active `NurtureEnrollment`, `NurtureDailyAttendanceSubmission`, and `NurtureAttendanceEntry` rows for the requested class-day | A submitted/reopened checkpoint yields a ratio. No checkpoint is `unavailable`, never zero absence. An institution with no active roster is `empty`. |
+| D-O02 | Attendance pulse | Active `NurtureEnrollment`, `NurtureDailyAttendanceSubmission`, and `NurtureAttendanceEntry` rows for the publication-policy-backed Institution local class-day | A submitted/reopened checkpoint yields a ratio. No checkpoint is `unavailable`, never zero absence. An institution with no active roster is `empty`. |
 | D-O03 | Activity pulse | `NurtureActivityPlacement` rows whose canonical state is `placed` for the requested class-day | Ready count or honest empty state; the presenter does not inspect arbitrary capture bodies. |
 | D-O04 | Message-response pulse | Current `NurtureFamilyCareItem` response/lifecycle axes in active institution Enrollments | Ready ratio over reply-requiring active items; no staff ranking or message body is exposed. |
 | D-O05 | Home-kindergarten flow | Current `NurtureFamilyCareMessage.direction` and exact active Enrollment/CareGroup scope | Ready two-way flow metric; message bodies, attachments, Family ids, and Child ids stay absent. |
@@ -55,6 +55,9 @@ contract.
   validation, exact request/response binding, and default-false gate.
 - Potentially large reads are bounded: drilldown at 50, material pages at 20,
   authority cardinality at two, and trend at seven days.
+- Calendar-day windows come only from the current Institution publication
+  policy timezone. UTC is never guessed; request-time facts are capped at the
+  owner snapshot and pre-G2 default axes are not canonical presenter facts.
 - Interactive-transaction queries remain sequential. No network or protected
   content call runs inside a Prisma transaction.
 

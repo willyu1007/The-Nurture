@@ -363,6 +363,17 @@ const seedWorld = async (
     const careProcess = await prisma.nurtureChildCareProcess.create({
       data: { workspaceId, childId: child.id, status: "active" },
     });
+    const guardianRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId,
+        participantId: guardian!.id,
+        role: "guardian",
+        scopeType: "child_care_process",
+        scopeId: careProcess.id,
+        status: "active",
+        aggregateVersion: 1,
+      },
+    });
     const family = await prisma.nurtureFamily.create({
       data: {
         workspaceId,
@@ -494,8 +505,8 @@ const seedWorld = async (
             userEvidenceHash: hash("user"),
             actorEvidenceHash: hash("actor"),
             purpose: "scenario_binding_write",
-            authorizationSourceRef: "my_chat_child_identity",
-            authorizationSourceVersion: 1,
+            authorizationSourceRef: `nurture-care-role:${guardianRole.id}`,
+            authorizationSourceVersion: guardianRole.aggregateVersion,
             status: "active",
             verifiedAt: new Date("2026-08-05T08:00:00.000Z"),
             expiresAt:

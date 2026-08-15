@@ -17,12 +17,11 @@ default-off within minutes by flipping its gate.
 
 ## Verified facts this assessment stands on (code-checked 2026-08-15)
 
-1. Production `bootstrap()` calls `createScenarioServiceApplication()` with
-   no input — **no owner binding is injected in production**. Even with an
-   env gate set true, the process has no Prisma-backed binding; bindings are
-   composed only in tests/e2e. This is the deliberate default-off posture,
-   and it means "production assembly" is real, authorization-independent
-   code work.
+1. Production `bootstrap()` now uses the gate-selected production assembly.
+   Every declared owner surface has one concrete Prisma composition, all
+   selected bindings share one shutdown-managed client, and all gates still
+   default false. This closes the former G2 supply gap without activating a
+   route or admitting traffic.
 2. My-Chat has **no rollout/canary/feature-flag infrastructure**; a minimal
    control plane (per-surface gate + family/org allowlist ramp) must be
    built host-side.
@@ -37,7 +36,7 @@ default-off within minutes by flipping its gate.
 | # | Gap | Repo | Needs activation authorization? | Notes |
 |---|---|---|---|---|
 | G1 | Activation authorization | governance | — | The only external input; blocks nothing below |
-| G2 | Production assembly: gate-guarded Prisma binding factory in `main.ts` | Nurture | No (stays default-off) | See verified fact 1 |
+| G2 | Production assembly: gate-guarded Prisma binding factory in `main.ts` | Nurture | Closed (default-off) | One production factory per declared surface; see verified fact 1 |
 | G3 | Deployment environment for scenario-service (containerization, config manifest, DB migration baseline) | Nurture | Deployment itself yes; preparation no | |
 | G4 | Service trust: `NURTURE_INTERNAL_SERVICE_TOKEN` issuance/injection/rotation | both | No | |
 | G5 | My-Chat wiring layer: the nine dormant strict clients have no host API/UI caller | My-Chat | No (wired but host-gated off) | Prerequisite for the joint rehearsal |
@@ -54,7 +53,7 @@ cleanly across the two repos (the only shared surface is the cross-repo pin,
 handled by the per-batch reseal discipline), and can all start now.
 
 - **Track A — activation spine**: A1 authorization (external) → A2
-  production assembly (G2, can start now) → A3 staging deployment + token
+  production assembly (G2, complete) → A3 staging deployment + token
   (G3/G4; containerization prep can start now) → A4 joint rehearsal (G8,
   needs B1) → A5 per-surface ramp (order below) → A6 full volume.
 - **Track B — My-Chat wiring and UI** (starts now): B1 host wiring layer
@@ -87,7 +86,7 @@ families/orgs) → percentage → full; the three G7 metrics gate each step.
 ## Pre-ramp checklist (joint sign-off)
 
 - [ ] G1 explicit authorization on record
-- [ ] G2 assembly landed; default-posture test (all gates false → all
+- [x] G2 assembly landed; default-posture test (all gates false → all
       routes 404/degraded) still green
 - [ ] G3 staging interop both ways; DB migration baseline flat
 - [ ] G4 token issuance/rotation exercised once
@@ -112,12 +111,15 @@ gate the affected ramp waves:
 1. W2 parent-context presenter — source composition and explicit local
    selection are complete; wave 1b now waits on the reviewed migration,
    cross-service configuration and gray execution evidence.
-2. W4 director presenter — no Prisma owner composition exists; wave 2
-   waits on it in addition to the director composition layer (C1).
+2. W4 director presenter — closed by W4.1: one bounded current-authority
+   Prisma owner and the shared-client production binding are qualified on
+   canonical PostgreSQL. Wave 2 now waits on the My-Chat director composition
+   layer (C1), deployment and separately authorized activation, not provider
+   owner supply.
 3. Parent-communication owner + extension — the old host-selected Enrollment
    port must be replaced by the shared binding carrier plus Nurture local
    selection mapper and then wired in production; wave 5 waits on it.
 
-Until each gap closes, its gate fails fast at startup by design (the
-assembly refuses with a structured log naming the missing piece), so a
-premature flip cannot limp into undefined behavior.
+The remaining parent-communication gap fails fast at startup by design. W2
+and W4 no longer retain missing-owner refusals; their still-default-false gates
+remain the activation boundary.

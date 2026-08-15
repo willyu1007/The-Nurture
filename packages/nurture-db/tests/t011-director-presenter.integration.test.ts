@@ -99,12 +99,16 @@ const seedScope = async (input: {
       state: "submitted",
       submittedByRoleAssignmentId: directorRole.id,
       submittedAt: new Date(`${LOCAL_DATE}T01:00:00.000Z`),
+      createdAt: new Date(`${LOCAL_DATE}T00:30:00.000Z`),
+      updatedAt: new Date(`${LOCAL_DATE}T01:00:00.000Z`),
       entries: {
         create: {
           workspaceId: base.workspaceId,
           childCareProcessId: base.processId,
           state: "present",
           aggregateVersion: 1,
+          createdAt: new Date(`${LOCAL_DATE}T00:30:00.000Z`),
+          updatedAt: new Date(`${LOCAL_DATE}T01:00:00.000Z`),
         },
       },
     },
@@ -120,6 +124,8 @@ const seedScope = async (input: {
         state: "placed",
         activityRef: "morning",
         decidedBy: "source_binding",
+        createdAt: new Date(`${LOCAL_DATE}T01:30:00.000Z`),
+        updatedAt: new Date(`${LOCAL_DATE}T01:30:00.000Z`),
       },
       {
         workspaceId: base.workspaceId,
@@ -130,6 +136,8 @@ const seedScope = async (input: {
         state: "placed",
         activityRef: "outdoor",
         decidedBy: "source_binding",
+        createdAt: new Date(`${LOCAL_DATE}T01:31:00.000Z`),
+        updatedAt: new Date(`${LOCAL_DATE}T01:31:00.000Z`),
       },
     ],
   });
@@ -325,6 +333,10 @@ const seedScope = async (input: {
     ...base,
     director,
     directorRole,
+    questionGrant,
+    thread,
+    familyMessage,
+    priorFamilyMessage,
     binding: createPrismaDirectorPresenterBinding({
       prisma,
       integrityKey: INTEGRITY_KEY,
@@ -371,9 +383,137 @@ const section = (
   return found;
 };
 
+const seedRowsOutsideCanonicalPresenterScope = async (scope: Scope) => {
+  const legacyMessage = await prisma.nurtureFamilyCareMessage.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      threadId: scope.thread.id,
+      childCareProcessId: scope.processId,
+      senderParticipantId: scope.participantId,
+      senderRoleAssignmentId: scope.roleAssignmentId,
+      messageKind: "family_message",
+      authorshipKind: "family_authored",
+      bodyFormat: "plain_text",
+      bodyStorageMode: "protected",
+      sourceSurface: "mobile",
+      status: "sent",
+      writerContract: "legacy_v1",
+      enrollmentId: scope.enrollmentId,
+      careGroupId: scope.careGroupId,
+      direction: "family_to_org",
+      createdAt: new Date(`${LOCAL_DATE}T07:00:00.000Z`),
+      updatedAt: new Date(`${LOCAL_DATE}T07:00:00.000Z`),
+    },
+  });
+  await prisma.nurtureFamilyCareItem.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      sourceMessageId: legacyMessage.id,
+      threadId: scope.thread.id,
+      childCareProcessId: scope.processId,
+      familyId: scope.familyId,
+      enrollmentId: scope.enrollmentId,
+      careGroupId: scope.careGroupId,
+      dataClass: "family_care_question",
+      category: "question",
+      summary: "Legacy untrusted response axes",
+      urgency: "normal",
+      requiresReply: true,
+      status: "open",
+      classificationSource: "manual",
+      writerContract: "legacy_v1",
+      responseState: "awaiting_reply",
+      lifecycleState: "active",
+      createdAt: new Date(`${LOCAL_DATE}T07:01:00.000Z`),
+      updatedAt: new Date(`${LOCAL_DATE}T07:01:00.000Z`),
+    },
+  });
+  const inactiveEnrollment = await prisma.nurtureEnrollment.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: scope.processId,
+      institutionId: scope.institutionId,
+      careGroupId: scope.careGroupId,
+      status: "withdrawn",
+      participationPhase: "formal",
+      leftAt: new Date(`${LOCAL_DATE}T06:00:00.000Z`),
+    },
+  });
+  await prisma.nurtureChildLinkGrant.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: scope.processId,
+      enrollmentId: inactiveEnrollment.id,
+      grantedByParticipantId: scope.participantId,
+      grantedToScopeType: "care_group",
+      grantedToScopeId: scope.careGroupId,
+      directions: ["family_to_org"],
+      dataClasses: ["family_care_question"],
+      purposes: ["family_communication"],
+      status: "revoked",
+      revokedAt: new Date(`${LOCAL_DATE}T08:00:00.000Z`),
+      revokedByParticipantId: scope.participantId,
+      revokeReason: "user_revoked",
+      createdAt: new Date(`${LOCAL_DATE}T07:30:00.000Z`),
+      updatedAt: new Date(`${LOCAL_DATE}T08:00:00.000Z`),
+    },
+  });
+};
+
+const seedFutureCanonicalQuestion = async (scope: Scope) => {
+  const message = await prisma.nurtureFamilyCareMessage.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      threadId: scope.thread.id,
+      childCareProcessId: scope.processId,
+      senderParticipantId: scope.participantId,
+      senderRoleAssignmentId: scope.roleAssignmentId,
+      messageKind: "family_message",
+      authorshipKind: "family_authored",
+      bodyFormat: "plain_text",
+      bodyStorageMode: "protected",
+      sourceSurface: "mobile",
+      grantId: scope.questionGrant.id,
+      status: "sent",
+      writerContract: "harness_g2_v1",
+      enrollmentId: scope.enrollmentId,
+      careGroupId: scope.careGroupId,
+      direction: "family_to_org",
+      replyOrderKey: `future-question-${scope.runId}`,
+      createdAt: new Date(`${LOCAL_DATE}T13:00:00.000Z`),
+      updatedAt: new Date(`${LOCAL_DATE}T13:00:00.000Z`),
+    },
+  });
+  await prisma.nurtureFamilyCareItem.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      sourceMessageId: message.id,
+      threadId: scope.thread.id,
+      childCareProcessId: scope.processId,
+      familyId: scope.familyId,
+      enrollmentId: scope.enrollmentId,
+      careGroupId: scope.careGroupId,
+      dataClass: "family_care_question",
+      category: "question",
+      summary: "Future canonical question",
+      urgency: "normal",
+      requiresReply: true,
+      status: "open",
+      classificationSource: "manual",
+      grantId: scope.questionGrant.id,
+      writerContract: "harness_g2_v1",
+      responseState: "awaiting_reply",
+      lifecycleState: "active",
+      createdAt: new Date(`${LOCAL_DATE}T13:00:01.000Z`),
+      updatedAt: new Date(`${LOCAL_DATE}T13:00:01.000Z`),
+    },
+  });
+};
+
 describe("T-011 W4 director presenter real owner ports", () => {
   it("projects canonical institution facts and bounded drilldowns", async () => {
     const scope = await seedScope({ label: "Canonical" });
+    await seedRowsOutsideCanonicalPresenterScope(scope);
     const identity = identityOf(scope);
     const authority = await resolveAuthority(scope, "overview_query");
     const overview = asRecord(await scope.binding.owner.overview({
@@ -444,6 +584,38 @@ describe("T-011 W4 director presenter real owner ports", () => {
     expect(materials).toMatchObject({
       status: "masked",
       mask_signal: { reason_code: "protected_material_denied" },
+    });
+  });
+
+  it("uses the policy-backed local day and excludes facts after the snapshot", async () => {
+    const scope = await seedScope({ label: "LocalDay" });
+    await prisma.nurtureInstitutionPublicationPolicy.updateMany({
+      where: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institutionId,
+      },
+      data: { timeZone: "Asia/Shanghai" },
+    });
+    await seedFutureCanonicalQuestion(scope);
+
+    const identity = identityOf(scope);
+    const authority = await resolveAuthority(scope, "overview_query");
+    const overview = asRecord(await scope.binding.owner.overview({
+      request: { ...identity, local_date: LOCAL_DATE },
+      authority,
+    }));
+    assertPublishedDirectorPresenterResponse("overview_query", overview);
+    expect(section(overview, "message_response")).toMatchObject({
+      status: "ready",
+      metric: { primary_value: 1, secondary_value: 2 },
+    });
+    expect(section(overview, "home_kindergarten_flow")).toMatchObject({
+      status: "ready",
+      metric: { primary_value: 2, secondary_value: 1 },
+    });
+    expect(section(overview, "trend")).toMatchObject({
+      status: "ready",
+      trend: { points: [0, 0, 0, 0, 0, 0, 3] },
     });
   });
 

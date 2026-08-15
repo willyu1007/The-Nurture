@@ -182,9 +182,9 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-15 reseal: W2 explicit parent-context enrollment selection and
-      // carrier
-      head_revision: "0c7215f9c620b4009e575aeb594bbfe3f3b52a46",
+      // 2026-08-15 reseal: adopt My-Chat parent carrier closure and finalized W4
+      // director Prisma closure
+      head_revision: "72a40a1c1be16d78ea6ad823f8d11e4c7de75933",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "b7a9d3e156092ee2758b3d01039d1f26d45bdbe963e52b5f8cf1adb8fa8b8cc3",
     },

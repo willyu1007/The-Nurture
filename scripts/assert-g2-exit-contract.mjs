@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-15 reseal: W2 explicit parent-context enrollment selection and
-  // carrier
-  "0c7215f9c620b4009e575aeb594bbfe3f3b52a46",
+  // 2026-08-15 reseal: adopt My-Chat parent carrier closure and finalized W4
+  // director Prisma closure
+  "72a40a1c1be16d78ea6ad823f8d11e4c7de75933",
   "My-Chat revision",
 );
 assertEqual(

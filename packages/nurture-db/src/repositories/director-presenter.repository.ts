@@ -1,14 +1,17 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
-import type {
-  DirectorContextReadV1,
-  DirectorDrilldownKindV1,
-  DirectorDrilldownRowV1,
-  DirectorOverviewFactsV1,
-  DirectorOwnerReadV1,
-  DirectorPresenterExactAuthorityV1,
-  DirectorPresenterReadPortV1,
-  DirectorSourceReadV1,
+import {
+  type DirectorContextReadV1,
+  type DirectorDrilldownKindV1,
+  type DirectorDrilldownRowV1,
+  type DirectorOverviewFactsV1,
+  type DirectorOwnerReadV1,
+  type DirectorPresenterExactAuthorityV1,
+  type DirectorPresenterReadPortV1,
+  type DirectorSourceReadV1,
+  zonedLocalTimeToInstant,
 } from "@the-nurture/scenario";
+import { activeRoleWindow } from "./board-read-support.js";
+import { loadInstitutionLocalDay } from "./institution-local-day.js";
 
 type PrismaReader = PrismaClient | Prisma.TransactionClient;
 
@@ -104,12 +107,18 @@ implements DirectorPresenterReadPortV1 {
     );
   }
 
-  loadOverviewFacts(input: {
+  async loadOverviewFacts(input: {
     workspace_id: string;
     authority: DirectorPresenterExactAuthorityV1;
     local_date: string;
     at: Date;
   }): Promise<DirectorOwnerReadV1<DirectorOverviewFactsV1>> {
+    const day = await loadDirectorDay(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: input.authority.exact.institution_id,
+      local_date: input.local_date,
+      at: input.at,
+    });
     return this.prisma.$transaction(async (transaction) => {
       if (!await directorAuthorityIsCurrent(
         transaction,
@@ -129,6 +138,12 @@ implements DirectorPresenterReadPortV1 {
         select: { displayName: true },
       });
       if (!institution) return { status: "scope_changed" };
+      if (!day || day.start > input.at) {
+        return {
+          status: "current",
+          value: allSourcesUnavailable(institution.displayName),
+        };
+      }
       const groups = await transaction.nurtureCareGroup.findMany({
         where: {
           workspaceId: input.workspace_id,
@@ -147,8 +162,7 @@ implements DirectorPresenterReadPortV1 {
         };
       }
       const groupIds = groups.map((group) => group.id);
-      const day = utcDayWindow(input.local_date);
-      const trendStart = new Date(day.start.getTime() - 6 * 86_400_000);
+      const trendStart = day.trend_windows[0]!.start;
 
       const enrollments = await transaction.nurtureEnrollment.findMany({
         where: activeInstitutionEnrollmentWhere(
@@ -170,7 +184,7 @@ implements DirectorPresenterReadPortV1 {
       )];
 
       let attendance: DirectorOverviewFactsV1["attendance"];
-      if (enrollmentOverflow) {
+      if (enrollmentOverflow || boundedEnrollments.length !== processIds.length) {
         attendance = sourceUnavailable();
       } else if (processIds.length === 0) {
         attendance = current({ present_count: 0, roster_count: 0 });
@@ -179,8 +193,10 @@ implements DirectorPresenterReadPortV1 {
           where: {
             workspaceId: input.workspace_id,
             careGroupId: { in: enrolledGroupIds },
-            localDate: day.start,
+            localDate: day.storage_date,
             state: { in: ["submitted", "reopened"] },
+            createdAt: { lte: input.at },
+            updatedAt: { lte: input.at },
             deletedAt: null,
           },
           include: {
@@ -188,24 +204,35 @@ implements DirectorPresenterReadPortV1 {
               where: {
                 workspaceId: input.workspace_id,
                 childCareProcessId: { in: processIds },
+                createdAt: { lte: input.at },
+                updatedAt: { lte: input.at },
               },
               select: { childCareProcessId: true, state: true },
             },
           },
           take: enrolledGroupIds.length + 1,
         });
-        const entries = submissions.flatMap((row) => row.entries);
-        const covered = new Set(entries.map((entry) => entry.childCareProcessId));
-        attendance = submissions.length === enrolledGroupIds.length
-          && covered.size === processIds.length
-          ? current({
-              present_count: new Set(
-                entries
-                  .filter((entry) => entry.state === "present")
-                  .map((entry) => entry.childCareProcessId),
-              ).size,
-              roster_count: processIds.length,
-            })
+        const rosterByGroup = groupSet(boundedEnrollments, "childCareProcessId");
+        const submissionByGroup = new Map(
+          submissions.map((submission) => [submission.careGroupId, submission] as const),
+        );
+        const present = new Set<string>();
+        let complete = submissions.length === enrolledGroupIds.length;
+        for (const groupId of enrolledGroupIds) {
+          const roster = rosterByGroup.get(groupId) ?? new Set<string>();
+          const entries = submissionByGroup.get(groupId)?.entries.filter(
+            (entry) => roster.has(entry.childCareProcessId),
+          ) ?? [];
+          if (new Set(entries.map((entry) => entry.childCareProcessId)).size !== roster.size) {
+            complete = false;
+            break;
+          }
+          for (const entry of entries) {
+            if (entry.state === "present") present.add(entry.childCareProcessId);
+          }
+        }
+        attendance = complete
+          ? current({ present_count: present.size, roster_count: processIds.length })
           : sourceUnavailable();
       }
 
@@ -215,8 +242,10 @@ implements DirectorPresenterReadPortV1 {
             where: {
               workspaceId: input.workspace_id,
               careGroupId: { in: groupIds },
-              localDate: day.start,
+              localDate: day.storage_date,
               state: "placed",
+              createdAt: { lte: input.at },
+              updatedAt: { lte: input.at },
             },
           });
 
@@ -226,11 +255,18 @@ implements DirectorPresenterReadPortV1 {
             where: {
               workspaceId: input.workspace_id,
               careGroupId: { in: groupIds },
-              enrollment: { is: activeEnrollmentRelation(input.authority.exact.institution_id) },
+              enrollment: {
+                is: activeScopedEnrollmentRelation(
+                  input.authority.exact.institution_id,
+                  groupIds,
+                ),
+              },
+              writerContract: "harness_g2_v1",
               lifecycleState: "active",
               requiresReply: true,
               responseState: { in: ["awaiting_reply", "responded"] },
-              createdAt: { gte: day.start, lt: day.end },
+              createdAt: { gte: day.start, lt: day.end, lte: input.at },
+              updatedAt: { lte: input.at },
             },
             orderBy: { id: "asc" },
             select: { responseState: true },
@@ -251,10 +287,17 @@ implements DirectorPresenterReadPortV1 {
             where: {
               workspaceId: input.workspace_id,
               careGroupId: { in: groupIds },
-              enrollment: { is: activeEnrollmentRelation(input.authority.exact.institution_id) },
+              enrollment: {
+                is: activeScopedEnrollmentRelation(
+                  input.authority.exact.institution_id,
+                  groupIds,
+                ),
+              },
+              writerContract: "harness_g2_v1",
               status: "sent",
               direction: { in: ["family_to_org", "org_to_family"] },
-              createdAt: { gte: trendStart, lt: day.end },
+              createdAt: { gte: trendStart, lt: day.end, lte: input.at },
+              updatedAt: { lte: input.at },
             },
             orderBy: [{ createdAt: "asc" }, { id: "asc" }],
             select: { createdAt: true, direction: true },
@@ -279,7 +322,7 @@ implements DirectorPresenterReadPortV1 {
           });
       const trend = messageOverflow
         ? sourceUnavailable<Readonly<{ points: readonly number[] }>>()
-        : current({ points: dailyCounts(messages, trendStart, 7) });
+        : current({ points: dailyCounts(messages, day.trend_windows) });
 
       const authorizationCount = groupIds.length === 0
         ? 0
@@ -287,10 +330,12 @@ implements DirectorPresenterReadPortV1 {
             where: {
               workspaceId: input.workspace_id,
               enrollment: {
-                institutionId: input.authority.exact.institution_id,
-                careGroupId: { in: groupIds },
+                is: activeScopedEnrollmentRelation(
+                  input.authority.exact.institution_id,
+                  groupIds,
+                ),
               },
-              updatedAt: { gte: day.start, lt: day.end },
+              updatedAt: { gte: day.start, lt: day.end, lte: input.at },
             },
           });
 
@@ -302,7 +347,7 @@ implements DirectorPresenterReadPortV1 {
               childCareProcessId: { in: processIds },
               deletedAt: null,
               focusGoal: {
-                updatedAt: { gte: day.start, lt: day.end },
+                updatedAt: { gte: day.start, lt: day.end, lte: input.at },
                 focusCycle: {
                   workspaceId: input.workspace_id,
                   status: "active",
@@ -336,7 +381,7 @@ implements DirectorPresenterReadPortV1 {
     }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
   }
 
-  loadDrilldownFacts(input: {
+  async loadDrilldownFacts(input: {
     workspace_id: string;
     authority: DirectorPresenterExactAuthorityV1;
     local_date: string;
@@ -347,6 +392,12 @@ implements DirectorPresenterReadPortV1 {
     organization_display_name: string;
     rows: readonly DirectorDrilldownRowV1[];
   }>>> {
+    const day = await loadDirectorDay(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: input.authority.exact.institution_id,
+      local_date: input.local_date,
+      at: input.at,
+    });
     return this.prisma.$transaction(async (transaction) => {
       if (!await directorAuthorityIsCurrent(
         transaction,
@@ -365,6 +416,7 @@ implements DirectorPresenterReadPortV1 {
         select: { displayName: true },
       });
       if (!institution) return { status: "scope_changed" };
+      if (!day || day.start > input.at) return { status: "unavailable" };
       const groups = await transaction.nurtureCareGroup.findMany({
         where: {
           workspaceId: input.workspace_id,
@@ -380,9 +432,10 @@ implements DirectorPresenterReadPortV1 {
         transaction,
         input.workspace_id,
         input.authority.exact.institution_id,
-        input.local_date,
+        day,
         input.kind,
         groups,
+        input.at,
       );
       return {
         status: "current",
@@ -436,20 +489,19 @@ export async function directorAuthorityIsCurrent(
   return institution === 1;
 }
 
-const activeRoleWindow = (at: Date) => ({
-  status: "active" as const,
-  deletedAt: null,
-  AND: [
-    { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
-    { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
-  ],
-});
-
 const activeEnrollmentRelation = (institutionId: string) => ({
   institutionId,
   status: "active" as const,
   deletedAt: null,
   childCareProcess: { status: "active" as const, deletedAt: null },
+});
+
+const activeScopedEnrollmentRelation = (
+  institutionId: string,
+  groupIds: readonly string[],
+) => ({
+  ...activeEnrollmentRelation(institutionId),
+  careGroupId: { in: [...groupIds] },
 });
 
 const activeInstitutionEnrollmentWhere = (
@@ -478,22 +530,62 @@ const allSourcesUnavailable = (
   family_focus_attention: sourceUnavailable(),
 });
 
-const utcDayWindow = (localDate: string) => {
-  const start = new Date(`${localDate}T00:00:00.000Z`);
-  return { start, end: new Date(start.getTime() + 86_400_000) };
+type DirectorDayWindow = Readonly<{ start: Date; end: Date }>;
+type DirectorDay = DirectorDayWindow & Readonly<{
+  storage_date: Date;
+  trend_windows: readonly DirectorDayWindow[];
+}>;
+
+const shiftedDateParts = (storageDate: Date, days: number) => {
+  const shifted = new Date(storageDate.getTime() + days * 86_400_000);
+  return {
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth() + 1,
+    day: shifted.getUTCDate(),
+  };
+};
+
+const loadDirectorDay = async (
+  prisma: PrismaClient,
+  input: Readonly<{
+    workspace_id: string;
+    institution_id: string;
+    local_date: string;
+    at: Date;
+  }>,
+): Promise<DirectorDay | null> => {
+  const localDay = await loadInstitutionLocalDay(prisma, input);
+  if (!localDay) return null;
+  const storageDate = new Date(localDay.storage_date);
+  const trendWindows = Array.from({ length: 7 }, (_, index) => {
+    const offset = index - 6;
+    return {
+      start: zonedLocalTimeToInstant(
+        shiftedDateParts(storageDate, offset),
+        0,
+        localDay.time_zone,
+      ),
+      end: zonedLocalTimeToInstant(
+        shiftedDateParts(storageDate, offset + 1),
+        0,
+        localDay.time_zone,
+      ),
+    };
+  });
+  return {
+    storage_date: storageDate,
+    start: new Date(localDay.occurred_from),
+    end: new Date(localDay.occurred_before),
+    trend_windows: trendWindows,
+  };
 };
 
 const dailyCounts = (
   messages: readonly Readonly<{ createdAt: Date }>[],
-  start: Date,
-  days: number,
-): number[] => Array.from({ length: days }, (_, index) => {
-  const from = new Date(start.getTime() + index * 86_400_000);
-  const before = new Date(from.getTime() + 86_400_000);
-  return messages.filter(
-    (message) => message.createdAt >= from && message.createdAt < before,
-  ).length;
-});
+  windows: readonly DirectorDayWindow[],
+): number[] => windows.map((window) => messages.filter(
+  (message) => message.createdAt >= window.start && message.createdAt < window.end,
+).length);
 
 type ClassRow = Readonly<{ id: string; name: string }>;
 
@@ -501,11 +593,11 @@ async function drilldownRows(
   transaction: Prisma.TransactionClient,
   workspaceId: string,
   institutionId: string,
-  localDate: string,
+  day: DirectorDay,
   kind: Exclude<DirectorDrilldownKindV1, "class_load_attention">,
   groups: readonly ClassRow[],
+  at: Date,
 ): Promise<DirectorDrilldownRowV1[]> {
-  const day = utcDayWindow(localDate);
   const groupIds = groups.map((group) => group.id);
   const base = new Map(groups.map((group) => [group.id, group] as const));
   const values = new Map<string, { status: "current" | "unavailable"; primary: number; secondary?: number }>();
@@ -522,11 +614,22 @@ async function drilldownRows(
       where: {
         workspaceId,
         careGroupId: { in: groupIds },
-        localDate: day.start,
+        localDate: day.storage_date,
         state: { in: ["submitted", "reopened"] },
+        createdAt: { lte: at },
+        updatedAt: { lte: at },
         deletedAt: null,
       },
-      include: { entries: { select: { childCareProcessId: true, state: true } } },
+      include: {
+        entries: {
+          where: {
+            workspaceId,
+            createdAt: { lte: at },
+            updatedAt: { lte: at },
+          },
+          select: { childCareProcessId: true, state: true },
+        },
+      },
     });
     const submissionByGroup = new Map(submissions.map((row) => [row.careGroupId, row]));
     for (const group of groups) {
@@ -556,8 +659,10 @@ async function drilldownRows(
       where: {
         workspaceId,
         careGroupId: { in: groupIds },
-        localDate: day.start,
+        localDate: day.storage_date,
         state: "placed",
+        createdAt: { lte: at },
+        updatedAt: { lte: at },
       },
       _count: { _all: true },
     });
@@ -569,11 +674,13 @@ async function drilldownRows(
       where: {
         workspaceId,
         careGroupId: { in: groupIds },
-        enrollment: { is: activeEnrollmentRelation(institutionId) },
+        enrollment: { is: activeScopedEnrollmentRelation(institutionId, groupIds) },
+        writerContract: "harness_g2_v1",
         lifecycleState: "active",
         requiresReply: true,
         responseState: { in: ["awaiting_reply", "responded"] },
-        createdAt: { gte: day.start, lt: day.end },
+        createdAt: { gte: day.start, lt: day.end, lte: at },
+        updatedAt: { lte: at },
       },
       select: { careGroupId: true, responseState: true },
       take: MAX_RESPONSE_ITEMS + 1,
@@ -593,10 +700,12 @@ async function drilldownRows(
       where: {
         workspaceId,
         careGroupId: { in: groupIds },
-        enrollment: { is: activeEnrollmentRelation(institutionId) },
+        enrollment: { is: activeScopedEnrollmentRelation(institutionId, groupIds) },
+        writerContract: "harness_g2_v1",
         status: "sent",
         direction: { in: ["family_to_org", "org_to_family"] },
-        createdAt: { gte: day.start, lt: day.end },
+        createdAt: { gte: day.start, lt: day.end, lte: at },
+        updatedAt: { lte: at },
       },
       select: { careGroupId: true, direction: true },
       take: MAX_MESSAGES + 1,
@@ -615,8 +724,8 @@ async function drilldownRows(
     const grants = await transaction.nurtureChildLinkGrant.findMany({
       where: {
         workspaceId,
-        enrollment: { institutionId, careGroupId: { in: groupIds } },
-        updatedAt: { gte: day.start, lt: day.end },
+        enrollment: { is: activeScopedEnrollmentRelation(institutionId, groupIds) },
+        updatedAt: { gte: day.start, lt: day.end, lte: at },
       },
       select: { enrollment: { select: { careGroupId: true } } },
       take: MAX_ENROLLMENTS + 1,
@@ -632,10 +741,12 @@ async function drilldownRows(
         workspaceId,
         deletedAt: null,
         focusGoal: {
-          updatedAt: { gte: day.start, lt: day.end },
+          updatedAt: { gte: day.start, lt: day.end, lte: at },
           focusCycle: { workspaceId, status: "active", deletedAt: null },
         },
         childCareProcess: {
+          status: "active",
+          deletedAt: null,
           enrollments: {
             some: {
               institutionId,

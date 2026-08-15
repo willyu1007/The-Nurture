@@ -354,3 +354,38 @@
   graphs and create ambiguity only at cardinalities the canonical schema
   admits. Never weaken a constraint or invent a legacy row to make a read test
   pass.
+
+## 2026-08-15 — A local date is not a UTC interval
+
+- Symptom: W4 attendance used the correct stored date, but response, flow,
+  authorization, focus and trend queries treated that date as UTC midnight to
+  midnight and admitted rows later than the request snapshot.
+- Root cause: the first repository implementation reused one convenient UTC
+  helper instead of the existing publication-policy-backed Institution local-
+  day owner. It also accepted legacy default direction/response axes as if they
+  were canonical G2 facts.
+- What was tried: exercised the real owner with an `Asia/Shanghai` policy,
+  boundary messages, a canonical future row, a legacy graph and an inactive
+  Enrollment Grant on a fresh PostgreSQL target.
+- Fix: resolve the policy local day once outside the interactive transaction,
+  use timezone-correct seven-day windows, cap rows at the owner snapshot, admit
+  only `harness_g2_v1` axes and require active Enrollment relations.
+- Prevention: any feature named by local date must use the repository's local-
+  day owner; timestamp-backed reads must state their snapshot upper bound and
+  their canonical-writer discriminator.
+
+## 2026-08-15 — N8 still forged retired binding provenance
+
+- Symptom: the full scenario-service DB lane denied all N8 prepares with
+  `authorization_provenance_invalid` although its lower-level DB lane passed.
+- Root cause: the N8 fixture still wrote `my_chat_child_identity` as a binding
+  authorization source after the owner contract moved provenance to an exact
+  current Nurture Guardian role and positive role version.
+- What was tried: reran the suite on a second empty migrated database and added
+  one temporary fail-fast diagnostic to expose the exact denial; the diagnostic
+  was then removed.
+- Fix: seed one Guardian role per care process and bind child/family owner
+  authorizations to `nurture-care-role:<id>` plus its exact version.
+- Prevention: integration fixtures must call or faithfully model the current
+  owner authorization path. Never preserve an old identity shortcut by adding
+  a compatibility acceptance branch.

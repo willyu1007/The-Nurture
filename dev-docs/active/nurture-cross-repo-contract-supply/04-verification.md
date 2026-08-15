@@ -1530,3 +1530,34 @@ Verdict: `W4_PRISMA_STEP_5_PASS / 44_MIGRATIONS_REPLAYED /
 REAL_OWNER_3_OF_3 / REVOCATION_AND_AMBIGUITY_CLOSED /
 WORKSPACE_ISOLATED / ZERO_SCHEMA_DRIFT / DISPOSABLE_REMOVED /
 DEFAULT_OFF`.
+
+## 2026-08-15 — W4 Prisma composition step 6
+
+- Frozen director contract passed at unchanged digest
+  `sha256:39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`
+  with 12 fixtures / 11 invalid probes. The full formal-ingress validator also
+  passed all nine interface contracts and 52 controller routes.
+- Focused W4 lanes passed: DB-free presenter 1 file / 7 tests; generated owner
+  plus formal service routes 2 files / 6 tests; final PostgreSQL owner 1 file /
+  4 tests. My-Chat's strict consumer passed 5 tests with its one intentional
+  skipped transport case, and its package typecheck passed.
+- Root unit lane passed 105 files / 1,144 tests. Scenario service passed 27
+  files / 209 tests. Production DB passed 60 files / 506 tests. After repairing
+  stale authorization provenance, scenario-service DB passed 3 files / 68
+  tests, including N8 10/10.
+- All three closure databases replayed all 44 migrations. Production boundary
+  validation passed 105 tables / 127 enums, Prisma schema validation passed,
+  migration status was current and final schema diff reported no difference.
+  All exact disposable databases were dropped and a catalog query proved zero
+  remaining targets. No shared, staging or production database was migrated.
+- Formal routing, 211-file test routing, persistence boundaries and port
+  topology passed. Production assembly coverage still proves all gates off
+  creates no Prisma client and all selected bindings share one client.
+- Workflow/G2/upstream pins passed after adopting clean My-Chat `72a40a1`;
+  C30 default-off census remained unchanged. The owner-adoption lock is minted
+  only after this step's committed HEAD, per the required two-phase workflow.
+
+Verdict: `W4_PRISMA_STEP_6_PASS / SIX_OF_SIX_CLOSED /
+POLICY_LOCAL_DAY / REQUEST_SNAPSHOT_BOUNDED / CANONICAL_G2_ONLY /
+FULL_DB_506 / SERVICE_DB_68 / CROSS_REPO_STRICT /
+ZERO_SCHEMA_DRIFT / DEFAULT_OFF / NO_DEPLOYMENT_OR_TRAFFIC`.
