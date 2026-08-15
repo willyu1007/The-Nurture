@@ -21,6 +21,14 @@ describe("SafeExceptionFilter", () => {
       request_id: "unavailable",
       route_class: "unknown",
     });
+    expect(records).toContainEqual({
+      schema: "nurture_scenario_service_log_v1",
+      event: "request_refused",
+      request_id: "unavailable",
+      route_class: "unknown",
+      status_code: 500,
+      reason_code: "internal_error",
+    });
   });
 
   it("maps only recognized body-parser failures to body-safe statuses", () => {
@@ -32,7 +40,16 @@ describe("SafeExceptionFilter", () => {
     expect(response.json).toHaveBeenCalledWith({
       error: "payload_too_large",
     });
-    expect(records).toHaveLength(0);
+    expect(records).toEqual([
+      {
+        schema: "nurture_scenario_service_log_v1",
+        event: "request_refused",
+        request_id: "unavailable",
+        route_class: "unknown",
+        status_code: 413,
+        reason_code: "payload_too_large",
+      },
+    ]);
   });
 
   it("adds private no-store headers before serializing private-controller errors", () => {

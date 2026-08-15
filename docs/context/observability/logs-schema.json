@@ -1,8 +1,13 @@
 {
   "version": 1,
-  "updatedAt": "2025-12-25T00:00:00Z",
+  "updatedAt": "2026-08-15T05:40:26.315Z",
   "format": "json",
-  "levels": ["debug", "info", "warn", "error"],
+  "levels": [
+    "debug",
+    "info",
+    "warn",
+    "error"
+  ],
   "fields": [
     {
       "name": "timestamp",
@@ -14,7 +19,12 @@
     {
       "name": "level",
       "type": "string",
-      "enum": ["debug", "info", "warn", "error"],
+      "enum": [
+        "debug",
+        "info",
+        "warn",
+        "error"
+      ],
       "required": true,
       "description": "Log level"
     },
@@ -53,6 +63,48 @@
       "type": "string",
       "required": false,
       "description": "Request identifier"
+    },
+    {
+      "name": "surface",
+      "type": "string",
+      "required": false,
+      "description": "Low-cardinality scenario surface key."
+    },
+    {
+      "name": "operation",
+      "type": "string",
+      "required": false,
+      "description": "Low-cardinality operation key."
+    },
+    {
+      "name": "outcome",
+      "type": "string",
+      "required": false,
+      "description": "Bounded request or reconciliation outcome."
+    },
+    {
+      "name": "reason_code",
+      "type": "string",
+      "required": false,
+      "description": "Bounded machine-readable refusal or failure reason."
+    },
+    {
+      "name": "duration_ms",
+      "type": "number",
+      "required": false,
+      "description": "Monotonic operation duration in milliseconds."
+    },
+    {
+      "name": "status_code",
+      "type": "number",
+      "required": false,
+      "description": "HTTP response status code where applicable."
+    },
+    {
+      "name": "route_class",
+      "type": "string",
+      "required": false,
+      "description": "Low-cardinality internal route class; never a raw URL."
     }
   ]
 }

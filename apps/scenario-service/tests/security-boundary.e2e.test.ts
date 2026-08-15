@@ -50,6 +50,22 @@ describe("scenario-service M1/M2 HTTP boundary", () => {
       error: "binding_owner_disabled",
     });
 
+    const teacherDisabled = await fetch(
+      `${baseUrl}/internal/nurture/teacher-class-stream/v1/class-context`,
+      {
+        method: "POST",
+        headers: {
+          authorization: "Bearer secret-marker",
+          "content-type": "application/json",
+        },
+        body: "{}",
+      },
+    );
+    expect(teacherDisabled.status).toBe(503);
+    expect(await teacherDisabled.json()).toEqual({
+      error: "teacher_class_stream_presenter_disabled",
+    });
+
     for (const path of [
       "/internal/nurture/activation/user-attention/resolve",
       "/api/workflow/runs",
@@ -77,6 +93,17 @@ describe("scenario-service M1/M2 HTTP boundary", () => {
           event: "request_completed",
           route_class: "binding_owner",
           status_code: 503,
+        }),
+        expect.objectContaining({
+          event: "request_completed",
+          route_class: "teacher_class_stream_class_context",
+          status_code: 503,
+        }),
+        expect.objectContaining({
+          event: "request_refused",
+          route_class: "teacher_class_stream_class_context",
+          status_code: 503,
+          reason_code: "teacher_class_stream_presenter_disabled",
         }),
         expect.objectContaining({
           event: "request_completed",

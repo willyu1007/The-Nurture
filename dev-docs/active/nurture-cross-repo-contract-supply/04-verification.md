@@ -1148,3 +1148,26 @@ DEFAULT_OFF / CANDIDATE_NOT_FROZEN`.
 
 Verdict: `A2_PRODUCTION_ASSEMBLY_PASS / FIVE_TEACHER_BINDINGS /
 ONE_PRISMA_CLIENT / FOUR_EXPLICIT_STARTUP_REFUSALS / DEFAULT_OFF`.
+
+## 2026-08-15 — W6 current-main gray preparation
+
+- Direct scenario-service TypeScript check — pass.
+- Focused scenario-service suites — pass, 5 files / 30 tests, including W6
+  formal ingress, production assembly, security boundary, safe exception and
+  secret-file loading.
+- G7 summarizer Node tests — pass, 2/2; Docker Compose prefixes are accepted
+  and request identifiers are not retained in output.
+- Deployment controller verification — pass after registering the
+  scenario-service descriptor. Observability controller verification — pass.
+- Environment suite — pass. `git diff --check` — pass.
+- My-Chat API typecheck and focused BFF/exact-pin tests — pass, 15 passed / one
+  fixture-sync test skipped by design.
+- W6 BWS manifest dry-run — pass, four required refs, no request/write.
+- Base staging Compose plus W6 overlay `config --quiet` — pass using disposable
+  empty non-secret files. Structural assertions prove no provider host port,
+  exact internal origin, default-false W6 and false sampled non-W6 gates.
+- No image build/push, BWS value retrieval, database connection/migration,
+  container action, cloud mutation or remote deployment ran.
+
+Verdict: `W6_GRAY_REPO_PREP_PASS / CURRENT_MAIN / DEFAULT_OFF /
+HUMAN_STAGING_EXECUTION_PENDING`.

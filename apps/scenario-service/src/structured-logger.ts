@@ -1,4 +1,11 @@
-export type ScenarioRouteClass = "health" | "binding_owner" | "unknown";
+export type ScenarioRouteClass =
+  | "health"
+  | "binding_owner"
+  | "teacher_class_stream_class_context"
+  | "teacher_class_stream_child_strip"
+  | "teacher_class_stream_child_day_detail"
+  | "teacher_class_stream_schedule"
+  | "unknown";
 export type ScenarioHttpMethod =
   | "GET"
   | "POST"
@@ -24,6 +31,14 @@ export type ScenarioStructuredLogRecord =
       event: "unhandled_exception";
       request_id: string;
       route_class: ScenarioRouteClass;
+    }>
+  | Readonly<{
+      schema: "nurture_scenario_service_log_v1";
+      event: "request_refused";
+      request_id: string;
+      route_class: ScenarioRouteClass;
+      status_code: number;
+      reason_code: string;
     }>
   | Readonly<{
       schema: "nurture_scenario_service_log_v1";
@@ -88,6 +103,22 @@ export class ScenarioStructuredLogger {
       event: "unhandled_exception",
       request_id: input.requestId,
       route_class: input.routeClass,
+    });
+  }
+
+  requestRefused(input: {
+    requestId: string;
+    routeClass: ScenarioRouteClass;
+    statusCode: number;
+    reasonCode: string;
+  }): void {
+    this.sink({
+      schema: "nurture_scenario_service_log_v1",
+      event: "request_refused",
+      request_id: input.requestId,
+      route_class: input.routeClass,
+      status_code: input.statusCode,
+      reason_code: input.reasonCode,
     });
   }
 

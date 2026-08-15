@@ -72,11 +72,18 @@
   see `03-implementation-notes.md` / `04-verification.md` (2026-08-15
   deep-review entries). All batches remain default-off contract supply
   with no activation, durable apply, deployment or traffic.
-- Current next step: keep all nine provider gates false. Parent context needs
-  its W2 Prisma owner composition, director needs its W4 Prisma owner
-  composition, and parent communication owner plus extension need a production
-  `ParentCommunicationContextSelectionPortV1` host adapter. Staging deployment,
-  secret delivery and any gate change remain separately authorized work.
+- Current next step: the owner selected the current-main gray path and
+  authorized restricted-staging deployment/migration plus W6 teacher
+  class-stream progression. Repository preparation is complete: W6-only
+  secret-file startup, provider refusal logs, G7 aggregation contracts/tool,
+  My-Chat Compose overlay/BWS manifest and the human-run migration/rehearsal/
+  gate-off runbook are in place. W6 still defaults false until the release
+  operator supplies the reviewed staging organization allowlist and executes
+  the runbook; no remote operation has run. Keep the other eight provider
+  gates false. Parent context still needs its W2 Prisma owner composition,
+  director needs its W4 Prisma owner composition, and parent communication
+  owner plus extension still need a production
+  `ParentCommunicationContextSelectionPortV1` host adapter.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without
   activation. The default-off binding now resolves one host-selected
   Enrollment as routing input only, rereads exact current Nurture authority,

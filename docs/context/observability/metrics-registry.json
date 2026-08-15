@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-15T04:19:59.977Z",
+  "updatedAt": "2026-08-15T05:40:26.117Z",
   "metrics": [
     {
       "name": "http_requests_total",
@@ -102,6 +102,51 @@
         "outcome"
       ],
       "unit": "replays"
+    },
+    {
+      "name": "nurture_gray_surface_requests_total",
+      "type": "counter",
+      "description": "Gray-release provider requests derived from low-cardinality structured logs.",
+      "labels": [
+        "surface",
+        "operation",
+        "outcome",
+        "reason_code"
+      ],
+      "unit": "requests"
+    },
+    {
+      "name": "nurture_gray_surface_request_duration_ms",
+      "type": "histogram",
+      "description": "Gray-release provider request duration derived from structured logs.",
+      "labels": [
+        "surface",
+        "operation",
+        "outcome"
+      ],
+      "unit": "milliseconds",
+      "buckets": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500,
+        1000,
+        5000
+      ]
+    },
+    {
+      "name": "nurture_gray_command_reconciliation_total",
+      "type": "counter",
+      "description": "Gray-release command reconciliation outcomes; read-only surfaces emit no command events.",
+      "labels": [
+        "surface",
+        "outcome"
+      ],
+      "unit": "events"
     }
   ]
 }

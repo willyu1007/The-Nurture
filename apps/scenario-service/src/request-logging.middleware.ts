@@ -78,5 +78,15 @@ function classifyRoute(url: string | undefined): ScenarioRouteClass {
   if (path === "/internal/nurture/scenario-binding/authorize") {
     return "binding_owner";
   }
+  switch (path) {
+    case "/internal/nurture/teacher-class-stream/v1/class-context":
+      return "teacher_class_stream_class_context";
+    case "/internal/nurture/teacher-class-stream/v1/child-strip":
+      return "teacher_class_stream_child_strip";
+    case "/internal/nurture/teacher-class-stream/v1/child-day-detail":
+      return "teacher_class_stream_child_day_detail";
+    case "/internal/nurture/teacher-class-stream/v1/schedule":
+      return "teacher_class_stream_schedule";
+  }
   return "unknown";
 }

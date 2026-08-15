@@ -8,6 +8,8 @@ Scope: every variable read by `apps/scenario-service/src/config.ts` or a runtime
 
 Each `NURTURE_*_ENABLED` variable accepts only `true` or `false`; omission means `false`. All provider gates default to false. Enabling any provider gate requires explicit activation authorization in addition to the listed runtime prerequisites and adopted consumer contract.
 
+The long-running image also accepts `<SECRET>_FILE` for the allowlisted secret variables in `apps/scenario-service/src/runtime-secrets.ts`. File paths must be absolute and refer to non-empty regular files no larger than 64 KiB. Supplying both a direct value and its `_FILE` twin fails startup. Staging Compose uses this path so secret values stay out of rendered configuration.
+
 | Variable | Purpose | Default | Required when | Gray-release wave |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | Service deployment profile. | `dev` | Never; the loader supplies `dev`. | Infrastructure |

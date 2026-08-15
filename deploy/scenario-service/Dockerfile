@@ -1,6 +1,7 @@
 # BuildKit inputs: `nurture` is this checkout; `my-chat` is the pinned sibling
 # checkout required by the workspace's link:../My-Chat dependency entries.
-FROM node:20-bookworm-slim AS build
+ARG NODE_BASE_IMAGE=node:20-bookworm-slim
+FROM ${NODE_BASE_IMAGE} AS build
 
 WORKDIR /workspace/The-Nurture
 
@@ -15,7 +16,14 @@ RUN corepack enable && pnpm install --frozen-lockfile
 RUN pnpm --filter @the-nurture/scenario-service build
 RUN pnpm --filter @the-nurture/scenario-service deploy --prod /opt/scenario-service
 
-FROM node:20-bookworm-slim AS runtime
+# Human-run one-shot target for `prisma migrate deploy`. It intentionally keeps
+# the full build workspace and is not used as the long-running service image.
+FROM build AS migration
+
+ENTRYPOINT ["node", "apps/scenario-service/dist/runtime-secrets.js"]
+CMD ["pnpm", "exec", "prisma", "migrate", "deploy", "--schema", "prisma/schema.prisma"]
+
+FROM ${NODE_BASE_IMAGE} AS runtime
 
 ENV NODE_ENV=production
 WORKDIR /app

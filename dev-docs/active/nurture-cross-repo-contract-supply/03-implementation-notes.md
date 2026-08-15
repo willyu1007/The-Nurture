@@ -1260,3 +1260,25 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   in the ramp-plan amendment (W2/W4 real Prisma owner ports, production
   parent-communication context-selection adapter).
 - Both heads closed green: this repo `3b95698`, My-Chat `99be59c`.
+
+## 2026-08-15 — W6 current-main gray implementation
+
+- Added allowlisted `_FILE` loading for scenario-service secrets. The W6
+  runtime can now consume Compose file secrets for its dedicated database,
+  service bearer and integrity key without placing values in rendered
+  configuration. The migration Docker target runs Prisma through the same
+  loader.
+- Registered W6 provider route classes and `request_refused` events containing
+  only request correlation, bounded route, HTTP status and safe reason.
+- Added `scripts/summarize-gray-w6.mjs`, which joins provider completion/
+  refusal logs and My-Chat ramp logs into outcome/reason/p95/timeout aggregates.
+  W6 reconciliation is explicitly `not_applicable_read_only` with zero
+  commands.
+- Registered the internal scenario-service artifact and staging authorization
+  in `ops/deploy`; remote execution remains human-owned through My-Chat's
+  `staging-nurture-w6.md` runbook.
+- Parameterized the Docker base image so staging can use a reviewed private ACR
+  digest. The long-running image has no public-listener deployment contract;
+  My-Chat's overlay gives it only the private Compose network.
+- The release choice is current-main, not the older T-008 Candidate 1.0.
+  Candidate identity/evidence remains immutable and untouched.

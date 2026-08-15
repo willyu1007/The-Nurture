@@ -159,3 +159,22 @@ Remaining owner-supply gaps are W2 parent-context Prisma composition, W4
 director Prisma composition, and the host-owned production
 `ParentCommunicationContextSelectionPortV1` adapter for parent communication
 owner and extension. Deployment and activation remain separate decisions.
+
+### G7/G8 — W6 current-main gray preparation (2026-08-15)
+
+- [x] Classify all four W6 provider routes and emit safe refusal reasons.
+- [x] Emit My-Chat owner-call and BFF composite outcomes with exact timeout
+  classification and no canonical-scope labels.
+- [x] Register low-cardinality request/duration/reconciliation contracts in
+  both repositories and add the maintained aggregate summarizer.
+- [x] Register the current My-Chat ECS/Compose W6 overlay, separate
+  provider/consumer BWS refs, Nurture secret-file loading, immutable service
+  and one-shot migration images, health check and one-minute gate-off path.
+- [x] Statically qualify type safety, focused W6 tests, environment/
+  observability/deployment contracts, BWS dry-run and Compose invariants.
+- [ ] Human-execute BWS verification, dedicated Nurture staging migration,
+  W6-only deployment, three-read rehearsal and gate-off drill. Keep only the
+  G7 aggregate plus immutable release identity as evidence.
+
+This path deliberately uses the current-main source pair. It does not deploy,
+mutate or qualify T-008's frozen `nurture.service-candidate@1.0.0`.

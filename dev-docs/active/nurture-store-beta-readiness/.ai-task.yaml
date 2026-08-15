@@ -3,7 +3,7 @@ task_id: T-008
 project: main
 slug: nurture-store-beta-readiness
 status: in-progress
-updated: "2026-08-13"
+updated: "2026-08-15"
 keywords:
   - store-beta
   - testflight

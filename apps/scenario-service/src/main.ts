@@ -10,8 +10,10 @@ import {
   loadScenarioServiceConfig,
 } from "./config.js";
 import { createScenarioServiceProductionAssembly } from "./production-assembly.js";
+import { loadScenarioServiceRuntimeSecrets } from "./runtime-secrets.js";
 
 async function bootstrap(): Promise<void> {
+  loadScenarioServiceRuntimeSecrets();
   const config = loadScenarioServiceConfig();
   const bindingOwnerServiceAuth = loadBindingOwnerServiceAuth();
   const productionAssembly = createScenarioServiceProductionAssembly({

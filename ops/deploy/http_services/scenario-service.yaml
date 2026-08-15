@@ -1,0 +1,10 @@
+# W6 staging owner-service deployment descriptor.
+
+id: scenario-service
+kind: http_service
+artifact: ${ACR_REGISTRY}/${ACR_NAMESPACE}/nurture-scenario-service:${NURTURE_IMAGE_TAG}
+description: Internal-only Nurture scenario provider hosted by the My-Chat staging Compose overlay.
+composeService: nurture-scenario-service
+healthcheckPath: /health
+port: 8000
+publicIngress: false

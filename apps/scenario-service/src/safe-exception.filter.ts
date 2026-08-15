@@ -99,6 +99,11 @@ export class SafeExceptionFilter implements ExceptionFilter {
     const requestContext = readScenarioRequestContext(request);
     const status = exceptionStatus(exception);
     const error = safeError(exception, status);
+    this.logger.requestRefused({
+      ...requestContext,
+      statusCode: status,
+      reasonCode: error,
+    });
     if (
       (!isOperationalException(exception) || status >= 500) &&
       error !== "binding_owner_disabled" &&

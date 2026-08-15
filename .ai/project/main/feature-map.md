@@ -370,7 +370,7 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 (`archived`); T-005 (`archived`); T-006 (`archived`);
-  T-007 (`archived`); T-008 (`planned`); T-011 (`in-progress`).
+  T-007 (`archived`); T-008 (`in-progress`); T-011 (`in-progress`).
 - Current posture: T-007 completed 0C, 0D and the full frozen 0E chain at
   private I1. G4-D increments 2–5 are qualified through 33 migrations on
   disposable PostgreSQL. I2-A publishes the exact three-query/21-action
@@ -438,7 +438,16 @@ Project: `main`
   W9/W10 sources. Mainline W6 supply does not touch the frozen G5-A
   Candidate; My-Chat consumer adoption and any successor-candidate selection
   remain separate steps.
-  Durable apply, deployment, activation and external traffic remain closed.
+  2026-08-15: the owner selected current-main for the restricted-staging W6
+  gray path and authorized staging migration/deployment operations. T-011 and
+  My-Chat T-043 now provide W6-only secret-file startup, internal Compose/BWS
+  wiring, bounded provider/host telemetry, aggregate G7 evidence and a
+  human-run migration/rehearsal/gate-off procedure. Repository preparation is
+  green and default-off; BWS verification, dedicated Nurture migration, three
+  canary reads and the one-minute gate-off drill remain human-executed. This
+  path does not deploy or qualify T-008 Candidate 1.0, whose G5-B/C/D/E gates
+  remain unchanged. Other provider activation and external traffic remain
+  closed.
 
 ### F-004 Family growth material provider
 

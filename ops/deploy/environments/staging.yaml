@@ -1,9 +1,12 @@
-# Staging owner-service planning record.
-# No runnable Nurture deployment artifact is registered.
+# W6 restricted-staging registration. Remote execution stays human-owned.
 
 environment: staging
-status: planned
+status: authorized
 deployModel: vm
 platform: aliyun-ecs+docker-compose
+hostRepository: My-Chat
+composeFile: ops/deploy/compose/docker-compose.staging-nurture-w6.yml
+service: nurture-scenario-service
+healthcheckPath: /health
 debug: false
 logLevel: info

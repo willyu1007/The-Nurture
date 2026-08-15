@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-27T00:00:00.000Z",
+  "updatedAt": "2026-08-15T00:00:00.000Z",
   "model": "vm",
   "platform": "aliyun-ecs+docker-compose",
   "phase3PlusUpgradePath": "aliyun-ack-helm",
@@ -13,8 +13,8 @@
     },
     {
       "id": "staging",
-      "description": "Staging owner service - planning only; runtime artifact not registered",
-      "canDeploy": false,
+      "description": "Staging owner service - My-Chat ECS Compose W6 overlay; human-executed",
+      "canDeploy": true,
       "requiresApproval": true
     },
     {
@@ -24,6 +24,17 @@
       "requiresApproval": true
     }
   ],
-  "services": [],
+  "services": [
+    {
+      "id": "scenario-service",
+      "kind": "http_service",
+      "artifact": "${ACR_REGISTRY}/${ACR_NAMESPACE}/nurture-scenario-service:${NURTURE_IMAGE_TAG}",
+      "type": "http_service",
+      "image": "nurture-scenario-service",
+      "composeService": "nurture-scenario-service",
+      "healthcheckPath": "/health",
+      "port": 8000
+    }
+  ],
   "history": []
 }

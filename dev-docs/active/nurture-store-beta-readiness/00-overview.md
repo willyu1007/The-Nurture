@@ -92,6 +92,14 @@ D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建�
 
 ## Next Step
 
+Owner direction on 2026-08-15 selects the current-main path for the W6
+restricted-staging gray release. That path is tracked by T-011/T-043 and is
+not a deployment of the frozen `nurture.service-candidate@1.0.0`: it neither
+creates `NurtureDeploymentBindingV1` for Candidate 1.0 nor advances G5-B/C/D/E.
+Candidate 1.0 and its evidence stay immutable. If T-008 resumes G5-B, it must
+still deploy and qualify the exact Candidate 1.0 identity or explicitly freeze
+a successor under the existing drift rules.
+
 G5-A 已完成，精确 Candidate 身份与 Freeze evidence 见
 [`09-g5-a-candidate-freeze.md`](./09-g5-a-candidate-freeze.md)。下一个门是单独
 授权的 G5-B Deployment Binding & Local Qualification。在建立 observed
