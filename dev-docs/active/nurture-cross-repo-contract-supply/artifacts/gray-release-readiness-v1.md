@@ -74,7 +74,8 @@ handled by the per-batch reseal discipline), and can all start now.
 
 | Wave | Surface | Contract (gate) | Risk | Key metrics | Rollback |
 |---|---|---|---|---|---|
-| 1 | Parent context + teacher class stream (read-only) | W2 `PARENT_CONTEXT_PRESENTER`, W6 `TEACHER_CLASS_STREAM_PRESENTER` | Lowest: pure reads | refusal distribution, p95, timeout rate | gate off, immediate |
+| 1 | Teacher class stream (read-only) | W6 `TEACHER_CLASS_STREAM_PRESENTER` | Lowest: pure reads | refusal distribution, p95, timeout rate | gate off, immediate |
+| 1b | Parent context (read-only), once its owner ports exist | W2 `PARENT_CONTEXT_PRESENTER` | Low; blocked on supply gap 1 below | same as wave 1 | same |
 | 2 | Director read-only (once C1 lands) | W4 `DIRECTOR_PRESENTER` | Low; heavy aggregate reads | + query latency | same |
 | 3 | Teacher commands | W7 / W8 / W10 owner gates | Medium: first real traffic through the command ledger | **reconcile rate, `already_satisfied` replay hits, `command_write_conflict` count** | gate off; committed ledger entries are append-only and stay (replay converges after reopen) |
 | 4 | Teacher media association | W9 gate | Medium | attribution-count spot checks | same |
@@ -100,3 +101,22 @@ families/orgs) → percentage → full; the three G7 metrics gate each step.
 Presentation copies of this assessment (HTML status report + Markdown plan)
 live outside the repo per house rule; this artifact is the maintained
 project record.
+
+## Amendment 2026-08-15 — A2 assembly findings
+
+The A2 production-assembly work (commit `dc92d97`) established that only
+the five teacher surfaces (W6-W10) have production-ready Prisma
+compositions in `@the-nurture/db`. Three supply gaps join Track C and
+gate the affected ramp waves:
+
+1. W2 parent-context presenter — no Prisma owner composition exists;
+   wave 1b waits on it.
+2. W4 director presenter — no Prisma owner composition exists; wave 2
+   waits on it in addition to the director composition layer (C1).
+3. Parent-communication owner + extension — missing a production
+   `ParentCommunicationContextSelectionPortV1` host adapter; wave 5
+   waits on it.
+
+Until each gap closes, its gate fails fast at startup by design (the
+assembly refuses with a structured log naming the missing piece), so a
+premature flip cannot limp into undefined behavior.
