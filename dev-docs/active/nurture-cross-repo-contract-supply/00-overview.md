@@ -12,10 +12,13 @@
   No Enrollment id crosses repositories and the frozen W2 body contract is
   unchanged. Source migration and disposable-PostgreSQL qualification are
   complete; no shared/staging/prod database was migrated.
-- W3 readiness verdict: implementation can proceed, activation cannot. The
-  exact blocker/sequence is recorded in
+- W3 readiness verdict: the six-step carrier cutover and local/staging-static
+  qualification are complete; traffic activation still cannot proceed without
+  the external canary and release decision. The original blocker/sequence is
+  recorded in
   `artifacts/w3-parent-communication-implementation-readiness-review-2026-08-15.md`.
-  The old host-selected Enrollment port must be replaced, not implemented.
+  That review is historical: the old host-selected Enrollment port has now
+  been removed rather than implemented.
 - Supply extension (2026-08-14): the owner directed the main effort to the
   teacher-side contract gaps. The batch schedule W6-W11 is frozen in
   `artifacts/w6-teacher-supply-schedule.md` and summarized in `01-plan.md`.
@@ -86,7 +89,7 @@
   with no activation, durable apply, deployment or traffic.
 - Current next step: the owner selected the current-main gray path and
   authorized restricted-staging deployment/migration plus W6 teacher
-  class-stream progression. Repository preparation is complete: W6-only
+  class-stream progression. Repository preparation is complete: Nurture
   secret-file startup, provider refusal logs, G7 aggregation contracts/tool,
   My-Chat Compose overlay/BWS manifest and the human-run migration/rehearsal/
   gate-off runbook are in place. The local class → child → day-detail path is
@@ -97,11 +100,11 @@
   W2 parent context now has its production Prisma owner
   composition and canonical PostgreSQL qualification, without changing its
   frozen contract or default-false gate. Director still needs its W4 Prisma
-  owner composition. W3/W11 carrier cutover is now at step 5 of 6: the shared
-  mapper, seven carrier-protected routes, association-first authority, exact
-  My-Chat current-context emission and default-off production/family-ramp
-  wiring are complete. The remaining step is joint conformance, disposable-DB
-  behavioral qualification and staging gate-off rehearsal. The W2
+  owner composition. W3/W11 carrier cutover is now closed at step 6 of 6: the
+  shared mapper, seven carrier-protected routes, association-first authority,
+  exact My-Chat current-context emission, default-off production/family-ramp
+  wiring, joint conformance, disposable-DB behavior and local staging gate-off
+  rehearsal are complete. The W2
   implementation and C30 lock are already landed; no
   task status should describe them as uncommitted.
 - Prior next step (superseded but preserved): W3.1 real local owner qualification is complete without

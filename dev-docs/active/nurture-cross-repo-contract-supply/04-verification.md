@@ -1364,3 +1364,27 @@ ONE_SHARED_CARRIER / FROZEN_BODIES_UNCHANGED / DEFAULT_OFF`.
 
 Verdict: `W3_CARRIER_STEP_5_PASS / REAL_PRODUCTION_BINDINGS /
 FAMILY_SCOPED_RAMP / IDENTITY_FREE_TELEMETRY / ALL_GATES_FALSE`.
+
+## 2026-08-15 — W3 carrier cutover step 6
+
+- Frozen provider validators passed: W3 v1 9 valid / 8 invalid fixtures; W11
+  v1.1 11 valid / 12 invalid probes with the base digest unchanged.
+- Current cross-repository strict clients passed 2 files / 15 tests. Nurture
+  private routes plus production assembly passed 3 files / 36 tests.
+- Disposable PostgreSQL focused behavior passed 2 files / 7 tests; the full DB
+  lane passed 59 files / 502 tests.
+- Migration replay repaired three redundant legacy foreign keys, then passed
+  44/44 status and zero Prisma diff. Database/environment public feature suites
+  passed, and the disposable database was removed with absence proven.
+- The generic staging BWS manifest dry-run passed 5/5 required references;
+  deployment verification passed in both repositories. Rendered Compose
+  assertions passed for consumer/provider gate-off, empty family allowlist,
+  private provider topology, exact internal origin and protected-key mount.
+- Evidence:
+  `artifacts/db/w3-carrier-cutover/`,
+  `artifacts/env/w3-carrier-cutover/`, and
+  `artifacts/w3-carrier-staging-gate-off-rehearsal.md`.
+
+Verdict: `W3_CARRIER_STEP_6_PASS / SIX_OF_SIX_CLOSED /
+CANONICAL_POSTGRES / ZERO_SCHEMA_DRIFT / STAGING_STATIC_GATE_OFF /
+REMOTE_AND_TRAFFIC_NOT_EXECUTED`.

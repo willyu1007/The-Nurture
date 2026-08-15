@@ -1,5 +1,23 @@
 # Implementation notes
 
+## 2026-08-15 — W3 carrier cutover step 6
+
+- Joint v1/v1.1 conformance, the seven private routes and production assembly
+  were requalified against the exact current source pair.
+- A loopback disposable PostgreSQL database replayed the complete migration
+  history, then exercised current read, prepare, confirm, exact replay,
+  cross-actor refusal, revocation rollback, W11 redaction and receipts.
+- The replay found migration/Prisma drift from three retained id-only
+  family-growth foreign keys. A forward repair removes only those redundant
+  keys while preserving the stricter workspace-scoped replacements; 44/44
+  status and zero database-to-datamodel diff now hold.
+- My-Chat staging assets were generalized into one Nurture overlay, manifest
+  and runbook. W3/W11 remain false in the rendered configuration, the W3
+  family allowlist is empty, and the independent protected-content secret is
+  wired without storing a value.
+- No remote BWS request, image push, shared database migration, service deploy,
+  authenticated canary traffic or gate flip occurred.
+
 ## 2026-08-15 — W3 carrier cutover step 5
 
 - Scenario-service production assembly now exposes the existing real W3 v1
@@ -1320,7 +1338,7 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   commands.
 - Registered the internal scenario-service artifact and staging authorization
   in `ops/deploy`; remote execution remains human-owned through My-Chat's
-  `staging-nurture-w6.md` runbook.
+  `staging-nurture.md` runbook.
 - Parameterized the Docker base image so staging can use a reviewed private ACR
   digest. The long-running image has no public-listener deployment contract;
   My-Chat's overlay gives it only the private Compose network.

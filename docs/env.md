@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-14T16:52:13Z`
+Generated at (UTC): `2026-08-15T11:54:59Z`
 
 ## Environments
 - `dev`, `prod`, `staging`

@@ -1,11 +1,11 @@
-# W6 restricted-staging registration. Remote execution stays human-owned.
+# Nurture restricted-staging registration. Remote execution stays human-owned.
 
 environment: staging
 status: authorized
 deployModel: vm
 platform: aliyun-ecs+docker-compose
 hostRepository: My-Chat
-composeFile: ops/deploy/compose/docker-compose.staging-nurture-w6.yml
+composeFile: ops/deploy/compose/docker-compose.staging-nurture.yml
 service: nurture-scenario-service
 healthcheckPath: /health
 debug: false

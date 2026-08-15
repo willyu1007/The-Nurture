@@ -1,5 +1,28 @@
 # Pitfalls
 
+## 2026-08-15 — Successful migration status does not prove Prisma SSOT parity
+
+- Symptom: all 43 migrations replayed successfully and `migrate status` was
+  green, but `migrate diff` still found three database-only foreign keys.
+- Root cause: a prior hardening migration added stronger workspace-scoped keys
+  while deliberately retaining their id-only predecessors; the Prisma models
+  expressed only the stronger relation.
+- Fix: add one forward migration that removes the three redundant old keys,
+  then require 44/44 status and a zero database-to-datamodel diff.
+- Prevention: disposable replay gates must run both migration status and
+  schema diff; either one alone can miss a dual track.
+
+## 2026-08-15 — Surface-specific staging filenames become rollout SSOT drift
+
+- Symptom: the only Nurture staging overlay, manifest and runbook were named
+  W6 even after W3 entered deployment qualification, and the runbook embedded
+  a stale migration count.
+- Fix: replace them with one generic Nurture staging path, derive migration
+  count from the release tree and express every surface as an explicit
+  default-off gate.
+- Prevention: keep release assets environment/provider-scoped; keep canary
+  surface choices in values and runbook sections, not parallel overlay files.
+
 ## 2026-08-15 — A qualified binding can remain blocked by stale assembly policy
 
 - Symptom: W3/W11 had complete Prisma composition factories and carrier-based

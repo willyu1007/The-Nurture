@@ -107,7 +107,7 @@ activation. Execute the carrier cutover as six independently reviewed commits:
    have both strict v1/v1.1 clients emit the existing carrier.
 5. [x] Supply W3/W11 production bindings behind default-false provider gates
    and add family-scoped default-off My-Chat ramp/telemetry.
-6. [ ] Qualify cross-repo conformance, disposable-PostgreSQL
+6. [x] Qualify cross-repo conformance, disposable-PostgreSQL
    read/prepare/confirm/replay/revocation, then rehearse staging migration and
    gate-off behavior without activating traffic.
 
