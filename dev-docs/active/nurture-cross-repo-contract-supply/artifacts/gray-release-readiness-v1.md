@@ -116,10 +116,11 @@ gate the affected ramp waves:
    canonical PostgreSQL. Wave 2 now waits on the My-Chat director composition
    layer (C1), deployment and separately authorized activation, not provider
    owner supply.
-3. Parent-communication owner + extension — the old host-selected Enrollment
-   port must be replaced by the shared binding carrier plus Nurture local
-   selection mapper and then wired in production; wave 5 waits on it.
+3. ~~Parent-communication owner + extension~~ **Closed 2026-08-15 by
+   `049a23a`**: production assembly builds both bindings from the Prisma
+   compositions with the shared client and dependency checks; the
+   `ParentCommunicationContextSelectionPortV1` fail-fast no longer exists
+   in live source (recorded in 03-implementation-notes/04-verification).
 
-The remaining parent-communication gap fails fast at startup by design. W2
-and W4 no longer retain missing-owner refusals; their still-default-false gates
-remain the activation boundary.
+All nine surfaces now assemble in production; no missing-owner refusal
+remains. The still-default-false gates are the activation boundary.
