@@ -2131,3 +2131,18 @@ the rejected checkpoint and are historical.
 | My-Chat qualification | PASS — 46 empty-database migrations, three consecutive 13-case PostgreSQL rounds, 192 files / 1,342 tests, lint, typecheck, API/context/environment/DB gates, and zero-residue readback pass. |
 | Single-track semantics | PASS — T-028 creates only the platform Child, parent stewardship, and existing-Family relation; Nurture receives no Role, Enrollment, Grant, association, or ambient permission. |
 | Effect boundary | NONE — no Nurture source/schema/migration/capability change, persistent database write, deployment, activation, or traffic change. |
+
+### Clean-checkout invariant repair
+
+- Initial main CI run `31923575535` passed workflow pin, governance, context/
+  environment, Scenario Service, frontend build, dev-host DB and the new T-028
+  boundaries, but stopped its combined typecheck step at the stale family-growth
+  outbox invariant guard.
+- The corrected guard passes with four uniques, three current composite FKs,
+  and three retired id-only FKs. The complete failed-job command chain then
+  passes locally: environment-runner tests, exact workflow pin, typecheck, test
+  routing, family-growth/family-sharing/persistence guards, 1,144/1,144 unit
+  tests, 139/139 synthetic surface cases, and G2 exit.
+- This repair changes verification semantics only; the previously qualified W3
+  migration remains the sole schema SSOT and no database or runtime effect is
+  introduced.

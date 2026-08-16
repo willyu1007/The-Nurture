@@ -957,7 +957,9 @@ LIVE_QUALIFICATION_PENDING`.
 - `node scripts/assert-family-growth-outbox-invariants.mjs` — passed; parsed
   statement/comment handling, additive statement-shape allowlisting, four
   uniques, three composite FKs and all three legacy FKs at the current
-  aggregate migration head pinned. The command is also wired into CI.
+  aggregate migration head pinned. This is historical W5 evidence: successor
+  `20260815190000_align_family_growth_fk_ssot` later retires the three id-only
+  FKs, and the current CI guard now requires the composite-only SSOT.
 - `node dev-docs/active/nurture-cross-repo-contract-supply/artifacts/qualification/run-t011-n3-qualification.mjs
   --check-only` — passed before the disposable execution recorded above.
 - `node .ai/scripts/ctl-db-ssot.mjs sync-to-context` and strict context verify —

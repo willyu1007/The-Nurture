@@ -2229,3 +2229,14 @@ human-judged step.
   intent before parent authority. A later explicit owner binding and Nurture
   local-association command remains separately authorized and cannot be inferred
   from Child creation.
+
+## 2026-08-16 — Final clean-checkout invariant repair
+
+- Main CI exposed one stale W5 assertion after all new T-028 and cross-owner
+  gates had passed: the family-growth outbox verifier still required three
+  id-only FKs that W3 intentionally retired in favor of stricter
+  workspace-scoped composite constraints.
+- Updated only the static verifier. It now pins the exact forward cleanup
+  statements, reconstructs the complete migration history, requires all three
+  current composite FKs, and rejects any surviving id-only predecessor. No
+  schema, migration, runtime, contract, database, or activation changed.

@@ -1039,6 +1039,12 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   `20260813120000_t011_family_growth_outbox_scope` adds four supporting uniques
   and three strictly stronger composite FKs while retaining all original FKs;
   it contains no drop or data mutation/backfill.
+- Successor migration `20260815190000_align_family_growth_fk_ssot` supersedes
+  that temporary additive posture: after clean replay proved the composite FKs
+  preserve and strengthen the same referential guarantees, it removes the three
+  redundant id-only FKs. The current static guard therefore requires the three
+  composite constraints and rejects retention of their id-only predecessors;
+  the earlier retention statement describes only the W5 migration checkpoint.
 - Added the N3 schema-diff preview and migration plan, parsed static invariant
   guard, and a guarded three-phase qualification runner. Phase A replays from
   empty and runs the existing controls/probes. Phase B1 migrates to the

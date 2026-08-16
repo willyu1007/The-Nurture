@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// T-011 W5 N3: pin the additive provider-outbox tenant/lineage constraints
-// that Prisma relation declarations alone do not prove survived migration SQL.
+// T-011 W5 N3: pin the provider-outbox tenant/lineage constraints that Prisma
+// relation declarations alone do not prove survived the complete migration history.
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,9 +11,14 @@ const migrationPath = join(
   migrationsDirectory,
   "20260813120000_t011_family_growth_outbox_scope/migration.sql",
 );
+const cleanupMigrationPath = join(
+  migrationsDirectory,
+  "20260815190000_align_family_growth_fk_ssot/migration.sql",
+);
 const schemaPath = join(root, "prisma/schema.prisma");
 const failures = [];
 const migrationStatements = sqlStatements(read(migrationPath));
+const cleanupMigrationStatements = sqlStatements(read(cleanupMigrationPath));
 const schema = normalize(read(schemaPath));
 
 function read(path) {
@@ -194,6 +199,13 @@ function requireStatement(label, expected) {
   if (!migrationStatements.includes(normalized)) failures.push(`migration: missing ${label}`);
 }
 
+function requireCleanupStatement(label, expected) {
+  const normalized = normalize(expected);
+  if (!cleanupMigrationStatements.includes(normalized)) {
+    failures.push(`cleanup migration: missing ${label}`);
+  }
+}
+
 for (const [label, statement] of [
   [
     "release workspace target unique",
@@ -224,6 +236,21 @@ for (const [label, statement] of [
     `ALTER TABLE "nurture_family_growth_admission_receipt" ADD CONSTRAINT "fk_nurture_fg_receipt_workspace_outbox" FOREIGN KEY ("workspace_id", "outbox_event_id") REFERENCES "nurture_family_growth_outbox_event"("workspace_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE`,
   ],
 ]) requireStatement(label, statement);
+
+for (const [label, statement] of [
+  [
+    "id-only receipt/outbox FK retirement",
+    `ALTER TABLE "nurture_family_growth_admission_receipt" DROP CONSTRAINT "nurture_family_growth_admission_receipt_outbox_event_id_fkey"`,
+  ],
+  [
+    "id-only outbox/release FK retirement",
+    `ALTER TABLE "nurture_family_growth_outbox_event" DROP CONSTRAINT "nurture_family_growth_outbox_event_publication_release_id_fkey"`,
+  ],
+  [
+    "id-only outbox/visibility FK retirement",
+    `ALTER TABLE "nurture_family_growth_outbox_event" DROP CONSTRAINT "nurture_family_growth_outbox_event_visibility_event_id_fkey"`,
+  ],
+]) requireCleanupStatement(label, statement);
 
 function isAllowedMigrationStatement(statement) {
   if (statement === "BEGIN" || statement === "COMMIT") return true;
@@ -262,9 +289,9 @@ for (const forbidden of [
 }
 
 // Build the current FK schema by replaying ADD/DROP constraint declarations
-// from every migration in order. This proves a legacy FK still exists at the
-// current head instead of merely finding its name in the historical file that
-// first introduced it.
+// from every migration in order. This proves the composite FKs are the sole
+// current lineage constraints instead of accepting their historical id-only
+// predecessors as a second representation of the same invariant.
 function currentForeignKeys() {
   const foreignKeys = new Map();
   const migrationDirectories = readdirSync(migrationsDirectory, { withFileTypes: true })
@@ -297,36 +324,47 @@ function currentForeignKeys() {
 const foreignKeys = currentForeignKeys();
 for (const [name, expected] of [
   [
-    "nurture_family_growth_outbox_event_publication_release_id_fkey",
+    "fk_nurture_fg_outbox_workspace_release",
     {
       table: "nurture_family_growth_outbox_event",
-      columns: '"publication_release_id"',
+      columns: '"workspace_id", "publication_release_id"',
       referencedTable: "nurture_publication_release",
-      referencedColumns: '"id"',
+      referencedColumns: '"workspace_id", "id"',
     },
   ],
   [
-    "nurture_family_growth_outbox_event_visibility_event_id_fkey",
+    "fk_nurture_fg_outbox_workspace_release_visibility",
     {
       table: "nurture_family_growth_outbox_event",
-      columns: '"visibility_event_id"',
+      columns:
+        '"workspace_id", "publication_release_id", "visibility_event_id"',
       referencedTable: "nurture_publication_visibility_event",
-      referencedColumns: '"id"',
+      referencedColumns: '"workspace_id", "publication_release_id", "id"',
     },
   ],
   [
-    "nurture_family_growth_admission_receipt_outbox_event_id_fkey",
+    "fk_nurture_fg_receipt_workspace_outbox",
     {
       table: "nurture_family_growth_admission_receipt",
-      columns: '"outbox_event_id"',
+      columns: '"workspace_id", "outbox_event_id"',
       referencedTable: "nurture_family_growth_outbox_event",
-      referencedColumns: '"id"',
+      referencedColumns: '"workspace_id", "id"',
     },
   ],
 ]) {
   const actual = foreignKeys.get(name);
   if (!actual || JSON.stringify(actual) !== JSON.stringify(expected)) {
-    failures.push(`current migration schema: missing or changed legacy FK ${name}`);
+    failures.push(`current migration schema: missing or changed composite FK ${name}`);
+  }
+}
+
+for (const name of [
+  "nurture_family_growth_outbox_event_publication_release_id_fkey",
+  "nurture_family_growth_outbox_event_visibility_event_id_fkey",
+  "nurture_family_growth_admission_receipt_outbox_event_id_fkey",
+]) {
+  if (foreignKeys.has(name)) {
+    failures.push(`current migration schema: retired id-only FK remains ${name}`);
   }
 }
 
@@ -361,5 +399,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "[ok] family-growth outbox invariants pinned: parsed additive SQL allowlist, 4 uniques, 3 composite FKs, 3 current legacy FKs",
+  "[ok] family-growth outbox invariants pinned: parsed additive SQL allowlist, 4 uniques, 3 current composite FKs, 3 retired id-only FKs",
 );
