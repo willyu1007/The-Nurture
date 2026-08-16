@@ -28,12 +28,12 @@ reject('production migration', productionMigration, /(?:CREATE TABLE|ALTER TABLE
 reject('production migration', productionMigration, /CREATE TYPE "Workflow/);
 reject('Nurture DB exports', nurtureDbExports, /Workflow(?:Run|Step|Artifact|Approval|ContextBinding|OutboxEvent|StepResultStatus|ApprovalStatus)/);
 
-const devHostSchema = await read('apps/backend/prisma/schema.prisma');
-const devHostMigration = await readMigrationStream('apps/backend/prisma/migrations');
-reject('dev-host schema', devHostSchema, /^(?:model|enum) Nurture/m);
-reject('dev-host schema', devHostSchema, /@@map\("nurture_/);
-reject('dev-host migration', devHostMigration, /(?:CREATE TABLE|ALTER TABLE|REFERENCES) "nurture_/);
-reject('dev-host migration', devHostMigration, /CREATE TYPE "Nurture/);
+const legacyHostSchema = await read('apps/backend/prisma/schema.prisma');
+const legacyHostMigration = await readMigrationStream('apps/backend/prisma/migrations');
+reject('legacy-host schema', legacyHostSchema, /^(?:model|enum) Nurture/m);
+reject('legacy-host schema', legacyHostSchema, /@@map\("nurture_/);
+reject('legacy-host migration', legacyHostMigration, /(?:CREATE TABLE|ALTER TABLE|REFERENCES) "nurture_/);
+reject('legacy-host migration', legacyHostMigration, /CREATE TYPE "Nurture/);
 
 for (const relativePath of [
   'apps/backend/src/actions/action-service.ts',

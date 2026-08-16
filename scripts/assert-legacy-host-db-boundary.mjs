@@ -12,10 +12,10 @@ const expectedTables = [...schema.matchAll(/@@map\("([^"]+)"\)/g)].map((match) =
 const expectedEnums = [...schema.matchAll(/^enum\s+(Workflow\w+)\s*\{/gm)].map((match) => match[1]).sort();
 
 if (expectedTables.length === 0 || expectedTables.some((name) => !name.startsWith('workflow_'))) {
-  throw new Error(`Dev-host schema contains non-workflow tables: ${expectedTables.join(', ')}`);
+  throw new Error(`Legacy-host schema contains non-workflow tables: ${expectedTables.join(', ')}`);
 }
 if (expectedEnums.length === 0 || expectedEnums.some((name) => !name.startsWith('Workflow'))) {
-  throw new Error(`Dev-host schema contains invalid runtime enums: ${expectedEnums.join(', ')}`);
+  throw new Error(`Legacy-host schema contains invalid runtime enums: ${expectedEnums.join(', ')}`);
 }
 
 const prisma = new PrismaClient();
@@ -39,12 +39,12 @@ try {
   const actualEnums = enumRows.map((row) => row.typname).sort();
 
   if (JSON.stringify(actualTables) !== JSON.stringify(expectedTables)) {
-    throw new Error(`Dev-host table mismatch: expected=${expectedTables.join(',')} actual=${actualTables.join(',')}`);
+    throw new Error(`Legacy-host table mismatch: expected=${expectedTables.join(',')} actual=${actualTables.join(',')}`);
   }
   if (JSON.stringify(actualEnums) !== JSON.stringify(expectedEnums)) {
-    throw new Error(`Dev-host enum mismatch: expected=${expectedEnums.join(',')} actual=${actualEnums.join(',')}`);
+    throw new Error(`Legacy-host enum mismatch: expected=${expectedEnums.join(',')} actual=${actualEnums.join(',')}`);
   }
-  process.stdout.write(`[ok] dev-host DB boundary tables=${actualTables.length} enums=${actualEnums.length}\n`);
+  process.stdout.write(`[ok] legacy-host DB boundary tables=${actualTables.length} enums=${actualEnums.length}\n`);
 } finally {
   await prisma.$disconnect();
 }

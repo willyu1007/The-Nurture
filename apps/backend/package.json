@@ -1,9 +1,9 @@
 {
-  "name": "@the-nurture/backend",
+  "name": "@the-nurture/legacy-host",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The Nurture dev host harness (Fastify). Wires the My-Chat workflow-runtime worker/services + Postgres ports + the nurture scenario module to run family_rule_trial end-to-end. Replaced by the real My-Chat host post-MVP.",
+  "description": "Local-only legacy Fastify harness for focused My-Chat workflow-runtime contract tests; never a production Nurture backend.",
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "start": "tsx src/main.ts",

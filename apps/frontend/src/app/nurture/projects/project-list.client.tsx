@@ -8,7 +8,7 @@ export function ProjectList({ projects, error }: { projects: ProjectSummary[]; e
   if (error) {
     return (
       <Scene intro="养育项目">
-        <p className="mt-body">后端未连接（{error}）。请先启动 dev host：pnpm --filter @the-nurture/backend dev。</p>
+        <p className="mt-body">旧工作台测试宿主未连接（{error}）。请在仓库根目录运行 pnpm dev:legacy-host。</p>
       </Scene>
     );
   }

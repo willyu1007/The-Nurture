@@ -9,14 +9,14 @@
 
 ## Phase 2 — Converge maintained semantics
 
-- [ ] Rename root harness test/database/verification scripts to a single
+- [x] Rename root harness test/database/verification scripts to a single
       `legacy-host` namespace; keep no compatibility aliases.
-- [ ] Rename the workspace package identity from generic `backend` to explicit
+- [x] Rename the workspace package identity from generic `backend` to explicit
       legacy-host wording if repository references remain bounded.
-- [ ] Update CI and maintained source/documentation references.
-- [ ] Leave archived task evidence unchanged.
-- [ ] Independently verify routing, type safety and boundary checks.
-- [ ] Commit the phase with `Task: T-012`.
+- [x] Update CI and maintained source/documentation references.
+- [x] Leave archived task evidence unchanged.
+- [x] Independently verify routing, type safety and boundary checks.
+- [x] Commit the phase with `Task: T-012`.
 
 ## Phase 3 — Quality closure and deletion gate
 

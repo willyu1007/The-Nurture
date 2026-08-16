@@ -6,6 +6,9 @@ the default-disabled Harness/institution owner-read routes through service-authe
 production Prisma compositions. It does not replace My-Chat auth/runtime ownership;
 route availability does not activate a scenario capability or authorize traffic.
 
+From the repository root, `pnpm dev` is the normal local runtime entrypoint for
+this service. The legacy Fastify workflow harness is not on that path.
+
 ## Current routes
 
 | Method | Path | Current behavior |

@@ -2,8 +2,8 @@
 
 ## 2026-08-16 — Discovery
 
-- Root `pnpm dev` currently builds local binding/runtime packages and launches
-  `@the-nurture/backend`, the Fastify harness.
+- Before phase 1, root `pnpm dev` built local binding/runtime packages and
+  launched the then-named `@the-nurture/backend` Fastify harness.
 - `apps/scenario-service` is already documented and packaged as the
   production-intended NestJS ingress.
 - The harness has a separate Prisma schema, port and focused test population;
@@ -23,3 +23,20 @@ gate in `02-architecture.md` is met.
 - The previous Fastify command is available only as `pnpm dev:legacy-host`.
 - No service configuration, provider gate, port, contract or database path
   changed.
+
+## 2026-08-16 — Phase 2 semantic convergence
+
+- The harness workspace is now `@the-nurture/legacy-host`; root commands,
+  test artifacts and the CI lane use the same `legacy-host` namespace with no
+  old aliases.
+- The normal local setup generates and starts only the production Nurture
+  schema/service. Full-repository verification still generates the isolated
+  legacy client explicitly.
+- The scenario-service and legacy-host READMEs now state their mutually
+  exclusive roles and the exact harness deletion gate. The Next.js workbench
+  identifies its fixture data source as legacy and points only to the explicit
+  command.
+- Stable isolation identifiers (`DEV_HOST_DATABASE_URL`, `DEV_HOST_PORT`, the
+  `nurture_dev_host` database and generated-client directory) remain unchanged;
+  renaming them would add configuration migration risk without reducing a
+  runtime ownership ambiguity.

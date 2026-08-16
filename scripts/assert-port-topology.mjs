@@ -39,13 +39,13 @@ const scenarioConfig = read("apps/scenario-service/src/config.ts");
 assertIncludes(scenarioConfig, "const DEFAULT_PORT = 8000;", "scenario port");
 assertIncludes(scenarioConfig, "parsePort(env.PORT)", "scenario PORT input");
 
-const devHostMain = read("apps/backend/src/main.ts");
+const legacyHostMain = read("apps/backend/src/main.ts");
 assertIncludes(
-  devHostMain,
+  legacyHostMain,
   "process.env.DEV_HOST_PORT",
-  "dev-host dedicated port input",
+  "legacy-host dedicated port input",
 );
-assertExcludes(devHostMain, "process.env.PORT", "dev-host shared PORT input");
+assertExcludes(legacyHostMain, "process.env.PORT", "legacy-host shared PORT input");
 
 const frontendPackage = readJson("apps/frontend/package.json");
 assertEqual(frontendPackage.scripts?.dev, "next dev -p 3201", "frontend dev");
@@ -85,7 +85,7 @@ assertExcludes(
 );
 
 process.stdout.write(
-  "[ok] port topology scenario=8000 dev-host=3001 backend=3200 frontend=3201\n",
+  "[ok] port topology scenario=8000 legacy-host=3001 backend=3200 frontend=3201\n",
 );
 
 function assertEqual(actual, expected, label) {

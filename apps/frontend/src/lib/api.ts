@@ -1,4 +1,4 @@
-// Typed client for the Base-assigned local Nurture backend endpoint. Server
+// Typed client for the Base-assigned legacy workbench-host endpoint. Server
 // components call BACKEND directly; client code uses relative paths proxied by
 // next.config rewrites.
 const BACKEND = process.env.NURTURE_BACKEND_URL ?? "http://localhost:3200";
@@ -57,7 +57,7 @@ export const getRunDetail = (runId: string, workspaceId = DEFAULT_WORKSPACE): Pr
 
 // ---- mutations (client-side) ----
 // Client code uses RELATIVE paths so the browser hits the Next origin and the
-// next.config rewrites proxy /api/* and /internal/* to the dev host. (Server
+// next.config rewrites proxy /api/* and /internal/* to the legacy host. (Server
 // components use BACKEND directly via `get`; the browser must not.)
 const post = async <T>(path: string, body: unknown): Promise<T> => {
   const res = await fetch(path, {

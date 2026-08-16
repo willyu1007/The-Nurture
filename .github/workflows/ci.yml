@@ -257,7 +257,7 @@ jobs:
         working-directory: The-Nurture
         run: pnpm build:pinned-workflow-contracts
 
-      - name: Generate and validate production Prisma client
+      - name: Generate clients and validate isolated schemas
         working-directory: The-Nurture
         env:
           DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture?schema=public
@@ -265,7 +265,7 @@ jobs:
         run: |
           pnpm db:generate:all
           pnpm db:validate
-          pnpm dev-host:db:validate
+          pnpm legacy-host:db:validate
 
       - name: Typecheck
         working-directory: The-Nurture
@@ -398,8 +398,8 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-  dev-host-db:
-    name: Backend Dev-Host DB and E2E
+  legacy-host-db:
+    name: Legacy Host DB and E2E
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -472,7 +472,7 @@ jobs:
         working-directory: My-Chat
         run: pnpm install --frozen-lockfile
 
-      - name: Create separate dev-host database
+      - name: Create separate legacy-host database
         run: psql -h 127.0.0.1 -p 5432 -U nurture -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE nurture_dev_host'
 
       - name: Generate and deploy both schemas
@@ -480,19 +480,19 @@ jobs:
         run: |
           pnpm db:generate:all
           pnpm db:deploy
-          pnpm dev-host:db:deploy
+          pnpm legacy-host:db:deploy
 
       - name: Assert both ownership boundaries
         working-directory: The-Nurture
         run: |
           pnpm db:assert-boundary
-          pnpm dev-host:db:assert-boundary
+          pnpm legacy-host:db:assert-boundary
 
-      - name: Run dev-host E2E population
+      - name: Run legacy-host E2E population
         working-directory: The-Nurture
         run: |
-          pnpm test:dev-host:ci
-          pnpm verify:dev-host-population
+          pnpm test:legacy-host:ci
+          pnpm verify:legacy-host-population
 
   frontend:
     name: Frontend Lint and Build
