@@ -78,7 +78,34 @@ shell cwd 停留在 `apps/frontend` 而误报「不存在」，Write 直接覆�
 
 ## P2 — 移除 legacy host 依赖
 
-（待填）
+删除 8 个文件：`src/app/nurture/projects/`（5 个）与 `src/lib/`（`api.ts`、`adapters.ts`）。
+`lib` 下两个文件只被那 5 个页面引用，删除是自足的，无悬空导入。
+
+### 相对计划的三处扩大
+
+**1. 一并删掉了 `next.config.ts` 的 rewrites。** 计划原写「暂留，P3 决定去留」。
+但该 rewrite 指向 `NURTURE_BACKEND_URL`（默认 `:3200`，即已退役的 legacy host），
+留着就是指向退役宿主的死配置，与本阶段目标相悖。真实 ingress 出现时会重新加，
+届时指向 scenario-service 而不是这个端口。已在 `next.config.ts` 注释里写明。
+
+**2. 新增 `/nurture/overview` 占位页。** 不加的话 P2 结束后应用没有任何可达页面，
+`/` 会重定向到 404。占位页刻意不显示任何数字——队列数据还不存在，编造计数会被误读成进度。
+P4 用真实 Hub 替换其内容。
+
+**3. 删掉了 `globals.css` 的 `.nurture-card-grid`。** 它只被 `project-list.client.tsx` 使用，
+随该文件一同失效。
+
+### 其他
+
+- `src/app/page.tsx` 的重定向改为 `/nurture/overview`。
+- `apps/frontend/README.md` 重写：不再描述为 legacy host 的 fixtures 演练场，
+  改为说明它承载 `web_domain_workbench`，并明确它不是 My-Chat 的 `web_run_workbench`。
+
+### 验证时发现的铁律违反
+
+占位页初版写了 `<Scene intro="概览台">`，而加粗的面包屑本身就是页面标题，
+等于把名字说了两遍。kit 对 `intro` 的定义是「一行场景说明」，不是标题。
+占位阶段没有有意义的说明，因此整个省略 `intro`。
 
 ## P3 — Fixtures 层
 

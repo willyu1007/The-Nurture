@@ -58,9 +58,23 @@ node .ai/scripts/ctl-project-governance.mjs lint --check --project main
   `/nurture/projects` 也命中概览台并将其点亮。改为 `/nurture/overview` 后复测，
   legacy 路由不再错误点亮任何模块。
 
-## P2 — 移除 legacy host 依赖
+## P2 — 移除 legacy host 依赖（2026-08-17）
 
-（待填）
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+| 残留引用扫描 | 无 —— `NURTURE_BACKEND_URL` / `3200` / `legacy-host` / `projects` 在 `apps/frontend` 内零命中 |
+
+浏览器验证：
+
+- `/` 重定向到 `/nurture/overview`，概览台在侧栏正确点亮，面包屑显示「概览台」。
+- 占位页渲染，无 legacy host 连接错误。
+- 在**全新 tab** 中 `read_console_messages --onlyErrors` 无输出；当前页面的
+  network 请求全部 200/304，零 404。
+
+排除的假阳性：原 tab 的控制台里有 10 条 404。核对 network 日志后确认全部来自本 tab
+早前对已删除的 `/nurture/projects` 的导航，是历史残留而非当前缺陷；开新 tab 复测为零。
 
 ## P3 — Fixtures 层
 
