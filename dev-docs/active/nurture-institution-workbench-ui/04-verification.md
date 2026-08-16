@@ -76,9 +76,24 @@ node .ai/scripts/ctl-project-governance.mjs lint --check --project main
 排除的假阳性：原 tab 的控制台里有 10 条 404。核对 network 日志后确认全部来自本 tab
 早前对已删除的 `/nurture/projects` 的导航，是历史残留而非当前缺陷；开新 tab 复测为零。
 
-## P3 — Fixtures 层
+## P3 — Fixtures 层（2026-08-17）
 
-（待填）
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+契约核对（逐字段对照 schema，非凭印象）：
+
+- `EnrollmentJourneyProjection` 的必填字段、枚举取值与 `const` 约束与
+  `enrollment-journey-types.schema.json#/$defs/workflowProjection` 一致。
+- `AdminWaitlistEntry` / `AdminWaitlist` 与同文件的对应 `$defs` 一致，
+  确认无 rank 字段。
+- `WorkbenchModule` / `ActionRef` / `PageInfo` 与
+  `surface-envelope.schema.json` 一致，确认 `itemRefs` 为 opaque ref 数组。
+- `OwnerTargetOption` 与 `invocation/target-option.schema.json` 一致。
+
+无浏览器验证：本阶段不产生界面，`lib/queries` 的首个消费者在 P4。
 
 ## P4–P7
 

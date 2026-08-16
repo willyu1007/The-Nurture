@@ -109,7 +109,43 @@ P4 用真实 Hub 替换其内容。
 
 ## P3 — Fixtures 层
 
-（待填）
+三个文件：`lib/contracts/`（类型，镜像 schema）、`lib/fixtures/`（数据）、
+`lib/queries/`（读取面，唯一的替换点）。界面层只 import `lib/queries`。
+
+### 读契约后推翻的四个设计前提
+
+对照 `capabilities/contracts/enrollment-journey-types.schema.json`、
+`query-enrollment-journey.schema.json`、`surfaces/surface-envelope.schema.json`
+与 `invocation/target-option.schema.json` 后发现，已批准设计有四处依赖契约不提供的东西。
+
+**1. 没有列表能力。** `query_institution_enrollment_journey` 的 input 是空对象、
+targetPolicy 为 `owner_option_required`、result 是**单个** `workflow`。
+envelope 的 `workbenchModule` 只给 `itemRefs`（opaque ref 数组）与 `pageInfo`，
+不含任何可显示字段。因此渲染一屏队列 = 逐条解析，N+1 是**契约形状**而非实现偷懒。
+`listQueueRows()` 把这个扇出集中在一处，将来出现列表能力时只改这一个函数体。
+
+**2. 没有结构化的意向字段。** projection 里人类可读的只有 `safeSummary`
+（≤500 字符）一行，外加 `safeBlocker` 与 `nextAction`。孩子称呼、出生月份、
+目标班型、照护时间需求、来源渠道、联系方式**都不在任何能力的返回里**——
+现有 28 个能力中没有意向详情查询。设计基准里 Record 的「意向信息」区块因此
+没有契约支撑，P6 必须去掉或先补能力。
+
+**3. 候补没有名次字段。** `adminWaitlistEntry` 无 rank/position，
+`adminWaitlist.orderedEntries` 的数组顺序就是名次，且作用域是单个 CareGroup。
+`waitlistPositionOf()` 按索引推导，并在注释中写明这一点。
+
+**4. 漏了一个分组。** `waitingState` 枚举含 `waiting_on_caregiver`，
+`responsibleRole` 含 `caregiver`——已批准的四分组（等我/等家庭/等系统/推进中）
+少了「等老师」。改用 `responsibleRole` 作为分组键：它的五个取值与分组 1:1 对应，
+比按 `waitingState` 拼更准确（后者没有「等园长」这个值，等我其实是
+`responsibleRole === institution_admin`）。
+
+### Fixtures 覆盖
+
+12 条 journey，覆盖 `responsibleRole` 全部五个取值与四档时限（逾期 / 今日 /
+本周 / 无时限），含一条 `waiting_on_caregiver`、一条 `waiting_on_system`、
+一条已完成。全部合成数据，`safeSummary` 按 owner 会写的方式撰写。
+另有一个 CareGroup 的候补列表（3 条，含一条 `hasOpenOffer`）。
 
 ## P4 — Hub
 
