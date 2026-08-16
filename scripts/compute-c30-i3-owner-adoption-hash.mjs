@@ -182,11 +182,11 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-15 reseal: adopt My-Chat parent carrier closure and finalized W4
-      // director Prisma closure
-      head_revision: "72a40a1c1be16d78ea6ad823f8d11e4c7de75933",
+      // 2026-08-16 reseal: align exact My-Chat T-028 institutional creation
+      // sources without activation
+      head_revision: "1a2f2088cda5b90236a477512e2d2dc4f2cbfd76",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
-      aggregate_source_hash: "b7a9d3e156092ee2758b3d01039d1f26d45bdbe963e52b5f8cf1adb8fa8b8cc3",
+      aggregate_source_hash: "bb0156f1efff07ca61412bb543bacad623578e69956b9c18d27d61a08ca1c34e",
     },
     host: {
       // Step-5 requalification binds the current clean Host head while the
@@ -195,7 +195,7 @@ const computeLock = () => {
       // child-identity merge rotated that lock; fixture localization and the
       // curated api export keep the C30 Host runtime source profiles unchanged.
       head_revision: "a9281feb13a055061e6ed39a05fa83c4bede8044",
-      runtime_revision: "89e80119deb97da258a956b58d4299b9998249ad",
+      runtime_revision: "828343ba74357bc11cbb156c6ef357b256bb4853",
       aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
     source_hash: sha256(

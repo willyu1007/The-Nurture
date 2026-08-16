@@ -16,9 +16,9 @@ const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-15 reseal: adopt My-Chat parent carrier closure and finalized W4
-  // director Prisma closure
-  hostHead: "72a40a1c1be16d78ea6ad823f8d11e4c7de75933",
+  // 2026-08-16 reseal: align exact My-Chat T-028 institutional creation
+  // sources without activation
+  hostHead: "1a2f2088cda5b90236a477512e2d2dc4f2cbfd76",
 };
 
 const run = (command, args, cwd) =>
