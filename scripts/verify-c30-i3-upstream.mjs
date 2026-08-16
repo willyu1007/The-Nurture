@@ -16,9 +16,8 @@ const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-16 reseal: My-Chat scenario-surface source freeze and Nurture
-  // legacy-host retirement
-  hostHead: "9d385381fb6b2e9c7d4d44b3d9a3af55d1bf2f63",
+  // 2026-08-16 reseal: My-Chat post-CI source-consumer packaging correction
+  hostHead: "c11b8d199b1514a09c51eb1ae0c52ec478f8acbf",
 };
 
 const run = (command, args, cwd) =>
