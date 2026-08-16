@@ -1,5 +1,17 @@
 # Implementation notes
 
+## 2026-08-16 — Gray-status semantic reconciliation
+
+- Reconciled the overview with already-landed W4.1 and My-Chat T-039 evidence:
+  the director Prisma composition, guarded public API/client and approved
+  Mobile Pulse grid are complete and default-off.
+- Replaced the parser-invisible `Current next step` label with the governed
+  `Next step` field. The remaining work is remote staging qualification,
+  native/accessibility evidence and later activation, not additional W4
+  repository composition.
+- No contract, runtime, schema, migration, gate value, deployment or traffic
+  state changed.
+
 ## 2026-08-15 — W3 final deep review
 
 - Reviewed the complete six-commit cutover rather than only the final staging

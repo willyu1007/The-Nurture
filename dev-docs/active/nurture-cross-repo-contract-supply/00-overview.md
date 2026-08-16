@@ -87,7 +87,7 @@
   see `03-implementation-notes.md` / `04-verification.md` (2026-08-15
   deep-review entries). All batches remain default-off contract supply
   with no activation, durable apply, deployment or traffic.
-- Current next step: the owner selected the current-main gray path and
+- Next step: the owner selected the current-main gray path and
   authorized restricted-staging deployment/migration plus W6 teacher
   class-stream progression. Repository preparation is complete: Nurture
   secret-file startup, provider refusal logs, G7 aggregation contracts/tool,
@@ -116,7 +116,8 @@
   final review repaired policy-timezone day boundaries, request-snapshot
   cutoffs, legacy-axis admission, inactive-Enrollment authorization counts and
   one stale N8 binding-authority fixture. The W4 digest and default-false gate
-  are unchanged, and My-Chat public API/Mobile composition, deployment,
+  are unchanged. My-Chat public API/Mobile composition has since closed under
+  T-039; deployed default-off qualification, native/accessibility evidence,
   activation and traffic remain separate next work. W3/W11 carrier
   cutover is now closed at step 6 of 6: the
   shared mapper, seven carrier-protected routes, association-first authority,
@@ -291,10 +292,10 @@ conformance fixtures, all default-off.
   latest-generation behavior are qualified. Media streaming, deployment,
   activation, traffic and device evidence remain separate gates.
 - [x] W4: `nurture.director-presenter@1.0.0` is registered after W2/W3 with
-  exact digest, three default-off service-authenticated read routes, current-
-  authority port contracts, conformance fixtures and a strict My-Chat private
-  consumer. Public API/Mobile composition, real owner ports, deployment and
-  device evidence remain later gates.
+  exact digest, three default-off service-authenticated read routes, real
+  current-authority Prisma ports, conformance fixtures, a strict My-Chat
+  private consumer, guarded public API/client and the approved Mobile Pulse
+  grid composition. Deployment and device evidence remain later gates.
 - [x] W5: every open ledger item is fixed forward-only with its negative
   test; N3's additive migration passes disposable-target qualification;
   N2/N5/N6/N8 land before or with the W1 callback implementation.
@@ -328,6 +329,6 @@ conformance fixtures, all default-off.
     parent-context binding and W3/W11 communication bindings are injected by
     `main.ts` only when their unchanged
     default-false gates and required secrets are present, sharing one
-    shutdown-managed Prisma client. The director surface without a complete
-    production owner dependency refuses startup with a structured reason
-    instead of remaining silently dead.
+    shutdown-managed Prisma client. W4 director production composition now
+    uses the same lifecycle boundary with its complete authority/read ports;
+    all-off startup still constructs no owner.

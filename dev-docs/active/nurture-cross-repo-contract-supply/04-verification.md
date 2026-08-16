@@ -1,5 +1,19 @@
 # Verification
 
+## 2026-08-16 — Gray-status semantic reconciliation
+
+- Confirmed W4.1 steps 1-6 remain recorded as complete in this verification
+  ledger and in `03-implementation-notes.md`.
+- Confirmed My-Chat T-039 records the guarded director public API/client,
+  state/cache controller and approved Mobile Pulse grid composition.
+- `node .ai/scripts/lint-docs.mjs --path
+  dev-docs/active/nurture-cross-repo-contract-supply --strict`: PASS, 43/43
+  Markdown files with zero warnings/errors.
+- `node .ai/scripts/ctl-project-governance.mjs lint --check --project main`:
+  PASS.
+- No source, test, contract, schema, generated environment value or rollout
+  setting changed.
+
 ## 2026-08-15 — W3 final deep review
 
 - Nurture root typecheck — pass.
