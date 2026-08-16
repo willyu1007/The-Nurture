@@ -572,7 +572,7 @@ Project: `main`
 | T-007 nurture-institution-surfaces | archived | dev-docs/archive/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | in-progress | dev-docs/active/nurture-store-beta-readiness |
 | T-011 nurture-cross-repo-contract-supply | in-progress | dev-docs/active/nurture-cross-repo-contract-supply |
-| T-012 legacy-host-retirement | done | dev-docs/active/legacy-host-retirement |
+| T-012 legacy-host-retirement | archived | dev-docs/archive/legacy-host-retirement |
 
 ### F-004 Family growth material provider
 

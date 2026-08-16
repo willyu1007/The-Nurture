@@ -2,7 +2,7 @@ version: 1
 task_id: T-012
 project: main
 slug: legacy-host-retirement
-status: done
+status: archived
 updated: "2026-08-16"
 keywords:
   - scenario-service

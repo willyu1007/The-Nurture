@@ -86,13 +86,13 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 12 (planned: 0, in-progress: 3, blocked: 0, done: 1, archived: 8)
+- Tasks: 12 (planned: 0, in-progress: 3, blocked: 0, done: 0, archived: 9)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-012 legacy-host-retirement | done | F-003 | dev-docs/active/legacy-host-retirement |
+| T-012 legacy-host-retirement | archived | F-003 | dev-docs/archive/legacy-host-retirement |
 | T-007 nurture-institution-surfaces | archived | F-003 | dev-docs/archive/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | in-progress | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-010 nurture-family-sharing-eligibility | archived | F-005 | dev-docs/archive/nurture-family-sharing-eligibility |
