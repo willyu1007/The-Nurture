@@ -1,8 +1,11 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import type { AnySchema, ValidateFunction } from "ajv";
-import Ajv2020Module from "ajv/dist/2020.js";
-import addFormatsModule from "ajv-formats";
+import {
+  createAjvRuntime,
+  hasForbiddenKey,
+  parsePublishedContract,
+  type ValidateFunction,
+} from "./response-validator-core.js";
 import {
   TEACHER_ORGANIZATION_OWNER_INTERFACE,
   type TeacherOrganizationOwnerOperation,
@@ -22,25 +25,6 @@ const OPERATIONS: readonly TeacherOrganizationOwnerOperation[] = [
   "queue_admission_exchange",
 ];
 
-type PublishedContract = Readonly<{
-  interface: Readonly<{ key: string; version: string }>;
-  operations: Record<
-    TeacherOrganizationOwnerOperation,
-    Readonly<{ response_schema_ref: string }>
-  >;
-  schemas: AnySchema;
-}>;
-
-type AjvRuntime = Readonly<{
-  addSchema(schema: AnySchema): unknown;
-  getSchema(ref: string): ValidateFunction | undefined;
-}>;
-
-const Ajv2020 = ((Ajv2020Module as unknown as { default?: unknown }).default
-  ?? Ajv2020Module) as new (options: object) => AjvRuntime;
-const addFormats = ((addFormatsModule as unknown as { default?: unknown }).default
-  ?? addFormatsModule) as (ajv: AjvRuntime) => unknown;
-
 export class TeacherOrganizationResponseContractError extends Error {
   constructor() {
     super("teacher_organization_response_contract_violation");
@@ -48,36 +32,15 @@ export class TeacherOrganizationResponseContractError extends Error {
   }
 }
 
-const parsePublishedContract = (value: unknown): PublishedContract => {
-  if (!isRecord(value) || !isRecord(value.interface)) {
-    throw new Error("Teacher organization runtime contract is invalid");
-  }
-  if (
-    typeof value.interface.key !== "string"
-    || typeof value.interface.version !== "string"
-    || !isRecord(value.operations)
-    || !isRecord(value.schemas)
-  ) {
-    throw new Error("Teacher organization runtime contract is invalid");
-  }
-  for (const operation of OPERATIONS) {
-    const definition = value.operations[operation];
-    if (
-      !isRecord(definition)
-      || typeof definition.response_schema_ref !== "string"
-    ) {
-      throw new Error("Teacher organization runtime contract is invalid");
-    }
-  }
-  return value as PublishedContract;
-};
-
 const compileValidators = (): ReadonlyMap<
   TeacherOrganizationOwnerOperation,
   ValidateFunction
 > => {
   const artifact = parsePublishedContract(
     JSON.parse(readFileSync(CONTRACT_URL, "utf8")) as unknown,
+    OPERATIONS,
+    "schemas",
+    "Teacher organization runtime contract is invalid",
   );
   const digest = `sha256:${createHash("sha256")
     .update(nurtureCanonicalJson(artifact), "utf8")
@@ -89,8 +52,7 @@ const compileValidators = (): ReadonlyMap<
   ) {
     throw new Error("Teacher organization runtime contract pin mismatch");
   }
-  const ajv = new Ajv2020({ allErrors: true, strict: true });
-  addFormats(ajv);
+  const ajv = createAjvRuntime();
   ajv.addSchema(artifact.schemas);
   return new Map(
     OPERATIONS.map((operation) => {
@@ -145,7 +107,7 @@ function hasOwnerExchangeSemantics(
   operation: TeacherOrganizationOwnerOperation,
   response: unknown,
 ): boolean {
-  if (collectKeys(response).some((key) => forbiddenResponseFields.has(key))) {
+  if (hasForbiddenKey(response, forbiddenResponseFields)) {
     return false;
   }
   if (!isRecord(response)) return false;
@@ -224,19 +186,6 @@ function instantMillis(value: unknown): number | null {
   if (typeof value !== "string") return null;
   const parsed = Date.parse(value);
   return Number.isFinite(parsed) ? parsed : null;
-}
-
-function collectKeys(value: unknown, output: string[] = []): string[] {
-  if (Array.isArray(value)) {
-    for (const item of value) collectKeys(item, output);
-    return output;
-  }
-  if (!isRecord(value)) return output;
-  for (const [key, child] of Object.entries(value)) {
-    output.push(key);
-    collectKeys(child, output);
-  }
-  return output;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

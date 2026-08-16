@@ -1763,3 +1763,21 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   operation-for-operation, so nothing from that branch landed. Full
   verification still ran green on the branch (unit 1144, e2e 209,
   production-DB 506) before discard.
+
+## 2026-08-17 — Shared response-validator core consolidation
+
+- Reverified the deferred premise before editing: exactly nine scenario-service
+  response validators still owned separate Ajv 2020 ESM interop, runtime and
+  published-contract types, contract parsing, and (on seven surfaces) the same
+  recursive forbidden-key walk. No shared response-validator core existed.
+- Added one `response-validator-core.ts` that owns only those shared mechanics.
+  The parser remains generic over the operation union and the two frozen schema
+  property names (`schemas` and `contract_schema`), while each caller supplies
+  its existing invalid-contract message.
+- Rewired all nine validators to the core. Contract paths, operation arrays,
+  interface pins, pin/compile/violation messages, per-surface forbidden-field
+  sets, and every surface-specific semantic check remain local and unchanged.
+  The broader deferred `isRecord` consolidation was deliberately left alone.
+- No frozen contract artifact, package manifest, lockfile, Prisma schema,
+  migration, environment contract, gate, deployment or traffic setting
+  changed.

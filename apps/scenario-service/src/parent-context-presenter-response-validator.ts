@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import Ajv2020Module, {
-  type AnySchema,
+import {
+  createAjvRuntime,
+  parsePublishedContract,
   type ValidateFunction,
-} from "ajv/dist/2020.js";
-import addFormatsModule from "ajv-formats";
+} from "./response-validator-core.js";
 import {
   nurtureCanonicalJson,
   PARENT_CONTEXT_PRESENTER_INTERFACE,
@@ -24,27 +24,6 @@ const OPERATIONS = [
   "freshness_attendance_projection",
 ] as const satisfies readonly ParentContextPresenterOperation[];
 
-type PublishedContract = Readonly<{
-  interface: Readonly<{ key: string; version: string }>;
-  operations: Readonly<
-    Record<
-      ParentContextPresenterOperation,
-      Readonly<{ response_schema_ref: string }>
-    >
-  >;
-  schemas: AnySchema;
-}>;
-
-type AjvRuntime = Readonly<{
-  addSchema(schema: AnySchema): unknown;
-  getSchema(ref: string): ValidateFunction | undefined;
-}>;
-
-const Ajv2020 = ((Ajv2020Module as unknown as { default?: unknown }).default
-  ?? Ajv2020Module) as new (options: object) => AjvRuntime;
-const addFormats = ((addFormatsModule as unknown as { default?: unknown }).default
-  ?? addFormatsModule) as (ajv: AjvRuntime) => unknown;
-
 export class ParentContextPresenterResponseContractError extends Error {
   constructor() {
     super("parent_context_presenter_response_contract_violation");
@@ -58,6 +37,9 @@ const compilePublishedResponseValidators = (): ReadonlyMap<
 > => {
   const artifact = parsePublishedContract(
     JSON.parse(readFileSync(CONTRACT_URL, "utf8")) as unknown,
+    OPERATIONS,
+    "schemas",
+    "Parent-context presenter runtime contract is invalid",
   );
   const digest = `sha256:${createHash("sha256")
     .update(nurtureCanonicalJson(artifact), "utf8")
@@ -70,8 +52,7 @@ const compilePublishedResponseValidators = (): ReadonlyMap<
     throw new Error("Parent-context presenter runtime contract pin mismatch");
   }
 
-  const ajv = new Ajv2020({ allErrors: true, strict: true });
-  addFormats(ajv);
+  const ajv = createAjvRuntime();
   ajv.addSchema(artifact.schemas);
   return new Map(
     OPERATIONS.map((operation) => {
@@ -88,30 +69,6 @@ const compilePublishedResponseValidators = (): ReadonlyMap<
   );
 };
 
-const parsePublishedContract = (value: unknown): PublishedContract => {
-  if (!isRecord(value) || !isRecord(value.interface)) {
-    throw new Error("Parent-context presenter runtime contract is invalid");
-  }
-  if (
-    typeof value.interface.key !== "string"
-    || typeof value.interface.version !== "string"
-    || !isRecord(value.operations)
-    || !isRecord(value.schemas)
-  ) {
-    throw new Error("Parent-context presenter runtime contract is invalid");
-  }
-  for (const operation of OPERATIONS) {
-    const definition = value.operations[operation];
-    if (
-      !isRecord(definition)
-      || typeof definition.response_schema_ref !== "string"
-    ) {
-      throw new Error("Parent-context presenter runtime contract is invalid");
-    }
-  }
-  return value as PublishedContract;
-};
-
 const publishedResponseValidators = compilePublishedResponseValidators();
 
 export const assertPublishedParentContextPresenterResponse = (
@@ -123,7 +80,3 @@ export const assertPublishedParentContextPresenterResponse = (
     throw new ParentContextPresenterResponseContractError();
   }
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}

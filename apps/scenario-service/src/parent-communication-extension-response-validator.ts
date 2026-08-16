@@ -1,8 +1,11 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import type { AnySchema, ValidateFunction } from "ajv";
-import Ajv2020Module from "ajv/dist/2020.js";
-import addFormatsModule from "ajv-formats";
+import {
+  createAjvRuntime,
+  hasForbiddenKey,
+  parsePublishedContract,
+  type ValidateFunction,
+} from "./response-validator-core.js";
 import {
   PARENT_COMMUNICATION_EXTENSION_INTERFACE,
   type ParentCommunicationExtensionOperation,
@@ -19,25 +22,6 @@ const OPERATIONS: readonly ParentCommunicationExtensionOperation[] = [
   "delivery_receipt_query",
 ];
 
-type PublishedContract = Readonly<{
-  interface: Readonly<{ key: string; version: string }>;
-  operations: Record<
-    ParentCommunicationExtensionOperation,
-    Readonly<{ response_schema_ref: string }>
-  >;
-  contract_schema: AnySchema;
-}>;
-
-type AjvRuntime = Readonly<{
-  addSchema(schema: AnySchema): unknown;
-  getSchema(ref: string): ValidateFunction | undefined;
-}>;
-
-const Ajv2020 = ((Ajv2020Module as unknown as { default?: unknown }).default
-  ?? Ajv2020Module) as new (options: object) => AjvRuntime;
-const addFormats = ((addFormatsModule as unknown as { default?: unknown }).default
-  ?? addFormatsModule) as (ajv: AjvRuntime) => unknown;
-
 export class ParentCommunicationExtensionResponseContractError extends Error {
   constructor() {
     super("parent_communication_extension_response_contract_violation");
@@ -45,36 +29,15 @@ export class ParentCommunicationExtensionResponseContractError extends Error {
   }
 }
 
-const parsePublishedContract = (value: unknown): PublishedContract => {
-  if (!isRecord(value) || !isRecord(value.interface)) {
-    throw new Error("Parent-communication extension runtime contract is invalid");
-  }
-  if (
-    typeof value.interface.key !== "string"
-    || typeof value.interface.version !== "string"
-    || !isRecord(value.operations)
-    || !isRecord(value.contract_schema)
-  ) {
-    throw new Error("Parent-communication extension runtime contract is invalid");
-  }
-  for (const operation of OPERATIONS) {
-    const definition = value.operations[operation];
-    if (
-      !isRecord(definition)
-      || typeof definition.response_schema_ref !== "string"
-    ) {
-      throw new Error("Parent-communication extension runtime contract is invalid");
-    }
-  }
-  return value as PublishedContract;
-};
-
 const compileValidators = (): ReadonlyMap<
   ParentCommunicationExtensionOperation,
   ValidateFunction
 > => {
   const artifact = parsePublishedContract(
     JSON.parse(readFileSync(CONTRACT_URL, "utf8")) as unknown,
+    OPERATIONS,
+    "contract_schema",
+    "Parent-communication extension runtime contract is invalid",
   );
   const digest = `sha256:${createHash("sha256")
     .update(nurtureCanonicalJson(artifact), "utf8")
@@ -87,8 +50,7 @@ const compileValidators = (): ReadonlyMap<
   ) {
     throw new Error("Parent-communication extension runtime contract pin mismatch");
   }
-  const ajv = new Ajv2020({ allErrors: true, strict: true });
-  addFormats(ajv);
+  const ajv = createAjvRuntime();
   ajv.addSchema(artifact.contract_schema);
   return new Map(
     OPERATIONS.map((operation) => {
@@ -151,7 +113,7 @@ function hasOwnerExchangeSemantics(
   operation: ParentCommunicationExtensionOperation,
   response: unknown,
 ): boolean {
-  if (collectKeys(response).some((key) => forbiddenResponseFields.has(key))) {
+  if (hasForbiddenKey(response, forbiddenResponseFields)) {
     return false;
   }
   if (!isRecord(response)) return false;
@@ -188,19 +150,6 @@ function hasOwnerExchangeSemantics(
     }
   }
   return true;
-}
-
-function collectKeys(value: unknown, output: string[] = []): string[] {
-  if (Array.isArray(value)) {
-    for (const item of value) collectKeys(item, output);
-    return output;
-  }
-  if (!isRecord(value)) return output;
-  for (const [key, child] of Object.entries(value)) {
-    output.push(key);
-    collectKeys(child, output);
-  }
-  return output;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

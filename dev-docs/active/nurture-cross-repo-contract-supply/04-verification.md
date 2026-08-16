@@ -1603,3 +1603,48 @@ Verdict: `W4_PRISMA_STEP_6_PASS / SIX_OF_SIX_CLOSED /
 POLICY_LOCAL_DAY / REQUEST_SNAPSHOT_BOUNDED / CANONICAL_G2_ONLY /
 FULL_DB_506 / SERVICE_DB_68 / CROSS_REPO_STRICT /
 ZERO_SCHEMA_DRIFT / DEFAULT_OFF / NO_DEPLOYMENT_OR_TRAFFIC`.
+
+## 2026-08-17 — Shared response-validator core consolidation
+
+- Premise census found exactly nine `*-response-validator.ts` files; all nine
+  contained the Ajv ESM-interop cast, `AjvRuntime`, and
+  `parsePublishedContract`, while no `response-validator-core.ts` existed.
+- Before the edit, all nine frozen contract validators plus the formal-ingress
+  assertion passed through the listener-free `node --import tsx` entrypoint.
+  The recorded digests were:
+  `3ac0906c6b514c861d266c3b4e470e5dcacb6cccdd61887e7b7a03e4c194c196`,
+  `b1dce3a73ac45ff244452e13434834a152bc1ffdc8ede685f8a20b04c9b24a7f`,
+  `d705146eb00185cbec425953e9a6fa358cc5fb9af193c86f788276617c7b29d1`,
+  `39b879a6d6b310327bb5c5699e4d03b5774f4c3e6aee82761ed78899a5aa2ea9`,
+  `00a8494544e9b2ba6045f79da196b1003e2744f905399aab86bb5efdb9be5df3`,
+  `b0d4602ff30017338f2a46d3a84cfdaaa011a2d04e134aba8d4dde0125304161`,
+  `e4a831cdb867ab2a5ad38d6e634e13b9da41d44606a9644c6aa0b7fd36503edf`,
+  `528e50c8170a8b2fa41679cd7fc8d20f5fb344278a6d8e3a6294adc405dd96b4`,
+  and
+  `d401066102cb398f00b6bd897611ba794abb36d11837a25423f1c19101cadb8e`.
+  The normal `tsx` CLI could not be used directly because this sandbox rejects
+  its IPC listener with `EPERM`.
+- The scenario-service package typecheck passed after repairing generated
+  worktree dependency links and generating the local Prisma clients. Root
+  `pnpm typecheck` then passed with sandbox-only command-path and Prisma-engine
+  remapping; the temporary command wrappers were restored byte-for-byte.
+- `pnpm test:unit` passed 105 files / 1,144 tests.
+- `pnpm build:scenario-service` passed.
+- The complete nine-surface controller lane passed 9 files / 70 tests. This
+  includes every schema-drift, forbidden-key, binding-drift, invalid-response,
+  and negative semantic case on all nine surfaces.
+- `pnpm test:scenario-service` collected the full 27-file / 209-test lane. All
+  nine target suites and all other listener-free suites passed (20 files / 168
+  tests); seven unrelated legacy HTTP suites could not bind `127.0.0.1` in the
+  managed sandbox, producing 40 uniform `listen EPERM` failures and one skipped
+  joint-listener test. No target response-validator assertion failed.
+- After the edit, the exact `pnpm verify:formal-ingress-contract` script passed
+  via a temporary listener-free `tsx` launcher. Every digest above was
+  byte-identical and the final formal-ingress assertion remained green.
+- `git diff --check` passed, and diffs over frozen contracts, `package.json`,
+  `pnpm-lock.yaml`, Prisma and environment paths were empty.
+- Project-governance lint passed.
+
+Verdict: `RESPONSE_VALIDATOR_CORE_PASS / NINE_SURFACES_70_OF_70 /
+UNIT_1144 / BUILD_PASS / DIGESTS_BYTE_IDENTICAL /
+FULL_E2E_LISTENER_BLOCKED_168_PASS_40_EPERM_1_SKIP`.
