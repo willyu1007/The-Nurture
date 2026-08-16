@@ -573,6 +573,8 @@ Project: `main`
 | T-008 nurture-store-beta-readiness | in-progress | dev-docs/active/nurture-store-beta-readiness |
 | T-011 nurture-cross-repo-contract-supply | in-progress | dev-docs/active/nurture-cross-repo-contract-supply |
 | T-012 legacy-host-retirement | archived | dev-docs/archive/legacy-host-retirement |
+| T-013 nurture-institution-workbench-ui | in-progress | dev-docs/active/nurture-institution-workbench-ui |
+| T-014 legacy-host-deletion | in-progress | dev-docs/active/legacy-host-deletion |
 
 ### F-004 Family growth material provider
 

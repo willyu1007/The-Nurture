@@ -183,3 +183,17 @@ tasks:
     feature_id: F-003
     dev_docs_path: dev-docs/archive/legacy-host-retirement
     updated: 2026-08-16
+  - id: T-013
+    slug: nurture-institution-workbench-ui
+    status: in-progress
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/nurture-institution-workbench-ui
+    updated: 2026-08-17
+  - id: T-014
+    slug: legacy-host-deletion
+    status: in-progress
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/legacy-host-deletion
+    updated: 2026-08-17

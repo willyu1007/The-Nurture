@@ -1,0 +1,15 @@
+version: 1
+task_id: T-014
+project: main
+slug: legacy-host-deletion
+status: in-progress
+updated: "2026-08-17"
+keywords:
+  - legacy-host
+  - deletion-gate
+  - owner-boundary-coverage
+  - owner-route-migration
+  - user-attention
+  - growth-record-contribution
+  - x5-joint
+  - test-migration
