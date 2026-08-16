@@ -49,3 +49,6 @@ contract or persistence file changed.
   activation is absent.
 - `RESEAL_MY_CHAT_ROOT=<clean-worktree> pnpm verify:c30-i3-upstream`: PASS.
 - My-Chat scenario-host adoption lock check: PASS, unchanged source aggregate.
+- `pnpm reseal:pins lock`: PASS — owner-adoption lock minted at exact Nurture
+  source `b53a9b3`; `pnpm verify:c30-i3-owner-adoption` passes with source hash
+  `7ec001bda63187555f31e4b98b253f9b5a31de414b64ad05f5e916e088fbb040`.

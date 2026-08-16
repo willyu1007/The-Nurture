@@ -52,3 +52,7 @@ gate in `02-architecture.md` is met.
 - Workflow-contract pin, G2 exit, C30-I3 upstream and reseal-tool tests pass.
   The owner-adoption lock is intentionally minted only after this stage is a
   committed Nurture revision.
+- After commit `b53a9b3`, the second reseal stage minted the owner-adoption lock
+  against that exact source revision. The lock now binds My-Chat `9d38538`, the
+  unchanged My-Chat runtime source revision/aggregate, and the updated Nurture
+  manifest/cumulative source profiles without widening their file sets.
