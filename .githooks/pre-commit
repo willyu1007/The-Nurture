@@ -23,6 +23,20 @@ if git diff --cached --name-only | grep -qE '\.md$'; then
   fi
 fi
 
+# Guard the B3-0 surface vocabulary whenever text that can carry it is staged.
+# Keeps `web_run_workbench` (My-Chat) and `web_domain_workbench` (Nurture) from
+# being re-conflated in prose. Not wired into package.json: the root manifest is
+# covered by the cross-repo contract pin and changing it would force a reseal.
+if git diff --cached --name-only | grep -qE '\.(md|json|ya?ml|tsx?|mjs)$'; then
+  if [ -f scripts/assert-surface-terminology.mjs ]; then
+    echo "[hook] Checking surface terminology..."
+    if ! node scripts/assert-surface-terminology.mjs; then
+      echo "[hook] Surface terminology check failed. Fix the issues above before committing."
+      exit 1
+    fi
+  fi
+fi
+
 # Auto-regenerate API Index when materialized OpenAPI contract changes
 if git diff --cached --name-only | grep -qE '^docs/context/api/openapi\.ya?ml$'; then
   OPENAPI_FILE=""
