@@ -141,8 +141,8 @@
   - Acceptance criteria: 例如 `child A` 是 My-Chat 对象；The Nurture 可以维护 `nurture_child_profile`，通过 canonical object ref 绑定到 `child A`，且不阻止 `child A` 进入其他场景。
 - MUST: 支持孕产妇和孩子健康状态的受控记录与安全建议边界。
   - Acceptance criteria: 健康状态表/画像必须贴附到 My-Chat canonical object；建议必须标注非诊断性质；高风险输入触发就医/急救提示；不生成处方、剂量或替代医生判断。
-- MUST: 支持 dashboard 接入，覆盖 chat dashboard summary、mobile dashboard cards、web run workbench 和 The Nurture 深度 web 操作台。
-  - Acceptance criteria: My-Chat dashboard surface 只消费 safe dashboard cards、run summary、artifact preview 和 action availability；The Nurture 深度操作台可展示更丰富的场景视图，但必须通过标准 Workflow API 或 manifest-declared internal API，并遵守 exposure level。
+- MUST: 支持 dashboard 接入，覆盖 chat dashboard summary、mobile dashboard cards、My-Chat 的 `web_run_workbench` 和 The Nurture 自有的 `web_domain_workbench`。
+  - Acceptance criteria: My-Chat dashboard surface 只消费 safe dashboard cards、run summary、artifact preview 和 action availability；`web_domain_workbench` 可展示更丰富的场景视图，但必须通过标准 Workflow API 或 manifest-declared internal API，并遵守 exposure level。
 - MUST: 支持标准 ChatWorkflowAdapter 能力：recommend、submit_start_requirements、start_run、confirm_action、get_dashboard_summary、get_citation_package。
   - Acceptance criteria: Chat 只接收 safe summary、action availability、citation package 和 conflict summary。
 - MUST: 支持 standard workflow events，事件 payload refs-only、no private body、no PII。

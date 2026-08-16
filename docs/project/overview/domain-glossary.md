@@ -2,6 +2,15 @@
 
 # Domain Glossary
 
+> **ARCHIVED — initialization-stage glossary.** The current glossary SSOT is
+> [`docs/context/glossary.json`](../../context/glossary.json). Terms below record the
+> initialization baseline and may be superseded; where they disagree with `docs/context/`,
+> the context layer wins (`AGENTS.md` → "Prefer `docs/context/` contracts"). Entries whose
+> init-era meaning has been replaced are marked **SUPERSEDED** with a pointer; the old
+> wording is recoverable from git history, not from this file.
+> Do not add or edit terms here — use
+> `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs add-term`.
+
 ## Purpose
 Define domain terms used across requirements and implementation.
 
@@ -41,19 +50,20 @@ Define domain terms used across requirements and implementation.
 ### Workflow dashboard
 - Definition: My-Chat 共享 workflow 消费面，用 dashboard cards、run summary、artifact preview 和 action availability 展示 run 状态并承载轻量确认动作。
 - Synonyms: mobile dashboard, chat dashboard summary, dashboard cards。
-- Non-examples: The Nurture 深度 web 操作台、原始私密 artifact 查看器、直接写知识库/论坛的按钮。
+- Non-examples: `web_domain_workbench`、原始私密 artifact 查看器、直接写知识库/论坛的按钮。
 - Notes: Dashboard 只能展示 safe presenter output；写操作必须 canonical reread 并走 Workflow API action command。
 
-### Web run workbench
-- Definition: 面向 web 的 run 详情和操作面，可查看更完整的 run timeline、artifact preview、action 和 handoff，但仍遵守 Workflow API、权限、evidence 和 exposure level。
-- Synonyms: web workflow workbench。
-- Non-examples: 绕过 workflow ledger 的场景私有后台。
+### `Web run workbench`
+- **SUPERSEDED.** 该条目原先把 My-Chat 的通用 Run 操作面写成 The Nurture 的业务操作面。
+  B3-0 已把两者分开，当前定义见 `docs/context/glossary.json` 的 `web_run_workbench`
+  （My-Chat 所有，MUST NOT 授予 Nurture 业务访问）与 `web_domain_workbench`
+  （The Nurture 所有，当前实例 surface `institution_workbench`）。
 
 ### The Nurture web console
-- Definition: The Nurture 独立 web 操作台，用于长期目标 workflow、画像查看、活动建模、复盘、人工确认和场景管理等深度操作。
-- Synonyms: nurture console, 场景操作台。
-- Non-examples: My-Chat 全局 Admin、通用 forum/knowledge 管理台。
-- Notes: 可以使用 manifest-declared internal API，但不能替代 My-Chat shared dashboard contract。
+- **SUPERSEDED.** 该条目原先称其为「独立 web 操作台」，与 `README.md` 的
+  "The Nurture is not an independent product shell" 冲突。当前定义见
+  `docs/context/glossary.json` 的 `The Nurture web console`；园区管理
+  `InstitutionWorkflow` 的主要操作面是 `web_domain_workbench`。
 
 ### Domain Context Ref
 - Definition: workflow 面向 canonical domain object 的稳定引用，包含 namespace、object_type、object_id、version 和 owner_scope。

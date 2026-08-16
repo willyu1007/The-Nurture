@@ -359,7 +359,7 @@
       "rollback/export/recovery plan exists before cloud apply"
     ],
     "firstJourney": "long-term goal/family strategy -> short-term care plan -> activity comparison -> execution review",
-    "dashboard": "include chat dashboard summary, mobile cards, web run workbench, and The Nurture web console",
+    "dashboard": "include chat dashboard summary, mobile cards, My-Chat web_run_workbench, and the Nurture-owned web_domain_workbench",
     "canonicalObjects": [
       "mother_or_expectant_mother",
       "child",

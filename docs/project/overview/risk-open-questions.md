@@ -79,9 +79,9 @@
    - Decision due: Stage B
 
 10. Question: Dashboard 首版覆盖哪些 surface？
-   - Why it matters: My-Chat 已有 chat dashboard summary、mobile dashboard cards、web run workbench；The Nurture 还需要深度 web 操作台，二者职责不能混淆。
+   - Why it matters: My-Chat 已有 chat dashboard summary、mobile dashboard cards、`web_run_workbench`；The Nurture 还需要自有的 `web_domain_workbench`，二者职责不能混淆。
    - Owner: User
-   - Options: 只接入 shared dashboard cards；shared dashboard + web run workbench；shared dashboard + The Nurture web console；三者都进入 MVP
+   - Options: 只接入 shared dashboard cards；shared dashboard + `web_run_workbench`；shared dashboard + The Nurture web console；三者都进入 MVP
    - Decision due: Stage B 前
 
 11. Question: Calendar/todo 在首版如何处理？

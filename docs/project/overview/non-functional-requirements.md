@@ -70,7 +70,7 @@
   - Context resolver 失败：Chat 只展示 conflict summary，不暴露 resolver 内部细节。
   - Handoff 下游不可用：保留 request 状态，等待 receipt 或重试，不直接写下游表。
   - 社区/知识不可用：不阻断家庭私域决策主链路。
-  - The Nurture 深度操作台不可用：My-Chat dashboard 仍应能展示 safe card、不可用原因和可跳转/重试状态。
+  - `web_domain_workbench` 不可用：My-Chat dashboard 仍应能展示 safe card、不可用原因和可跳转/重试状态。
 
 ## Operability
 - Observability:
