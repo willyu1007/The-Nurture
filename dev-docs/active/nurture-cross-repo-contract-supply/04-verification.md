@@ -1,5 +1,18 @@
 # Verification
 
+## 2026-08-16 — Current-main reseal stage 1
+
+- `RESEAL_MY_CHAT_ROOT=<clean-76651e4-worktree> pnpm reseal:pins apply
+  --note <current-main-rationale>`: PASS.
+- Workflow-contract pin, G2 exit and C30-I3 upstream verification: PASS.
+- Reseal tool tests: 3/3 PASS; workflow-pin tests: 7/7 PASS.
+- C30-I3 default-off census: PASS; zero enabled manifest capabilities,
+  production domain actions, protected interactions and action offers.
+- Node syntax checks for every changed reseal/verifier script and
+  `git diff --check`: PASS.
+- My-Chat contract/source profiles and scenario-host adoption lock are
+  unchanged; only the exact repository revision moved.
+
 ## 2026-08-16 — Gray-status semantic reconciliation
 
 - Confirmed W4.1 steps 1-6 remain recorded as complete in this verification

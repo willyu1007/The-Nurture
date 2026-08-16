@@ -87,8 +87,13 @@
   see `03-implementation-notes.md` / `04-verification.md` (2026-08-15
   deep-review entries). All batches remain default-off contract supply
   with no activation, durable apply, deployment or traffic.
-- Next step: the owner selected the current-main gray path and
-  authorized restricted-staging deployment/migration plus W6 teacher
+- Next step: finish the current-main reseal before any remote gray work. The
+  first-stage exact My-Chat pin and three governed revision literals now target
+  `76651e4d29c84c31437a57862ff5eb42054780df`; pin, G2 and C30-I3 upstream
+  checks pass. Commit that stage, mint the owner-adoption lock from the
+  committed Nurture revision, run the final gates and then push both `main`
+  branches. Afterward, continue the owner-selected restricted-staging
+  deployment/migration and W6 teacher
   class-stream progression. Repository preparation is complete: Nurture
   secret-file startup, provider refusal logs, G7 aggregation contracts/tool,
   My-Chat Compose overlay/BWS manifest and the human-run migration/rehearsal/

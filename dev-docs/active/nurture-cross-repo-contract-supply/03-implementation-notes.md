@@ -1,5 +1,16 @@
 # Implementation notes
 
+## 2026-08-16 — Current-main reseal stage 1
+
+- Adopted the My-Chat T-044 archive head
+  `76651e4d29c84c31437a57862ff5eb42054780df` as the exact current-main host
+  revision without changing any contract or source-profile hash.
+- Rotated only the workflow pin and the three governed My-Chat revision
+  literals used by G2, C30-I3 upstream and owner-adoption computation.
+- Verified against a clean detached My-Chat worktree so the seven unrelated
+  shared-worktree changes remain excluded. The owner-adoption lock is deferred
+  until this first-stage source revision is committed.
+
 ## 2026-08-16 — Gray-status semantic reconciliation
 
 - Reconciled the overview with already-landed W4.1 and My-Chat T-039 evidence:

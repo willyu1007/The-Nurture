@@ -155,8 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: My-Chat post-CI source-consumer packaging correction
-  "c11b8d199b1514a09c51eb1ae0c52ec478f8acbf",
+  // 2026-08-16 reseal: adopt the My-Chat T-044 archive head for the
+  // current-main gray release
+  "76651e4d29c84c31437a57862ff5eb42054780df",
   "My-Chat revision",
 );
 assertEqual(
