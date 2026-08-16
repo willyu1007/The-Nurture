@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "3898d8541323d82ff72f45dbc6eddaa1f08ec25c",
+  "source_revision": "49b273f1c56efe30437c8e08635d6fed00fb9144",
   "base": {
-    "head_revision": "02a70e43000928f5febd78a15cdb0bd051ce2ff2",
+    "head_revision": "0ef4e8c3024187007fe931e33af94cb7fc6e0705",
     "source_revision": "6740871affd53a1200af8e19eaee67f4f0aff52d",
-    "aggregate_source_hash": "d31435eb0e65163b6914e6480960ce5778788147adeb093ab118ad77f27ff05b"
+    "aggregate_source_hash": "352358fa16e32f7a10a5e261dd369bdc09a18713ea28b269c966c2cf93ae5c3c"
   },
   "host": {
     "head_revision": "a9281feb13a055061e6ed39a05fa83c4bede8044",
-    "runtime_revision": "947c8633f35fa392ab9972a82f6000bbec194c82",
+    "runtime_revision": "32a4cdd27da826546d081252817cbe11f61b512d",
     "aggregate_source_hash": "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2"
   },
-  "source_hash": "03e2f1b9caee397563edc7e38ec67a523e09ab38fc73d8adc3fd5f89caeb4306",
+  "source_hash": "7e76b5a5f83d2db67f80220d1567ae90cb26cab098ec5303ff4aaf087c2af740",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
-      "source_hash": "092816e3a10fac9f17db46f2f3c6d535fb6b2cd72d0b655bf240f0b248254355",
+      "source_hash": "ea06ac6f9796abfcb2be5e48a8c6e43649b45d289cf6451bc6d1592fa66dba17",
       "files": [
         "package.json",
         "packages/nurture-scenario/package.json",
@@ -123,7 +123,7 @@
     },
     {
       "source_identity": "nurture_c30_cumulative_convergence_v1",
-      "source_hash": "dff1ff0a44c2dbcb7f4200bf21e7b6d5664acaa358fa0dafa35fe57ff5d03d16",
+      "source_hash": "a59c27806bf2cd49143f4dcf1aeef87de01a9b2ce7827a3aff8e19884e13fd7b",
       "files": [
         "package.json",
         "packages/nurture-scenario/scenario.manifest.yaml",
