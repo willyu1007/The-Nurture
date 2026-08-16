@@ -3,7 +3,7 @@ task_id: T-002
 project: main
 slug: nurture-institution-mode
 status: in-progress
-updated: "2026-08-12"
+updated: "2026-08-16"
 keywords:
   - institution-ecology
   - multi-family
@@ -47,3 +47,4 @@ keywords:
   - structured-clarification
   - scenario-token-mvp
   - token-ttl-staleness
+  - institutional-creation-owner-pin

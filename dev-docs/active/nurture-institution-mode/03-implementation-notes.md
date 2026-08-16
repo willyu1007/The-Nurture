@@ -2240,3 +2240,21 @@ human-judged step.
   statements, reconstructs the complete migration history, requires all three
   current composite FKs, and rejects any surviving id-only predecessor. No
   schema, migration, runtime, contract, database, or activation changed.
+
+## 2026-08-16 — T-028 quality-hardening pin closure
+
+- Adopted My-Chat `02a70e43000928f5febd78a15cdb0bd051ce2ff2`
+  after its institutional-creation quality review. The source adds database-
+  enforced request/principal, Family/parent-evidence and consumed-Child lineage,
+  plus expiry/adversarial verification; it does not grant scenario authority.
+- Resealed the exact `x5_joint_api` and `wave4_binding_host` populations to
+  `d677a4395d16a18c92e57683f1dab56c4c8765b07bf0634e35da4bcfb04f5f13`
+  and `8df27b13de3580f90aa3d356e990bf8233a8aa8631b5dee48498c35042c2ea86`.
+  Workflow-contract parity remains `85cf56e2…`; Base remains fixed at
+  `536638a204865ebdc43bca70992388352789a36f`.
+- My-Chat's qualified Host lock now binds runtime revision `947c8633…` and
+  aggregate `d31435eb…`. The Nurture owner lock is minted only after this pin
+  population is committed, preserving the two-stage exact-revision rule.
+- No Nurture positive institutional-creation path, model, migration, switch,
+  association or permission was added. The Pilot single track and every C30/G2
+  default-off gate remain unchanged.

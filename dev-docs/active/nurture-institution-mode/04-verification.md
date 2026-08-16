@@ -2146,3 +2146,18 @@ the rejected checkpoint and are historical.
 - This repair changes verification semantics only; the previously qualified W3
   migration remains the sole schema SSOT and no database or runtime effect is
   introduced.
+
+## 2026-08-16 — T-028 quality-hardening pin verification
+
+| Check | Result |
+| --- | --- |
+| Exact My-Chat input | PASS — head `02a70e43000928f5febd78a15cdb0bd051ce2ff2`; Host runtime `947c8633…`; Host aggregate `d31435eb…` |
+| Source profiles | PASS — `x5_joint_api=d677a439…` / 321 files; `wave4_binding_host=8df27b13…` / 22 files; Base/My-Chat workflow parity remains `85cf56e2…` |
+| Repository quality | PASS — lint, root typecheck and 105 files / 1,144 tests; pin/reseal tests 10/10 |
+| Boundary gates | PASS — workflow pin, G2, C30 upstream, C30 default-off, strict context and project-governance lint |
+| Negative runtime census | PASS — no `ChildCreationRequest`, `ChildCreationAuthorization`, institutional-creation route/scope/switch or writer in Nurture apps, packages or Prisma sources |
+| Effect boundary | NONE — metadata adoption only; no Nurture schema/migration/runtime, persistent database, deployment, activation, Pilot or traffic change |
+
+The cumulative Nurture owner-adoption lock is intentionally regenerated only
+from the committed pin population in the following lock commit. This preserves
+the lock's committed-source invariant instead of hashing a dirty worktree.
