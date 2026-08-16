@@ -1,0 +1,12 @@
+version: 1
+task_id: T-012
+project: main
+slug: legacy-host-retirement
+status: in-progress
+updated: "2026-08-16"
+keywords:
+  - scenario-service
+  - legacy-host
+  - runtime-entrypoint
+  - ownership-boundary
+  - single-track

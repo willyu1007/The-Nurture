@@ -176,3 +176,10 @@ tasks:
       - R-004
     dev_docs_path: dev-docs/active/nurture-cross-repo-contract-supply
     updated: 2026-08-13
+  - id: T-012
+    slug: legacy-host-retirement
+    status: in-progress
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/legacy-host-retirement
+    updated: 2026-08-16
