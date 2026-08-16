@@ -77,6 +77,8 @@ export function summarizeRampMetrics(records, input = undefined) {
   const startupFailureReasons = new Map();
   const unhandledExceptionsBySurface = new Map();
   const familyGrowthEventCounts = new Map();
+  const commandSettlementOutcomes = new Map();
+  const commandSettlementOutcomesBySurface = new Map();
   let serviceStartedTotal = 0;
   let replayedSettlementsTotal = 0;
   let replayedFieldRecordsTotal = 0;
@@ -96,7 +98,19 @@ export function summarizeRampMetrics(records, input = undefined) {
         if (record.reason_code === "request_timeout") {
           increment(timeoutRefusalsBySurface, record.route_class);
         }
-        if (record.reason_code === "command_write_conflict") {
+        break;
+      }
+      case "scenario_command_settled": {
+        increment(commandSettlementOutcomes, record.outcome);
+        incrementNested(
+          commandSettlementOutcomesBySurface,
+          record.surface,
+          record.outcome,
+        );
+        if (
+          record.outcome === "refused"
+          && record.reason_code === "command_write_conflict"
+        ) {
           writeConflictRefusalsTotal += 1;
         }
         break;
@@ -183,17 +197,21 @@ export function summarizeRampMetrics(records, input = undefined) {
       ),
     },
     command_ledger_health: {
-      command_replay_or_already_satisfied_hits: {
-        status: "not_emitted_by_current_provider_logs",
-        count: null,
+      command_settlements: {
+        source: "scenario_command_settled.outcome",
+        ...summarizeCommandSettlements(commandSettlementOutcomes),
+        by_surface: Object.fromEntries(
+          [...commandSettlementOutcomesBySurface.entries()]
+            .sort(([left], [right]) => left.localeCompare(right))
+            .map(([surface, outcomes]) => [
+              surface,
+              summarizeCommandSettlements(outcomes),
+            ]),
+        ),
       },
       command_write_conflict_refusals: {
-        source: "request_refused.reason_code",
+        source: "scenario_command_settled.reason_code",
         count: writeConflictRefusalsTotal,
-      },
-      command_reconcile_events: {
-        status: "not_emitted_by_current_provider_logs",
-        count: null,
       },
       family_growth_delivery: {
         event_counts: sortedCountObject(familyGrowthEventCounts),
@@ -273,11 +291,26 @@ export function formatHumanSummary(summary) {
 
   const ledger = summary.command_ledger_health;
   lines.push("", "Command-ledger and delivery health");
+  const settlements = ledger.command_settlements;
   lines.push(
-    `Command replay/already-satisfied: ${ledger.command_replay_or_already_satisfied_hits.status}.`,
+    `Command settlements: ${settlements.settlements_total}; replay/already-satisfied: ${settlements.replay_hits}; reconciliation signals: ${settlements.reconcile_count}; reconcile/replay rate: ${formatShare(settlements.reconcile_or_replay_rate)}.`,
     `Command write-conflict refusals: ${ledger.command_write_conflict_refusals.count} (${ledger.command_write_conflict_refusals.source}).`,
-    `Command reconciliation: ${ledger.command_reconcile_events.status}.`,
   );
+  const commandRows = Object.entries(settlements.by_surface)
+    .map(([surface, metrics]) => [
+      surface,
+      metrics.settlements_total,
+      metrics.replay_hits,
+      metrics.reconcile_count,
+      metrics.outcomes.refused,
+      formatShare(metrics.reconcile_or_replay_rate),
+    ]);
+  lines.push(renderTable(
+    ["command surface", "settlements", "replay/already", "reconcile", "refused", "reconcile/replay rate"],
+    commandRows.length === 0
+      ? [["(none)", 0, 0, 0, 0, "n/a"]]
+      : commandRows,
+  ));
   const familyGrowthRows = Object.entries(ledger.family_growth_delivery.event_counts)
     .map(([event, count]) => [event, count]);
   lines.push(renderTable(
@@ -336,6 +369,13 @@ function isRecognizedRecord(value) {
       return hasString(value, "reason");
     case "scenario_service_production_assembly_refused":
       return hasString(value, "surface") && hasString(value, "reason");
+    case "scenario_command_settled":
+      return hasString(value, "surface")
+        && hasNumber(value, "duration_ms")
+        && ["executed", "already_satisfied", "reconciled", "refused"].includes(
+          value.outcome,
+        )
+        && (value.outcome !== "refused" || hasString(value, "reason_code"));
     default:
       return FAMILY_GROWTH_EVENTS.has(value.event);
   }
@@ -391,6 +431,29 @@ function summarizeDurations(durations) {
     p50: percentile(sorted, 0.5),
     p95: percentile(sorted, 0.95),
     max: sorted.at(-1),
+  };
+}
+
+function summarizeCommandSettlements(outcomes) {
+  const executed = outcomes.get("executed") ?? 0;
+  const replayHits = outcomes.get("already_satisfied") ?? 0;
+  const reconcileCount = outcomes.get("reconciled") ?? 0;
+  const refused = outcomes.get("refused") ?? 0;
+  const settlementsTotal = executed + replayHits + reconcileCount + refused;
+  return {
+    settlements_total: settlementsTotal,
+    outcomes: {
+      executed,
+      already_satisfied: replayHits,
+      reconciled: reconcileCount,
+      refused,
+    },
+    replay_hits: replayHits,
+    reconcile_count: reconcileCount,
+    reconcile_or_replay_rate: rate(
+      replayHits + reconcileCount,
+      settlementsTotal,
+    ),
   };
 }
 

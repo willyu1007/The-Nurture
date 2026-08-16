@@ -20,7 +20,11 @@ import { createFamilyGrowthRenditionRuntime } from "../src/family-growth-runtime
 import { createDisabledFamilySharingPrivateRuntime } from "../src/family-sharing-private-runtime.js";
 import { HarnessRuntime } from "../src/harness-runtime.js";
 import { SafeExceptionFilter } from "../src/safe-exception.filter.js";
-import { ScenarioStructuredLogger } from "../src/structured-logger.js";
+import {
+  type ScenarioStructuredLogRecord,
+  type ScenarioStructuredLogSink,
+  ScenarioStructuredLogger,
+} from "../src/structured-logger.js";
 import {
   TeacherOrganizationOwnerComposition,
   type TeacherOrganizationAuthorityResolverV1,
@@ -85,7 +89,11 @@ describe("teacher organization-owner formal ingress", () => {
     const replayed = fixture("w7-admission-replayed-already-satisfied");
     const unknown = fixture("w7-supplement-outcome-unknown");
     const runtime = fixtureComposition([replayed, unknown]);
-    const application = await start(runtime.composition);
+    const records: ScenarioStructuredLogRecord[] = [];
+    const application = await start(
+      runtime.composition,
+      (record) => records.push(record),
+    );
     const replayResponse = await post(
       application,
       TEACHER_ORGANIZATION_OWNER_QUEUE_ADMISSION_PATH,
@@ -107,6 +115,24 @@ describe("teacher organization-owner formal ingress", () => {
       recovery: "reconcile_same_command",
       command_request_id: unknown.request.command_request_id,
     });
+    expect(
+      records.filter((record) => record.event === "scenario_command_settled"),
+    ).toEqual([
+      expect.objectContaining({
+        schema: "nurture_scenario_service_log_v1",
+        event: "scenario_command_settled",
+        surface: "teacher_organization_owner",
+        outcome: "already_satisfied",
+        duration_ms: expect.any(Number),
+      }),
+      expect.objectContaining({
+        schema: "nurture_scenario_service_log_v1",
+        event: "scenario_command_settled",
+        surface: "teacher_organization_owner",
+        outcome: "reconciled",
+        duration_ms: expect.any(Number),
+      }),
+    ]);
   });
 
   it("returns current fail-closed responses without calling owner ports", async () => {
@@ -280,9 +306,12 @@ describe("teacher organization-owner formal ingress", () => {
   });
 });
 
-async function start(composition?: TeacherOrganizationOwnerComposition) {
+async function start(
+  composition?: TeacherOrganizationOwnerComposition,
+  logSink: ScenarioStructuredLogSink = () => undefined,
+) {
   const auth = createBindingOwnerServiceAuth(TOKEN);
-  const logger = new ScenarioStructuredLogger(() => undefined);
+  const logger = new ScenarioStructuredLogger(logSink);
   const moduleRef = await Test.createTestingModule({
     imports: [
       AppModule.register({

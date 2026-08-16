@@ -16,6 +16,23 @@ export type ScenarioHttpMethod =
   | "OPTIONS"
   | "UNKNOWN";
 
+export type ScenarioCommandSurface =
+  | "harness"
+  | "teacher_release_owner"
+  | "parent_context_presenter"
+  | "parent_communication_owner"
+  | "parent_communication_extension"
+  | "teacher_organization_owner"
+  | "teacher_communication_owner"
+  | "teacher_media_association_owner"
+  | "teacher_assistant_query_owner";
+
+export type ScenarioCommandSettlementOutcome =
+  | "executed"
+  | "already_satisfied"
+  | "reconciled"
+  | "refused";
+
 export type ScenarioStructuredLogRecord =
   | Readonly<{
       schema: "nurture_scenario_service_log_v1";
@@ -53,6 +70,22 @@ export type ScenarioStructuredLogRecord =
       surface: string;
       reason: string;
     }>
+  | Readonly<
+      {
+        schema: "nurture_scenario_service_log_v1";
+        event: "scenario_command_settled";
+        surface: ScenarioCommandSurface;
+        duration_ms: number;
+      } & (
+        | {
+            outcome: Exclude<ScenarioCommandSettlementOutcome, "refused">;
+          }
+        | {
+            outcome: "refused";
+            reason_code: string;
+          }
+      )
+    >
   | Readonly<
       {
         schema: "nurture_scenario_service_log_v1";
@@ -120,6 +153,40 @@ export class ScenarioStructuredLogger {
       status_code: input.statusCode,
       reason_code: input.reasonCode,
     });
+  }
+
+  scenarioCommandSettled(
+    input: {
+      surface: ScenarioCommandSurface;
+      durationMs: number;
+    } & (
+      | {
+          outcome: Exclude<ScenarioCommandSettlementOutcome, "refused">;
+        }
+      | {
+          outcome: "refused";
+          reasonCode: string;
+        }
+    ),
+  ): void {
+    const common = {
+      schema: "nurture_scenario_service_log_v1" as const,
+      event: "scenario_command_settled" as const,
+      surface: input.surface,
+      duration_ms: input.durationMs,
+    };
+    this.sink(
+      input.outcome === "refused"
+        ? {
+            ...common,
+            outcome: input.outcome,
+            reason_code: input.reasonCode,
+          }
+        : {
+            ...common,
+            outcome: input.outcome,
+          },
+    );
   }
 
   /** T-009 I3b delivery-worker events; fields carry ids and counts only. */

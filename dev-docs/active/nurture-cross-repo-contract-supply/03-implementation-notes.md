@@ -1781,3 +1781,24 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
 - No frozen contract artifact, package manifest, lockfile, Prisma schema,
   migration, environment contract, gate, deployment or traffic setting
   changed.
+## 2026-08-17 — Command-ledger ramp observability closure
+
+- Reconfirmed the recorded gap before implementation: the provider logger had
+  no command settlement event, and no source emitted the ledger's exact replay
+  or same-command reconciliation outcomes.
+- Registered one application-wide command-response interceptor rather than
+  patching individual controllers. It covers every current generic-ledger HTTP
+  surface and emits `scenario_command_settled` with only surface, normalized
+  outcome and handler duration; deterministic refusals additionally carry the
+  existing safe reason code. No command, actor or owner identity is logged.
+- Normalized exact replay and already-satisfied business outcomes to
+  `already_satisfied`; normalized `outcome_unknown` plus
+  `reconcile_same_command` to the operational `reconciled` signal. The latter
+  is deliberately documented as a reconciliation request, not proof of later
+  convergence.
+- Extended the ramp summarizer with total and per-surface settlement counts,
+  replay hits, reconciliation count, combined reconcile/replay rate and
+  command-write-conflict refusals. Synthetic JSONL and the existing W7 replay
+  E2E lane now exercise the new evidence.
+- Changed no frozen contract artifact, schema, migration, environment value,
+  dependency, gate or default-off setting.

@@ -1,4 +1,5 @@
 import { type DynamicModule, Module } from "@nestjs/common";
+import { APP_INTERCEPTOR } from "@nestjs/core";
 import { BindingOwnerController } from "./binding-owner.controller.js";
 import {
   BINDING_OWNER_GUARD_CONFIG,
@@ -89,6 +90,7 @@ import {
 } from "./parent-communication-extension.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
+import { ScenarioCommandSettlementInterceptor } from "./scenario-command-settlement.interceptor.js";
 
 @Module({
   controllers: [
@@ -133,6 +135,12 @@ export class AppModule {
         {
           provide: ScenarioStructuredLogger,
           useValue: input.logger,
+        },
+        {
+          provide: APP_INTERCEPTOR,
+          useFactory: (logger: ScenarioStructuredLogger) =>
+            new ScenarioCommandSettlementInterceptor(logger),
+          inject: [ScenarioStructuredLogger],
         },
         SafeExceptionFilter,
         PrivateResponseExceptionFilter,

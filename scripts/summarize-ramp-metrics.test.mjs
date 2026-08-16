@@ -28,6 +28,16 @@ test("summarizes emitted provider fields and accounts for unparseable input", ()
       eventId: "outbox-2",
       signalIncrement: 1,
     }),
+    JSON.stringify(commandSettled("teacher_organization_owner", "executed")),
+    JSON.stringify(commandSettled(
+      "teacher_organization_owner",
+      "already_satisfied",
+    )),
+    JSON.stringify(commandSettled("teacher_organization_owner", "reconciled")),
+    JSON.stringify({
+      ...commandSettled("teacher_communication_owner", "refused"),
+      reason_code: "command_write_conflict",
+    }),
     JSON.stringify({
       schema: "nurture_scenario_service_log_v1",
       event: "scenario_service_production_assembly_refused",
@@ -47,11 +57,11 @@ test("summarizes emitted provider fields and accounts for unparseable input", ()
   const surface = "teacher_class_stream_class_context";
 
   assert.deepEqual(parsed.input, {
-    lines_total: 10,
+    lines_total: 14,
     blank_lines: 0,
     non_json_lines: 1,
     unknown_lines: 1,
-    recognized_records_total: 8,
+    recognized_records_total: 12,
   });
   assert.deepEqual(summary.refusals_by_surface[surface], {
     refusals_total: 2,
@@ -70,17 +80,48 @@ test("summarizes emitted provider fields and accounts for unparseable input", ()
     },
   });
   assert.deepEqual(summary.command_ledger_health, {
-    command_replay_or_already_satisfied_hits: {
-      status: "not_emitted_by_current_provider_logs",
-      count: null,
+    command_settlements: {
+      source: "scenario_command_settled.outcome",
+      settlements_total: 4,
+      outcomes: {
+        executed: 1,
+        already_satisfied: 1,
+        reconciled: 1,
+        refused: 1,
+      },
+      replay_hits: 1,
+      reconcile_count: 1,
+      reconcile_or_replay_rate: 0.5,
+      by_surface: {
+        teacher_communication_owner: {
+          settlements_total: 1,
+          outcomes: {
+            executed: 0,
+            already_satisfied: 0,
+            reconciled: 0,
+            refused: 1,
+          },
+          replay_hits: 0,
+          reconcile_count: 0,
+          reconcile_or_replay_rate: 0,
+        },
+        teacher_organization_owner: {
+          settlements_total: 3,
+          outcomes: {
+            executed: 1,
+            already_satisfied: 1,
+            reconciled: 1,
+            refused: 0,
+          },
+          replay_hits: 1,
+          reconcile_count: 1,
+          reconcile_or_replay_rate: 0.666667,
+        },
+      },
     },
     command_write_conflict_refusals: {
-      source: "request_refused.reason_code",
-      count: 0,
-    },
-    command_reconcile_events: {
-      status: "not_emitted_by_current_provider_logs",
-      count: null,
+      source: "scenario_command_settled.reason_code",
+      count: 1,
     },
     family_growth_delivery: {
       event_counts: {
@@ -108,7 +149,10 @@ test("summarizes emitted provider fields and accounts for unparseable input", ()
     },
     unhandled_exceptions_by_surface: {},
   });
-  assert.match(formatHumanSummary(summary), /Command reconciliation: not_emitted_by_current_provider_logs/);
+  assert.match(
+    formatHumanSummary(summary),
+    /reconcile\/replay rate: 50\.0%/,
+  );
   assert.doesNotMatch(JSON.stringify(summary), /request-1|request-2|outbox-1|outbox-2/);
 });
 
@@ -150,5 +194,15 @@ function requestRefused(requestId, reasonCode) {
     route_class: "teacher_class_stream_class_context",
     status_code: reasonCode === "request_timeout" ? 408 : 503,
     reason_code: reasonCode,
+  };
+}
+
+function commandSettled(surface, outcome) {
+  return {
+    schema: "nurture_scenario_service_log_v1",
+    event: "scenario_command_settled",
+    surface,
+    outcome,
+    duration_ms: 7,
   };
 }

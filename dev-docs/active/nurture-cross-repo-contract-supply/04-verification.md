@@ -1648,3 +1648,25 @@ ZERO_SCHEMA_DRIFT / DEFAULT_OFF / NO_DEPLOYMENT_OR_TRAFFIC`.
 Verdict: `RESPONSE_VALIDATOR_CORE_PASS / NINE_SURFACES_70_OF_70 /
 UNIT_1144 / BUILD_PASS / DIGESTS_BYTE_IDENTICAL /
 FULL_E2E_LISTENER_BLOCKED_168_PASS_40_EPERM_1_SKIP`.
+
+## 2026-08-17 — Command-ledger ramp observability
+
+- Premise guard passed: `deploy/scenario-service/observability.md` recorded the
+  metric as non-derivable, `structured-logger.ts` had no settlement event, and
+  repository grep found no existing `scenario_command_settled` emission.
+- Root `pnpm typecheck` passed in a disposable checkout with the exact pinned
+  My-Chat sibling. The normal worktree-relative command could not resolve its
+  hard-coded `../My-Chat` path; Prisma's cache was redirected to writable
+  temporary storage for the sandbox only. No repository configuration changed.
+- Full unit lane passed: 105 files / 1,144 tests.
+- `pnpm build:scenario-service` passed, including scenario and DB runtime
+  dependency builds.
+- Full scenario-service lane was executed: 20 files / 168 tests passed and one
+  was skipped; seven legacy TCP-listener files (40 tests) were blocked only by
+  sandbox `listen EPERM 127.0.0.1`. The changed listener-free W7 route lane
+  passed independently at 1 file / 7 tests, including exact replay and
+  same-command reconciliation log assertions.
+- Summarizer test passed 2/2; test-routing assertion passed all 211 files (unit
+  105, production DB 60, legacy host 11, scenario service 30, x5 joint 5).
+- Repository documentation lint passed 714/714 Markdown files with zero errors
+  or warnings.
