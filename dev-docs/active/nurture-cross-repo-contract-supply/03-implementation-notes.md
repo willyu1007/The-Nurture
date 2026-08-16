@@ -1692,3 +1692,50 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   provider gates remain false.
 - Added no schema, migration, contract, environment value, deployment,
   activation, public API or Mobile business rendering.
+
+## 2026-08-16 — Deep quality review round (both repos)
+
+- Two independent reviewers swept both repos with quality and cleanup
+  lenses. Cleanup came back nearly empty on both sides (no stray
+  artifacts, no unused dependencies here; My-Chat's only dead weight was
+  an unused i18next dependency, three consumer-less exports and an empty
+  directory) — the debt is duplication accumulated as the nine surfaces
+  landed one at a time, not rot.
+- Landed in this repo (`6c56329`): startup errors are no longer
+  discarded by `bootstrap().catch` (reason field added); the
+  family-growth delivery worker reuses the production assembly's Prisma
+  client instead of opening a second pool (worker stops before the
+  shared client disconnects); the worker log adapter's event cast and
+  silent field filter are gone; the reseal script distinguishes a
+  genuinely stale My-Chat adoption lock from an infrastructure failure;
+  a single-use accessor was inlined; the W11 ledger spec override
+  drops its undefined-assignment double cast; four `as never` casts are
+  replaced by real enum unions (no mismatch surfaced); sixteen forked
+  `asJson` helpers collapse into one shared cast helper with the cloning
+  variants renamed (`asClonedJson`/`clonedJson`).
+- Landed in My-Chat (`463980a`): the fourth `positiveInt` copy regained
+  the 30-second ceiling; the nurture-bff duplicate trios collapsed; the
+  client factory gained a focused test; parent-context ramped telemetry
+  with reason-coded access resolution; the pfcv1 confirmation prefix is
+  now verified; unreachable type branch/clause removed; shared date
+  validation; teaser-dismiss dedup; i18next dropped.
+- Reseal tooling: `verify-workflow-contract-pin.mjs` now honors
+  `RESEAL_MY_CHAT_ROOT` like its two sibling verifiers; the lock step
+  can run from a clean temporary worktree when the shared checkout
+  carries another session's work-in-progress.
+- Dispositions decided this round: the knowledge-rag contract pin
+  (`docs/project/integrations/my-chat-knowledge-rag-contract.json`) is
+  retained as archival G4-0F freeze evidence and deliberately NOT wired
+  into CI — its pinned paths have legitimately evolved, CI's depth-1
+  checkout cannot resolve the old revision, and live consumption is
+  already gated by the workflow pin plus the owner-adoption lock.
+  `family-sharing-private-composition.ts` stays as intentionally
+  unwired C3 groundwork.
+- Deferred consolidation backlog (each its own batch with e2e
+  bracketing, not this round): the nine identical runtime factories and
+  the nine 68%-identical response validators; the eight
+  dead-in-production serviceAuth fallbacks in `app.module.ts`; 42
+  `isRecord` copies and the inconsistent `violation()` idiom;
+  presenter/owner naming drift (wire strings stay frozen). My-Chat
+  side: fifteen `safeJson` controller copies; the injectable clock and
+  `onCallSettled` hook missing from some dormant clients.
