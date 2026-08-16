@@ -5,7 +5,7 @@
       "name": "frontend",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@the-nurture/frontend", "dev"],
-      "port": 3000
+      "port": 3201
     }
   ]
 }
