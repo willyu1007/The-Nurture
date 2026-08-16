@@ -1739,3 +1739,27 @@ audit) ran after the schedule closed; every confirmed finding is repaired:
   presenter/owner naming drift (wire strings stay frozen). My-Chat
   side: fifteen `safeJson` controller copies; the injectable clock and
   `onCallSettled` hook missing from some dormant clients.
+
+## 2026-08-17 — Wave 2 provider-side round: one landing, one no-op
+
+- G7 landed (`01cca33`): `scripts/summarize-ramp-metrics.mjs` + test +
+  `deploy/scenario-service/observability.md`, grounded in the fields the
+  structured logger actually emits. Two of the three wave-gate metrics
+  (reason-code distribution, timeout/latency) are now derivable from a
+  log window; the command-ledger `already_satisfied` /
+  `reconcile_same_command` outcomes are NOT logged today, so the Wave 3
+  reconcile/replay metric is recorded as a rehearsal-prep gap instead of
+  being reported as zero.
+- The W2-ports work item dispatched this round was verified stale on
+  arrival, twice: `e94488f` had already landed the real parent-context
+  Prisma repository, composition, production wiring, migration and
+  integration test, and the W4.1 increment had already qualified the
+  bounded director owner against the frozen
+  `w4-director-ports-feasibility` conclusions in
+  `w4-director-prisma-source-freeze.md`. The dispatched agent honestly
+  reported the stale premise; its only code change (a factory rename with
+  a compatibility alias) was rejected at review as churn, and its
+  reconnaissance file duplicated the existing source-freeze matrix
+  operation-for-operation, so nothing from that branch landed. Full
+  verification still ran green on the branch (unit 1144, e2e 209,
+  production-DB 506) before discard.
