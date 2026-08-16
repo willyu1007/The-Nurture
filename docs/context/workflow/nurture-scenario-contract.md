@@ -425,6 +425,12 @@ Nurture Child/Process/Family, or promote roster prefill into any profile.
 Roster/intent rows contain no platform id, anchor, stewardship, membership, or
 scenario-binding candidate. Any future parent-authorized institutional
 `ChildCreationAuthorization` path is a separately versioned, non-Pilot feature.
+Its current T-028 contract is create-only: My-Chat may create one platform Child
+inside an existing parent-owned Family after an opaque request and exact
+parent/steward authorization, but the institution receives no Family
+membership, stewardship, scenario binding, Nurture anchor/association, local
+Child/Profile, Enrollment, Role, or Grant. Nurture adopts no positive runtime
+path until that owner source is independently implemented and qualified.
 
 Platform stewardship, Family membership, Child/Family binding, and anchor
 association are necessary routing facts but never sufficient Nurture authority.

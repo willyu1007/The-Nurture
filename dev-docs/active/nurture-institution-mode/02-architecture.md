@@ -39,8 +39,10 @@ My-Chat authenticated Workspace/User/Actor principal
 
 My-Chat 独占 canonical identity。只有 Parent/steward 或其明确授权成人可创建
 platform Child；Institution Admin、Caregiver 和 Nurture 不能 mint、推断或通过 PII
-匹配。无 authority 时只能保留 provisional local record，不得创建 global identity
-或 anchor candidate。Child/Family anchor namespace 分离，body-free、PII-free、
+匹配。当前 Pilot 无 authority 时只能保留 body-free RosterEntry/Enrollment
+Invitation intent，不得创建 local Child/Profile、global identity 或 anchor
+candidate；未来 provisional local record 需要独立版本化契约。Child/Family anchor
+namespace 分离，body-free、PII-free、
 authority-free，只能存在于 owner ref、Nurture persistence 和短生命周期 private
 envelope；不得进入 client、Chat、Notification、Handoff、logs、search 或 evidence。
 `reserved | bound_empty | associated | retired` 是正常 lifecycle；

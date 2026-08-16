@@ -10,7 +10,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-08-12
+- Last updated: 2026-08-16
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
   `C30-I0-A/B/C/D` gates remain complete. Artifact 50 reaccepts C30-I1-F after
   the successor repair closes all four artifact-49 findings. Artifact 48 remains
@@ -2111,3 +2111,12 @@ the rejected checkpoint and are historical.
 | I1-A exact scope | PASS | Three named neutral wire types, closed envelope-owned fields, delegated operation input, 60-second bound, exact canonical refs and schema/codec parity acceptance are frozen in artifact 15. |
 | Downstream isolation | PASS | I1-B..F remain ordered and unstarted; C30-I2/I3/I4 remain NO-GO. |
 | Effect boundary | PASS | Planning/docs only; no Base/My-Chat/Nurture application source, schema, runtime, manifest, package, database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
+## 2026-08-16 — T-028 institutional creation semantic alignment
+
+| Check | Result |
+| --- | --- |
+| Current Pilot intake | PASS — Institution intake remains RosterEntry/Enrollment Invitation only; no provisional local Child/Profile path is implied. |
+| T-028 scope | PASS — parent-authorized institutional creation is non-Pilot and create-only; no Family creation, scenario binding, Nurture association, Role, Enrollment, or Grant follows from it. |
+| Ownership | PASS — My-Chat owns the protected Child/Family authorization; Nurture remains the sole owner of local care facts and permissions. |
+| Runtime effect | NONE — documentation alignment only; no schema, migration, source, capability, activation, deployment, or traffic change. |

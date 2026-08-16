@@ -3,7 +3,7 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-08-12
+- Last updated: 2026-08-16
 
 ## Next concrete actions
 
@@ -2201,3 +2201,16 @@ human-judged step.
   disposable pgvector PG 上 4/4 通过,含 revoke 路径;production-db 86/86;
   详见 `../../archive/nurture-family-care-conversation/04-verification.md`。无 schema
   变更、无持久化 apply、无激活或流量效果。
+
+## 2026-08-16 — T-028 institutional creation semantic alignment
+
+- Clarified the current Pilot single track: without parent/steward authority an
+  Institution may retain only the body-free RosterEntry and Enrollment
+  Invitation intent. It cannot create a local Child/Profile or platform
+  identity.
+- Recorded My-Chat T-028 institutional creation as a separate non-Pilot,
+  create-only source. It grants no platform or Nurture continuing authority and
+  produces no Nurture object before a later independently authorized binding and
+  local-association operation.
+- No Nurture schema, source, runtime, migration, capability, activation, or
+  traffic state changed.

@@ -58,7 +58,9 @@ T-002 对 G1 的责任只覆盖六 surface 实际消费的 owner/source path，�
    - My-Chat 提供 authenticated Workspace/User/Actor principal，并独占 canonical
      Child/Family、stewardship/membership 和 scenario binding。
    - Parent/steward 或其明确授权成人之外的 actor 不得创建、推断或通过 PII 匹配
-     platform Child。无 authority 时 Nurture 只能保留 provisional local record。
+     platform Child。当前 Pilot 无 authority 时只能保留 body-free
+     `RosterEntry`/Enrollment Invitation intent，不得创建 local Child/Profile；未来
+     provisional local record 必须有独立版本化产品契约，不能被当前路径推断。
    - Nurture Child/Family anchors 使用独立 namespace，body-free、PII-free、
      authority-free；仅存在于 owner ref、Nurture persistence 和短生命周期 private
      envelope。不得进入 client、Chat、Notification、Handoff、logs、search 或 evidence。
