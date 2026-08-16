@@ -16,10 +16,9 @@ import {
   type BoardPrisma,
 } from "./board-read-support.js";
 import { appendFamilyGrowthOutboxEventWithin } from "./family-growth-outbox.transaction.js";
+import { asJson } from "./prisma-json.js";
 
 type DomainContextRef = CanonicalRef;
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 const domainRef = (objectType: string, objectId: string, version = 1): DomainContextRef => ({
   schema_version: 1,
@@ -92,7 +91,7 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
     participant_id: string;
     updates: Array<{
       publication_id: string;
-      from_visibility: string[];
+      from_visibility: Array<"visible" | "removed" | "redacted">;
       to_visibility: "removed" | "redacted";
     }>;
   }): Promise<{ updated_publication_ids: string[] }> {
@@ -105,7 +104,7 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
         where: {
           id: update.publication_id,
           workspaceId: input.workspace_id,
-          visibility: { in: update.from_visibility as never },
+          visibility: { in: update.from_visibility },
         },
         data: { visibility: update.to_visibility },
       });

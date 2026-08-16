@@ -11,8 +11,7 @@ import {
   type NurtureInstitutionKnowledgeConflictReviewCandidateV1,
   type NurtureInstitutionKnowledgeExactSourceTupleV1,
 } from "@the-nurture/scenario";
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
+import { asJson } from "./prisma-json.js";
 
 const toCandidate = (
   row: PrismaConflictCandidate,

@@ -890,10 +890,16 @@ export const createTeacherCommunicationOwnerService = (
     if (!target) return masked(request.context_ref, "access_changed");
     const participantId = membership.context.participant_id;
     const actorBinding = actorBindingOf(request.workspace_id, participantId);
-    const spec = createCancelPublishProcessSpec({
+    const specWithOptionalHeads: NurtureCommandSpec<CancelPublishProcessCommandV1> & {
+      expectedHeads?: unknown;
+      head_keys?: unknown;
+    } = createCancelPublishProcessSpec({
       integrity_key: deps.integrityKey,
       now,
     });
+    const { expectedHeads, head_keys, ...spec } = specWithOptionalHeads;
+    void expectedHeads;
+    void head_keys;
     const result = await deps.commands.execute({
       workspace_id: request.workspace_id,
       invocation_request_id: request.host_request_id,
@@ -915,11 +921,9 @@ export const createTeacherCommunicationOwnerService = (
           ).process_key,
           actor_binding_ref: actorBinding,
         }),
-        expectedHeads: undefined,
-        head_keys: undefined,
-      } as unknown as NurtureCommandSpec<CancelPublishProcessCommandV1>,
-      // The cancel rule itself re-reads live process state; the volatile
-      // aggregate head is not a precondition this exchange freezes.
+      },
+      // The kernel treats absent head helpers like undefined ones. The cancel
+      // rule re-reads live process state, so this exchange omits those helpers.
     });
     if (result.status === "outcome_unknown") {
       return outcomeUnknown(request.context_ref, request.command_request_id);

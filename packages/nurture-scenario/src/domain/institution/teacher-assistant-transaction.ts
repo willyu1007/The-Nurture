@@ -44,7 +44,7 @@ export type NurtureTeacherAssistantTransaction = {
     week_start: string;
     week_end: string;
     safety: {
-      route: string;
+      route: "ordinary" | "review_required" | "direct_interaction_required";
       policy_ref: string;
       policy_head: number;
       rule_revision: string;

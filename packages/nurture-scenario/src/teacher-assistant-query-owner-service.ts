@@ -657,8 +657,6 @@ export const createTeacherAssistantQueryOwnerService = (
       const committedAt = now().toISOString();
 
       let facts: NurtureWeeklyDraftFacts | undefined;
-      const stateOf = (existing: { state: "draft" | "needs_review" }) =>
-        existing.state;
       const spec: NurtureCommandSpec<Record<string, unknown>> = {
         command_key: "teacher_assistant_weekly_draft",
         command_scope: "teacher_assistant_query",
@@ -696,7 +694,7 @@ export const createTeacherAssistantQueryOwnerService = (
               committed_result: {
                 schema_version: 1,
                 process_id: loaded.existing.process_id,
-                state: stateOf(loaded.existing),
+                state: loaded.existing.state,
                 week_start: window.week_start,
               },
             };

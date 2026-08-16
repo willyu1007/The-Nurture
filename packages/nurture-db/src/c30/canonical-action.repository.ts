@@ -142,17 +142,17 @@ implements NurtureC30ActionExecutionRepository {
           businessActorRef: participantRef,
           actorPrincipalBindingId: participantBindingId,
           actorBindingVersion: command.current_participant.binding_revision,
-          actorAccountRef: json(command.principal.account_ref),
-          actorRef: json(command.principal.actor_ref),
-          actorWorkspaceRef: json(command.principal.workspace_ref),
+          actorAccountRef: clonedJson(command.principal.account_ref),
+          actorRef: clonedJson(command.principal.actor_ref),
+          actorWorkspaceRef: clonedJson(command.principal.workspace_ref),
           ...(command.current_participant.represented_organization_ref
             ? {
-                actorRepresentedOrganizationRef: json(
+                actorRepresentedOrganizationRef: clonedJson(
                   command.current_participant.represented_organization_ref,
                 ),
               }
             : {}),
-          invocationProvenance: json({
+          invocationProvenance: clonedJson({
             provenance_version: 1,
             principal_origin: command.principal.principal_origin,
             principal_provenance_hash: command.invocation_evidence.principal_provenance_hash,
@@ -162,14 +162,14 @@ implements NurtureC30ActionExecutionRepository {
           scenarioKey: "nurture",
           scenarioEffectIdentityHash: effectIdentityHash,
           executionDriver: command.definition.contract.driver,
-          primaryScopeRef: json(command.current_target.primary_scope_ref),
+          primaryScopeRef: clonedJson(command.current_target.primary_scope_ref),
           childCareProcessId: command.current_target.child_care_process_ref?.object_id,
-          targetRefs: json([command.current_target.primary_scope_ref]),
+          targetRefs: clonedJson([command.current_target.primary_scope_ref]),
           businessOutcome: effect.businessOutcome,
-          outputRefs: json(effect.outputRefs),
-          handoffRequestSnapshotsPayload: json(command.handoff_request_snapshots),
+          outputRefs: clonedJson(effect.outputRefs),
+          handoffRequestSnapshotsPayload: clonedJson(command.handoff_request_snapshots),
           resultSchemaVersion: 1,
-          committedResultPayload: json({
+          committedResultPayload: clonedJson({
             result_version: 1,
             body: "no_body",
             effect_identity_hash: effectIdentityHash,
@@ -207,8 +207,8 @@ implements NurtureC30ActionExecutionRepository {
           state: "committed",
           commandExecutionId: command.execution_id,
           businessOutcome: effect.businessOutcome,
-          outputRefs: json(effect.outputRefs),
-          handoffRequestSnapshots: json(command.handoff_request_snapshots),
+          outputRefs: clonedJson(effect.outputRefs),
+          handoffRequestSnapshots: clonedJson(command.handoff_request_snapshots),
           commitEvidenceHash,
           committedAt: now,
         },
@@ -333,13 +333,13 @@ implements NurtureC30ActionExecutionRepository {
             command.current_participant.represented_organization_ref?.object_id,
           targetRefHash: hashCanonical(command.current_target.target_ref),
           targetVersion: command.current_target.current_version,
-          primaryScopeRef: json(command.current_target.primary_scope_ref),
+          primaryScopeRef: clonedJson(command.current_target.primary_scope_ref),
           childCareProcessId: command.current_target.child_care_process_ref?.object_id,
           submitContextRef: identity.driver === "scenario_direct_empty_v1"
-            ? json(identity.submit_context_ref)
+            ? clonedJson(identity.submit_context_ref)
             : undefined,
           originalWorkflowStepRef: identity.driver === "workflow_claimed_step_v1"
-            ? json(identity.original_workflow_step_ref)
+            ? clonedJson(identity.original_workflow_step_ref)
             : undefined,
           actionContractHash: command.prepared.action_contract_hash,
           authorityEvidenceHash: authority.authorityEvidenceHash,
@@ -535,7 +535,7 @@ function assertOpenDeadline(deadline: Date, now: Date): void {
   ) throw actionError("action_conflict", "The action effect deadline is not current.");
 }
 
-function json(value: unknown): Prisma.InputJsonValue {
+function clonedJson(value: unknown): Prisma.InputJsonValue {
   return structuredClone(value) as Prisma.InputJsonValue;
 }
 

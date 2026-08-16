@@ -13,11 +13,10 @@ import {
   type NurtureInstitutionKnowledgeTransaction,
 } from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import { asJson } from "./prisma-json.js";
 
 const MAX_REVISIONS = 1_000;
 const MAX_EVENTS = 4_000;
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 type ItemRow = {
   id: string;

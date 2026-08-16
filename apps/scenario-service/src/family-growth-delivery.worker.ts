@@ -12,6 +12,7 @@ import type {
   FamilyGrowthTransportFailureRecordResultV1,
 } from "@the-nurture/db";
 import type { FamilyGrowthDeliveryConfig } from "./family-growth-runtime.js";
+import type { ScenarioStructuredLogger } from "./structured-logger.js";
 
 /**
  * T-009 I3b delivery worker (wire half), bound by
@@ -41,10 +42,7 @@ export type FamilyGrowthDeliveryOutboxPort = {
   }): Promise<FamilyGrowthTransportFailureRecordResultV1>;
 };
 
-export type FamilyGrowthDeliveryLog = (
-  event: string,
-  fields: Record<string, unknown>,
-) => void;
+export type FamilyGrowthDeliveryLog = ScenarioStructuredLogger["familyGrowthDelivery"];
 
 export type FamilyGrowthTransport = (
   envelope: unknown,

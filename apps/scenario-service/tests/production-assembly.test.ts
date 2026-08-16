@@ -115,6 +115,7 @@ describe("scenario-service production assembly", () => {
     });
 
     expect(assembly.bindings).toEqual({});
+    expect(assembly.prisma).toBeUndefined();
     expect(fixture.createPrisma).not.toHaveBeenCalled();
     expect(fixture.bindingFactories).toSatisfy(
       (factories: readonly ReturnType<typeof vi.fn>[]) =>
@@ -138,6 +139,7 @@ describe("scenario-service production assembly", () => {
 
       expect(fixture.createPrisma).toHaveBeenCalledOnce();
       expect(fixture.createPrisma).toHaveBeenCalledWith(DATABASE_URL);
+      expect(assembly.prisma).toBe(fixture.prisma);
       expect(fixture.dependencies[factory]).toHaveBeenCalledOnce();
       expect(binding in assembly.bindings).toBe(true);
       expect(fixture.bindingFactories).toSatisfy(
@@ -242,6 +244,7 @@ describe("scenario-service production assembly", () => {
     });
 
     expect(fixture.createPrisma).toHaveBeenCalledOnce();
+    expect(assembly.prisma).toBe(fixture.prisma);
     expect(fixture.bindingPrisma).toEqual(Array(9).fill(fixture.prisma));
 
     await assembly.disconnect();

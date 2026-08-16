@@ -28,9 +28,6 @@ async function bootstrap(): Promise<void> {
       ...productionAssembly.bindings,
     });
     app.enableShutdownHooks();
-    app.getHttpServer().once("close", () => {
-      void productionAssembly.disconnect();
-    });
     await app.listen(config.port, "0.0.0.0");
     logger.serviceStarted({
       appEnv: config.appEnv,
@@ -42,38 +39,35 @@ async function bootstrap(): Promise<void> {
     // are configured (family_growth_transport@1.0.0 §1 — absence = off).
     const deliveryConfig = loadFamilyGrowthDeliveryConfig();
     if (deliveryConfig) {
-      const prisma = createPrismaClient();
+      const prisma = productionAssembly.prisma ?? createPrismaClient();
+      const workerOwnsPrisma = productionAssembly.prisma === undefined;
       const worker = new FamilyGrowthDeliveryWorker({
         outbox: new PrismaFamilyGrowthOutboxPort(prisma),
         transport: createFamilyGrowthHttpTransport({ config: deliveryConfig }),
         log: (event, fields) =>
-          logger.familyGrowthDelivery(
-            event as Parameters<typeof logger.familyGrowthDelivery>[0],
-            Object.fromEntries(
-              Object.entries(fields).filter(
-                (entry): entry is [string, string | number] =>
-                  typeof entry[1] === "string" || typeof entry[1] === "number",
-              ),
-            ),
-          ),
+          logger.familyGrowthDelivery(event, fields),
       });
       worker.start();
       app.getHttpServer().once("close", () => {
         worker.stop();
-        void prisma.$disconnect();
+        if (workerOwnsPrisma) void prisma.$disconnect();
       });
     }
+    app.getHttpServer().once("close", () => {
+      void productionAssembly.disconnect();
+    });
   } catch (error) {
     await productionAssembly.disconnect();
     throw error;
   }
 }
 
-bootstrap().catch(() => {
+bootstrap().catch((error: unknown) => {
   process.stderr.write(
     `${JSON.stringify({
       schema: "nurture_scenario_service_log_v1",
       event: "scenario_service_startup_failed",
+      reason: error instanceof Error ? error.message : String(error),
     })}\n`,
   );
   process.exitCode = 1;

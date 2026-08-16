@@ -46,10 +46,9 @@ import type {
   ParentCommunicationSendFactsV1,
 } from "@the-nurture/scenario/harness";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
+import { asJson } from "./prisma-json.js";
 
 type DomainContextRef = CanonicalRef;
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 const domainRef = (objectType: string, objectId: string, version = 1): DomainContextRef => ({
   schema_version: 1,

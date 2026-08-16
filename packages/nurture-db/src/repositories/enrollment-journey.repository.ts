@@ -22,6 +22,7 @@ import {
 } from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
 import { hasPrismaErrorCode } from "./prisma-error.js";
+import { asJson } from "./prisma-json.js";
 
 type EnrollmentJourneyPrisma = PrismaClient | Prisma.TransactionClient;
 type ResolvedAuthority = Extract<
@@ -33,9 +34,6 @@ type WorkflowCarrier = NurtureInstitutionWorkflow & {
   inquiry: { id: string; lastTouchpointAt: Date } | null;
   _count: { touchpoints: number };
 };
-
-const asJson = (value: unknown): Prisma.InputJsonValue =>
-  value as Prisma.InputJsonValue;
 
 const denied = (): NurtureEnrollmentJourneyMutationResult => ({
   status: "denied",

@@ -16,6 +16,7 @@ import {
 } from "./institution-core.repositories.js";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
 import { PrismaFamilyCareQueryRepository } from "./family-care-query.repository.js";
+import { asJson } from "./prisma-json.js";
 import { PrismaUserAttentionRepository } from "./user-attention.repository.js";
 
 type DomainContextRef = CanonicalRef;
@@ -86,9 +87,6 @@ const toProject = (row: PrismaProjectRow): NurtureWorkflowProject => ({
   risk_level: row.riskLevel ?? undefined,
   aggregate_version: row.aggregateVersion,
 });
-
-const asJson = (value: unknown): Prisma.InputJsonValue =>
-  value as unknown as Prisma.InputJsonValue;
 
 // ---- NurtureProfileRepository ----
 

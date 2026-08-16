@@ -55,7 +55,7 @@ export type NurturePublicationSafetyTransaction = {
     participant_id: string;
     updates: Array<{
       publication_id: string;
-      from_visibility: string[];
+      from_visibility: Array<"visible" | "removed" | "redacted">;
       to_visibility: "removed" | "redacted";
     }>;
   }): Promise<{ updated_publication_ids: string[] }>;

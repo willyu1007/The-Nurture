@@ -321,8 +321,8 @@ implements NurtureC30ProtectedContentRepository {
         protectedContentRef: command.prepared_content.protected_content_ref,
         contentKind: command.contract.content_kind,
         protectedFieldKey: command.contract.protected_field_key,
-        owningActionRef: json(command.owning_action_ref),
-        aggregateRef: json(command.aggregate_ref),
+        owningActionRef: clonedJson(command.owning_action_ref),
+        aggregateRef: clonedJson(command.aggregate_ref),
         creatorParticipantId: command.current_participant.participant_ref.object_id,
         creatorParticipantBindingId: participantBindingId,
         creatorAccountObjectId: command.principal.account_ref.object_id,
@@ -1140,7 +1140,7 @@ function principalBindingRef(bindingId: string): string {
   return `nurture:participant_principal_binding:${bindingId}`;
 }
 
-function json(value: unknown): Prisma.InputJsonValue {
+function clonedJson(value: unknown): Prisma.InputJsonValue {
   return structuredClone(value) as Prisma.InputJsonValue;
 }
 

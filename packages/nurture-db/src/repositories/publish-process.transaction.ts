@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import type { Prisma } from "@prisma/client";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   NurturePublishDraftContent,
@@ -18,11 +17,10 @@ import {
   type CaregiverReachV1,
 } from "./board-read-support.js";
 import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
+import { asJson } from "./prisma-json.js";
 import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
 
 type DomainContextRef = CanonicalRef;
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 /**
  * The revision-level identity of one draft save. It backs

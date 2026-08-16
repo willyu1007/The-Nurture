@@ -9,11 +9,10 @@ import type {
 } from "@the-nurture/scenario";
 import { TEACHER_ASSISTANT_CARE_KINDS } from "@the-nurture/scenario";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
+import { asJson } from "./prisma-json.js";
 import { publishDraftCommandIdentity } from "./publish-process.transaction.js";
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 const utcDayWindow = (localDate: string) => {
   const start = new Date(`${localDate}T00:00:00.000Z`);
@@ -406,7 +405,7 @@ implements NurtureTeacherAssistantTransaction {
     week_start: string;
     week_end: string;
     safety: {
-      route: string;
+      route: "ordinary" | "review_required" | "direct_interaction_required";
       policy_ref: string;
       policy_head: number;
       rule_revision: string;
@@ -476,7 +475,7 @@ implements NurtureTeacherAssistantTransaction {
         publishProcessId: process.id,
         careGroupId: input.care_group_id,
         organizerInputRevision: input.organizer_input_revision,
-        route: input.safety.route as never,
+        route: input.safety.route,
         policyRef: input.safety.policy_ref,
         policyHead: input.safety.policy_head,
         ruleRevision: input.safety.rule_revision,

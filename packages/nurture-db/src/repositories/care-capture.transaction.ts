@@ -1,4 +1,3 @@
-import type { Prisma } from "@prisma/client";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import {
   type NurtureCareCaptureTransaction,
@@ -10,11 +9,10 @@ import {
 } from "@the-nurture/scenario/harness";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
 import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
+import { asJson } from "./prisma-json.js";
 import { publishDraftCommandIdentity } from "./publish-process.transaction.js";
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 const domainRef = (objectType: string, objectId: string, version: number): CanonicalRef => ({
   schema_version: 1,
@@ -279,7 +277,7 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
           captureBatchId: input.batch_id,
           processKey: input.process.process_key,
           state: input.process.state,
-          dataClass: input.process.data_class as never,
+          dataClass: input.process.data_class,
           purposeKey: input.process.purpose_key,
           authorizingRoleAssignmentId: input.process.authorizing_role_assignment_id,
         },
@@ -334,7 +332,7 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
         ...(processId ? { publishProcessId: processId } : {}),
         careGroupId,
         organizerInputRevision: input.organizer_input_revision,
-        route: input.safety.route as never,
+        route: input.safety.route,
         policyRef: input.safety.policy_ref,
         policyHead: input.safety.policy_head,
         ruleRevision: input.safety.rule_revision,

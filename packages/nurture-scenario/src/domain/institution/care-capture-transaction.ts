@@ -100,7 +100,7 @@ export type NurtureOrganizeCutApplyInput = {
    * still be addressable — the assessment anchors on the CareGroup.
    */
   safety: {
-    route: string;
+    route: "ordinary" | "review_required" | "direct_interaction_required";
     policy_ref: string;
     policy_head: number;
     rule_revision: string;
@@ -114,7 +114,7 @@ export type NurtureOrganizeCutApplyInput = {
   process?: {
     process_key: string;
     state: "draft" | "needs_review";
-    data_class: string;
+    data_class: "daily_care_log" | "child_growth_record";
     purpose_key: string;
     content_digest: string;
     title_envelope: unknown;

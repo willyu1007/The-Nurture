@@ -30,6 +30,7 @@ import {
   hasPrismaErrorCode,
   isPrismaSerializationAbort,
 } from "./prisma-error.js";
+import { asJson } from "./prisma-json.js";
 
 type WaitlistPrisma = PrismaClient | Prisma.TransactionClient;
 
@@ -68,9 +69,6 @@ type AuthorizationResult =
   | { status: "denied" | "unavailable"; reason_code: string };
 
 const MAX_ADMIN_WAITLIST_ENTRIES = 500;
-
-const asJson = (value: unknown): Prisma.InputJsonValue =>
-  value as Prisma.InputJsonValue;
 
 const canonicalRefEqual = (left: Prisma.JsonValue, right: unknown): boolean => {
   if (!right || typeof right !== "object") return false;

@@ -42,8 +42,8 @@ import { isPrismaWriteConflict } from "./prisma-error.js";
 import { nurtureCommandAdvisoryKey } from "./nurture-command-advisory-key.js";
 import { PrismaNurtureWorkflowRunSettlementTransaction } from "./workflow-run-settlement.repository.js";
 import { PrismaParentContextPresenterTransaction } from "./parent-context-presenter.repository.js";
+import { asJson } from "./prisma-json.js";
 
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
 
 const toProject = (row: PrismaWorkflowProject): NurtureWorkflowProject => ({

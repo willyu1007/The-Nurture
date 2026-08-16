@@ -12,11 +12,9 @@ import {
 } from "@the-nurture/scenario/harness";
 import { PrismaClassSchedulePlacementRepository } from "./class-schedule-placement.repository.js";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import { asJson } from "./prisma-json.js";
 
 const MAX_COMPLETE_CHAIN = 1_000;
-
-const asJson = (value: NurtureContentRevisionValueV1): Prisma.InputJsonValue =>
-  value as Prisma.InputJsonValue;
 
 const subjectRef = (
   kind: "care_capture" | "media_asset_ref" | "activity_placement",

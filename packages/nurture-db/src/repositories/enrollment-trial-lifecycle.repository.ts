@@ -27,6 +27,7 @@ import {
   hasPrismaErrorCode,
   isPrismaSerializationAbort,
 } from "./prisma-error.js";
+import { asJson } from "./prisma-json.js";
 
 type TrialPrisma = PrismaClient | Prisma.TransactionClient;
 
@@ -36,9 +37,6 @@ type Loaded = {
   enrollment?: NurtureEnrollment;
   grant?: NurtureChildLinkGrant;
 };
-
-const asJson = (value: unknown): Prisma.InputJsonValue =>
-  value as Prisma.InputJsonValue;
 
 const toSnapshot = (
   row: NurtureInstitutionWorkflow,

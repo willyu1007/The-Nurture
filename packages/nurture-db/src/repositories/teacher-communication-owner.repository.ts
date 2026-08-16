@@ -1,4 +1,3 @@
-import type { Prisma } from "@prisma/client";
 import type {
   NurtureTeacherCommunicationTransaction,
   NurtureThreadReadCursorApplied,
@@ -9,6 +8,7 @@ import type {
   TeacherCommunicationTimelinePageV1,
 } from "@the-nurture/scenario";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
+import { asJson } from "./prisma-json.js";
 
 /**
  * W8 Prisma facts for the teacher communication owner. Threads are the
@@ -20,8 +20,6 @@ import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
  */
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
-const asJson = (value: unknown): Prisma.InputJsonValue =>
-  value as Prisma.InputJsonValue;
 
 const CANDIDATE_MESSAGE_LIMIT = 500;
 

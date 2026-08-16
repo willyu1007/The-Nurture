@@ -1362,7 +1362,7 @@ type SafetyAppendPlan = {
   targets: ProvenCommittedPublicationFactV1[];
   updates: Array<{
     publication_id: string;
-    from_visibility: string[];
+    from_visibility: Array<"visible" | "removed" | "redacted">;
     to_visibility: "removed" | "redacted";
   }>;
   /**

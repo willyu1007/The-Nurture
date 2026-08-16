@@ -77,7 +77,7 @@ export type FamilyGrowthReceiptRecordResultV1 =
 
 export type FamilyGrowthTransportFailureRecordResultV1 = "recorded" | "stale";
 
-const asJson = (value: unknown): Prisma.InputJsonValue =>
+const asClonedJson = (value: unknown): Prisma.InputJsonValue =>
   JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 
 const asCanonicalJson = (value: unknown): Prisma.InputJsonValue =>
@@ -172,7 +172,7 @@ export const appendFamilyGrowthOutboxEventWithin = async (
         ? { visibilityEventId: input.visibilityEventId }
         : {}),
       payloadDigest: input.payloadDigest,
-      envelopePayload: asJson(input.envelope),
+      envelopePayload: asClonedJson(input.envelope),
     },
   });
 };

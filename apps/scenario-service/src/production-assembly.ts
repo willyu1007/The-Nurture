@@ -56,6 +56,7 @@ export type ScenarioServiceProductionBindings = Readonly<{
 
 export type ScenarioServiceProductionAssembly = Readonly<{
   bindings: ScenarioServiceProductionBindings;
+  prisma?: NurturePrismaClient;
   disconnect(): Promise<void>;
 }>;
 
@@ -331,6 +332,7 @@ function createAssembly(
   let disconnected = false;
   return Object.freeze({
     bindings: Object.freeze(bindings),
+    ...(prisma ? { prisma } : {}),
     async disconnect(): Promise<void> {
       if (disconnected) return;
       disconnected = true;

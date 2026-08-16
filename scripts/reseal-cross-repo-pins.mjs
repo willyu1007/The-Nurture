@@ -45,6 +45,10 @@ const myChatLockPath = path.join(
   myChatRoot,
   "packages/workflow-runtime/conformance/scenario-host-adoption-lock.json",
 );
+const myChatAdoptionCheckPath = path.join(
+  myChatRoot,
+  "packages/workflow-runtime/conformance/compute-scenario-host-adoption-hash.mjs",
+);
 
 const LITERAL_FILES = {
   upstream: path.join(scriptsDir, "verify-c30-i3-upstream.mjs"),
@@ -153,19 +157,30 @@ const collectState = async () => {
     }
   }
 
-  let myChatLockState = "ok";
+  let myChatLockState = { kind: "ok" };
   try {
     run(
       process.execPath,
       [
-        "packages/workflow-runtime/conformance/compute-scenario-host-adoption-hash.mjs",
+        myChatAdoptionCheckPath,
         "--check",
-        "packages/workflow-runtime/conformance/scenario-host-adoption-lock.json",
+        myChatLockPath,
       ],
       myChatRoot,
     );
-  } catch {
-    myChatLockState = "stale";
+  } catch (error) {
+    myChatLockState =
+      typeof error === "object"
+      && error !== null
+      && "status" in error
+      && typeof error.status === "number"
+      && error.status !== 0
+        ? { kind: "stale" }
+        : {
+            kind: "infrastructure_error",
+            attemptedPath: myChatAdoptionCheckPath,
+            message: error instanceof Error ? error.message : String(error),
+          };
   }
 
   const upstreamSource = readFileSync(LITERAL_FILES.upstream, "utf8");
@@ -184,11 +199,16 @@ const collectState = async () => {
 };
 
 const printPlan = (state) => {
-  if (state.myChatLockState === "stale") {
+  if (state.myChatLockState.kind === "stale") {
     console.log("[stale] My-Chat scenario-host-adoption lock does not match its bytes.");
     console.log("        Refresh it in My-Chat first (update the sourceRevision literal in");
     console.log("        packages/workflow-runtime/conformance/compute-scenario-host-adoption-hash.mjs,");
     console.log("        regenerate the lock with that tool, commit, push), then rerun this plan.");
+  }
+  if (state.myChatLockState.kind === "infrastructure_error") {
+    console.log("[infra] My-Chat scenario-host-adoption lock check could not run.");
+    console.log(`        attempted: ${state.myChatLockState.attemptedPath}`);
+    console.log(`        error: ${state.myChatLockState.message}`);
   }
   for (const finding of state.findings) {
     console.log(`[stale] ${finding.label}: ${String(finding.expected).slice(0, 12)} -> ${String(finding.actual).slice(0, 12)}`);
@@ -198,8 +218,12 @@ const printPlan = (state) => {
   }
   const clean = state.findings.length === 0
     && !Object.values(state.literalStale).some(Boolean)
-    && state.myChatLockState === "ok";
-  console.log(clean ? "[ok] every pin, lock and literal is current" : "[plan] run: pnpm reseal:pins apply --note \"<why>\"");
+    && state.myChatLockState.kind === "ok";
+  if (clean) {
+    console.log("[ok] every pin, lock and literal is current");
+  } else if (state.myChatLockState.kind !== "infrastructure_error") {
+    console.log("[plan] run: pnpm reseal:pins apply --note \"<why>\"");
+  }
   return clean;
 };
 
@@ -207,7 +231,12 @@ const apply = async (state, note, allowBaseMove) => {
   if (!note) throw new Error("apply requires --note \"<dated rationale for the literal comments>\"");
   if (!gitClean(myChatRoot)) throw new Error("My-Chat worktree must be clean and committed");
   if (!gitClean(baseRoot)) throw new Error("My-Workflow-Base worktree must be clean");
-  if (state.myChatLockState === "stale") {
+  if (state.myChatLockState.kind === "infrastructure_error") {
+    throw new Error(
+      `My-Chat scenario-host-adoption lock check could not run at ${state.myChatLockState.attemptedPath}: ${state.myChatLockState.message}`,
+    );
+  }
+  if (state.myChatLockState.kind === "stale") {
     throw new Error("My-Chat scenario-host-adoption lock is stale; refresh and commit it in My-Chat first");
   }
   if (state.pin.myWorkflowBase.revision !== state.baseHead && !allowBaseMove) {

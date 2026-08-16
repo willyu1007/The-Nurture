@@ -30,6 +30,7 @@ import {
 } from "./board-read-support.js";
 import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
 import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
+import { asJson } from "./prisma-json.js";
 
 const RELEASE_COMMAND_KEY = "release_publish_process";
 const RELEASE_COMMAND_SCOPE = "board_publication";
@@ -88,8 +89,6 @@ export const publicationReleaseCommandIdentity = (
 
 export const publicationReleaseAttemptIdentity = (commandRequestId: string): string =>
   sha256(`nurture.publication-release-attempt.v1\0${commandRequestId}`);
-
-const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 const canonicalRef = (objectType: string, objectId: string) => ({
   schema_version: 1,
