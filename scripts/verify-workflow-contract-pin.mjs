@@ -38,7 +38,12 @@ function parseArgs(argv) {
   const options = {
     nurtureRepo,
     pinPath: path.join(nurtureRepo, 'docs/project/integrations/my-chat-workflow-contract.json'),
-    myChatRepo: path.resolve(nurtureRepo, '..', 'My-Chat'),
+    // RESEAL_MY_CHAT_ROOT points a reseal-time verification at a clean
+    // secondary worktree when the shared sibling checkout carries another
+    // session's work-in-progress (same override as the sibling verifiers).
+    myChatRepo: process.env.RESEAL_MY_CHAT_ROOT
+      ? path.resolve(process.env.RESEAL_MY_CHAT_ROOT)
+      : path.resolve(nurtureRepo, '..', 'My-Chat'),
     workflowBaseRepo: path.resolve(nurtureRepo, '..', 'My-Workflow-Base'),
     report: false,
   };

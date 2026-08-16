@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: adopt the My-Chat T-044 archive head for the
-  // current-main gray release
-  "76651e4d29c84c31437a57862ff5eb42054780df",
+  // 2026-08-16 reseal: deep-review quality batch: scenario-service runtime
+  // hardening + nurture-db JSON cast consolidation
+  "463980aac5d7634c5ca99e95fddd63d45f3d0f40",
   "My-Chat revision",
 );
 assertEqual(
