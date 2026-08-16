@@ -2278,3 +2278,16 @@ human-judged step.
 - The cumulative owner lock is intentionally minted only after this pin
   population is committed, preserving the repository's exact committed-source
   invariant and independent rollback point.
+
+## 2026-08-16 — T-028 carrier clean-build successor pin
+
+- Advanced only the exact My-Chat head to
+  `d6d7d22b07e525ef873603924a2ad96ebd1fbfb0` after CI exposed and the owner
+  repaired the Web route's production-only adjacent-module import resolution.
+- `x5_joint_api=69f70e926d1a…`,
+  `wave4_binding_host=a5c538af54f8…`, workflow-contract parity and Host
+  adoption aggregate remain byte-identical. The repair is outside those source
+  populations and changes no Nurture contract or runtime.
+- Repeated the committed-adoption-then-owner-lock sequence instead of weakening
+  exact-HEAD verification. Nurture's negative institutional-creation census and
+  all default-off gates remain unchanged.

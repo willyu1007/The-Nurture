@@ -2175,3 +2175,15 @@ the lock's committed-source invariant instead of hashing a dirty worktree.
 
 The owner-adoption lock is generated from the committed adoption revision in
 the next independent commit; it is not computed from this dirty worktree.
+
+## 2026-08-16 — T-028 carrier clean-build successor verification
+
+| Check | Result |
+| --- | --- |
+| Exact My-Chat input | PASS — clean head `d6d7d22b07e525ef873603924a2ad96ebd1fbfb0` |
+| Build repair | PASS — targeted ESLint, Web typecheck, five state tests and exact Next/Turbopack production build |
+| Pin stability | PASS — `x5_joint_api`, `wave4_binding_host`, workflow-contract parity and Host aggregate are unchanged |
+| Boundary gates | PASS — workflow pin, G2 exit and C30 upstream; no Nurture runtime or environment effect |
+
+As before, the cumulative owner lock follows only after this exact pin update is
+committed.

@@ -155,9 +155,8 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: T-028 option-A carrier composition qualified and closed
-  // default-off
-  "0ef4e8c3024187007fe931e33af94cb7fc6e0705",
+  // 2026-08-16 reseal: T-028 carrier Web production-build repair qualified
+  "d6d7d22b07e525ef873603924a2ad96ebd1fbfb0",
   "My-Chat revision",
 );
 assertEqual(

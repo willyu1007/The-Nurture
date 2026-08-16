@@ -182,9 +182,8 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-16 reseal: T-028 option-A carrier composition qualified and closed
-      // default-off
-      head_revision: "0ef4e8c3024187007fe931e33af94cb7fc6e0705",
+      // 2026-08-16 reseal: T-028 carrier Web production-build repair qualified
+      head_revision: "d6d7d22b07e525ef873603924a2ad96ebd1fbfb0",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "352358fa16e32f7a10a5e261dd369bdc09a18713ea28b269c966c2cf93ae5c3c",
     },

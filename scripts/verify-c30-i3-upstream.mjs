@@ -16,9 +16,8 @@ const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-16 reseal: T-028 option-A carrier composition qualified and closed
-  // default-off
-  hostHead: "0ef4e8c3024187007fe931e33af94cb7fc6e0705",
+  // 2026-08-16 reseal: T-028 carrier Web production-build repair qualified
+  hostHead: "d6d7d22b07e525ef873603924a2ad96ebd1fbfb0",
 };
 
 const run = (command, args, cwd) =>
