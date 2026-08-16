@@ -182,11 +182,11 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-16 reseal: T-028 institutional creation quality hardening and
-      // exact lineage constraints
-      head_revision: "02a70e43000928f5febd78a15cdb0bd051ce2ff2",
+      // 2026-08-16 reseal: T-028 option-A carrier composition qualified and closed
+      // default-off
+      head_revision: "0ef4e8c3024187007fe931e33af94cb7fc6e0705",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
-      aggregate_source_hash: "d31435eb0e65163b6914e6480960ce5778788147adeb093ab118ad77f27ff05b",
+      aggregate_source_hash: "352358fa16e32f7a10a5e261dd369bdc09a18713ea28b269c966c2cf93ae5c3c",
     },
     host: {
       // Step-5 requalification binds the current clean Host head while the
@@ -195,7 +195,7 @@ const computeLock = () => {
       // child-identity merge rotated that lock; fixture localization and the
       // curated api export keep the C30 Host runtime source profiles unchanged.
       head_revision: "a9281feb13a055061e6ed39a05fa83c4bede8044",
-      runtime_revision: "947c8633f35fa392ab9972a82f6000bbec194c82",
+      runtime_revision: "32a4cdd27da826546d081252817cbe11f61b512d",
       aggregate_source_hash: "2e1a29aaa1892391b98f8172a6d2b6241d3a0abf009851f0339fbc47df7126c2",
     },
     source_hash: sha256(

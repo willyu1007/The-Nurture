@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: T-028 institutional creation quality hardening and
-  // exact lineage constraints
-  "02a70e43000928f5febd78a15cdb0bd051ce2ff2",
+  // 2026-08-16 reseal: T-028 option-A carrier composition qualified and closed
+  // default-off
+  "0ef4e8c3024187007fe931e33af94cb7fc6e0705",
   "My-Chat revision",
 );
 assertEqual(

@@ -2258,3 +2258,23 @@ human-judged step.
 - No Nurture positive institutional-creation path, model, migration, switch,
   association or permission was added. The Pilot single track and every C30/G2
   default-off gate remain unchanged.
+
+## 2026-08-16 — T-028 option-A carrier pin adoption
+
+- Adopted final clean My-Chat head
+  `0ef4e8c3024187007fe931e33af94cb7fc6e0705` after its default-off institution
+  Web carrier, parent General Dashboard authorization, strict PostgreSQL
+  qualification, cleanup, and Host-lock closure.
+- Resealed `x5_joint_api` to
+  `69f70e926d1a0f27534eb319905fe39ba2f5ea127e5b8337fdccd460399b6a63`
+  and `wave4_binding_host` to
+  `a5c538af54f8befa9b4b69c939db44a2b4f3b8779ab83f184847471fd30e6cde`.
+  My-Chat's exact Host adoption lock binds runtime `32a4cdd27da8…` and
+  aggregate `352358fa16e3…`; Base and workflow-contract parity are unchanged.
+- The adoption remains metadata-only. Nurture adds no carrier parser, request or
+  authorization model, route, switch, lifecycle writer, notification shortcut,
+  anchor association, Role, Enrollment, Grant, or permission. Pilot intake
+  remains RosterEntry/Enrollment Invitation intent only.
+- The cumulative owner lock is intentionally minted only after this pin
+  population is committed, preserving the repository's exact committed-source
+  invariant and independent rollback point.

@@ -2161,3 +2161,17 @@ the rejected checkpoint and are historical.
 The cumulative Nurture owner-adoption lock is intentionally regenerated only
 from the committed pin population in the following lock commit. This preserves
 the lock's committed-source invariant instead of hashing a dirty worktree.
+
+## 2026-08-16 — T-028 option-A carrier pin verification
+
+| Check | Result |
+| --- | --- |
+| Exact My-Chat input | PASS — clean head `0ef4e8c3024187007fe931e33af94cb7fc6e0705`; Host runtime `32a4cdd27da8…`; Host aggregate `352358fa16e3…` |
+| Source profiles | PASS — `x5_joint_api=69f70e926d1a…`; `wave4_binding_host=a5c538af54f8…`; workflow contract parity remains `85cf56e2…` |
+| Pin gates | PASS — exact workflow-contract pin, G2 exit and C30 upstream verifier |
+| Negative runtime census | PASS — no institutional creation request/authorization type, route, scope, switch, writer or carrier URI exists in Nurture apps, packages, Prisma or env source |
+| Ownership boundary | PASS — the carrier remains My-Chat shell transport; Nurture receives no identity creation or ambient scenario authority |
+| Effect boundary | NONE — pin metadata/docs only; no schema, migration, runtime, persistent database, deployment, activation, Pilot or traffic change |
+
+The owner-adoption lock is generated from the committed adoption revision in
+the next independent commit; it is not computed from this dirty worktree.
