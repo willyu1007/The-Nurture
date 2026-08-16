@@ -72,3 +72,18 @@ gate in `02-architecture.md` is met.
   database or traffic state changed. T-012 has no remaining implementation
   issue; the bounded legacy harness is retained only until its documented
   deletion gate is satisfied.
+
+## 2026-08-16 — Post-CI source re-adoption
+
+- My-Chat's first remote run exposed a TypeScript workspace-source resolution
+  defect in the new API-client entrypoints. My-Chat corrected it without changing
+  public exports or scenario semantics and froze again at
+  `c11b8d199b1514a09c51eb1ae0c52ec478f8acbf`.
+- The-Nurture re-ran the same two-stage adoption protocol: exact pin/revision
+  literals were committed first at `55cff47`, then the owner-adoption lock was
+  minted from that committed source and committed independently at `b18342e`.
+- Contract/source hashes and the My-Chat scenario-host adoption aggregate did not
+  move because the packaging correction is outside those pinned populations.
+  Only the exact repository revision and Nurture adoption profiles changed.
+- The final plan reports every pin, lock and literal current. No runtime behavior,
+  contract, schema, deployment, migration, gate or traffic state changed.

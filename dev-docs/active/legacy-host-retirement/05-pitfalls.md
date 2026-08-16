@@ -24,3 +24,13 @@ because their schemas were not current. A failing masked HTTP response did not
 identify a code regression. Re-run migration-dependent evidence on two fresh,
 explicitly disposable databases and prove teardown; never migrate an existing
 developer database merely to make a quality gate green.
+
+## Do not finalize a cross-repository pin before source-consumer CI is green
+
+Typecheck and unit tests did not exercise Next/Turbopack consuming the new
+TypeScript package entrypoints. The first exact pin was internally consistent
+but had to be rotated after remote application builds exposed the packaging
+defect. For future owner adoption, run the relevant application production build
+or wait for its equivalent CI lane before declaring the upstream source frozen;
+if a correction is still required, repeat both reseal stages without editing a
+minted lock by hand.

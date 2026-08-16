@@ -21,9 +21,9 @@
 ## Exit evidence
 
 T-012 is source-complete and independently revertible through commits
-`3b38d67`, `e46fcea`, `b53a9b3` and `ce38d32`. The final disposable database
-contained only synthetic test data and was destroyed. No deployment, durable
-migration, gate change or traffic is authorized by this task.
+`3b38d67`, `e46fcea`, `b53a9b3`, `ce38d32`, `55cff47` and `b18342e`. The final
+disposable database contained only synthetic test data and was destroyed. No
+deployment, durable migration, gate change or traffic is authorized by this task.
 
 ## Phase 1 evidence
 
@@ -57,3 +57,16 @@ contract or persistence file changed.
 - `pnpm reseal:pins lock`: PASS — owner-adoption lock minted at exact Nurture
   source `b53a9b3`; `pnpm verify:c30-i3-owner-adoption` passes with source hash
   `7ec001bda63187555f31e4b98b253f9b5a31de414b64ad05f5e916e088fbb040`.
+
+## Post-CI source re-adoption evidence
+
+- My-Chat post-correction source: exact revision `c11b8d199b1514a09c51eb1ae0c52ec478f8acbf`.
+- `pnpm verify:workflow-contract-pin`, `pnpm verify:g2-exit-contract` and clean-
+  worktree `pnpm verify:c30-i3-upstream`: PASS.
+- Reseal and workflow-pin test scripts: 10/10 PASS; all changed scripts also pass
+  Node syntax checks and `git diff --check`.
+- Exact-revision commit: `55cff47`; independent owner-lock commit: `b18342e`.
+- `pnpm verify:c30-i3-owner-adoption`: PASS with final source hash
+  `20e91f71c7f9d040ea89552f0bf447adbc5c62595da46abf664bb437fc754179`.
+- `RESEAL_MY_CHAT_ROOT=<clean-worktree> pnpm reseal:pins plan`: PASS — every pin,
+  lock and literal is current.

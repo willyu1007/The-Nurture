@@ -5,6 +5,7 @@
 - State: done
 - Updated: 2026-08-16
 - Current phase: complete; archival requires explicit approval
+- Next step: none; keep the task active until archival is explicitly approved
 
 ## Goal
 
