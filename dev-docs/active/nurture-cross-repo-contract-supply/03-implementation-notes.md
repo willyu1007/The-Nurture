@@ -1,5 +1,18 @@
 # Implementation notes
 
+## 2026-08-16 — Current-main reseal stage 2
+
+- Minted the owner-adoption lock from committed Nurture source revision
+  `d1d330fab91443d7da7581b0b0c176d6003ad090` after the exact My-Chat pin
+  stage landed independently.
+- The final owner source hash is
+  `ddc985e63e4ac6e8e2bdec041fe4be89e97309950186f24bd39b176d0485255d`.
+  My-Chat runtime revision/aggregate and all workflow contract/source hashes
+  remain unchanged; only qualified repository heads and Nurture adoption
+  profiles moved.
+- No deployment, migration, gate activation, traffic or shared-worktree user
+  change is part of the reseal.
+
 ## 2026-08-16 — Current-main reseal stage 1
 
 - Adopted the My-Chat T-044 archive head

@@ -1,5 +1,18 @@
 # Verification
 
+## 2026-08-16 — Current-main reseal stage 2
+
+- `pnpm reseal:pins lock`: PASS; lock minted from committed Nurture source
+  `d1d330fab91443d7da7581b0b0c176d6003ad090`.
+- Workflow pin, G2 exit, clean-worktree C30-I3 upstream, owner-adoption and
+  default-off verification: PASS.
+- Final owner source hash:
+  `ddc985e63e4ac6e8e2bdec041fe4be89e97309950186f24bd39b176d0485255d`.
+- Reseal/workflow-pin tests: 10/10 PASS; final reseal plan reports every pin,
+  lock and literal current.
+- Changed-script Node syntax checks and `git diff --check`: PASS.
+- All provider gates remain false; no deployment, migration or traffic ran.
+
 ## 2026-08-16 — Current-main reseal stage 1
 
 - `RESEAL_MY_CHAT_ROOT=<clean-76651e4-worktree> pnpm reseal:pins apply
