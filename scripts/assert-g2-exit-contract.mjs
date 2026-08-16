@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: deep-review quality batch: scenario-service runtime
-  // hardening + nurture-db JSON cast consolidation
-  "463980aac5d7634c5ca99e95fddd63d45f3d0f40",
+  // 2026-08-16 reseal: Wave 3 batch: command-settlement observability event +
+  // response-validator core extraction
+  "8cbdc30f371b35b252f71375b700e672ee1ff2ea",
   "My-Chat revision",
 );
 assertEqual(

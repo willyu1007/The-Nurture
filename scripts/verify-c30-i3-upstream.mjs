@@ -16,9 +16,9 @@ const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
   baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-16 reseal: deep-review quality batch: scenario-service runtime
-  // hardening + nurture-db JSON cast consolidation
-  hostHead: "463980aac5d7634c5ca99e95fddd63d45f3d0f40",
+  // 2026-08-16 reseal: Wave 3 batch: command-settlement observability event +
+  // response-validator core extraction
+  hostHead: "8cbdc30f371b35b252f71375b700e672ee1ff2ea",
 };
 
 const run = (command, args, cwd) =>
