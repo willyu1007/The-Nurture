@@ -182,9 +182,9 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-16 reseal: align exact My-Chat T-028 institutional creation
-      // sources without activation
-      head_revision: "1a2f2088cda5b90236a477512e2d2dc4f2cbfd76",
+      // 2026-08-16 reseal: bind final My-Chat T-028 qualification head without
+      // runtime activation
+      head_revision: "951def107adbdb4e503f5cf46a1db3b3388f8196",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "bb0156f1efff07ca61412bb543bacad623578e69956b9c18d27d61a08ca1c34e",
     },

@@ -2120,3 +2120,14 @@ the rejected checkpoint and are historical.
 | T-028 scope | PASS — parent-authorized institutional creation is non-Pilot and create-only; no Family creation, scenario binding, Nurture association, Role, Enrollment, or Grant follows from it. |
 | Ownership | PASS — My-Chat owns the protected Child/Family authorization; Nurture remains the sole owner of local care facts and permissions. |
 | Runtime effect | NONE — documentation alignment only; no schema, migration, source, capability, activation, deployment, or traffic change. |
+
+## 2026-08-16 — T-028 cross-repository closure
+
+| Check | Result |
+| --- | --- |
+| Negative runtime census | PASS — Nurture package, app, and Prisma sources contain no `ChildCreationRequest`, `ChildCreationAuthorization`, institutional route/scope/switch, or lifecycle writer. |
+| Nurture quality | PASS — lint and typecheck pass; 105 test files / 1,144 tests pass. |
+| Exact owner gates | PASS — workflow pin, G2 exit, C30 upstream, context, owner-adoption lock, and clean reseal plan pass against the final My-Chat evidence head. |
+| My-Chat qualification | PASS — 46 empty-database migrations, three consecutive 13-case PostgreSQL rounds, 192 files / 1,342 tests, lint, typecheck, API/context/environment/DB gates, and zero-residue readback pass. |
+| Single-track semantics | PASS — T-028 creates only the platform Child, parent stewardship, and existing-Family relation; Nurture receives no Role, Enrollment, Grant, association, or ambient permission. |
+| Effect boundary | NONE — no Nurture source/schema/migration/capability change, persistent database write, deployment, activation, or traffic change. |

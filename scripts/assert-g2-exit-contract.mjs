@@ -155,9 +155,9 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: align exact My-Chat T-028 institutional creation
-  // sources without activation
-  "1a2f2088cda5b90236a477512e2d2dc4f2cbfd76",
+  // 2026-08-16 reseal: bind final My-Chat T-028 qualification head without
+  // runtime activation
+  "951def107adbdb4e503f5cf46a1db3b3388f8196",
   "My-Chat revision",
 );
 assertEqual(

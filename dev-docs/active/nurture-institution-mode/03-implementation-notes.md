@@ -2214,3 +2214,18 @@ human-judged step.
   local-association operation.
 - No Nurture schema, source, runtime, migration, capability, activation, or
   traffic state changed.
+
+## 2026-08-16 — T-028 institutional creation cross-repository closure
+
+- Re-ran the linked My-Chat/The-Nurture boundary after the complete default-off
+  implementation landed. Nurture source and both Prisma schemas contain no
+  institutional creation route, model, scope, switch, or authorization writer;
+  no positive runtime adoption was added.
+- The exact My-Chat source profiles and The-Nurture scenario bytes are resealed
+  through the repository's two-stage pin/owner-lock workflow. The final pin
+  advances only metadata to the My-Chat T-028 evidence head; Base remains fixed
+  and all C30/G2 activation gates remain default-off.
+- The current Pilot continues to accept only RosterEntry/Enrollment Invitation
+  intent before parent authority. A later explicit owner binding and Nurture
+  local-association command remains separately authorized and cannot be inferred
+  from Child creation.
