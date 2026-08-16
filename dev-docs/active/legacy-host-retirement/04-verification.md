@@ -39,3 +39,13 @@ contract or persistence file changed.
 - Focused frontend lint, test routing, persistence source isolation, port
   topology and maintained-reference scans passed. No old public command alias,
   `@the-nurture/backend` filter or old Vitest/assertion filename remains.
+
+## Phase 3 source-adoption evidence
+
+- `pnpm test:reseal-pins`: PASS — 3 tests.
+- `pnpm verify:workflow-contract-pin`: PASS at exact My-Chat `9d38538`,
+  unchanged Base `536638a`, contract parity and both source profiles.
+- `pnpm verify:g2-exit-contract`: PASS; gates stay default-off and legacy
+  activation is absent.
+- `RESEAL_MY_CHAT_ROOT=<clean-worktree> pnpm verify:c30-i3-upstream`: PASS.
+- My-Chat scenario-host adoption lock check: PASS, unchanged source aggregate.

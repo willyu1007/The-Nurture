@@ -40,3 +40,15 @@ gate in `02-architecture.md` is met.
   `nurture_dev_host` database and generated-client directory) remain unchanged;
   renaming them would add configuration migration risk without reducing a
   runtime ownership ambiguity.
+
+## 2026-08-16 — Phase 3 exact source adoption
+
+- My-Chat T-044 is source-frozen at
+  `9d385381fb6b2e9c7d4d44b3d9a3af55d1bf2f63`. A clean detached worktree is
+  used for pin tooling so unrelated shared-worktree UI changes remain excluded.
+- The first reseal stage rotates only the exact My-Chat revision, the Nurture
+  scenario self hash and the three governed revision literals. My-Workflow-Base
+  did not move and the My-Chat scenario-host adoption lock remained current.
+- Workflow-contract pin, G2 exit, C30-I3 upstream and reseal-tool tests pass.
+  The owner-adoption lock is intentionally minted only after this stage is a
+  committed Nurture revision.
