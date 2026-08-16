@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-30T07:59:48.858Z",
+  "updatedAt": "2026-08-16T13:42:04.485Z",
   "terms": [
     {
       "term": "Evidence record",
@@ -231,7 +231,7 @@
       "see_also": [
         "InstitutionWorkflowRun",
         "InstitutionWorkflowProjection",
-        "Web run workbench"
+        "web_domain_workbench"
       ]
     },
     {
@@ -258,7 +258,7 @@
       "see_also": [
         "InstitutionWorkflow",
         "Workflow dashboard",
-        "Web run workbench"
+        "web_domain_workbench"
       ]
     },
     {
@@ -327,32 +327,6 @@
       ]
     },
     {
-      "term": "Workflow dashboard",
-      "definition": "消费 InstitutionWorkflowProjection 的看板型 surface。当前 Institution mobile board 只读展示关键内容与进度；dashboard 不拥有或直接修改 Workflow Run/Step。",
-      "scope": "nurture",
-      "aliases": [
-        "workflow board",
-        "流程看板"
-      ],
-      "see_also": [
-        "InstitutionWorkflowProjection",
-        "Web run workbench"
-      ]
-    },
-    {
-      "term": "Web run workbench",
-      "definition": "InstitutionWorkflow 的主要 Web 操作面，提供 queue、detail、steps、forms 和授权动作；通过版本化接口消费 Nurture 语义并遵守 current authority。",
-      "scope": "nurture",
-      "aliases": [
-        "Institution workbench",
-        "web workflow workbench"
-      ],
-      "see_also": [
-        "InstitutionWorkflow",
-        "Workflow dashboard"
-      ]
-    },
-    {
       "term": "Handoff",
       "definition": "My-Chat 下游 owner 之间的 refs-only 技术交接契约。Handoff 属于 ActionDelivery/宿主 runtime，不自动创建产品 Workflow 或授予 Nurture 数据权限。",
       "scope": "global",
@@ -375,19 +349,6 @@
       "see_also": [
         "Family constraint",
         "Review result"
-      ]
-    },
-    {
-      "term": "The Nurture web console",
-      "definition": "由 My-Chat Web host 承载的 Nurture 场景操作面，用于画像查看、活动建模、复盘、人工确认和场景管理；它不是独立产品 shell。园区管理 Workflow 的主要操作由 Web run workbench 承担。",
-      "scope": "nurture",
-      "aliases": [
-        "nurture console",
-        "场景操作台"
-      ],
-      "see_also": [
-        "Web run workbench",
-        "InstitutionWorkflow"
       ]
     },
     {
@@ -463,7 +424,7 @@
       ],
       "see_also": [
         "lead_caregiver",
-        "InstitutionAdminWorkbench"
+        "web_domain_workbench"
       ]
     },
     {
@@ -478,6 +439,62 @@
         "Lead designation",
         "CareInteraction",
         "PublishProcess"
+      ]
+    },
+    {
+      "term": "web_run_workbench",
+      "definition": "My-Chat 拥有的通用 Workflow Run 操作面（queue、detail、steps、forms、Run 动作），Nurture 通过 nurture.web_run_workbench adapter 提供语义。它不是 Nurture 业务工作台：B3-0 锁定 web_run_workbench MUST NOT 授予 Nurture 业务访问。Nurture 的业务操作面是 web_domain_workbench。",
+      "scope": "global",
+      "aliases": [
+        "Web run workbench",
+        "web workflow workbench"
+      ],
+      "see_also": [
+        "web_domain_workbench",
+        "InstitutionWorkflow",
+        "Workflow dashboard"
+      ]
+    },
+    {
+      "term": "web_domain_workbench",
+      "definition": "The Nurture 拥有的场景业务工作台，route namespace /nurture，是 InstitutionWorkflow 的主要操作面，承载队列、详情、步骤、表单与授权动作。当前唯一实例是 surface institution_workbench（仅 institution_admin 角色）。它与 My-Chat 的 web_run_workbench 是两个不同表面，不可互为别名。",
+      "scope": "nurture",
+      "aliases": [
+        "Institution workbench",
+        "InstitutionAdminWorkbench",
+        "机构 Web 操作台",
+        "Nurture 业务工作台"
+      ],
+      "see_also": [
+        "web_run_workbench",
+        "InstitutionWorkflow",
+        "The Nurture web console"
+      ]
+    },
+    {
+      "term": "The Nurture web console",
+      "definition": "由 My-Chat Web host 承载的 Nurture 场景操作面，用于画像查看、活动建模、复盘、人工确认和场景管理；它不是独立产品 shell。园区管理 InstitutionWorkflow 的主要操作面是 web_domain_workbench（当前实例 institution_workbench），不是 My-Chat 的 web_run_workbench。",
+      "scope": "nurture",
+      "aliases": [
+        "nurture console",
+        "场景操作台"
+      ],
+      "see_also": [
+        "web_domain_workbench",
+        "InstitutionWorkflow"
+      ]
+    },
+    {
+      "term": "Workflow dashboard",
+      "definition": "消费 InstitutionWorkflowProjection 的看板型 surface（board）。board 是 Workflow 的 consumer，不拥有也不直接修改 Workflow Run/Step；角色相同本身不授权，每次读取仍须校验 Workspace、Institution、scope、assignment 与 Grant/fact visibility。权威写入只发生在 web_domain_workbench。",
+      "scope": "nurture",
+      "aliases": [
+        "workflow board",
+        "流程看板"
+      ],
+      "see_also": [
+        "InstitutionWorkflowProjection",
+        "web_domain_workbench"
       ]
     }
   ]

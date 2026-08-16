@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T03:02:19.806Z",
+  "updatedAt": "2026-08-16T13:43:00.297Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -47,8 +47,8 @@
         "glossary",
         "llm"
       ],
-      "checksumSha256": "6693d0fda3c08ebad9b468274bb99f2044f38f2f3fd11849d81180304d68761a",
-      "lastUpdated": "2026-07-30T07:59:48.861Z",
+      "checksumSha256": "31be357e9d330934b0432a7178a9e6623bc0242f01609c7952c435c1b981318b",
+      "lastUpdated": "2026-08-16T13:43:00.295Z",
       "source": {
         "kind": "manual",
         "notes": "Edit via ctl-context add-term/remove-term; then run ctl-context touch."
