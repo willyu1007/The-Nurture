@@ -149,7 +149,53 @@ envelope 的 `workbenchModule` 只给 `itemRefs`（opaque ref 数组）与 `page
 
 ## P4 — Hub
 
-（待填）
+`/nurture/overview` 用 kit 的 `<Hub modules>`，一个 module（入园流程）。
+另加 `lib/view/due.ts`（时限分档与语义色的唯一来源）与 `lib/view/journey.ts`
+（角色分组、阶段中文、两级判定）。同时补了 `/nurture/queue` 占位页，
+让待办行的 href 有落点。
+
+### 决策 (a) 已生效
+
+Record 的「意向信息」区块确认去掉。本阶段的 Hub 只呈现契约给的字段：
+`safeSummary` 作标题，阶段 + 时限 + `safeBlocker ?? nextAction` 作副行。
+
+### 两级如何落到 kit 上
+
+`AttentionItem.tone` 只允许 `accent | warning | info`，没有 `danger`——
+kit 有意限制了待办的色阶。正好对应产品的两级规则：
+
+- `accent`（橙）= 需要处理，判定是 `needsAdminNow()`：canonical 逾期或 `state === "blocked"`
+- `info`（蓝）= 建议关注，园长负责但未触及期限
+
+Hub 只渲染一条统一待办列表（按 `workflow` 标注来源），所以两级靠色调区分而非分区，
+这是 kit 的模型，没有对抗它。
+
+### StatStrip 用五个角色桶
+
+空桶保留显示。零是信息；而且列会随数据增减移动的 strip 无法阅读。
+
+### 时钟被钉住
+
+`FIXTURE_NOW = 2026-08-17T03:00Z`，由 `queries.now()` 暴露。不用系统时钟的原因：
+fixtures 是写死日期的，跟真实时间走的话几天后每条都会变成「逾期」，
+界面看起来像坏了，而原因与代码无关。真实 ingress 落地时这个函数返回 `Date.now()`。
+
+### 验证抓到的缺陷：typecheck 和 lint 都漏掉的构建错误
+
+P3 的 lib 文件用了 `.js` 后缀的相对导入（ESM 写法）。`tsconfig` 的
+`moduleResolution: "bundler"` 容忍这种写法，所以 typecheck 全绿；
+但 Turbopack 解析不了，运行时 `Module not found`。
+
+它在 P3 没暴露，是因为当时没有任何运行时代码 import 过 `lib/queries`——
+P4 的 Hub 是第一个消费者。全部改为 `@/` 别名（页面本来就在用这个约定）。
+
+**这意味着 P3 提交的代码带着一个潜伏缺陷，静态检查不可能发现它。**
+后续阶段每新增一个模块都要实际打开页面，不能只看 typecheck。
+
+### 文案
+
+fixture 的 `safeBlocker` 原文写了「复盘已到期 3 天」，与 UI 计算出的
+「逾期 3 天」在同一行重复出现。改为只说原因，不说时长——时长由界面算。
 
 ## P5 — Queue
 

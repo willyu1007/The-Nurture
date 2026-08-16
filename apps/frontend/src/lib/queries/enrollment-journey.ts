@@ -24,8 +24,22 @@ import type {
   OpaqueRef,
   OwnerTargetOption,
   SurfaceEnvelope,
-} from "../contracts/enrollment-journey.js";
-import { ENVELOPE, JOURNEYS, TARGET_OPTIONS, WAITLISTS } from "../fixtures/enrollment-journey.js";
+} from "@/lib/contracts/enrollment-journey";
+import {
+  ENVELOPE,
+  FIXTURE_NOW,
+  JOURNEYS,
+  TARGET_OPTIONS,
+  WAITLISTS,
+} from "@/lib/fixtures/enrollment-journey";
+
+/**
+ * The clock the screens measure due dates against. Pinned to the fixture clock
+ * today; becomes `Date.now()` when the real ingress lands.
+ */
+export function now(): number {
+  return FIXTURE_NOW;
+}
 
 /** The workbench envelope for the current actor. */
 export async function openWorkbench(): Promise<SurfaceEnvelope> {

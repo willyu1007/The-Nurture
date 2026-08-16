@@ -95,6 +95,31 @@ node .ai/scripts/ctl-project-governance.mjs lint --check --project main
 
 无浏览器验证：本阶段不产生界面，`lib/queries` 的首个消费者在 P4。
 
-## P4–P7
+## P4 — Hub（2026-08-17）
+
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+浏览器验证（全新 tab，零控制台错误）：
+
+- 「共 11 条进行中的入园流程」——12 条 fixture 中 1 条已完成被正确过滤。
+- StatStrip 五桶：等我 5 / 等家庭 3 / 等老师 1 / 等系统 1 / 推进中 1，合计 11，与 fixture 吻合。
+- 待办 5 条，全部是 `responsibleRole === institution_admin` 的 journey，
+  按到期先后排序：果果（逾期 14 天）→ 小满（逾期 3 天）→ 豆豆（今天 10:00）
+  → 团团（无时限）→ 星星（无时限）。
+- 两级色调正确：前三条 accent，后两条 info。
+
+发现并修复的缺陷（静态检查全绿，仅运行时暴露）：
+
+- **`.js` 后缀导入无法被 Turbopack 解析**。P3 的三个 lib 文件用了
+  `../contracts/enrollment-journey.js` 形式。`moduleResolution: "bundler"`
+  让 typecheck 通过，但 Next 构建报 `Module not found`，页面 500。
+  P3 阶段没有运行时消费者，所以直到 P4 才暴露。已全部改为 `@/` 别名。
+- **副行文案重复**。fixture 的 `safeBlocker` 内含「已到期 3 天」，
+  与 UI 计算的「逾期 3 天」并排出现。已改为只述原因。
+
+## P5–P7
 
 （待填）

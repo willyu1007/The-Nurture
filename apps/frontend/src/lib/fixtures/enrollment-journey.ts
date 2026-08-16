@@ -15,7 +15,15 @@ import type {
   EnrollmentJourneyProjection,
   OwnerTargetOption,
   SurfaceEnvelope,
-} from "../contracts/enrollment-journey.js";
+} from "@/lib/contracts/enrollment-journey";
+
+/**
+ * The clock this data is written against. Pinned rather than read from the
+ * system so the screens stay reproducible: with a live clock, every fixture
+ * would drift into "overdue" within days and the views would look broken for
+ * reasons that have nothing to do with the code.
+ */
+export const FIXTURE_NOW = Date.parse("2026-08-17T03:00:00.000Z");
 
 const j = (p: EnrollmentJourneyProjection): EnrollmentJourneyProjection => p;
 
@@ -45,7 +53,9 @@ export const JOURNEYS: readonly EnrollmentJourneyProjection[] = [
       "trial_started",
       "trial_review_reached",
     ],
-    safeBlocker: "复盘已到期 3 天。超过试入园结束日期继续试入园，必须先显式延长。",
+    // Says why, not how long: the elapsed time is computed and shown by the UI,
+    // so repeating it here would print it twice on every row.
+    safeBlocker: "复盘已到期，名额仍被预留占用。超过试入园结束日期继续试入园，必须先显式延长。",
     nextAction: "复盘并在延长、提出正式入园、结束并释放名额之间选择",
     responsibleRole: "institution_admin",
     dueAt: "2026-08-14T09:00:00.000Z",
