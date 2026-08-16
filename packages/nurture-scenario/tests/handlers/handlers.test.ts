@@ -225,6 +225,16 @@ describe("calibrate_family_strategy", () => {
     expect(persisted.constraint_payload.negotiable_levers).toEqual(["timing"]);
   });
 
+  it.each(["screen", "bedtime"])("drives issue_type=%s through the same handler", async (issue) => {
+    // Pushed down from the legacy-host two-issue-types e2e (T-014): the
+    // family_strategy flow is shared schema/flow, not a per-issue_type hardcode.
+    const { deps, calls } = buildDeps({ project: project(issue) });
+    const r = await makeCalibrateFamilyStrategy(deps)(stepInput());
+    expect(r.status).toBe("completed");
+    expect(r.artifact_drafts?.[0]?.artifact_type).toBe("family_strategy_summary");
+    expect(calls.updateStrategy).toHaveLength(1);
+  });
+
   it("manual-reviews on a version conflict (persist throws)", async () => {
     const { deps } = buildDeps({ project: project(), rejectUpdates: true });
     const r = await makeCalibrateFamilyStrategy(deps)(stepInput());

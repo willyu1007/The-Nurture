@@ -26,6 +26,28 @@
 
 验收：`pnpm test:unit`、`pnpm test:db` 全绿；新增用例与上表一一对应。
 
+### Wave 1 结果（2026-08-17，完成）
+
+动手前核对发现三项计划目标**已有等价覆盖**，无需新增：
+
+- p3-② 产物预览 L4 门控：`presenters.test.ts`「ref-only for a never-exposable
+  L0/L4 artifact」（比 harness 版更强，L0/L4 双档 + safe_* 全缺失断言）。
+- safety-escalation-③ 路由收敛不变量：`conformance.test.ts`「keeps the
+  health-safety escalation event off every shared consumer」（还多断言了
+  scenario_internal_events 声明）。
+- first-slice 投影自动应用（handler 层）：`handlers.test.ts`「record_review
+  auto-applies the profile projection (version+1)」。
+
+实际新增：
+
+- `packages/nurture-db/tests/workflow-project-owner-boundary.integration.test.ts`
+  （4 用例）：`PrismaWorkflowProjectRepository.getById` / `getByWorkflowRunId`
+  workspace 隔离（p4）、时间线三仓持久化（two-issue-types 后半）、
+  `PrismaProfileRepository` upsert/读回/原位版本推进（first-slice DB 层）。
+- `handlers.test.ts` calibrate_family_strategy 补 it.each 跨 issue_type 同构
+  （two-issue-types 前半，镜像 care_plan 既有模式）。
+- `assert-test-routing.mjs` census：productionDb 60→61。
+
 ## Wave 2 — 两组 owner 路由搬入 scenario-service（M）
 
 3. `growth-record-contribution`：模块整体迁入 scenario-service，路径

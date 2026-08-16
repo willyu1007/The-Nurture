@@ -4,8 +4,12 @@
 
 ## Wave 1
 
-- [ ] `pnpm test:unit` 全绿（新增 presenter L4 / manifest 收敛 / handler 同构用例）
-- [ ] `pnpm test:db` 全绿（新增项目仓库隔离 / 时间线 / 画像投影用例）
+- [x] 2026-08-17 `pnpm verify:test-routing` → `[ok] files=212 unit=105
+  production-db=61 legacy-host=11 scenario-service=30 x5-joint=5`
+- [x] 2026-08-17 `pnpm test:unit` → 105 files / 1146 passed（下限 1133）
+- [x] 2026-08-17 `pnpm test:db` → 61 files / 510 passed（下限 499）
+- 注：presenter L4 / manifest 收敛 / 投影 handler 层三项为既有覆盖，
+  未新增用例（见 01-plan Wave 1 结果）。
 
 ## Wave 2
 

@@ -6,7 +6,8 @@
 - Task: T-014
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-17
-- Next step: Wave 1 — 场景语义下沉（nurture-db 集成测试 + nurture-scenario 单测）。
+- Next step: Wave 2 — user-attention 与 growth-record contribution 两组
+  owner 路由迁入 scenario-service（Wave 1 已于 2026-08-17 完成）。
 
 ## Goal
 
