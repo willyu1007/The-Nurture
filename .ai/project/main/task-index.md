@@ -21,5 +21,5 @@ Project: `main`
 | T-009 nurture-family-growth-provider | archived | F-004 | dev-docs/archive/nurture-family-growth-provider |
 | T-010 nurture-family-sharing-eligibility | archived | F-005 | dev-docs/archive/nurture-family-sharing-eligibility |
 | T-011 nurture-cross-repo-contract-supply | in-progress | F-003 | dev-docs/active/nurture-cross-repo-contract-supply |
-| T-012 legacy-host-retirement | in-progress | F-003 | dev-docs/active/legacy-host-retirement |
+| T-012 legacy-host-retirement | done | F-003 | dev-docs/active/legacy-host-retirement |
 <!-- AUTO-GENERATED:END task-index -->

@@ -162,4 +162,4 @@ dev-docs/active/legacy-host-retirement/
 - [x] Confirm planning-mode signal handling and input precedence.
 - [x] Confirm scope, non-goals and phase order from inspected repository evidence.
 - [x] Confirm verification and rollback strategy.
-- [ ] Complete the detailed task bundle and implementation.
+- [x] Complete the detailed task bundle and implementation.

@@ -178,7 +178,7 @@ tasks:
     updated: 2026-08-13
   - id: T-012
     slug: legacy-host-retirement
-    status: in-progress
+    status: done
     milestone_id: M-002
     feature_id: F-003
     dev_docs_path: dev-docs/active/legacy-host-retirement

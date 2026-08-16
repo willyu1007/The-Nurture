@@ -20,12 +20,12 @@
 
 ## Phase 3 — Quality closure and deletion gate
 
-- [ ] Run focused service and legacy suites, aggregate typecheck/lint and
+- [x] Run focused service and legacy suites, aggregate typecheck/lint and
       persistence/port/test-routing gates.
-- [ ] Scan for ambiguous normal-runtime instructions, duplicate aliases,
+- [x] Scan for ambiguous normal-runtime instructions, duplicate aliases,
       stale package filters and unneeded artifacts.
-- [ ] Document exact deletion prerequisites for the legacy harness.
-- [ ] Record evidence and close the task without claiming deployment.
+- [x] Document exact deletion prerequisites for the legacy harness.
+- [x] Record evidence and close the task without claiming deployment.
 
 ## Rollback
 

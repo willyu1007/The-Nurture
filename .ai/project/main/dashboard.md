@@ -10,10 +10,10 @@ Project: `main`
 
 - Active tasks: T-002 (institution-mode owner gates, holding after C30), T-008
   (G5-0, final shared-input revision reconciliation and G5-A Candidate Freeze
-  complete; G5-B awaits separate authorization), T-011
-  (cross-repo contract supply and guardian-decision callback), and T-012
-  (make the scenario service the sole normal local runtime while keeping the
-  Fastify harness explicitly legacy). T-007
+  complete; G5-B awaits separate authorization), and T-011
+  (cross-repo contract supply and guardian-decision callback). Completed T-012
+  makes the scenario service the sole normal local runtime while keeping the
+  Fastify harness explicitly legacy and removal-gated. T-007
   and T-010 are archived with their exact default-off exits retained.
   2026-08-13 owner decision: authorizations and quota budgets released for the
   agreed sequencing — T-008 G5-0 is complete after the T-011 W1/W2 supply
@@ -86,13 +86,13 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 12 (planned: 0, in-progress: 4, blocked: 0, done: 0, archived: 8)
+- Tasks: 12 (planned: 0, in-progress: 3, blocked: 0, done: 1, archived: 8)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-012 legacy-host-retirement | in-progress | F-003 | dev-docs/active/legacy-host-retirement |
+| T-012 legacy-host-retirement | done | F-003 | dev-docs/active/legacy-host-retirement |
 | T-007 nurture-institution-surfaces | archived | F-003 | dev-docs/archive/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | in-progress | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-010 nurture-family-sharing-eligibility | archived | F-005 | dev-docs/archive/nurture-family-sharing-eligibility |

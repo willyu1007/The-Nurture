@@ -5,20 +5,25 @@
 | Area | Command/evidence | Status |
 | --- | --- | --- |
 | Entrypoint | root/package workspace script resolution assertion | PASS — normal entry resolves only to `@the-nurture/scenario-service`; legacy escape hatch resolves only to `@the-nurture/legacy-host` |
-| Type safety | `pnpm --filter @the-nurture/scenario-service typecheck` | PASS |
-| Lint | focused frontend ESLint + Stylelint | PASS |
+| Type safety | root and affected workspace typechecks | PASS |
+| Lint | root pin-aware lint plus frontend ESLint + Stylelint | PASS |
 | Scenario ingress | `pnpm test:scenario-service` | PASS — 27 files / 209 tests |
 | Legacy evidence | `pnpm test:legacy-host` on fresh disposable PostgreSQL | PASS — 11 files / 27 tests |
 | Test ownership | `pnpm verify:test-routing` | PASS — 211 files: 105 unit / 60 production DB / 11 legacy host / 30 scenario service / 5 x5 joint |
 | Persistence | source gate plus both empty-database boundaries | PASS — Nurture 44 migrations, 105 tables / 127 enums; legacy 1 migration, 6 tables / 2 enums |
 | Ports | `pnpm verify:port-topology` | PASS — scenario 8000 / legacy host 3001 / workbench endpoint 3200 / frontend 3201 |
-| Governance | project sync/lint | pending |
-| Documentation | `node .ai/scripts/lint-docs.mjs` | pending |
+| Production DB | fresh 44-migration target + `pnpm test:db` | PASS — 60 files / 506 tests |
+| Scenario-service DB | same fresh Nurture target + `pnpm test:scenario-service:db` | PASS — 3 files / 68 tests |
+| Cross-owner x5 | fresh exact Nurture/My-Chat pair + `pnpm test:x5` | PASS — 5 files / 37 tests |
+| Governance | project sync/lint | PASS |
+| Documentation | `node .ai/scripts/lint-docs.mjs` | PASS — 718 files, zero warnings/errors |
 
 ## Exit evidence
 
-Not yet recorded. No deployment, database migration, gate change or traffic is
-authorized by this task.
+T-012 is source-complete and independently revertible through commits
+`3b38d67`, `e46fcea`, `b53a9b3` and `ce38d32`. The final disposable database
+contained only synthetic test data and was destroyed. No deployment, durable
+migration, gate change or traffic is authorized by this task.
 
 ## Phase 1 evidence
 

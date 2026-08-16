@@ -371,7 +371,7 @@ Project: `main`
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 (`archived`); T-005 (`archived`); T-006 (`archived`);
   T-007 (`archived`); T-008 (`in-progress`); T-011 (`in-progress`); T-012
-  legacy-host-retirement (`in-progress`).
+  legacy-host-retirement (`done`).
 - Current posture: T-007 completed 0C, 0D and the full frozen 0E chain at
   private I1. G4-D increments 2–5 are qualified through 33 migrations on
   disposable PostgreSQL. I2-A publishes the exact three-query/21-action
@@ -572,7 +572,7 @@ Project: `main`
 | T-007 nurture-institution-surfaces | archived | dev-docs/archive/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | in-progress | dev-docs/active/nurture-store-beta-readiness |
 | T-011 nurture-cross-repo-contract-supply | in-progress | dev-docs/active/nurture-cross-repo-contract-supply |
-| T-012 legacy-host-retirement | in-progress | dev-docs/active/legacy-host-retirement |
+| T-012 legacy-host-retirement | done | dev-docs/active/legacy-host-retirement |
 
 ### F-004 Family growth material provider
 

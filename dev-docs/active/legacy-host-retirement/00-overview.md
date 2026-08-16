@@ -2,9 +2,9 @@
 
 ## Status
 
-- State: in-progress
+- State: done
 - Updated: 2026-08-16
-- Current phase: entrypoint correction
+- Current phase: complete; archival requires explicit approval
 
 ## Goal
 
@@ -30,15 +30,15 @@ named legacy test tool until its focused evidence has a replacement.
 
 ## Acceptance criteria
 
-- [ ] Root `pnpm dev` selects the scenario service.
-- [ ] The Fastify application is accessible only through explicitly legacy
+- [x] Root `pnpm dev` selects the scenario service.
+- [x] The Fastify application is accessible only through explicitly legacy
       scripts and is never described as a normal backend.
-- [ ] CI/test routing and maintained docs use one vocabulary without aliases.
-- [ ] The legacy harness retains focused boundary tests and has an exact
+- [x] CI/test routing and maintained docs use one vocabulary without aliases.
+- [x] The legacy harness retains focused boundary tests and has an exact
       removal gate.
-- [ ] Typecheck, lint, relevant suites, ownership/persistence gates,
+- [x] Typecheck, lint, relevant suites, ownership/persistence gates,
       governance and documentation lint pass.
-- [ ] No unrelated feature or schema changes are included.
+- [x] No unrelated feature or schema changes are included.
 
 ## Ownership decision
 

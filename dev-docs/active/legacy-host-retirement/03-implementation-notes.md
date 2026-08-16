@@ -56,3 +56,19 @@ gate in `02-architecture.md` is met.
   against that exact source revision. The lock now binds My-Chat `9d38538`, the
   unchanged My-Chat runtime source revision/aggregate, and the updated Nurture
   manifest/cumulative source profiles without widening their file sets.
+
+## 2026-08-16 — Final quality and cleanup
+
+- Aggregate typecheck, root lint, 1144 unit tests, 209 scenario-service tests,
+  all formal ingress validators and every affected static boundary gate pass.
+- A second disposable pgvector/PostgreSQL 16 target replayed all 44 Nurture,
+  one legacy-host and 47 My-Chat migrations from empty. Production DB,
+  scenario-service DB, renamed legacy CI population and all five two-database
+  joint files pass; the exact container was removed afterward.
+- Maintained-source scans find no old public script alias, generic backend
+  package filter, old Vitest/boundary filename, duplicate runtime instruction,
+  dynamic plugin path or compatibility API-client export.
+- No contract body, business rule, schema, provider gate, deployment, durable
+  database or traffic state changed. T-012 has no remaining implementation
+  issue; the bounded legacy harness is retained only until its documented
+  deletion gate is satisfied.
