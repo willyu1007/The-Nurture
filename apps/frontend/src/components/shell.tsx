@@ -41,7 +41,16 @@ const nav: ShellNav = {
   },
   groups: [{ label: "园区", items: MODULES.map((m) => ({ ...m })) }],
   sections: [],
-  home: { label: "The Nurture", href: "/nurture/overview" },
+  // Home belongs at the root. The shell matches nav entries by path prefix and
+  // special-cases "/" to an exact match, so any other value makes home light up
+  // alongside whichever module is actually open — first because it shared the
+  // hub's route, then because every module route sits under /nurture.
+  home: { label: "The Nurture", href: "/" },
+  // The paradigm puts quick global create in the sidebar, which keeps the scene
+  // toolbar down to its single primary. Registering an inquiry is the only thing
+  // this surface can create; the flow does not exist yet, so it is marked the
+  // same way the unbuilt modules are rather than left out and rebuilt later.
+  create: [{ href: "/nurture/queue/new", label: "登记新意向", soon: true }],
 };
 
 /**

@@ -221,6 +221,29 @@ React 尚未重渲染。点击与断言必须分两次调用。
 - 首次读取 toast 为空。两次 `javascript_exec` 之间有秒级往返，toast 已自动消失；
   改为单次 async 调用内 `await` 后读取即可见。
 
+## P1 侧栏返工（2026-08-17，用户看界面后指出）
+
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+两处与 kit 范式不一致，P1 时漏掉，静态检查看不出：
+
+- **home 与概览台同时高亮。** DOM 实测两个 `.wb-nav__item--active`，href 都是
+  `/nurture/overview`。根因是 P1 把概览台从 `/nurture` 挪走以避开前缀碰撞时，
+  没有同步调整 `home`。改 `home` 为 `/nurture` 并不解决——`matchPrefix` 对
+  `/nurture` 仍是前缀匹配，反而变成所有模块路由都点亮 home。
+  正解是 `home: "/"`：`matchPrefix` 对 `"/"` 有精确匹配特例，就是为根路径设计的。
+- **缺 `nav.create`。** kit 铁律把全局快捷新建钉在侧栏（这样场景工具栏只留一个
+  navy pill），P1 未配置。已加「登记新意向」并标 `soon`——创建流程尚不存在。
+
+复测（`/nurture/queue`）：高亮项只有「流程队列」，`.wb-create` 渲染为「新增」，
+home 不再高亮。`/` 与 `/nurture` 均 200 落到 `/nurture/overview`。全新 tab 零控制台错误。
+
+排查中的一次误判：先用 `.wb-nav__add` 判断 create 是否渲染，得出"没生效"。
+那个类是 `NavGroupDef.add`（分组级），create 菜单的类是 `.wb-create`——选错了选择器。
+
 ## 工具经验
 
 - Browser pane 会间歇进入 viewport 0x0 状态：`read_page` / `computer` 不可用，
