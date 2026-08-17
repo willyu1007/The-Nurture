@@ -20,6 +20,7 @@
 
 import type {
   AdminWaitlist,
+  AdminWaitlistEntry,
   EnrollmentJourneyProjection,
   OpaqueRef,
   OwnerTargetOption,
@@ -98,11 +99,31 @@ export async function listCapacityWaitlists(): Promise<readonly AdminWaitlist[]>
 
 /** The waitlist position of a journey, 1-based, or null when not waitlisted. */
 export async function waitlistPositionOf(targetOptionRef: OpaqueRef): Promise<number | null> {
+  return (await waitlistPlacementOf(targetOptionRef))?.position ?? null;
+}
+
+/** A journey's waitlist entry with its position, or null when not waitlisted. */
+export interface WaitlistPlacement {
+  readonly position: number;
+  readonly entry: AdminWaitlistEntry;
+  readonly careGroupLabel: string;
+}
+
+export async function waitlistPlacementOf(
+  targetOptionRef: OpaqueRef,
+): Promise<WaitlistPlacement | null> {
   for (const waitlist of await listCapacityWaitlists()) {
     const index = waitlist.orderedEntries.findIndex(
       (entry) => entry.journeyTargetOptionRef === targetOptionRef,
     );
-    if (index >= 0) return index + 1;
+    const entry = waitlist.orderedEntries[index];
+    if (entry !== undefined) {
+      return {
+        position: index + 1,
+        entry,
+        careGroupLabel: waitlist.targetClassSafeLabel,
+      };
+    }
   }
   return null;
 }

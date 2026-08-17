@@ -10,8 +10,13 @@
 
 import type {
   EnrollmentJourneyProjection,
+  JourneyLifecycle,
+  JourneyMilestone,
   JourneyStage,
+  PendingTransition,
+  ProjectionState,
   ResponsibleRole,
+  WaitingState,
 } from "@/lib/contracts/enrollment-journey";
 
 export const ROLE_GROUP_LABEL: Record<ResponsibleRole, string> = {
@@ -52,6 +57,84 @@ export const STAGE_LABEL: Record<JourneyStage, string> = {
   completed: "已完成",
   closed: "已关闭",
 };
+
+export const STATE_LABEL: Record<ProjectionState, string> = {
+  active: "进行中",
+  waiting: "等待中",
+  blocked: "已阻塞",
+  completed: "已完成",
+  closed: "已关闭",
+};
+
+export const LIFECYCLE_LABEL: Record<JourneyLifecycle, string> = {
+  active: "进行中",
+  completed: "已完成正式入园",
+  closed_without_formalization: "未转正式即结束",
+};
+
+export const WAITING_LABEL: Record<WaitingState, string> = {
+  ready: "可推进",
+  waiting_on_guardian: "等待家庭",
+  waiting_on_caregiver: "等待老师",
+  waiting_on_system: "等待系统校验",
+  scheduled_future: "已排期，未到时间",
+  blocked: "已阻塞",
+};
+
+export const PENDING_TRANSITION_LABEL: Record<PendingTransition, string> = {
+  none: "无",
+  trial_start_pending: "待开始试入园",
+  formalization_pending: "待转为正式",
+  exit_pending: "待退出",
+};
+
+export const MILESTONE_LABEL: Record<JourneyMilestone, string> = {
+  inquiry_started: "意向登记",
+  intent_confirmed: "意向确认",
+  visit_recorded: "到访记录",
+  waitlist_qualified: "取得候补资格",
+  trial_offer_accepted: "接受试入园 offer",
+  trial_started: "试入园开始",
+  trial_review_reached: "到达复盘节点",
+  trial_extended: "试入园已延长",
+  formal_proposed: "提出正式入园",
+  guardian_formal_acceptance_recorded: "家长已接受",
+  preparation_cancelled: "准备已取消",
+  trial_ended: "试入园结束",
+  formal_enrollment_committed: "正式入园已提交",
+  journey_completed: "流程完成",
+};
+
+/**
+ * Display order for completed milestones. Only reached ones are ever shown:
+ * rendering the unreached ones as a ladder would turn this into the percentage
+ * progress the product contract rules out, and several of them are branches
+ * that legitimately never happen.
+ */
+const MILESTONE_ORDER: readonly JourneyMilestone[] = [
+  "inquiry_started",
+  "intent_confirmed",
+  "visit_recorded",
+  "waitlist_qualified",
+  "trial_offer_accepted",
+  "trial_started",
+  "trial_review_reached",
+  "trial_extended",
+  "preparation_cancelled",
+  "formal_proposed",
+  "guardian_formal_acceptance_recorded",
+  "trial_ended",
+  "formal_enrollment_committed",
+  "journey_completed",
+];
+
+/** Reached milestones, in canonical order. Unreached ones are never returned. */
+export function orderedMilestones(
+  journey: EnrollmentJourneyProjection,
+): readonly JourneyMilestone[] {
+  const reached = new Set(journey.completedMilestones);
+  return MILESTONE_ORDER.filter((milestone) => reached.has(milestone));
+}
 
 /**
  * Whether a journey needs the admin now. Only a canonical overdue date or a

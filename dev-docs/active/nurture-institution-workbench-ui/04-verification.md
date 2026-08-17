@@ -151,6 +151,38 @@ node .ai/scripts/ctl-project-governance.mjs lint --check --project main
 工具限制：Browser pane 中途进入 viewport 0x0 状态，`read_page` 与 `computer`
 不可用；`get_page_text` 与 `javascript_tool` 仍可用，验证改走这两条路径。
 
-## P6–P7
+## P6 — Record（2026-08-17）
+
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+浏览器验证（全新 tab，零控制台错误），三条 journey 各验一个侧面：
+
+- **豆豆**（候补中）：三个 tab（概览 / 里程碑 3 / 候补）。候补 tab 显示
+  「托大班 · 第 1 位」、资格时间 2026-07-30、下次复核 2026-08-17、
+  继续意愿「已确认」、限时 offer「进行中」、优先类别 `sibling_priority · v3`。
+  无 `safeBlocker`，因此**概览没有渲染阻塞区**——条件渲染成立。
+- **小满**（有阻塞、非候补）：只有两个 tab，**没有候补 tab**；阻塞区正确显示原文。
+  StatStrip 为 试入园复盘 / 等我 / 逾期 3 天 / 6。
+- **乐乐**（等老师）：责任角色显示「等老师」，无候补 tab。
+
+里程碑 tab（`javascript_tool` 读 DOM）：
+
+- 已达成 6 项按 canonical 顺序全部出现。
+- **未达成的 0 项泄漏**（检查了取得候补资格 / 家长已接受 / 正式入园已提交 / 流程完成）。
+- 末行为「当前停在：试入园复盘」。
+
+其他：
+
+- 无法解析的 ref（`opt_does_not_exist`）返回 404 页面，`notFound()` 生效。
+- 加了 `SetBreadcrumb` 后，末级面包屑为截断的 `safeSummary`；
+  实测全文在页面中只出现 **1 次**（去掉 `Record` 的 `intro` 之后），无重复。
+
+工具注意：在同一次 `javascript_exec` 里点击 tab 并立刻读 DOM 会读到旧内容，
+React 尚未重渲染。点击与断言必须分两次调用。
+
+## P7
 
 （待填）
