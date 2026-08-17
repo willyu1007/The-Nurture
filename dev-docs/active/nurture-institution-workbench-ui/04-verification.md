@@ -244,6 +244,33 @@ home 不再高亮。`/` 与 `/nurture` 均 200 落到 `/nurture/overview`。全�
 排查中的一次误判：先用 `.wb-nav__add` 判断 create 是否渲染，得出"没生效"。
 那个类是 `NavGroupDef.add`（分组级），create 菜单的类是 `.wb-create`——选错了选择器。
 
+## P1 侧栏对齐 The-Education（2026-08-17）
+
+参照 `The-Education/apps/web/src/components/workbench/workbench-shell.tsx`——
+同一套 kit 的姊妹实现——补齐三处未用的 `ShellNav` 能力。
+
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+浏览器实测：
+
+- **分组从 1 个变 4 个。** 原来 8 个模块挤在一个标签为「园区」的分组里，
+  而这个标签只是复述表面名，白占一层层级。现改为：概览台（无标签）／
+  园区流程／园区管理／资料与洞察。DOM 确认四组结构与归属正确。
+- **队列 badge = 5**，来自 `countAwaitingAdmin()`（`responsibleRole ===
+  institution_admin` 且 lifecycle active），与概览台 StatStrip 的「等我」一致。
+  layout 改为 async 在服务端取数，Shell 仍是纯客户端组件。
+- **搜索按钮不再是死的。** kit 无论是否传 `onSearch` 都渲染该按钮，
+  之前未接等于发了个点了没反应的按钮。现接 toast 说明未接入。
+
+全新 tab 零控制台错误。
+
+刻意未采纳参考实现的两项：`sections`（本工作台所有路由都已是 nav 项，
+`activeCrumb` 能解析，补 sections 是无效冗余）与 `signOutHref`
+（尚无认证，指向不存在的登出页会是又一个死入口）。
+
 ## 工具经验
 
 - Browser pane 会间歇进入 viewport 0x0 状态：`read_page` / `computer` 不可用，

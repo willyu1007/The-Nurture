@@ -74,6 +74,15 @@ export async function listQueueRows(): Promise<readonly QueueRow[]> {
   return resolved.filter((row): row is QueueRow => row !== null);
 }
 
+/** Open journeys the admin owns — the count the sidebar badges the queue with. */
+export async function countAwaitingAdmin(): Promise<number> {
+  const rows = await listQueueRows();
+  return rows.filter(
+    ({ journey }) =>
+      journey.lifecycle === "active" && journey.responsibleRole === "institution_admin",
+  ).length;
+}
+
 /** Ordered waitlists, one per care group. Position is the entry's index. */
 async function listCapacityWaitlists(): Promise<readonly AdminWaitlist[]> {
   return WAITLISTS;

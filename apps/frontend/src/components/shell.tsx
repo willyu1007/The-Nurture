@@ -1,56 +1,61 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { AppShell, ToastProvider, type ShellNav } from "@willyu1007/web-workbench";
+import {
+  AppShell,
+  ToastProvider,
+  useToast,
+  type ShellNav,
+} from "@willyu1007/web-workbench";
 
-// The institution_workbench modules, in the surface registry's
-// orderedContentKinds order. `soon` marks the ones with no capability contract
-// yet — the information architecture lands once instead of growing an item per
-// release, and the kit renders those entries visibly unavailable rather than
-// linking to a route that does not exist.
-// Every module sits one level under /nurture, the hub included. The shell
-// matches nav items by path prefix and takes the first hit, so a hub at bare
-// `/nurture` would swallow every sibling route and keep itself highlighted.
-const MODULES = [
-  { href: "/nurture/overview", label: "概览台" },
-  { href: "/nurture/queue", label: "流程队列" },
-  { href: "/nurture/people", label: "人员与关系", soon: true },
-  { href: "/nurture/operations", label: "日常运营", soon: true },
-  { href: "/nurture/outreach", label: "家长触达", soon: true },
-  { href: "/nurture/knowledge", label: "园区知识", soon: true },
-  { href: "/nurture/grants", label: "授权申请", soon: true },
-  { href: "/nurture/insight", label: "洞察", soon: true },
-] as const;
+/**
+ * The institution_workbench modules, grouped by what the admin is doing rather
+ * than listed flat. A single group whose label restates the surface ("园区")
+ * spends a level of hierarchy on nothing; the kit's groups exist to separate
+ * kinds of work, which is how the sibling education workbench uses them.
+ *
+ * `soon` marks modules with no capability contract yet. The information
+ * architecture lands once instead of growing an entry per release, and the kit
+ * renders those visibly unavailable rather than linking nowhere.
+ *
+ * Every href is distinct and none is a prefix of another: the shell matches by
+ * path prefix and takes the first hit, so overlapping routes light up the wrong
+ * entry.
+ */
+const GROUPS: ShellNav["groups"] = [
+  // Unlabelled: the aggregation entry belongs above the categories, not inside one.
+  { items: [{ href: "/nurture/overview", label: "概览台" }] },
+  {
+    label: "园区流程",
+    items: [
+      { href: "/nurture/queue", label: "流程队列", badgeKey: "queue" },
+      { href: "/nurture/grants", label: "授权申请", soon: true },
+    ],
+  },
+  {
+    label: "园区管理",
+    items: [
+      { href: "/nurture/people", label: "人员与关系", soon: true },
+      { href: "/nurture/operations", label: "日常运营", soon: true },
+      { href: "/nurture/outreach", label: "家长触达", soon: true },
+    ],
+  },
+  {
+    label: "资料与洞察",
+    items: [
+      { href: "/nurture/knowledge", label: "园区知识", soon: true },
+      { href: "/nurture/insight", label: "洞察", soon: true },
+    ],
+  },
+];
 
-// Placeholder until P3 supplies the fixtures module. `active` is the bound role
-// for this session; `others` are roles the account holds that this surface
-// cannot serve — B3-0 gives the caregiver no domain web workbench at all, so
-// they are listed with the reason instead of an switch that leads nowhere.
+// Placeholder until real authentication exists. `active` is the bound role for
+// this session; `others` are roles the account holds that this surface cannot
+// serve — B3-0 gives the caregiver no domain web workbench at all, so they are
+// listed with the reason instead of a switch that leads nowhere.
 const ROLES = {
   active: { label: "园长 · 晨光园", surface: "机构 Web 操作台" },
   others: [{ label: "本班老师 · 托小班", surface: "仅移动端班级工作台" }],
-};
-
-// onSwitch lives here (client) because it is a callback; the dev workbench has
-// no second registered scenario, so it is a no-op.
-const nav: ShellNav = {
-  scenario: {
-    current: "nurture",
-    registered: [{ key: "nurture", name: "The Nurture", mark: "育" }],
-    onSwitch: () => {},
-  },
-  groups: [{ label: "园区", items: MODULES.map((m) => ({ ...m })) }],
-  sections: [],
-  // Home belongs at the root. The shell matches nav entries by path prefix and
-  // special-cases "/" to an exact match, so any other value makes home light up
-  // alongside whichever module is actually open — first because it shared the
-  // hub's route, then because every module route sits under /nurture.
-  home: { label: "The Nurture", href: "/" },
-  // The paradigm puts quick global create in the sidebar, which keeps the scene
-  // toolbar down to its single primary. Registering an inquiry is the only thing
-  // this surface can create; the flow does not exist yet, so it is marked the
-  // same way the unbuilt modules are rather than left out and rebuilt later.
-  create: [{ href: "/nurture/queue/new", label: "登记新意向", soon: true }],
 };
 
 /**
@@ -96,15 +101,63 @@ function RoleBar() {
   );
 }
 
-export function Shell({ children }: { children: ReactNode }) {
-  // The kit leaves toast to the host: AppShell does not wrap it, so the
-  // provider belongs here, outside the shell.
+/**
+ * Nav is built inside the provider because its callbacks need `useToast`. The
+ * kit leaves toast to the host — AppShell deliberately does not wrap it.
+ */
+function ShellWithNav({
+  badges,
+  children,
+}: {
+  readonly badges: Readonly<Record<string, number>>;
+  readonly children: ReactNode;
+}) {
+  const toast = useToast();
+
+  const nav: ShellNav = {
+    scenario: {
+      current: "nurture",
+      registered: [{ key: "nurture", name: "The Nurture", mark: "育" }],
+      onSwitch: () => {},
+    },
+    groups: GROUPS,
+    sections: [],
+    // Home belongs at the root. The shell matches nav entries by path prefix and
+    // special-cases "/" to an exact match, so any other value makes home light
+    // up alongside whichever module is actually open.
+    home: { label: "The Nurture", href: "/" },
+    // The paradigm puts quick global create in the sidebar, which keeps the
+    // scene toolbar down to its single primary. Registering an inquiry is the
+    // only thing this surface can create; the flow does not exist yet, so it is
+    // marked the same way the unbuilt modules are.
+    create: [{ href: "/nurture/queue/new", label: "登记新意向", soon: true }],
+  };
+
+  return (
+    <AppShell
+      nav={nav}
+      accountName="dev"
+      badges={badges}
+      // The kit renders the search control whether or not a handler is supplied,
+      // so leaving it unwired ships a button that does nothing.
+      onSearch={() => toast.notify("info", "搜索尚未接入", "工作台的检索面还没有能力支撑。")}
+    >
+      <RoleBar />
+      {children}
+    </AppShell>
+  );
+}
+
+export function Shell({
+  badges,
+  children,
+}: {
+  readonly badges: Readonly<Record<string, number>>;
+  readonly children: ReactNode;
+}) {
   return (
     <ToastProvider>
-      <AppShell nav={nav} accountName="dev">
-        <RoleBar />
-        {children}
-      </AppShell>
+      <ShellWithNav badges={badges}>{children}</ShellWithNav>
     </ToastProvider>
   );
 }
