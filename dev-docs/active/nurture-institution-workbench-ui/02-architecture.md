@@ -9,13 +9,38 @@
 ## 路由
 
 ```
-/nurture                     Hub（最小版，只聚合 institution_workflow_queue）
-/nurture/queue               Queue（四个阻塞分组）
-/nurture/queue/[id]          Record（4 tab）
+/                            重定向到概览
+/nurture                     重定向到概览（声明的 route namespace，不应死路）
+/nurture/overview            Hub（最小版，只聚合 institution_workflow_queue）
+/nurture/queue               Queue（按 responsibleRole 分五组）
+/nurture/queue/[ref]         Record（概览 / 里程碑 / 候补，末者条件出现）
 ```
 
-其余 7 个 contentKind 在导航中占位但不实现，点击进入空态并说明「尚未开放」。
-占位是刻意的：让 shell 的信息架构一次成型，避免后续每加一个模块就改一次导航。
+其余 7 个 contentKind 在导航中占位但不实现，用 `NavItemDef.soon` 渲染为「待上线」
+且不可点。占位是刻意的：让 shell 的信息架构一次成型，避免后续每加一个模块就改一次导航。
+
+## 侧栏信息架构
+
+```
+概览                          ← ShellNav.home，就是概览页本身
+＋ 新增                       ← ShellNav.create（登记新意向，soon）
+园区管理    入园流程 ⑤ · 人员与关系 · 日常运营 · 家长触达 · 授权申请
+资料与洞察  园区知识 · 洞察
+```
+
+四条约束，都踩过才定下来：
+
+- **概览没有独立 nav 项。** hub 就是 `home`。两者都指向同一路由时，
+  shell 会同时点亮两个入口。
+- **`activeCrumb` 不看 home**，所以概览页的面包屑靠 `sections` 提供。
+  加粗面包屑就是页面标题，缺了等于页面没标题。
+- **分组按工作性质，不按实现进度或使用频率。** 入园流程虽是唯一有数据的模块，
+  仍归「园区管理」——产品契约把当前 InstitutionWorkflow 的范围定义为园区管理。
+- **每个 href 互不为前缀。** shell 按路径前缀匹配且取首个命中，
+  重叠路由会点亮错误条目。
+
+命名上不用机制词：`institution_workflow_queue` 在界面里叫「入园流程」，
+不叫「流程队列」（机制词）也不叫「入园申请」（把施动方反转——园长发起、家庭同意）。
 
 ## kit 范式映射
 

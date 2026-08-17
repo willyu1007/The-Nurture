@@ -59,9 +59,14 @@ kit 六范式里从未用过的 Hub 与 Queue，以及 8 个 `strong_confirmatio
 | 2 | 强确认 | Drawer 为默认；`end_trial` / `close_enrollment` / `revoke_child_link_grant` 升级全屏 |
 | 3 | 角色切换 | 无二次确认（切换本身无副作用） |
 | 4 | 候补名次 | 队列中保留显示；排的是候补顺序，不是给孩子评分，与 Anti-Metrics 无冲突 |
+| 5 | 模块命名 | `institution_workflow_queue` 在界面里叫「入园流程」。不用「流程队列」（机制词，UX 契约禁开发向词汇）；不用「入园申请」（园长发起、家庭同意，「申请」会反转施动方） |
+| 6 | 侧栏信息架构 | 概览即 `home`，无独立 nav 项；其余按工作性质分「园区管理」「资料与洞察」两组，不按实现进度或使用频率 |
 
-设计基准（非仓库资产）：`~/Desktop/nurture-workbench-mocks/spec-merged.html`，
-另有 A/B/C 三个原始方向与 `index.html` 对比页。
+决策 5、6 由用户看实际界面后提出，详见 `02-architecture.md` 的侧栏一节。
+
+设计基准（非仓库资产）：`~/Desktop/nurture-workbench-mocks/`——
+Track C 的三个模块 mock 与 `index.html`。第一轮的 A/B/C 方向稿与 `spec-merged.html`
+已随目录一次误删丢失，未重建（对应设计已实现完毕，参考价值已消）。
 
 ## Acceptance criteria
 
