@@ -73,6 +73,17 @@ kit 六范式里从未用过的 Hub 与 Queue，以及 8 个 `strong_confirmatio
 - [x] 时限语义色映射只有一个来源（`lib/view/due.ts`）。
 - [x] `pnpm --filter @the-nurture/frontend lint` 与 `typecheck` 通过。
 
+## 三个零契约模块的能力提案
+
+`artifacts/capability-proposal.md` 反推了 `people_operations`、`daily_operations`、
+`grant_request_management` 需要哪些当前不存在的能力（26 个），逐条标注契约来源、
+确认级别与禁止边界。两条需要 owner 裁决的结论：
+
+- **GrantRequest 不满足 Workflow 判据**，建议做成带 waiting state 的 `ActionExecution`，
+  `grant_request_management` 从 `orderedContentKinds` 移除（8 个模块变 7 个）。
+- **`workflow-product-design-contract.md` 自身矛盾**：Current Scope 把 GrantRequest
+  列为 Workflow 范围，Classification Rules 又排除它。
+
 ## 交付后仍未闭合的契约缺口
 
 这些不是实现遗漏，是契约当前不提供，记录在此供后端任务取用：
