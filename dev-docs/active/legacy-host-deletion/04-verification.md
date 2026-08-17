@@ -13,9 +13,27 @@
 
 ## Wave 2
 
-- [ ] scenario-service e2e 全绿（两组路由 + security-boundary 断言翻转）
-- [ ] `pnpm test:legacy-host` 全绿（对应路由与测试移除后，population 下限同步）
-- [ ] reseal pins 通过
+- [x] 2026-08-17 `pnpm --filter @the-nurture/scenario-service typecheck` 通过
+- [x] 2026-08-17 `pnpm --filter @the-nurture/scenario-service test` → 213 passed
+  （+4 user-attention；security-boundary 断言翻转后全绿）
+- [x] 2026-08-17 scenario-service db lane（run-with-local-env）→ 4 files /
+  73 passed（+5 growth-record）
+- [x] 2026-08-17 `pnpm test:legacy-host` → 18 passed（首跑 12 败为与并行
+  dist 重建的瞬态竞争，复跑即绿，见 05-pitfalls）
+- [x] 2026-08-17 `pnpm test:x5` → 5 files / 37 passed（两只一次性库：
+  nurture_x5 @ docker:5433，my_chat_x5 @ 原生 5432 带 pgvector；
+  x5-joint-acceptance 已打 scenario-service 真实 ingress）
+- [x] 2026-08-17 scenario-service build + `node scripts/smoke-scenario-service.mjs`
+  → `[ok] ... user-attention=disabled growth-record-contribution=disabled`
+- [x] 2026-08-17 根 `pnpm typecheck` 通过；`verify:test-routing` →
+  legacy-host=9 scenario-service=32；`verify:g2-exit-contract` /
+  `verify:persistence-boundaries` / `verify:port-topology` /
+  `verify:family-growth-outbox-invariants` / `verify:c30-i3-default-off` 全 [ok]
+- [x] 2026-08-17 `verify:c30-i3-owner-adoption` 在批次提交后重封
+- 环境性红（非本批引入，记录）：`verify:workflow-contract-pin` 因共享
+  sibling My-Chat 已推进（4cd58f8 > 钉 8cbdc30）本地必红，CI 用钉住检出
+  不受影响；`verify:g2-exit-db-census` 是全新库普查，本地长期库有历史
+  protected 行必红。
 
 ## Wave 3
 

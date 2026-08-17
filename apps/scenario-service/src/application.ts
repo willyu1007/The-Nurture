@@ -80,6 +80,14 @@ import {
   createParentCommunicationExtensionComposition,
   type ParentCommunicationExtensionBindingV1,
 } from "./parent-communication-extension-runtime.js";
+import {
+  createUserAttentionOwnerConfig,
+  type UserAttentionOwnerConfig,
+} from "./user-attention-owner.controller.js";
+import {
+  createGrowthRecordContributionConfig,
+  type GrowthRecordContributionConfig,
+} from "./growth-record-contribution.controller.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
@@ -116,6 +124,8 @@ export async function createScenarioServiceApplication(input?: {
   parentCommunicationExtensionComposition?: ParentCommunicationExtensionComposition;
   parentCommunicationExtensionBinding?: ParentCommunicationExtensionBindingV1;
   familySharingPrivateRuntime?: FamilySharingPrivateRuntime;
+  userAttentionOwner?: UserAttentionOwnerConfig;
+  growthRecordContribution?: GrowthRecordContributionConfig;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
@@ -284,6 +294,11 @@ export async function createScenarioServiceApplication(input?: {
           createDisabledFamilySharingPrivateRuntime(),
         serviceAuth: bindingOwnerServiceAuth,
       },
+      userAttentionOwner:
+        input?.userAttentionOwner ??
+        createUserAttentionOwnerConfig({ serviceAuth: bindingOwnerServiceAuth }),
+      growthRecordContribution:
+        input?.growthRecordContribution ?? createGrowthRecordContributionConfig({}),
     }),
     {
       abortOnError: false,

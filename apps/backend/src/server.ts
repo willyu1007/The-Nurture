@@ -1,6 +1,6 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import Fastify, { type FastifyInstance } from "fastify";
-import type { CanonicalRef, WorkflowCommandMeta } from "@my-chat/workflow-contracts";
+import type { WorkflowCommandMeta } from "@my-chat/workflow-contracts";
 import {
   NurtureCaptureExtractionStatus,
   NurtureCaptureInputModality,
@@ -9,23 +9,14 @@ import {
 } from "@the-nurture/db";
 import { WorkflowApprovalStatus } from "./db/dev-host-client.js";
 import type { NurtureApp } from "./app.js";
-import { registerGrowthRecordContributionRoute } from "./growth-record-contribution.js";
-
-type DomainContextRef = CanonicalRef;
 
 const DEFAULT_WORKSPACE = "ws-dev";
 
-/** Fastify HTTP surface mirroring the runtime's route checklist (subset for the first slice). */
-const authorized = (header: string | undefined, token: string | undefined): boolean => {
-  if (!header || !token || !header.startsWith("Bearer ")) return false;
-  const supplied = Buffer.from(header.slice("Bearer ".length), "utf8");
-  const expected = Buffer.from(token, "utf8");
-  return supplied.length === expected.length && timingSafeEqual(supplied, expected);
-};
-
 export const buildServer = (
   app: NurtureApp,
-  options: { internalServiceToken?: string } = {},
+  // Accepted for ING-D4 evidence: a supplied token must not resurrect any
+  // owner route here; the parameter is intentionally unused.
+  _options: { internalServiceToken?: string } = {},
 ): FastifyInstance => {
   const fastify = Fastify({ logger: false });
 
@@ -34,80 +25,8 @@ export const buildServer = (
   // ING-D4 (M5): the dev-host P7 binding-owner route was removed; the formal
   // NestJS scenario-service is the only live owner ingress.
 
-  registerGrowthRecordContributionRoute(fastify, {
-    nurturePrisma: app.nurturePrisma,
-    ...(options.internalServiceToken
-      ? { internalServiceToken: options.internalServiceToken }
-      : {}),
-  });
-
-  fastify.post<{
-    Body: {
-      workspace_id?: string;
-      source_context_refs?: DomainContextRef[];
-      actor_user_id?: string;
-    };
-  }>("/internal/nurture/activation/user-attention/resolve", async (req, reply) => {
-    if (!options.internalServiceToken) {
-      return reply.code(503).send({ error: "activation_owner_disabled" });
-    }
-    if (!authorized(req.headers.authorization, options.internalServiceToken)) {
-      return reply.code(401).send({ error: "service_auth_required" });
-    }
-    if (
-      !req.body?.workspace_id ||
-      !Array.isArray(req.body.source_context_refs)
-    ) {
-      return reply.code(400).send({ error: "invalid_owner_read_request" });
-    }
-    return reply.send(
-      await app.resolveUserAttention({
-        workspace_id: req.body.workspace_id,
-        source_context_refs: req.body.source_context_refs,
-        ...(req.body.actor_user_id ? { actor_user_id: req.body.actor_user_id } : {}),
-      }),
-    );
-  });
-
-  fastify.post<{
-    Body: {
-      workspace_id?: string;
-      source_context_refs?: DomainContextRef[];
-      actor_user_id?: string;
-      expected_item_version?: number;
-      idempotency_key?: string;
-    };
-  }>("/internal/nurture/activation/user-attention/acknowledge", async (req, reply) => {
-    if (!options.internalServiceToken) {
-      return reply.code(503).send({ error: "activation_owner_disabled" });
-    }
-    if (!authorized(req.headers.authorization, options.internalServiceToken)) {
-      return reply.code(401).send({ error: "service_auth_required" });
-    }
-    const body = req.body;
-    if (
-      !body?.workspace_id ||
-      !Array.isArray(body.source_context_refs) ||
-      typeof body.actor_user_id !== "string" ||
-      body.actor_user_id.length === 0 ||
-      !Number.isSafeInteger(body.expected_item_version) ||
-      (body.expected_item_version as number) < 1 ||
-      typeof body.idempotency_key !== "string" ||
-      body.idempotency_key.length === 0 ||
-      body.idempotency_key.length > 200
-    ) {
-      return reply.code(400).send({ error: "invalid_owner_action_request" });
-    }
-    return reply.send(
-      await app.acknowledgeUserAttention({
-        workspace_id: body.workspace_id,
-        source_context_refs: body.source_context_refs,
-        actor_user_id: body.actor_user_id,
-        expected_item_version: body.expected_item_version as number,
-        idempotency_key: body.idempotency_key,
-      }),
-    );
-  });
+  // T-014 Wave 2: the user-attention and growth-record contribution owner
+  // routes moved to the scenario-service; this host serves no owner ingress.
 
   // POST /api/workflow/runs — start a run (persists run + seeds steps).
   fastify.post<{

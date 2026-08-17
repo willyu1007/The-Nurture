@@ -1,6 +1,20 @@
 # Pitfalls
 
-（已解决的失败与死胡同记录；建立时为空。）
+## 已解决
+
+- 2026-08-17（Wave 2）：`pnpm test:legacy-host` 首跑 12 个用例 500 全败，
+  复跑全绿。原因是共享工作区里另一会话/前一命令触发的
+  `build:binding-owner-runtime` dist 重建与测试进程竞争（vitest 经
+  node_modules 链接消费包 dist）。判定手法：只有触碰 dev-host 库的路由
+  500，仅用生产库的 p4 与无库的 guard 均绿，且 tsx 直连探针 201——
+  排除代码回归后复跑即可。
+- 2026-08-17（Wave 2）：smoke 的 parent-communication 断言
+  `service_unavailable` 其实依赖 CI 注入的 DATABASE_URL 走深层分支，
+  本地从来就跑不过。子进程 env 钉 `DATABASE_URL: ""` 后所有 fail-closed
+  分支确定化，断言改为 `parent_communication_owner_disabled`。
+- 2026-08-17（Wave 2）：`verify:g2-exit-db-census` 是「全新库普查」型
+  gate（期望 0 行 active protected storage），本地长期开发库必红；
+  只在 CI 的 fresh 库上有意义，不要试图在本地修它。
 
 预先记录的已知约束（非失败，避免踩坑）：
 

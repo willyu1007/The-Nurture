@@ -88,6 +88,18 @@ import {
   type ParentCommunicationExtensionConfig,
   ParentCommunicationExtensionServiceAuthGuard,
 } from "./parent-communication-extension.controller.js";
+import {
+  GROWTH_RECORD_CONTRIBUTION_CONFIG,
+  GrowthRecordContributionAuthGuard,
+  GrowthRecordContributionController,
+  type GrowthRecordContributionConfig,
+} from "./growth-record-contribution.controller.js";
+import {
+  USER_ATTENTION_OWNER_CONFIG,
+  UserAttentionOwnerController,
+  UserAttentionOwnerServiceAuthGuard,
+  type UserAttentionOwnerConfig,
+} from "./user-attention-owner.controller.js";
 import { SafeExceptionFilter } from "./safe-exception.filter.js";
 import { ScenarioStructuredLogger } from "./structured-logger.js";
 import { ScenarioCommandSettlementInterceptor } from "./scenario-command-settlement.interceptor.js";
@@ -109,6 +121,8 @@ import { ScenarioCommandSettlementInterceptor } from "./scenario-command-settlem
     TeacherAssistantQueryOwnerController,
     ParentCommunicationExtensionController,
     FamilySharingPrivateController,
+    UserAttentionOwnerController,
+    GrowthRecordContributionController,
   ],
 })
 export class AppModule {
@@ -128,6 +142,8 @@ export class AppModule {
     teacherAssistantQueryOwner?: TeacherAssistantQueryOwnerConfig;
     parentCommunicationExtension?: ParentCommunicationExtensionConfig;
     familySharingPrivate: FamilySharingPrivateConfig;
+    userAttentionOwner?: UserAttentionOwnerConfig;
+    growthRecordContribution?: GrowthRecordContributionConfig;
   }): DynamicModule {
     return {
       module: AppModule,
@@ -254,6 +270,27 @@ export class AppModule {
           useValue: Object.freeze({ ...input.familySharingPrivate }),
         },
         FamilySharingPrivateServiceAuthGuard,
+        {
+          // Absent input = fail-closed: the guard 503s on a null service.
+          provide: USER_ATTENTION_OWNER_CONFIG,
+          useValue:
+            input.userAttentionOwner ??
+            Object.freeze({
+              serviceAuth: input.bindingOwner.serviceAuth,
+              service: null,
+            }),
+        },
+        UserAttentionOwnerServiceAuthGuard,
+        {
+          provide: GROWTH_RECORD_CONTRIBUTION_CONFIG,
+          useValue:
+            input.growthRecordContribution ??
+            Object.freeze({
+              serviceAuth: input.bindingOwner.serviceAuth,
+              prisma: null,
+            }),
+        },
+        GrowthRecordContributionAuthGuard,
       ],
     };
   }

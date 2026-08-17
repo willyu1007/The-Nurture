@@ -55,22 +55,14 @@ assertEqual(
   "frontend start",
 );
 
-for (const relativePath of [
-  "apps/frontend/next.config.ts",
-  "apps/frontend/src/lib/api.ts",
-]) {
-  const content = read(relativePath);
-  assertIncludes(
-    content,
-    "process.env.NURTURE_BACKEND_URL",
-    `${relativePath} backend environment key`,
-  );
-  assertIncludes(
-    content,
-    "http://localhost:3200",
-    `${relativePath} backend endpoint`,
-  );
-}
+// T-013 cut the frontend loose from the legacy host: it consumes no backend
+// endpoint until the real scenario-service ingress exists, so the frontend
+// must no longer hardcode the retired host's port.
+assertExcludes(
+  read("apps/frontend/next.config.ts"),
+  "http://localhost:3200",
+  "frontend retired backend endpoint",
+);
 
 const devTemplate = read("config/environments/dev.yaml.template");
 assertIncludes(

@@ -1,89 +1,106 @@
+import type { AddressInfo } from "node:net";
 import { randomUUID } from "node:crypto";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
 import {
   NurtureMetricObservationStatus,
   NurtureMetricSourceType,
   NurtureMetricSubjectType,
   NurtureMetricValueKind,
+  createPrismaClient,
 } from "@the-nurture/db";
-import { createNurtureApp } from "../src/app.js";
-import { buildServer } from "../src/server.js";
+import { createScenarioServiceApplication } from "../src/application.js";
+import {
+  GROWTH_RECORD_CONTRIBUTION_PATH,
+  createGrowthRecordContributionConfig,
+} from "../src/growth-record-contribution.controller.js";
+
+// Migrated from the legacy host's growth-record contribution e2e (T-014
+// Wave 2): the display-safe resolver now runs in scenario-service on the real
+// disposable PostgreSQL, with unchanged fences and payload shape.
 
 const TOKEN = "growth-record-contribution-token-32b";
-const contributionPath = "/internal/nurture/growth-record/contribution/resolve";
 
-describe("growth-record contribution resolver", () => {
-  const app = createNurtureApp();
-  const server = buildServer(app, { internalServiceToken: TOKEN });
-  const disabledServer = buildServer(app);
-  const shortTokenServer = buildServer(app, { internalServiceToken: "short-token" });
+const prisma = createPrismaClient();
 
-  afterAll(async () => {
-    await Promise.all([server.close(), disabledServer.close(), shortTokenServer.close()]);
-    await app.disconnect();
+describe("growth-record contribution resolver (scenario-service)", () => {
+  let close: (() => Promise<void>) | undefined;
+
+  afterEach(async () => {
+    await close?.();
+    close = undefined;
   });
 
-  it("stays disabled without a configured service token", async () => {
-    const response = await disabledServer.inject({
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  const boot = async (token: string | undefined) => {
+    const { app } = await createScenarioServiceApplication({
+      growthRecordContribution: createGrowthRecordContributionConfig({ token, prisma }),
+    });
+    await app.listen(0, "127.0.0.1");
+    close = () => app.close();
+    const address = app.getHttpServer().address() as AddressInfo;
+    return `http://127.0.0.1:${address.port}`;
+  };
+
+  const post = (baseUrl: string, payload: unknown, authorization?: string) =>
+    fetch(`${baseUrl}${GROWTH_RECORD_CONTRIBUTION_PATH}`, {
       method: "POST",
-      url: contributionPath,
-      payload: validRequest(randomUUID()),
+      headers: {
+        "content-type": "application/json",
+        ...(authorization ? { authorization } : {}),
+      },
+      body: JSON.stringify(payload),
     });
 
-    expect(response.statusCode).toBe(503);
-    expect(response.json()).toEqual({ error: "contribution_resolve_disabled" });
-
-    const shortTokenResponse = await shortTokenServer.inject({
-      method: "POST",
-      url: contributionPath,
-      payload: validRequest(randomUUID()),
-    });
-    expect(shortTokenResponse.statusCode).toBe(503);
-    expect(shortTokenResponse.json()).toEqual({ error: "contribution_resolve_disabled" });
+  it("stays disabled without a configured (or long-enough) service token", async () => {
+    for (const token of [undefined, "short-token"]) {
+      const baseUrl = await boot(token);
+      const response = await post(baseUrl, validRequest(randomUUID()), `Bearer ${token}`);
+      expect(response.status).toBe(503);
+      expect(await response.json()).toEqual({ error: "contribution_resolve_disabled" });
+      await close?.();
+      close = undefined;
+    }
   });
 
   it("rejects an invalid bearer token", async () => {
-    const response = await server.inject({
-      method: "POST",
-      url: contributionPath,
-      headers: { authorization: "Bearer invalid-growth-record-token" },
-      payload: validRequest(randomUUID()),
-    });
-
-    expect(response.statusCode).toBe(401);
-    expect(response.json()).toEqual({ error: "service_auth_required" });
+    const baseUrl = await boot(TOKEN);
+    const response = await post(baseUrl, validRequest(randomUUID()), "Bearer invalid-growth-record-token");
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "service_auth_required" });
   });
 
   it("rejects malformed bodies and stops invalid Nurture contribution refs", async () => {
-    const headers = { authorization: `Bearer ${TOKEN}` };
-    const malformed = await server.inject({
-      method: "POST",
-      url: contributionPath,
-      headers,
-      payload: { workspace_id: "workspace-1", source_context_refs: "not-an-array" },
-    });
-    expect(malformed.statusCode).toBe(400);
-    expect(malformed.json()).toEqual({ error: "invalid_contribution_request" });
+    const baseUrl = await boot(TOKEN);
+    const authorization = `Bearer ${TOKEN}`;
 
-    const invalidRef = await server.inject({
-      method: "POST",
-      url: contributionPath,
-      headers,
-      payload: {
+    const malformed = await post(
+      baseUrl,
+      { workspace_id: "workspace-1", source_context_refs: "not-an-array" },
+      authorization,
+    );
+    expect(malformed.status).toBe(400);
+    expect(await malformed.json()).toEqual({ error: "invalid_contribution_request" });
+
+    const invalidRef = await post(
+      baseUrl,
+      {
         workspace_id: "workspace-1",
-        source_context_refs: [
-          canonicalRef("nurture", "metric_definition", randomUUID()),
-        ],
+        source_context_refs: [canonicalRef("nurture", "metric_definition", randomUUID())],
       },
-    });
-    expect(invalidRef.statusCode).toBe(200);
-    expect(invalidRef.json()).toEqual({
+      authorization,
+    );
+    expect(invalidRef.status).toBe(200);
+    expect(await invalidRef.json()).toEqual({
       status: "stopped",
       reason_code: "invalid_contribution_ref",
     });
   });
 
   it("stops missing and non-shareable observations", async () => {
+    const baseUrl = await boot(TOKEN);
     const workspaceId = `workspace-${randomUUID()}`;
     const unconfirmed = await observation({ workspaceId, userConfirmed: false });
     const missingChild = await observation({ workspaceId, childRefKey: null });
@@ -93,14 +110,21 @@ describe("growth-record contribution resolver", () => {
       status: NurtureMetricObservationStatus.corrected,
     });
 
-    await expectStopped(workspaceId, randomUUID(), "contribution_not_found");
-    await expectStopped(workspaceId, unconfirmed.id, "not_shareable");
-    await expectStopped(workspaceId, missingChild.id, "not_shareable");
-    await expectStopped(workspaceId, missingActor.id, "not_shareable");
-    await expectStopped(workspaceId, corrected.id, "not_shareable");
+    const expectStopped = async (observationId: string, reasonCode: string) => {
+      const response = await post(baseUrl, validRequest(observationId, workspaceId), `Bearer ${TOKEN}`);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ status: "stopped", reason_code: reasonCode });
+    };
+
+    await expectStopped(randomUUID(), "contribution_not_found");
+    await expectStopped(unconfirmed.id, "not_shareable");
+    await expectStopped(missingChild.id, "not_shareable");
+    await expectStopped(missingActor.id, "not_shareable");
+    await expectStopped(corrected.id, "not_shareable");
   });
 
   it("resolves only the display-safe observation contribution", async () => {
+    const baseUrl = await boot(TOKEN);
     const workspaceId = `workspace-${randomUUID()}`;
     const observedAt = new Date("2026-08-01T01:02:03.456Z");
     const row = await observation({
@@ -110,16 +134,10 @@ describe("growth-record contribution resolver", () => {
       observedAt,
       numericValue: 42,
     });
-    const response = await server.inject({
-      method: "POST",
-      url: contributionPath,
-      headers: { authorization: `Bearer ${TOKEN}` },
-      payload: validRequest(row.id, workspaceId),
-    });
+    const response = await post(baseUrl, validRequest(row.id, workspaceId), `Bearer ${TOKEN}`);
 
-    expect(response.statusCode).toBe(200);
-    const body = response.json() as Record<string, unknown>;
-    expect(Object.keys(body).sort()).toEqual(["contribution", "status"]);
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as Record<string, unknown>;
     expect(body).toEqual({
       status: "resolved",
       contribution: {
@@ -134,16 +152,6 @@ describe("growth-record contribution resolver", () => {
       },
     });
     const contribution = body.contribution as Record<string, unknown>;
-    expect(Object.keys(contribution).sort()).toEqual([
-      "contributor_actor_id",
-      "data_class",
-      "declared_audience",
-      "entry_type",
-      "occurred_at",
-      "owner_ref",
-      "summary",
-      "title",
-    ]);
     for (const key of [
       "numericValue",
       "booleanValue",
@@ -156,18 +164,14 @@ describe("growth-record contribution resolver", () => {
       expect(contribution).not.toHaveProperty(key);
     }
 
-    const withoutSummary = await observation({
-      workspaceId,
-      semanticSummary: "   ",
-    });
-    const withoutSummaryResponse = await server.inject({
-      method: "POST",
-      url: contributionPath,
-      headers: { authorization: `Bearer ${TOKEN}` },
-      payload: validRequest(withoutSummary.id, workspaceId),
-    });
+    const withoutSummary = await observation({ workspaceId, semanticSummary: "   " });
+    const withoutSummaryResponse = await post(
+      baseUrl,
+      validRequest(withoutSummary.id, workspaceId),
+      `Bearer ${TOKEN}`,
+    );
     const withoutSummaryContribution = (
-      withoutSummaryResponse.json() as { contribution: Record<string, unknown> }
+      (await withoutSummaryResponse.json()) as { contribution: Record<string, unknown> }
     ).contribution;
     expect(Object.keys(withoutSummaryContribution).sort()).toEqual([
       "contributor_actor_id",
@@ -180,21 +184,6 @@ describe("growth-record contribution resolver", () => {
     ]);
   });
 
-  async function expectStopped(
-    workspaceId: string,
-    observationId: string,
-    reasonCode: string,
-  ) {
-    const response = await server.inject({
-      method: "POST",
-      url: contributionPath,
-      headers: { authorization: `Bearer ${TOKEN}` },
-      payload: validRequest(observationId, workspaceId),
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual({ status: "stopped", reason_code: reasonCode });
-  }
-
   async function observation(input: {
     workspaceId: string;
     childRefKey?: string | null;
@@ -206,7 +195,7 @@ describe("growth-record contribution resolver", () => {
     numericValue?: number;
     status?: NurtureMetricObservationStatus;
   }) {
-    return app.nurturePrisma.nurtureMetricObservation.create({
+    return prisma.nurtureMetricObservation.create({
       data: {
         workspaceId: input.workspaceId,
         familyRefKey: `family:${input.workspaceId}`,

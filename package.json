@@ -52,7 +52,7 @@
     "db:migrate:all": "pnpm db:migrate && pnpm legacy-host:db:migrate",
     "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 1133",
     "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 499",
-    "verify:legacy-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/legacy-host.json legacy-host 25",
+    "verify:legacy-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/legacy-host.json legacy-host 18",
     "verify:test-routing": "node scripts/assert-test-routing.mjs",
     "verify:family-sharing-invariants": "node scripts/assert-family-sharing-invariants.mjs",
     "verify:family-growth-outbox-invariants": "node scripts/assert-family-growth-outbox-invariants.mjs",

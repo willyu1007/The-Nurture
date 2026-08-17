@@ -7,14 +7,8 @@ import {
   WorkflowWorker,
   type WorkflowRegistry,
 } from "@my-chat/workflow-runtime";
-import type { CanonicalRef, WorkflowPresenters } from "@my-chat/workflow-contracts";
+import type { WorkflowPresenters } from "@my-chat/workflow-contracts";
 import { createNurtureScenarioModule } from "@the-nurture/scenario";
-import {
-  acknowledgeNurtureUserAttention,
-  resolveNurtureUserAttention,
-  type NurtureUserAttentionAcknowledgeOutcome,
-  type NurtureUserAttentionResolution,
-} from "@the-nurture/scenario";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
 import { createDevHostPrismaClient, type DevHostPrismaClient } from "./db/dev-host-client.js";
 import { createDevHostRunBindingVerifier } from "./runtime/run-binding.verifier.js";
@@ -24,8 +18,6 @@ import { PgWorkflowLedgerRepository } from "./ledger/pg-workflow-ledger.reposito
 import { WorkflowActionService } from "./actions/action-service.js";
 import { StepDispatcher } from "./dispatcher.js";
 import { devHostSnapshot } from "./host-snapshot.js";
-
-type DomainContextRef = CanonicalRef;
 
 export type NurtureApp = {
   nurturePrisma: NurturePrismaClient;
@@ -40,18 +32,6 @@ export type NurtureApp = {
   presenters: WorkflowPresenters;
   /** Scenario-table repos (projects/captures/...) for the internal API (B3). */
   scenarioRepositories: ReturnType<typeof createScenarioRepositories>;
-  resolveUserAttention(input: {
-    workspace_id: string;
-    source_context_refs: readonly DomainContextRef[];
-    actor_user_id?: string;
-  }): Promise<NurtureUserAttentionResolution>;
-  acknowledgeUserAttention(input: {
-    workspace_id: string;
-    source_context_refs: readonly DomainContextRef[];
-    actor_user_id: string;
-    expected_item_version: number;
-    idempotency_key: string;
-  }): Promise<NurtureUserAttentionAcknowledgeOutcome>;
   disconnect(): Promise<void>;
 };
 
@@ -116,8 +96,6 @@ export const createNurtureApp = (
     artifacts,
     presenters,
     scenarioRepositories: createScenarioRepositories(nurturePrisma),
-    resolveUserAttention: (input) => resolveNurtureUserAttention(handlerDeps, input),
-    acknowledgeUserAttention: (input) => acknowledgeNurtureUserAttention(handlerDeps, input),
     async disconnect() {
       await Promise.all([nurturePrisma.$disconnect(), devHostPrisma.$disconnect()]);
     },

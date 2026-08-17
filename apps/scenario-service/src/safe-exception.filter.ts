@@ -63,6 +63,13 @@ const allowedErrors = new Set([
   "rendition_ref_invalid",
   "rendition_unavailable",
   "rendition_temporarily_unavailable",
+  // T-014 Wave 2 — owner routes migrated from the legacy host (frozen wire).
+  "activation_owner_disabled",
+  "invalid_owner_read_request",
+  "invalid_owner_action_request",
+  "contribution_resolve_disabled",
+  "invalid_contribution_request",
+  "contribution_resolve_unavailable",
 ]);
 
 const bodyParserErrorStatuses = new Map<string, number>([
@@ -118,7 +125,9 @@ export class SafeExceptionFilter implements ExceptionFilter {
       error !== "teacher_communication_owner_disabled" &&
       error !== "teacher_media_association_owner_disabled" &&
       error !== "teacher_assistant_query_owner_disabled" &&
-      error !== "parent_communication_extension_disabled"
+      error !== "parent_communication_extension_disabled" &&
+      error !== "activation_owner_disabled" &&
+      error !== "contribution_resolve_disabled"
     ) {
       this.logger.unhandledException(requestContext);
     }

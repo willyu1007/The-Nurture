@@ -29,9 +29,13 @@ this service. The legacy Fastify workflow harness is not on that path.
 | `POST` | `/internal/nurture/parent-communication-owner/v1/detail` | Default-off explicit-open bounded members and teacher timeline |
 | `POST` | `/internal/nurture/parent-communication-owner/v1/media-access` | Default-off P0 contract ingress; resolves current authority but returns `content_unavailable` until the private stream ingress and My-Chat proxy are implemented |
 | `POST` | `/internal/nurture/parent-communication-owner/v1/send-text` | Default-off text prepare/confirm exchange with same-command reconciliation |
+| `POST` | `/internal/nurture/activation/user-attention/resolve` | Fail-closed user-attention activation owner read (503 until service auth + `DATABASE_URL`); activation stays default-off |
+| `POST` | `/internal/nurture/activation/user-attention/acknowledge` | Fail-closed user-attention acknowledge action with the same fences |
+| `POST` | `/internal/nurture/growth-record/contribution/resolve` | Display-safe growth-record contribution resolver (503 until a >=16-char service token + `DATABASE_URL`) |
 
 All other paths return a body-safe `404`. The legacy Fastify workflow harness
-and `user_attention` route do not run in this service. Every private route uses
+does not run in this service; its `user_attention` and growth-record
+contribution owner routes migrated here (T-014). Every private route uses
 the same service bearer; the Harness remains disabled until service auth,
 `DATABASE_URL`, the integrity key and the protected-content key are all present.
 Institution business-communication read additionally requires its explicit flag.

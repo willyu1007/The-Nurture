@@ -6,8 +6,8 @@
 - Task: T-014
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-17
-- Next step: Wave 2 — user-attention 与 growth-record contribution 两组
-  owner 路由迁入 scenario-service（Wave 1 已于 2026-08-17 完成）。
+- Next step: Wave 3 — 四条 host-runtime 旅程的 x5-joint 等价覆盖
+  （Wave 1、2 已于 2026-08-17 完成；Wave 4 第 8 项已由 T-013 提前完成）。
 
 ## Goal
 

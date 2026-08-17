@@ -63,6 +63,36 @@
 验收：scenario-service e2e 全绿；harness 中对应路由与测试删除；
 `verify:legacy-host-population` 下限同步下调。
 
+### Wave 2 结果（2026-08-17，完成）
+
+- 两组路由以既有惯用法迁入 scenario-service：
+  `user-attention-owner.controller.ts`（guard + controller，逻辑复用
+  `NurtureUserAttentionService`）与
+  `growth-record-contribution.controller.ts`（resolver 整体平移，含
+  ≥16 字符 token 的独立判定）。错误体逐字保持；`SafeExceptionFilter`
+  allowlist 补入六个错误码，两个 `*_disabled` 码加入 unhandled 日志豁免。
+- 测试平移：`user-attention-owner-controller.e2e.test.ts`（plain lane，
+  stub service）+ `growth-record-contribution.db.e2e.test.ts`（db lane，
+  真库）；security-boundary 的 404 断言翻转为 fail-closed 503 正向覆盖。
+- harness 侧：两组路由、`growth-record-contribution.ts`、两个 e2e 文件
+  删除；`NurtureApp` 去掉 owner 成员；`buildServer` 的 token 参数保留为
+  ING-D4 证据（带下划线注明故意未用）。
+- **x5 joint 升级**：`x5-joint-acceptance` 原来把 harness 当 HTTP 壳，
+  现改为 boot scenario-service 真实 Nest ingress——My-Chat 的
+  `createNurtureUserAttentionHttpSource` 打到正式服务，joint 全绿
+  （5 文件 / 37 用例）。
+- smoke 确定性修复：子进程 env 钉 `DATABASE_URL: ""`，新增两条 503
+  fail-closed 断言；parent-communication 断言从 CI 专属的深层
+  `service_unavailable` 分支改为确定性的
+  `parent_communication_owner_disabled`。
+- 顺带修复：T-013 的「frontend 脱离 legacy host」提交让
+  `verify:port-topology` 变红（frontend 不再含 `NURTURE_BACKEND_URL`），
+  守卫改为断言 frontend **不得**再引用退休宿主端口——本属 Wave 4 的
+  守卫反转提前落了一小块；T-013 同时完成了原 Wave 4 第 8 项。
+- census/floor：legacyHost 11→9 文件、scenarioService 30→32、
+  `verify:legacy-host-population` 25→18；root package.json 变更需要
+  c30-i3 owner-adoption 锁在提交头重封（同批后续提交）。
+
 ## Wave 3 — host runtime 语义的 joint 等价（L，关键路径）
 
 6. 在 `test:x5` joint 通道为四条独家旅程建立等价覆盖（真 My-Chat runtime

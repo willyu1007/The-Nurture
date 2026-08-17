@@ -20,8 +20,9 @@ import {
   createPrismaClient as createNurturePrismaClient,
   PrismaUserAttentionRepository,
 } from "../src/index.js";
-import { buildServer } from "../../../apps/backend/src/server.js";
-import type { NurtureApp } from "../../../apps/backend/src/app.js";
+import { createScenarioServiceApplication } from "../../../apps/scenario-service/src/application.js";
+import { createBindingOwnerServiceAuth } from "../../../apps/scenario-service/src/binding-owner-service-auth.js";
+import { createGrowthRecordContributionConfig } from "../../../apps/scenario-service/src/growth-record-contribution.controller.js";
 import {
   createPrismaClient as createMyChatPrismaClient,
   PrismaAdminWorkflowRecoveryRepository,
@@ -66,7 +67,7 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
   const nurture = createNurturePrismaClient(NURTURE_DATABASE_URL);
   let myChat: ReturnType<typeof createMyChatPrismaClient>;
   let ownerBaseUrl: string;
-  let ownerServer: ReturnType<typeof buildServer>;
+  let ownerServer: { close(): Promise<void> };
 
   beforeAll(async () => {
     process.env.DATABASE_URL = MY_CHAT_DATABASE_URL;
@@ -74,13 +75,19 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
     const owner = new NurtureUserAttentionService(
       new PrismaUserAttentionRepository(nurture),
     );
-    ownerServer = buildServer(
-      {
-        resolveUserAttention: (input) => owner.resolve(input),
-      } as NurtureApp,
-      { internalServiceToken: SERVICE_TOKEN },
-    );
-    ownerBaseUrl = await ownerServer.listen({ host: "127.0.0.1", port: 0 });
+    // T-014 Wave 2: the owner endpoint now lives in the scenario-service; the
+    // joint lane drives My-Chat's HTTP source against that real ingress.
+    const { app } = await createScenarioServiceApplication({
+      userAttentionOwner: {
+        serviceAuth: createBindingOwnerServiceAuth(SERVICE_TOKEN),
+        service: owner,
+      },
+      growthRecordContribution: createGrowthRecordContributionConfig({ env: {} }),
+    });
+    await app.listen(0, "127.0.0.1");
+    ownerServer = app;
+    const address = app.getHttpServer().address() as AddressInfo;
+    ownerBaseUrl = `http://127.0.0.1:${address.port}`;
   });
 
   afterAll(async () => {

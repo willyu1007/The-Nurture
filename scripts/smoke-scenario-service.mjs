@@ -23,6 +23,9 @@ const child = spawn(
       PORT: String(port),
       NURTURE_BINDING_EVIDENCE_KEY: "",
       NURTURE_INTERNAL_SERVICE_TOKEN: "smoke-service-token",
+      // Deterministic across local/CI shells: with no database the migrated
+      // owner routes must answer fail-closed 503 rather than compose.
+      DATABASE_URL: "",
     },
     stdio: ["ignore", "pipe", "pipe"],
   },
@@ -85,18 +88,29 @@ try {
       body: "{}",
     },
   );
+  // With DATABASE_URL pinned empty the composition is deterministically
+  // absent, so the guard's disabled body replaces the CI-only deep
+  // service_unavailable branch this assertion used to depend on.
   await assertResponse(parentCommunicationDisabled, 503, {
-    error: "service_unavailable",
+    error: "parent_communication_owner_disabled",
   });
 
-  const legacy = await fetch(
+  // T-014 Wave 2: the activation owner routes migrated here from the legacy
+  // host; unconfigured they answer fail-closed instead of 404.
+  const userAttention = await fetch(
     `${baseUrl}/internal/nurture/activation/user-attention/resolve`,
     { method: "POST", headers: { connection: "close" } },
   );
-  await assertResponse(legacy, 404, { error: "not_found" });
+  await assertResponse(userAttention, 503, { error: "activation_owner_disabled" });
+
+  const growthRecord = await fetch(
+    `${baseUrl}/internal/nurture/growth-record/contribution/resolve`,
+    { method: "POST", headers: { connection: "close" } },
+  );
+  await assertResponse(growthRecord, 503, { error: "contribution_resolve_disabled" });
 
   process.stdout.write(
-    `[ok] scenario-service build/start/health port=${port} binding-owner=disabled harness=disabled parent-communication-owner=disabled legacy-route=absent\n`,
+    `[ok] scenario-service build/start/health port=${port} binding-owner=disabled harness=disabled parent-communication-owner=disabled user-attention=disabled growth-record-contribution=disabled\n`,
   );
 } catch (error) {
   process.stderr.write(`${String(error)}\n${stdout}${stderr}`);

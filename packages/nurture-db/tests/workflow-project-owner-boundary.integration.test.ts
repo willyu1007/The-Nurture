@@ -110,7 +110,7 @@ describe("profile projection upsert/read-back", () => {
       profile_id: `profile-${ws}`,
       workspace_id: ws,
       canonical_object_ref: ref,
-      scenario_key: "nurture",
+      scenario_key: "nurture" as const,
     };
 
     await ports.profiles.upsertProjection({ ...base, projection_version: 1, safe_summary: "Initial strategy summary." });

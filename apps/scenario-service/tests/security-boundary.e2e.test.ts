@@ -66,13 +66,21 @@ describe("scenario-service M1/M2 HTTP boundary", () => {
       error: "teacher_class_stream_presenter_disabled",
     });
 
-    for (const path of [
-      "/internal/nurture/activation/user-attention/resolve",
-      "/api/workflow/runs",
-    ]) {
+    for (const path of ["/api/workflow/runs"]) {
       const absent = await fetch(`${baseUrl}${path}`, { method: "POST" });
       expect(absent.status).toBe(404);
       expect(await absent.json()).toEqual({ error: "not_found" });
+    }
+
+    // T-014 Wave 2: the activation owner routes migrated here from the legacy
+    // host; unconfigured they stay fail-closed instead of absent.
+    for (const [path, error] of [
+      ["/internal/nurture/activation/user-attention/resolve", "activation_owner_disabled"],
+      ["/internal/nurture/growth-record/contribution/resolve", "contribution_resolve_disabled"],
+    ] as const) {
+      const migrated = await fetch(`${baseUrl}${path}`, { method: "POST" });
+      expect(migrated.status).toBe(503);
+      expect(await migrated.json()).toEqual({ error });
     }
 
     const unknownMethod = await fetch(`${baseUrl}/not-registered`, {
