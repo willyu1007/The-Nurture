@@ -22,23 +22,24 @@ import {
  * path prefix and takes the first hit, so overlapping routes light up the wrong
  * entry.
  */
+const OVERVIEW_HREF = "/nurture/overview";
+
 const GROUPS: ShellNav["groups"] = [
-  // Unlabelled: the two daily entry points. 概览台 aggregates 入园流程, so they
-  // belong together and above the categories rather than inside one.
-  {
-    items: [
-      { href: "/nurture/overview", label: "概览台" },
-      // Not 流程队列: that names the mechanism, which the UX contract rules out.
-      // Not 入园申请 either — the institution opens the inquiry, issues the offer
-      // and proposes formalization, and the family consents; calling it an
-      // application inverts who acts. 入园流程 also matches what the hub already
-      // calls this workflow.
-      { href: "/nurture/queue", label: "入园流程", badgeKey: "queue" },
-    ],
-  },
+  // The hub is absent here on purpose: it is the shell's home entry. A nav item
+  // pointing at the same route was a second control doing the same thing, and it
+  // is why the sidebar used to mark two entries active at once.
+  //
+  // 入园流程 sits in 园区管理 rather than pulled out for being the busiest — the
+  // workflow product contract scopes the current InstitutionWorkflow to
+  // institution management, so that is the category it belongs to.
   {
     label: "园区管理",
     items: [
+      // Not 流程队列: that names the mechanism, which the UX contract rules out.
+      // Not 入园申请 either — the institution opens the inquiry, issues the offer
+      // and proposes formalization, and the family consents; calling it an
+      // application inverts who acts.
+      { href: "/nurture/queue", label: "入园流程", badgeKey: "queue" },
       { href: "/nurture/people", label: "人员与关系", soon: true },
       { href: "/nurture/operations", label: "日常运营", soon: true },
       { href: "/nurture/outreach", label: "家长触达", soon: true },
@@ -126,11 +127,15 @@ function ShellWithNav({
       onSwitch: () => {},
     },
     groups: GROUPS,
-    sections: [],
-    // Home belongs at the root. The shell matches nav entries by path prefix and
-    // special-cases "/" to an exact match, so any other value makes home light
-    // up alongside whichever module is actually open.
-    home: { label: "The Nurture", href: "/" },
+    // The hub is the home entry, so it has no group item to derive a crumb from.
+    // `activeCrumb` only walks groups and sections, which is exactly what this
+    // section is for.
+    sections: [{ prefix: OVERVIEW_HREF, label: "概览", href: OVERVIEW_HREF }],
+    // Home is the hub itself, matching how the sibling education workbench uses
+    // it. Pointing it at "/" would leave nothing marked active while the hub is
+    // open; the earlier double-highlight came from the duplicate nav item, not
+    // from this href.
+    home: { label: "概览", href: OVERVIEW_HREF },
     // The paradigm puts quick global create in the sidebar, which keeps the
     // scene toolbar down to its single primary. Registering an inquiry is the
     // only thing this surface can create; the flow does not exist yet, so it is
