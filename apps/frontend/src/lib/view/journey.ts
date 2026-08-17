@@ -71,3 +71,29 @@ export function needsAdminNow(
 export function isOpen(journey: EnrollmentJourneyProjection): boolean {
   return journey.lifecycle === "active";
 }
+
+/**
+ * The verb on an admin row's action button. Only journeys the admin owns get a
+ * button at all, so this is never asked about someone else's work.
+ */
+export function adminActionVerb(stage: JourneyStage): string {
+  switch (stage) {
+    case "trial_review":
+      return "复盘";
+    case "trial_preparation":
+      return "开始试入园";
+    case "capacity_waitlist":
+      return "处理候补";
+    case "trial_in_progress":
+      return "处理";
+    case "inquiry":
+    case "intent_conversation":
+    case "visit_or_consultation":
+      return "跟进";
+    case "formal_enrollment_confirmation":
+      return "处理转正式";
+    case "completed":
+    case "closed":
+      return "查看";
+  }
+}

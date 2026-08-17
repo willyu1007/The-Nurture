@@ -199,7 +199,45 @@ fixture 的 `safeBlocker` 原文写了「复盘已到期 3 天」，与 UI 计�
 
 ## P5 — Queue
 
-（待填）
+`/nurture/queue` 按 `responsibleRole` 分五组。加了 `/nurture/queue/[ref]` 占位页
+供行与抽屉落点。
+
+### 只有「等我」组有动作按钮
+
+kit 的 `<Queue>` **强制**要求 `drawer` prop——它锁死「行 + 尾部按钮 → 右侧抽屉」，
+没有只读模式。这反而逼出了比原设计更准确的划分：
+
+- **等我**（`responsibleRole === "institution_admin"`）→ `<Queue>`，按钮开抽屉。
+- **其余四组** → `<Section>` + `<EntityRow href>`，chevron 导航到详情。
+
+依据是铁律「行内按钮 = 去做，chevron = 去看」：别人负责的流程不是园长可执行的动作，
+给它们配动作按钮会谎报可操作性。设计基准里那几组也画了按钮，是错的。
+
+### 抽屉现在只读
+
+`<Queue>` 的抽屉在本阶段展示阻塞、下一步、里程碑数，footer 是「打开完整详情」。
+P7 把强确认流程放进 footer。**动作从一开始就走抽屉而不是导航**，因为 Queue 范式
+锁死了这个形态，之后再改属于返工。
+
+### 客户端边界
+
+`<Queue>` 是 `"use client"` 且带 `useState`，而它的 `toRow` / `drawer` /
+`actionLabel` 都是函数，无法跨 RSC 边界序列化。所以 `admin-queue.client.tsx`
+只包住需要它的那一组；其余四组用 server-safe 的 `EntityRow` 直接在 page 里渲染。
+视图模型在 server 侧解析完再传纯数据下去。
+
+### 验证抓到的两个缺陷
+
+**1. `.mt-caption` 会把中文里夹的英文单词大写。** 「跨 owner 校验中」渲染成
+「跨 OWNER 校验中」。kit 自己的 `components.css` 注释里就写明了这个坑：
+`.mt-caption` 是 **Latin eyebrow**（uppercase + tracking），CJK 下 transform 是
+空操作但 tracking 仍生效，而夹杂的拉丁字母会被大写；双语产品应改用
+`.mt-value-label`（命名读取视图中的值）或 `.mt-field-label`（命名控件）。
+全仓 7 处 `.mt-caption` 已换成 `.mt-value-label`，含 P1 的角色条。
+
+**2. `adminActionVerb` 漏了一个 stage。** `trial_in_progress` 未覆盖，
+被 `noImplicitReturns` 抓到。10 个 stage 现已全覆盖，无 default 分支——
+将来契约加 stage 时会编译失败而不是静默返回 undefined。
 
 ## P6 — Record
 

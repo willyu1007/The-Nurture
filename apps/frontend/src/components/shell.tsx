@@ -55,7 +55,7 @@ function RoleBar() {
   return (
     <div className="nurture-rolebar">
       <div className="nurture-rolebar__id">
-        <span className="mt-caption">当前角色</span>
+        <span className="mt-value-label">当前角色</span>
         <span className="mt-chip">{ROLES.active.label}</span>
       </div>
       <button
@@ -68,17 +68,17 @@ function RoleBar() {
       </button>
       {open ? (
         <div className="nurture-rolebar__menu">
-          <p className="mt-caption">当前</p>
+          <p className="mt-value-label">当前</p>
           <p className="mt-body">
             {ROLES.active.label} — {ROLES.active.surface}
           </p>
-          <p className="mt-caption">该账号的其他角色</p>
+          <p className="mt-value-label">该账号的其他角色</p>
           {ROLES.others.map((r) => (
             <p className="mt-body" key={r.label}>
               {r.label} — {r.surface}
             </p>
           ))}
-          <p className="mt-caption">
+          <p className="mt-value-label">
             角色本身不授予权限；每次读取与动作仍会重新校验范围与授权。
           </p>
         </div>

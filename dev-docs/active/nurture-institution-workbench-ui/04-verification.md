@@ -120,6 +120,37 @@ node .ai/scripts/ctl-project-governance.mjs lint --check --project main
 - **副行文案重复**。fixture 的 `safeBlocker` 内含「已到期 3 天」，
   与 UI 计算的「逾期 3 天」并排出现。已改为只述原因。
 
-## P5–P7
+## P5 — Queue（2026-08-17）
+
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+浏览器验证（全新 tab，零控制台错误）：
+
+- 五组齐全且计数吻合：等我 5 / 等家庭 3 / 等老师 1 / 等系统 1 / 推进中 1 = 11。
+- 组内按到期排序：等家庭组为 08-20 → 08-21 → 09-01。
+- 候补名次按 `orderedEntries` 索引推导：豆豆第 1、牛牛第 2、米米第 3，与 fixture 顺序一致。
+- 时限标签与语义色分档正确：逾期 danger、今日 warning、未来 info、无时限 muted。
+
+抽屉交互（用 `javascript_tool` 检查 DOM，Browser pane 的可访问性读取当时不可用）：
+
+- 点击前 DOM 无抽屉内容；点击「复盘」后抽屉出现，含当前阻塞、下一步、里程碑数。
+- **`location.pathname` 仍为 `/nurture/queue`** —— 验证了 Queue 铁律「开抽屉，不跳页」。
+- 抽屉 footer 的详情链接为 `/nurture/queue/opt_wfr_01h_xiaoman`，指向正确记录。
+- 动作按钮共 5 个，全部落在等我组；其余四组为导航行，无按钮。
+
+发现并修复的缺陷：
+
+- **`.mt-caption` 把中文里的英文大写**。「跨 owner 校验中」渲染成「跨 OWNER」。
+  kit 的 `components.css` 已记录该类是 Latin eyebrow、双语产品应用 label 类。
+  全仓 7 处改为 `.mt-value-label` 后复验为小写。
+- **`adminActionVerb` 未覆盖 `trial_in_progress`**，由 typecheck 抓到。
+
+工具限制：Browser pane 中途进入 viewport 0x0 状态，`read_page` 与 `computer`
+不可用；`get_page_text` 与 `javascript_tool` 仍可用，验证改走这两条路径。
+
+## P6–P7
 
 （待填）
