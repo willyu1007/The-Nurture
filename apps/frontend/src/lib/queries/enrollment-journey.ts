@@ -23,16 +23,9 @@ import type {
   AdminWaitlistEntry,
   EnrollmentJourneyProjection,
   OpaqueRef,
-  OwnerTargetOption,
   SurfaceEnvelope,
 } from "@/lib/contracts/enrollment-journey";
-import {
-  ENVELOPE,
-  FIXTURE_NOW,
-  JOURNEYS,
-  TARGET_OPTIONS,
-  WAITLISTS,
-} from "@/lib/fixtures/enrollment-journey";
+import { ENVELOPE, FIXTURE_NOW, JOURNEYS, WAITLISTS } from "@/lib/fixtures/enrollment-journey";
 
 /**
  * The clock the screens measure due dates against. Pinned to the fixture clock
@@ -45,17 +38,6 @@ export function now(): number {
 /** The workbench envelope for the current actor. */
 export async function openWorkbench(): Promise<SurfaceEnvelope> {
   return ENVELOPE;
-}
-
-/** Owner-issued target options behind a module's itemRefs. */
-export async function listTargetOptions(
-  itemRefs: readonly OpaqueRef[],
-): Promise<readonly OwnerTargetOption[]> {
-  const byRef = new Map(TARGET_OPTIONS.map((option) => [option.targetOptionRef, option]));
-  return itemRefs.flatMap((ref) => {
-    const option = byRef.get(ref);
-    return option ? [option] : [];
-  });
 }
 
 /** One journey's projection. Returns null when the option no longer resolves. */
@@ -93,7 +75,7 @@ export async function listQueueRows(): Promise<readonly QueueRow[]> {
 }
 
 /** Ordered waitlists, one per care group. Position is the entry's index. */
-export async function listCapacityWaitlists(): Promise<readonly AdminWaitlist[]> {
+async function listCapacityWaitlists(): Promise<readonly AdminWaitlist[]> {
   return WAITLISTS;
 }
 

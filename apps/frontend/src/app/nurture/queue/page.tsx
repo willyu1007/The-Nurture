@@ -49,6 +49,17 @@ export default async function QueuePage() {
 
   const adminRows = byRole("institution_admin");
 
+  // Handled before the groups so the page shows one empty state. Rendering the
+  // sections anyway would stack the queue's own "nothing waiting on you" under
+  // the page's "nothing at all", which reads as two different facts.
+  if (views.length === 0) {
+    return (
+      <Scene>
+        <EmptyState title="暂无进行中的入园流程" desc="登记新意向后会出现在这里。" />
+      </Scene>
+    );
+  }
+
   return (
     <Scene intro={`共 ${views.length} 条进行中的入园流程`}>
       <Section title={`${ROLE_GROUP_LABEL.institution_admin}（${adminRows.length}）`}>
@@ -82,10 +93,6 @@ export default async function QueuePage() {
           </Section>
         );
       })}
-
-      {views.length === 0 ? (
-        <EmptyState title="暂无进行中的入园流程" desc="登记新意向后会出现在这里。" />
-      ) : null}
     </Scene>
   );
 }

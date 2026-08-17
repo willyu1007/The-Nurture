@@ -13,7 +13,6 @@
 import type {
   AdminWaitlist,
   EnrollmentJourneyProjection,
-  OwnerTargetOption,
   SurfaceEnvelope,
 } from "@/lib/contracts/enrollment-journey";
 
@@ -321,15 +320,15 @@ export const JOURNEYS: readonly EnrollmentJourneyProjection[] = [
   }),
 ];
 
-/** Owner-issued options, one per journey. Labels stay within the 128-char cap. */
-export const TARGET_OPTIONS: readonly OwnerTargetOption[] = JOURNEYS.map((journey) => ({
-  targetOptionRef: `opt_${journey.workflowRunRef}`,
-  label: journey.safeSummary.slice(0, 128),
-  sourceLabel: "流程队列",
-  expiresAt: "2026-08-17T16:00:00.000Z",
-}));
-
-/** The workbench envelope. Only the queue module has content in this slice. */
+/**
+ * The workbench envelope. Only the queue module has content in this slice.
+ *
+ * `itemRefs` are target-option refs. The owner-issued OwnerTargetOption objects
+ * behind them — carrying a label and an `expiresAt` — are not modelled: no
+ * screen shows a picker, and the queue resolves each ref to a full projection
+ * instead. Option expiry is therefore also unmodelled; `queryEnrollmentJourney`
+ * returning null for an unresolvable ref is the seam where it would land.
+ */
 export const ENVELOPE: SurfaceEnvelope = {
   surfaceKey: "institution_workbench",
   surfaceVersion: "1.0.0",
