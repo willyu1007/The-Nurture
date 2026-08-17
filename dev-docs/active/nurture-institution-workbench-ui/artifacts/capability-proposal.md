@@ -209,11 +209,49 @@ enrollment 已存在但授权缺失或过期时，园长如何重新发起。
 
 ---
 
-## 四、跨模块要先消除的重复
+## 四、两份模块分解不一致
 
-`02-architecture.md` 把 grant lifecycle 同时写在「人员与关系」和「授权申请」里。
-建议按上一节的结论划清：**授权覆盖是 enrollment 关系的属性，归人员与关系；
-工作台没有独立的授权模块。** 采纳第三节的建议，这个重复自动消失。
+本提案早期版本称「`02-architecture.md` 把 grant lifecycle 同时写在人员与关系和授权申请里」。
+**那是错的**：`02-architecture.md` 只提了一次（在人员与关系内），而且它根本没有「授权申请」
+这个模块。真正的问题不是文档内重复，是**两份分解彼此不一致**。
+
+| A：`nurture-mobile-ux-contract.md`（已注册 context 契约）<br>+ `02-architecture.md`（T-007 归档） | B：surface registry（冻结机器契约） |
+| --- | --- |
+| 人员与关系（**含 enrollment 与 grant lifecycle**） | `people_operations` |
+| 日常运营 | `daily_operations` |
+| 家长触达 | `communication_review` |
+| **数字资源** | *（无对应 contentKind）* |
+| 园区知识／RAG | `knowledge_management` |
+| 流程队列 | `institution_workflow_queue` |
+| *（无）* | `hub` |
+| *（无）* | `insight` |
+| *（含在人员与关系内）* | **`grant_request_management`**（被单独提出） |
+
+三处差异，性质各不相同：
+
+**① `grant_request_management` 被从人员与关系里单独提了出来。**
+第三节的证据（`grant_head` 已绑在 journey 命令内、`02-architecture.md` 明写 Grant change
+不是第二个 Workflow）指向把它合并回去——**恰好回到 A 的分法**。
+两条独立路径得出同一结论，是相互印证。
+
+**② `数字资源` 在 B 里消失了，而且没有任何能力支撑。**
+A 侧对它有实质描述（整理／查看／治理已授权的活动、媒体、文档资源；
+`02-architecture.md` 的 "Complete activity records in Web" 一整节讲 Admin 可新增园区来源
+照片文字、看完整原图、设活动封面、调整落位、提 correction candidate）。
+但在 B 侧：无 contentKind，且 workbench 绑定的 28 个能力里**零个**媒体相关——
+全部 6 个媒体能力（`confirm_child_media_attribution`、`organize_care_capture_batch`、
+`discard_media_asset` 等）都绑在 `caregiver_teacher_board` 上。
+**这需要一个决策：是有意砍掉了，还是在冻结 registry 时漏了？**
+
+**③ `hub` 与 `insight` 是 B 新增的。** 这两个是合理的新增（概览与洞察），
+A 没有不代表冲突。
+
+### 建议
+
+- ① 按第三节执行：移除 `grant_request_management`，coverage 回到人员与关系。
+- ② 单独决策。若确认砍掉，`nurture-mobile-ux-contract.md` 的「首批包含…数字资源…」
+  一句需要同步更正——那是已注册的 context 契约，不能放着与冻结 registry 不一致。
+- ③ 无需动作。
 
 ---
 
@@ -234,7 +272,7 @@ enrollment 已存在但授权缺失或过期时，园长如何重新发起。
 | 顺序 | 内容 | 性质 |
 | --- | --- | --- |
 | 1 | 确认移除 `grant_request_management` contentKind | 决策；归类本身已由证据定论 |
-| 2 | 消除 grant lifecycle 的双处描述 | 决策，阻塞两个模块的边界划分 |
+| 2 | 裁决 `数字资源` 是砍掉还是补回（见第四节 ②） | 决策；砍掉则需同步更正 mobile UX 契约 |
 | 3 | 人员与关系的**读**能力（4 个） | 拓扑根，其余模块的作用域来源 |
 | 4 | 人员与关系的**写**能力，按试点实际需要裁剪 | 19 个里试点可能只需 5–6 个 |
 | 5 | 日常运营（4 个） | 依赖 3 |
