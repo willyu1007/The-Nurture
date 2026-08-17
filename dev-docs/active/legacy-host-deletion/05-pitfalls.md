@@ -2,6 +2,18 @@
 
 ## 已解决
 
+- 2026-08-17（Wave 4 提交事故，内容无损）：Wave 4 的提交消息用了
+  `refactor(t014)!:`，commit-msg hook 的类型模式不含 `!` 标记而拒绝；
+  但 `git commit ... | tail` 的管道吃掉了退出码，`&&` 链继续执行 push
+  （推出的是并行会话的本地提交），随后 reseal 链里的 `git commit` 把
+  仍在暂存区的整个拆除（55 文件）连同锁一起提交成了 5b23d98。内容正确
+  且带 Task 标记，但提交边界错位；锁的 source_revision 已在 284922a
+  修正指向 5b23d98。三条教训：提交一律用 pathspec 形式
+  `git commit -m ... -- <paths>`（共享 index 下 `git add` 不设界）；
+  永远不要把 `git commit` 放进带管道的 `&&` 链；subject 不要用 `!`
+  breaking 标记（用正文说明）。与 T-013 bundle 的
+  「shared-index commit hazard」记录互为印证。
+
 - 2026-08-17（Wave 2）：`pnpm test:legacy-host` 首跑 12 个用例 500 全败，
   复跑全绿。原因是共享工作区里另一会话/前一命令触发的
   `build:binding-owner-runtime` dist 重建与测试进程竞争（vitest 经
