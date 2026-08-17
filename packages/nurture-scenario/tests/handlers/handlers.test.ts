@@ -166,13 +166,18 @@ const buildDeps = (cfg: Cfg = {}) => {
 const hasEvent = (result: { event_drafts?: { event_type: string }[] }, type: string) =>
   (result.event_drafts ?? []).some((e) => e.event_type === type);
 
+// Standard workflow.* events are host-emitted by the kernel; a scenario draft
+// of one is rejected as workflow_handoff_standard_event_forgery (T-014 pin).
+const hasStandardDraft = (result: { event_drafts?: { event_type: string }[] }) =>
+  (result.event_drafts ?? []).some((e) => e.event_type.startsWith("workflow."));
+
 describe("collect_context", () => {
   it("binds family context and completes (no profile)", async () => {
     const { deps } = buildDeps();
     const r = await makeCollectContext(deps)(stepInput());
     expect(r.status).toBe("completed");
     expect(r.context_bindings?.[0]?.context_refs[0]?.object_type).toBe("family");
-    expect(hasEvent(r, "workflow.context.bound")).toBe(true);
+    expect(hasStandardDraft(r)).toBe(false);
     expect(hasEvent(r, "nurture.profile.snapshot_attached")).toBe(false);
   });
 
@@ -189,7 +194,7 @@ describe("collect_context", () => {
     const r = await makeCollectContext(deps)(stepInput());
     expect(r.status).toBe("manual_review_required");
     expect(r.reason_code).toBe("canonical_ref_unresolved");
-    expect(hasEvent(r, "workflow.context.rebind_required")).toBe(true);
+    expect(hasStandardDraft(r)).toBe(false);
     expect(r.context_bindings).toBeUndefined();
   });
 });
@@ -240,7 +245,7 @@ describe("calibrate_family_strategy", () => {
     const r = await makeCalibrateFamilyStrategy(deps)(stepInput());
     expect(r.status).toBe("manual_review_required");
     expect(r.reason_code).toBe("version_conflict");
-    expect(hasEvent(r, "workflow.step.retry_requested")).toBe(true);
+    expect(hasStandardDraft(r)).toBe(false);
   });
 
   it("manual-reviews when project is missing", async () => {
@@ -314,6 +319,7 @@ describe("apply_medical_safety_gate", () => {
     expect(r.status).toBe("manual_review_required");
     expect(r.reason_code).toBe("SAFETY_DIAGNOSIS_INTENT");
     expect(hasEvent(r, "nurture.health_state.safety_escalated")).toBe(true);
+    expect(hasStandardDraft(r)).toBe(false); // the scenario-internal event travels alone
     expect(r.artifact_drafts?.[0]?.artifact_type).toBe("health_state_summary"); // always emitted
     expect(calls.evidence).toContain("health_safety_escalation_reason");
   });
@@ -376,26 +382,26 @@ describe("generate_care_plan / record_review version conflicts", () => {
 });
 
 describe("generic step handlers", () => {
-  it("request_approval pauses for guardian approval", async () => {
+  it("request_approval pauses for guardian approval without drafting host events", async () => {
     const { deps } = buildDeps();
     const r = await makeRequestApproval(deps)(stepInput());
     expect(r.status).toBe("manual_review_required");
     expect(r.reason_code).toBe("guardian_approval_required");
-    expect(hasEvent(r, "workflow.approval.requested")).toBe(true);
+    expect(r.event_drafts).toBeUndefined();
   });
 
-  it("request_handoff completes and requests a handoff", async () => {
+  it("request_handoff completes with the handoff boundary ref", async () => {
     const { deps } = buildDeps();
     const r = await makeRequestHandoff(deps)(stepInput());
     expect(r.status).toBe("completed");
-    expect(hasEvent(r, "workflow.handoff.requested")).toBe(true);
+    expect(hasStandardDraft(r)).toBe(false);
     expect(r.output_refs.some((ref) => ref.object_type === "workflow_handoff")).toBe(true);
   });
 
-  it("write_artifact completes", async () => {
+  it("write_artifact completes without drafting host events", async () => {
     const { deps } = buildDeps();
     const r = await makeWriteArtifact(deps)(stepInput());
     expect(r.status).toBe("completed");
-    expect(hasEvent(r, "workflow.step.completed")).toBe(true);
+    expect(r.event_drafts).toBeUndefined();
   });
 });

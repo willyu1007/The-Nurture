@@ -47,6 +47,9 @@ const artifactRef = (input: WorkflowStepHandlerInput, artifactType: string): Can
   version: input.expected_step_version,
 });
 
+// Scenario-internal (nurture.*) events ONLY. Standard workflow.* events are
+// host-emitted by the kernel; a scenario draft of one is rejected as
+// workflow_handoff_standard_event_forgery (T-014 joint pin).
 const eventDraft = (
   input: WorkflowStepHandlerInput,
   eventType: string,
@@ -92,15 +95,15 @@ const familyDomainRef = (objectId: string): DomainContextRef => ({
   object_id: objectId,
 });
 
+// The kernel emits workflow.step.manual_review_required itself; the handler
+// only states the verbatim pause intent.
 const manualReview = (
   input: WorkflowStepHandlerInput,
   reasonCode: string,
-  events: OutboxEventDraft[] = [],
 ): WorkflowStepHandlerResult => ({
   status: "manual_review_required",
   output_refs: [workflowRunRef(input)],
   reason_code: reasonCode,
-  event_drafts: [eventDraft(input, "workflow.step.manual_review_required", { reason_code: reasonCode }), ...events],
 });
 
 // ---------------------------------------------------------------------------
@@ -111,9 +114,7 @@ export const makeCollectContext = (deps: NurtureHandlerDeps): WorkflowStepHandle
   const ws = input.meta.workspace_id;
   const ctx = await deps.runContext.getStartRequirements({ workspace_id: ws, run_id: input.run_id });
   if (!ctx || ctx.context_refs.length === 0) {
-    return manualReview(input, "start_requirements_missing", [
-      eventDraft(input, "workflow.context.rebind_required", { reason_code: "start_requirements_missing" }),
-    ]);
+    return manualReview(input, "start_requirements_missing");
   }
 
   const contextRefs: DomainContextRef[] = [];
@@ -123,9 +124,7 @@ export const makeCollectContext = (deps: NurtureHandlerDeps): WorkflowStepHandle
     if (!snap) {
       if (ref.object_type === "family") {
         // family is canonical_required: cannot bind without it.
-        return manualReview(input, "canonical_ref_unresolved", [
-          eventDraft(input, "workflow.context.rebind_required", { reason_code: "canonical_ref_unresolved", target_type: ref.object_type }),
-        ]);
+        return manualReview(input, "canonical_ref_unresolved");
       }
       continue; // optional refs are skipped, not fatal
     }
@@ -139,7 +138,7 @@ export const makeCollectContext = (deps: NurtureHandlerDeps): WorkflowStepHandle
     });
   }
 
-  const events: OutboxEventDraft[] = [eventDraft(input, "workflow.context.bound"), eventDraft(input, "workflow.step.completed")];
+  const events: OutboxEventDraft[] = [];
 
   // nurture profile projection is keyed per family (D-P2-7).
   const familyRef = ctx.context_refs.find((r) => r.object_type === "family");
@@ -182,7 +181,6 @@ export const makeEvaluatePregnancyStage = (deps: NurtureHandlerDeps): WorkflowSt
     artifact_drafts: [
       artifactDraft(input, "pregnancy_stage_summary", "Pregnancy stage preparation", `Stage: ${stage.bucket}. Non-medical preparation prompts only.`),
     ],
-    event_drafts: [eventDraft(input, "workflow.step.completed"), eventDraft(input, "workflow.artifact.created")],
   };
 };
 
@@ -236,7 +234,6 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
       status: "retry_requested",
       output_refs: [workflowRunRef(input)],
       reason_code: command.reason_code,
-      event_drafts: [eventDraft(input, "workflow.step.retry_requested")],
     };
   }
   if (command.status === "not_committed") {
@@ -245,10 +242,9 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
         status: "retry_requested",
         output_refs: [workflowRunRef(input)],
         reason_code: command.reason_code,
-        event_drafts: [eventDraft(input, "workflow.step.retry_requested")],
       };
     }
-    return manualReview(input, command.reason_code, [eventDraft(input, "workflow.step.retry_requested")]);
+    return manualReview(input, command.reason_code);
   }
 
   return {
@@ -263,7 +259,6 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
       artifactDraft(input, "family_strategy_summary", "Family strategy", "Reviewable strategy from charter boundaries and family calibration."),
     ],
     handoff_drafts: [],
-    event_drafts: [eventDraft(input, "workflow.step.completed"), eventDraft(input, "workflow.artifact.created")],
   };
 };
 
@@ -294,7 +289,7 @@ export const makeGenerateCarePlan = (deps: NurtureHandlerDeps): WorkflowStepHand
       status: "active",
     });
   } catch {
-    return manualReview(input, "version_conflict", [eventDraft(input, "workflow.step.retry_requested")]);
+    return manualReview(input, "version_conflict");
   }
 
   return {
@@ -308,7 +303,6 @@ export const makeGenerateCarePlan = (deps: NurtureHandlerDeps): WorkflowStepHand
         `${plan.plan_payload.trial_window_days}-day ${project.issue_type} rule trial (${plan.plan_payload.rules.length} rule(s)).`,
       ),
     ],
-    event_drafts: [eventDraft(input, "workflow.step.completed"), eventDraft(input, "workflow.artifact.created")],
   };
 };
 
@@ -316,7 +310,7 @@ export const makeCompareActivities = (deps: NurtureHandlerDeps): WorkflowStepHan
   const ws = input.meta.workspace_id;
   const comparisonId = `${input.run_id}:activity_comparison`;
   const draft = await deps.repositories.activityComparisons.getDraft({ workspace_id: ws, comparison_id: comparisonId });
-  if (!draft) return { status: "retry_requested", output_refs: [workflowRunRef(input)], reason_code: "comparison_draft_missing", event_drafts: [eventDraft(input, "workflow.step.retry_requested")] };
+  if (!draft) return { status: "retry_requested", output_refs: [workflowRunRef(input)], reason_code: "comparison_draft_missing" };
 
   const options: ActivityOption[] = [];
   for (const ref of draft.option_refs) {
@@ -354,12 +348,7 @@ export const makeCompareActivities = (deps: NurtureHandlerDeps): WorkflowStepHan
         [evidenceRef],
       ),
     ],
-    event_drafts: [
-      eventDraft(input, "workflow.step.completed"),
-      eventDraft(input, "workflow.artifact.created"),
-      eventDraft(input, "nurture.activity_comparison.artifact_generated"),
-      eventDraft(input, "workflow.evidence.recorded"),
-    ],
+    event_drafts: [eventDraft(input, "nurture.activity_comparison.artifact_generated")],
   };
 };
 
@@ -386,7 +375,7 @@ export const makeRecordReview = (deps: NurtureHandlerDeps): WorkflowStepHandler 
       safe_summary: `Latest rule-trial learning for ${project.issue_type}.`,
     });
   } catch {
-    return manualReview(input, "projection_version_conflict", [eventDraft(input, "workflow.step.retry_requested")]);
+    return manualReview(input, "projection_version_conflict");
   }
 
   try {
@@ -400,7 +389,7 @@ export const makeRecordReview = (deps: NurtureHandlerDeps): WorkflowStepHandler 
       charter_update_proposal_payload: { proposed: false },
     });
   } catch {
-    return manualReview(input, "version_conflict", [eventDraft(input, "workflow.step.retry_requested")]);
+    return manualReview(input, "version_conflict");
   }
 
   const evidenceRef = await deps.repositories.evidence.appendEvidenceRef({
@@ -416,12 +405,7 @@ export const makeRecordReview = (deps: NurtureHandlerDeps): WorkflowStepHandler 
     artifact_drafts: [
       artifactDraft(input, "execution_review_summary", "Execution review", "Outcome review with learning output; profile projection updated by family ref.", [evidenceRef]),
     ],
-    event_drafts: [
-      eventDraft(input, "workflow.step.completed"),
-      eventDraft(input, "workflow.artifact.created"),
-      eventDraft(input, "workflow.evidence.recorded"),
-      eventDraft(input, "nurture.profile.snapshot_attached"),
-    ],
+    event_drafts: [eventDraft(input, "nurture.profile.snapshot_attached")],
   };
 };
 
@@ -466,8 +450,6 @@ export const makeApplyMedicalSafetyGate = (deps: NurtureHandlerDeps): WorkflowSt
       reason_code: classification.reason_code,
       artifact_drafts: [draft],
       event_drafts: [
-        eventDraft(input, "workflow.artifact.created"),
-        eventDraft(input, "workflow.step.manual_review_required", { reason_code: classification.reason_code }),
         // scenario_internal: MUST NOT reach chat/forum/knowledge consumers (manifest forbidden_events).
         eventDraft(input, "nurture.health_state.safety_escalated", { reason_code: classification.reason_code }),
       ],
@@ -478,7 +460,6 @@ export const makeApplyMedicalSafetyGate = (deps: NurtureHandlerDeps): WorkflowSt
     status: "completed",
     output_refs: [workflowRunRef(input), artifactRef(input, "health_state_summary")],
     artifact_drafts: [draft],
-    event_drafts: [eventDraft(input, "workflow.step.completed"), eventDraft(input, "workflow.artifact.created")],
   };
 };
 
@@ -486,16 +467,16 @@ export const makeApplyMedicalSafetyGate = (deps: NurtureHandlerDeps): WorkflowSt
 export const makeWriteArtifact = (_deps: NurtureHandlerDeps): WorkflowStepHandler => async (input) => ({
   status: "completed",
   output_refs: [workflowRunRef(input)],
-  event_drafts: [eventDraft(input, "workflow.step.completed")],
 });
 
 export const makeRequestApproval = (_deps: NurtureHandlerDeps): WorkflowStepHandler => async (input) => ({
   status: "manual_review_required",
   output_refs: [workflowRunRef(input)],
   reason_code: "guardian_approval_required",
-  event_drafts: [eventDraft(input, "workflow.approval.requested"), eventDraft(input, "workflow.step.manual_review_required", { reason_code: "guardian_approval_required" })],
 });
 
+// workflow.handoff.* events are kernel-emitted from real handoff
+// materialization (handoff_drafts); this P0 step only marks the boundary ref.
 export const makeRequestHandoff = (_deps: NurtureHandlerDeps): WorkflowStepHandler => async (input) => ({
   status: "completed",
   output_refs: [
@@ -508,7 +489,6 @@ export const makeRequestHandoff = (_deps: NurtureHandlerDeps): WorkflowStepHandl
       version: input.expected_step_version,
     },
   ],
-  event_drafts: [eventDraft(input, "workflow.handoff.requested")],
 });
 
 const makeOpenInstitutionSurface = (
@@ -533,10 +513,6 @@ const makeOpenInstitutionSurface = (
     output_refs: [workflowRunRef(input), artifactRef(input, artifactType)],
     artifact_drafts: [artifactDraft(input, artifactType, safeTitle, surface.safe_summary)],
     handoff_drafts: [],
-    event_drafts: [
-      eventDraft(input, "workflow.step.completed"),
-      eventDraft(input, "workflow.artifact.created"),
-    ],
   };
 };
 

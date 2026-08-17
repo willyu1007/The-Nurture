@@ -69,3 +69,14 @@
   不在 CI）。
 - 首跑期间的 unit/db 单点红均甄别为并行会话 WIP/构建竞争，复跑全绿
   （见 05-pitfalls 模式）。
+
+## Wave 3 后续 — 标准事件草稿剥离（2026-08-17，teardown 之后）
+
+- [x] `pnpm test:unit` → 105 files / 1146 passed（handlers.test.ts
+  反向断言重排，用例数不变）
+- [x] `pnpm test:x5` → 6 files / 40 passed（t014 joint 两钉翻转：
+  request_approval 原样暂停 reasonCode null；write_artifact `succeeded`
+  + kernel 自发 `workflow.step.completed`；钉 3 不动）
+- [x] 根 `pnpm typecheck` 通过（teardown 头之上）
+- 注：`test:legacy-host` 对齐半边随 Wave 4 删除取消，见
+  03-implementation-notes 当日条目。

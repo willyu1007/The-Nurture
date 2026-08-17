@@ -1,5 +1,35 @@
 # Implementation Notes
 
+## 2026-08-17 — Wave 3 后续完成：P0 handlers 标准事件草稿剥离
+
+- `p0-handlers.ts` 移除全部标准 `workflow.*` eventDraft（九类：
+  step.completed / step.retry_requested / step.manual_review_required /
+  approval.requested / artifact.created / context.bound /
+  context.rebind_required / evidence.recorded / handoff.requested）；
+  场景内部 `nurture.*` 草稿原样保留（三类，与 manifest
+  scenario_internal_events 一致）。`manualReview` helper 不再替宿主起草
+  review 事件。manifest 无需变更（标准事件 producer 本就声明为
+  workflow_ledger）。
+- t014 joint 两钉翻转为干净行为：request_approval 原样暂停
+  （`manual_review_required` + step.reasonCode null——该列只承载 kernel
+  缺陷码；kernel 自发 `workflow.step.manual_review_required`）；
+  write_artifact 干净完成（`succeeded` + kernel 自发
+  `workflow.step.completed`，无 review 事件）。钉 3（物化缺口）不动。
+- `handlers.test.ts` 以 hasStandardDraft 反向断言取代被删事件断言，
+  并为安全闸升级路径补「scenario-internal 事件单独出行」钉。
+- 边界发现：真 kernel preflight 在伪造检查之后还会以
+  `workflow_handoff_event_draft_not_supported` 拒绝任何非空事件草稿
+  （X3 不物化场景事件草稿）——`nurture.*` 草稿与产物草稿同属钉 3 的
+  future-kernel 物化缺口，保留草稿等待 kernel 能力，不属伪造类。
+- 时序协调：与 Wave 4 执行会话确认后，本批排在 teardown（5b23d98）之后
+  落；任务原定的「harness 端口 kernel 侧发射 + legacy-host e2e 对齐」
+  半边随 lane 删除而取消（thin-vertical / first-slice 的
+  context.bound / artifact.created / handoff.requested 断言随 e2e 文件
+  一并退场，无需逐事件裁决）。
+- 验证（teardown 头之上复跑）：`pnpm test:unit` 105 文件 / 1146 绿；
+  `pnpm test:x5` 6 文件 / 40 绿（本地双库配方见 Wave 2 记录）；根
+  `pnpm typecheck` 绿。root package.json 未动，无需 c30 重封。
+
 ## 2026-08-17 — Wave 3 完成（范围据实修订）
 
 - 新 joint 文件 `t014-host-runtime-joint.integration.test.ts` 用真

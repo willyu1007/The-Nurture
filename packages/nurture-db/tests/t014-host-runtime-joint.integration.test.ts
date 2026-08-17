@@ -29,25 +29,22 @@ import {
 // PrismaWorkflowRuntimePort, real WorkflowWorker, real run-binding verifier)
 // with the real Nurture module registered through the real host validator.
 //
-// What the real kernel proves today:
-//   1. a request_approval step ends manual_review_required and the run stays
-//      running (the approval-pause leg of the legacy approval-pause-resume
-//      e2e). The pause is currently overdetermined: the kernel flags the
-//      handler's standard workflow.* event drafts as
-//      `workflow_handoff_standard_event_forgery` before the handler's own
-//      manual_review_required intent can be recorded verbatim;
-//   2. the forgery defect is pinned in isolation on write_artifact — the one
-//      P0 step whose only non-completion output is a standard-event draft.
-//      Standard step events are host-emitted; the harness port silently
-//      accepted these drafts, the real kernel refuses them;
+// What the real kernel proves today (P0 handlers draft no standard
+// workflow.* events — host-owned events are kernel-emitted; a scenario draft
+// of one is rejected as `workflow_handoff_standard_event_forgery`):
+//   1. a request_approval step pauses VERBATIM: manual_review_required with
+//      reasonCode null (the step row's reasonCode only ever carries kernel
+//      defect codes), the run stays running, and the kernel emits its own
+//      workflow.step.manual_review_required outbox event (the approval-pause
+//      leg of the legacy approval-pause-resume e2e);
+//   2. write_artifact completes cleanly: step status `succeeded` with the
+//      kernel-emitted workflow.step.completed event — the step whose handler
+//      once only drafted a standard event now proves the clean path;
 //   3. a step whose handler emits artifact_drafts fail-closes with
 //      `workflow_step_materialization_requires_future_kernel` while the
 //      Nurture business write still lands on the Nurture database — pinning
 //      exactly why the artifact legs of thin-vertical / first-slice cannot
 //      leave the harness until My-Chat ships step materialization.
-// Follow-up recorded in the T-014 bundle: strip standard workflow.* event
-// drafts from the P0 handlers (host-owned events are kernel-emitted); after
-// that, (1) pauses verbatim and (2) completes cleanly on the real kernel.
 // Approve/reject resolution and run-completion scheduling are host actions
 // owned by My-Chat's api/dispatcher and are out of scope here by design.
 
@@ -231,9 +228,9 @@ describe("T-014 host-runtime joint equivalence (real My-Chat kernel)", () => {
 
     const step = await stepRow(seed.stepId);
     expect(step.status).toBe("manual_review_required");
-    // Today the defect fires before the handler's own pause intent; both roads
-    // lead to manual review, so approval never silently passes the gate.
-    expect(step.reasonCode).toBe("workflow_handoff_standard_event_forgery");
+    // Verbatim pause: reasonCode only ever carries kernel defect codes, and
+    // the cleaned handler trips none.
+    expect(step.reasonCode).toBeNull();
     const run = await myChat.workflowRun.findUniqueOrThrow({ where: { id: seed.runId } });
     expect(run.status).toBe("running");
 
@@ -241,7 +238,7 @@ describe("T-014 host-runtime joint equivalence (real My-Chat kernel)", () => {
     expect(events.has("workflow.step.manual_review_required")).toBe(true);
   });
 
-  it("rejects scenario-drafted standard workflow events as forgery on the real kernel", async () => {
+  it("completes a write_artifact step cleanly on the real kernel", async () => {
     const seed = await seedRunWithStep({
       capabilityKey: "family_strategy",
       entrypointKey: "calibrate_family_strategy",
@@ -253,13 +250,14 @@ describe("T-014 host-runtime joint equivalence (real My-Chat kernel)", () => {
     await worker.run(seed.payload);
 
     const step = await stepRow(seed.stepId);
-    expect(step.status).toBe("manual_review_required");
-    expect(step.reasonCode).toBe("workflow_handoff_standard_event_forgery");
+    expect(step.status).toBe("succeeded");
+    expect(step.reasonCode).toBeNull();
 
-    // The kernel still emits its own (real) step event for the fail-closed
-    // completion — host events are kernel-emitted, never scenario-drafted.
+    // Host events are kernel-emitted, never scenario-drafted: the kernel's
+    // own completion event lands and no fail-closed review event exists.
     const events = await outboxEventTypes(seed.workspaceId);
-    expect(events.has("workflow.step.manual_review_required")).toBe(true);
+    expect(events.has("workflow.step.completed")).toBe(true);
+    expect(events.has("workflow.step.manual_review_required")).toBe(false);
   });
 
   it("fail-closes artifact materialization with the future-kernel defect while the Nurture business write lands", async () => {
