@@ -23,5 +23,5 @@ Project: `main`
 | T-011 nurture-cross-repo-contract-supply | in-progress | F-003 | dev-docs/active/nurture-cross-repo-contract-supply |
 | T-012 legacy-host-retirement | archived | F-003 | dev-docs/archive/legacy-host-retirement |
 | T-013 nurture-institution-workbench-ui | in-progress | F-003 | dev-docs/active/nurture-institution-workbench-ui |
-| T-014 legacy-host-deletion | in-progress | F-003 | dev-docs/active/legacy-host-deletion |
+| T-014 legacy-host-deletion | archived | F-003 | dev-docs/archive/legacy-host-deletion |
 <!-- AUTO-GENERATED:END task-index -->

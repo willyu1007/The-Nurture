@@ -2,7 +2,7 @@ version: 1
 task_id: T-014
 project: main
 slug: legacy-host-deletion
-status: in-progress
+status: archived
 updated: "2026-08-17"
 keywords:
   - legacy-host
