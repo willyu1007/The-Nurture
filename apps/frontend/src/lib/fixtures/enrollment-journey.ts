@@ -342,7 +342,7 @@ export const ENVELOPE: SurfaceEnvelope = {
       moduleKey: "institution_workflow_queue",
       kind: "institution_workflow_queue",
       required: true,
-      title: "流程队列",
+      title: "入园流程",
       itemRefs: JOURNEYS.map((journey) => `opt_${journey.workflowRunRef}`),
       actionRefs: [
         {

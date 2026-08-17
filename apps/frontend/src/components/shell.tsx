@@ -23,13 +23,17 @@ import {
  * entry.
  */
 const GROUPS: ShellNav["groups"] = [
-  // Unlabelled: the aggregation entry belongs above the categories, not inside one.
-  { items: [{ href: "/nurture/overview", label: "概览台" }] },
+  // Unlabelled: the two daily entry points. 概览台 aggregates 入园流程, so they
+  // belong together and above the categories rather than inside one.
   {
-    label: "园区流程",
     items: [
-      { href: "/nurture/queue", label: "流程队列", badgeKey: "queue" },
-      { href: "/nurture/grants", label: "授权申请", soon: true },
+      { href: "/nurture/overview", label: "概览台" },
+      // Not 流程队列: that names the mechanism, which the UX contract rules out.
+      // Not 入园申请 either — the institution opens the inquiry, issues the offer
+      // and proposes formalization, and the family consents; calling it an
+      // application inverts who acts. 入园流程 also matches what the hub already
+      // calls this workflow.
+      { href: "/nurture/queue", label: "入园流程", badgeKey: "queue" },
     ],
   },
   {
@@ -38,6 +42,7 @@ const GROUPS: ShellNav["groups"] = [
       { href: "/nurture/people", label: "人员与关系", soon: true },
       { href: "/nurture/operations", label: "日常运营", soon: true },
       { href: "/nurture/outreach", label: "家长触达", soon: true },
+      { href: "/nurture/grants", label: "授权申请", soon: true },
     ],
   },
   {

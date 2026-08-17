@@ -271,6 +271,25 @@ home 不再高亮。`/` 与 `/nurture` 均 200 落到 `/nurture/overview`。全�
 `activeCrumb` 能解析，补 sections 是无效冗余）与 `signOutHref`
 （尚无认证，指向不存在的登出页会是又一个死入口）。
 
+## 「流程队列」改名为「入园流程」（2026-08-17）
+
+契约只有英文 `Enrollment Journey`，未定中文。但实现内部已经不一致：
+Hub、Scene intro、空态共 5 处用「入园流程」，只有侧栏标签与一个 fixture 字符串
+用「流程队列」。
+
+改名依据两条：
+
+- 「流程队列」是机制词（workflow queue），mobile UX 契约要求「无开发向词汇」。
+  姊妹实现 The-Education 也是分组用机制词（工作流）、条目用领域名词（作业）。
+- **未采用「入园申请」**：这条流程由园长驱动——`start_enrollment_inquiry`、
+  `record_or_skip_visit`、`issue_trial_offer`、`propose_formal_enrollment` 都是
+  园长能力，家庭只做接受。叫「申请」会反转施动方，暗示存在待审申请队列。
+
+连带把 `授权申请` 并入园区管理，避免改名后「园区流程／入园流程」重复，
+也避免该模块按提案移除后留下单项分组。
+
+复测：侧栏「流程队列」零命中，高亮项为「入园流程5」，全新 tab 零控制台错误。
+
 ## 工具经验
 
 - Browser pane 会间歇进入 viewport 0x0 状态：`read_page` / `computer` 不可用，
