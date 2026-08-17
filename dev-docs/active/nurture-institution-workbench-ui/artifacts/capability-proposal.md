@@ -138,51 +138,74 @@ Guardian 授权，coverage 视图也「MUST NOT 提供改授权的手段」。
 
 前三条是隐私边界，后两条是权限边界。五条都是契约原文。
 
-### GrantRequest 不满足 Workflow 的判据
+### GrantRequest 不是第二个 Workflow —— 它已经在 Enrollment Journey 里
 
-用 `workflow-product-design-contract.md` 自己的 Classification Rules 检验：
+三条证据，从硬到软：
 
-| 判据 | GrantRequest |
-| --- | --- |
-| 目的属于园区管理 | ✓ |
-| **跨越多个可恢复阶段，用户可离开后返回** | ✗ |
-| 当前阶段/里程碑/责任角色/阻塞/下一步有稳定业务含义 | ✗ |
-| 园区 Web workbench 是主要操作面 | ✓ |
+**① 机器契约已经把 grant 焊进 journey。** `start_trial` 与 `propose_formal_enrollment`
+的并发 `headBindings` 都含 `grant_head`：
 
-状态只有：发起 → 等待家长 → （同意｜拒绝｜过期｜撤销）。**一个等待态加一个终态**，
-没有中间可恢复阶段，「已完成里程碑」只会有一条，「下一步」永远是"等家长决定"，
-而且发起后园长什么都做不了——没有东西可以 resume。对比 Enrollment Journey 的九个阶段
-与多个园长决策点，差别是结构性的。
+```
+start_trial               [workflow_head, enrollment_head, grant_head, reservation_head, …]
+propose_formal_enrollment [workflow_head, enrollment_head, grant_head, reservation_head, …]
+```
 
-契约的**否定清单**也正好点到它：「跨越家庭与园区边界」和「产生通知、回执或 deep link」
-**本身不足以**把能力升级为 Workflow。GrantRequest 恰好只满足这两条。
+授权的建立已经在 journey 的事务里发生。它不是待接入的第二个流程，是 journey 正在操作的
+一个 head。这条是冻结的契约，不是文字推理。
 
-### 需要 owner 裁决的契约张力
+**② 架构文档直接点名。** `02-architecture.md` 的 InstitutionWorkflow Boundary：
+「第一实现增量的 `InstitutionWorkflow` registry 只包含 `EnrollmentJourneyWorkflowV1`。
+**Grant change**、出勤提交/修订、知识编辑…**均不是第二个 Workflow**。」
 
-同一份 `workflow-product-design-contract.md` 的 **Current Scope 明确把
-「GrantRequest 发起、等待 Guardian 决定、过期/拒绝/撤销结果」列为 Workflow 范围**，
-而它的 Classification Rules 又把 GrantRequest 排除。
+**③ Grant 的状态是实体生命周期，不是流程阶段。**
+`NurtureChildLinkGrantStatus` 有六个取值（`pending / active / revoked / expired /
+replaced / deleted`），但对照 Enrollment 就清楚了：Enrollment 既有实体状态
+（`status` + `participationPhase`）**又有**独立的 `EnrollmentJourneyWorkflowV1`，
+两者分开。Grant 只有实体生命周期，从未有人定义过它的阶段、里程碑或阻塞。
+这不是遗漏，是它本来就不需要。
 
-**这是契约自身的矛盾，不是实现选择。** 本提案给出的是按 Classification Rules 的读法；
-最终归类需要 owner 裁决。
+### Current Scope 不是 Workflow 类型清单
+
+`workflow-product-design-contract.md` 的 Current Scope 列出四条：roster intake／邀请／
+入托确认、Institution Enrollment 管理、GrantRequest、后续园区配置或审批流程。
+
+**前两条全都在 `EnrollmentJourneyWorkflowV1` 一个类型里面。** 所以这是「哪些业务领域算
+园区管理流程」的范围清单，不是「存在几个 Workflow 类型」。GrantRequest 与它们并列，
+恰恰说明它同样在**这一个** Workflow 之内——而 `grant_head` 的绑定证明它已经在了。
+
+早期版本的本提案曾把这里报为「契约自相矛盾、需 owner 裁决」。那是误读：
+把范围清单当成了类型清单。Classification Rules 与 Current Scope 之间没有冲突。
 
 ### 建议的落地形态
 
-授权本质上是**挂在 enrollment 上的属性**。园长遇到它的场景是「这个 enrollment 缺授权，
-所以家园沟通被 fail-closed 挡住了」——那就是 coverage 视图该在的地方。
+拆开园长实际会遇到的三种情况：
 
-```
-入托关系详情 → 授权区块（只读五字段 + 等待态 + 发起按钮）
-概览台       → 「N 个 enrollment 缺授权」作为待办
-```
+| 场景 | 归属 | 需要什么 |
+| --- | --- | --- |
+| 新入托时建立授权 | **已在 journey 内**（`trial_preparation` → `start_trial`） | 无需新增 |
+| 授权被撤销或过期 | 家长侧动作，园长是受影响方 | 只读 coverage |
+| 政策变更导致 `replaced` | Nurture 提 delta、家长决定 | 只读 coverage |
+
+园长在这三种里只有一个写动作，且已被 journey 覆盖。**唯一真实缺口**是：
+enrollment 已存在但授权缺失或过期时，园长如何重新发起。
 
 因此建议：
 
-1. 不新建 Workflow 类型，不新建模块。`initiate_grant_request` 是带 waiting state 的
-   `ActionExecution`。
+1. 不新建 Workflow 类型，不新建模块。`initiate_grant_request` 是一个挂在入托关系上的
+   `ActionExecution`，只服务「补发起」这一种情况。
 2. coverage 做成入托关系详情里的只读区块。
-3. 若接受，`grant_request_management` 应从 surface registry 的 `orderedContentKinds`
-   移除——**8 个模块变 7 个**。这是契约变更，需要单独决策。
+3. `grant_request_management` 从 surface registry 的 `orderedContentKinds` 移除——
+   **8 个模块变 7 个**。这是契约变更，需要单独决策。
+
+### 仍未决的小问题：缺授权的可发现性
+
+只读 coverage 按 enrollment 组织。14 个 enrollment 里有 2 个缺授权，园长怎么发现？
+
+- **靠概览台的待办**（T-013 已有机制）：「N 个 enrollment 缺授权」作为一条 attention row。
+  零新界面，且缺授权会 fail-closed 阻塞家园沟通，本就是「需要处理」级别的信号。
+- 或在人员与关系里加一个「仅看缺授权」筛选视图。
+
+建议前者：复用已跑通的两级规则。
 
 ---
 
@@ -210,12 +233,12 @@ Guardian 授权，coverage 视图也「MUST NOT 提供改授权的手段」。
 
 | 顺序 | 内容 | 性质 |
 | --- | --- | --- |
-| 1 | 裁决 GrantRequest 的归类（含上述契约张力） | 决策，决定第三个模块是否存在 |
+| 1 | 确认移除 `grant_request_management` contentKind | 决策；归类本身已由证据定论 |
 | 2 | 消除 grant lifecycle 的双处描述 | 决策，阻塞两个模块的边界划分 |
 | 3 | 人员与关系的**读**能力（4 个） | 拓扑根，其余模块的作用域来源 |
 | 4 | 人员与关系的**写**能力，按试点实际需要裁剪 | 19 个里试点可能只需 5–6 个 |
 | 5 | 日常运营（4 个） | 依赖 3 |
-| 6 | 授权 coverage 只读 | 若接受合并，这是唯一剩下的 |
+| 6 | 授权 coverage 只读 + 概览台缺授权待办 | 唯一剩下的授权相关工作 |
 
 第 1、2 条是决策不是代码，可以立刻做。第 4 条的裁剪需要真实园长参与。
 
