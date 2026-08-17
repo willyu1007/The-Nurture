@@ -1,10 +1,11 @@
 import type { WorkflowHostValidationSnapshot } from "@my-chat/workflow-contracts";
 import { standardWorkflowEvents } from "@my-chat/workflow-contracts";
 
-// Dev host validation snapshot — declares everything the nurture manifest needs
-// to pass validateWorkflowModule at activation_target "dev". Mirrors the
-// scenario package's conformance test snapshot (keep in sync).
-export const devHostSnapshot: WorkflowHostValidationSnapshot = {
+// Shared joint-lane host snapshot: declares everything the real My-Chat
+// module validator requires to register the nurture module at "dev".
+// Mirrors the scenario package's conformance snapshot (keep in sync); this
+// copy replaced the deleted legacy host's `devHostSnapshot` (T-014).
+export const jointHostValidationSnapshot: WorkflowHostValidationSnapshot = {
   scenario_records: { nurture: { status: "draft" } },
   domain_resolver_keys: [
     "my_chat.object.child",
@@ -19,8 +20,6 @@ export const devHostSnapshot: WorkflowHostValidationSnapshot = {
     "my_chat.forum",
     "my_chat.knowledge_base",
     "my_chat.notification",
-    // The manifest's user-attention handoff owner; absent here it fails
-    // fatally at WF-MAN-042.
     "user_attention",
   ],
   standard_events: [...standardWorkflowEvents],
@@ -39,12 +38,6 @@ export const devHostSnapshot: WorkflowHostValidationSnapshot = {
     "worker_runtime",
   ],
   projection_reviews: [],
-  // C30 (2026-08-08): the manifest now declares scenario_contracts capability
-  // dependencies, so validateWorkflowModule fails fatally at WF-MAN-111 and
-  // WF-MAN-119 unless the host declares matching support. Declaring them here
-  // keeps this snapshot the mirror its comment above promises — it grants the
-  // dev host nothing at runtime, since every manifest capability stays
-  // enablement_policy "disabled".
   host_capabilities: [
     "scenario_federation_v1",
     "workflow_handoff_materialization_v1",

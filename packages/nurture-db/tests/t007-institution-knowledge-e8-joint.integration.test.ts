@@ -52,7 +52,7 @@ import {
   PrismaInstitutionKnowledgeReadOwner,
   PrismaNurtureCommandRepository,
 } from "../src/index.js";
-import { devHostSnapshot } from "../../../apps/backend/src/host-snapshot.js";
+import { jointHostValidationSnapshot as devHostSnapshot } from "./host-validation-snapshot.js";
 
 // T-007 G4-E E8 Joint Conformance: the Base-committed / My-Chat-adopted
 // trusted dispatcher, the real Nurture formal owners over the Nurture

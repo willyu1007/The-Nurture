@@ -147,10 +147,7 @@ const sourceFiles = (root) => {
     .sort();
 };
 
-const applicationSource = [
-  ...sourceFiles("apps/backend/src"),
-  ...sourceFiles("apps/scenario-service/src"),
-];
+const applicationSource = [...sourceFiles("apps/scenario-service/src")];
 const positiveRouteHits = [];
 for (const absolutePath of applicationSource) {
   const source = readFileSync(absolutePath, "utf8");

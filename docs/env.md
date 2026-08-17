@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-15T11:54:59Z`
+Generated at (UTC): `2026-08-17T00:26:08Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -13,13 +13,10 @@ Generated at (UTC): `2026-08-15T11:54:59Z`
 |---|---:|---:|:---:|:---:|---|---|---|---|---|---|---|
 | `APP_ENV` | `active` | `enum` | yes | no | `dev` | `` | `*` | `` | `` | `` | Deployment environment profile. |
 | `DATABASE_URL` | `active` | `url` | yes | yes | `` | `database_url` | `*` | `` | `` | `` | PostgreSQL connection URL for Nurture-owned production schema and migrations. |
-| `DEV_HOST_DATABASE_URL` | `active` | `url` | yes | yes | `` | `dev_host_database_url` | `dev` | `` | `` | `` | PostgreSQL connection URL for backend-private workflow dev-host schema and migrations. |
-| `DEV_HOST_PORT` | `active` | `int` | no | no | `3001` | `` | `dev` | `` | `` | `` | Loopback-only Fastify workflow dev-host listen port; never used by the formal scenario service. |
 | `FAMILY_GROWTH_EVENTS_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `family_growth_events_service_token` | `*` | `` | `` | `` | Nurture-to-My-Chat bearer for family-growth event delivery (family_growth_transport@1.0.0); absent = delivery worker off. |
 | `FAMILY_GROWTH_RENDITION_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `family_growth_rendition_service_token` | `*` | `` | `` | `` | My-Chat-to-Nurture bearer validated by the rendition exchange (family_growth_transport@1.0.0); absent = endpoints refuse all requests. |
 | `FAMILY_GROWTH_RENDITION_SERVICE_TOKEN_PREVIOUS` | `active` | `string` | no | yes | `` | `family_growth_rendition_service_token_previous` | `*` | `` | `` | `` | Rotation window twin of FAMILY_GROWTH_RENDITION_SERVICE_TOKEN; cleared after rotation completes. |
 | `MY_CHAT_INTERNAL_BASE_URL` | `active` | `url` | no | no | `` | `` | `*` | `` | `` | `` | My-Chat host base URL for host-ward internal reads (ST-5 derived age/stage); the shared internal service token authenticates the call. Absence keeps derived reads disabled. |
-| `NURTURE_BACKEND_URL` | `active` | `url` | no | no | `http://localhost:3200` | `` | `dev` | `` | `` | `` | Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field. |
 | `NURTURE_BINDING_EVIDENCE_KEY` | `active` | `string` | no | yes | `` | `nurture_binding_evidence_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) enabling the scenario-binding owner endpoint; absence keeps the endpoint disabled and never degrades to an unhashed path. |
 | `NURTURE_DIRECTOR_PRESENTER_ENABLED` | `active` | `bool` | no | no | `false` | `` | `*` | `` | `` | `` | Default-off gate for the read-only director presenter v1 composition; true requires the exact adopted contract digest, current-authority/owner ports and separate activation approval, and never enables Institution Mobile commands. |
 | `NURTURE_HARNESS_INTEGRITY_KEY` | `active` | `string` | no | yes | `` | `nurture_harness_integrity_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) for Harness confirmation input-integrity tags and owner-issued target refs; absence keeps both Harness routes disabled. |

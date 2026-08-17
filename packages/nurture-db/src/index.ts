@@ -1,6 +1,6 @@
 export { createPrismaClient, type NurturePrismaClient } from "./client.js";
 export * from "./institution-knowledge-formal-owners.composition.js";
-// Re-export the Prisma namespace so the host (apps/backend) can type Json
+// Re-export the Prisma namespace so consumers can type Json
 // inputs without importing @prisma/client directly (db stays the sole importer).
 export { Prisma } from "@prisma/client";
 export * from "./repositories/port-repositories.js";

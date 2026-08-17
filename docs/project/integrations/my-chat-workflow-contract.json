@@ -110,9 +110,6 @@
       "pnpm-lock.yaml",
       "pnpm-workspace.yaml",
       "tsconfig.json",
-      "apps/backend/src/app.ts",
-      "apps/backend/src/main.ts",
-      "apps/backend/src/server.ts",
       "apps/scenario-service/package.json",
       "apps/scenario-service/src",
       "apps/scenario-service/tsconfig.build.json",
@@ -131,6 +128,6 @@
       "prisma/migrations",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "315f274df1f3f4534d1f5ebac8e9d9ca783af3a979f652331db5641a93ab7cd1"
+    "contractSha256": "e795d93230f399ac4536b8d771a93bc6261ba8dffbb31717d32b543a45e3ff2c"
   }
 }

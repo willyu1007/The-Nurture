@@ -12,7 +12,6 @@ database:
   # password: use DB_PASSWORD env var
 
 api:
-  baseUrl: ${NURTURE_BACKEND_URL:-http://localhost:3200}
   timeout: ${API_TIMEOUT:-30000}
 
 gateway:

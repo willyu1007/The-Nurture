@@ -18,8 +18,8 @@ async function collect(directory) {
 }
 
 const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await collect(path.join(repoRoot, 'apps')))];
-const routes = { unit: [], productionDb: [], legacyHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
-const expectedCounts = { unit: 105, productionDb: 61, legacyHost: 9, scenarioService: 32, x5Joint: 6 };
+const routes = { unit: [], productionDb: [], scenarioService: [], x5Joint: [], unclassified: [] };
+const expectedCounts = { unit: 105, productionDb: 61, scenarioService: 32, x5Joint: 6 };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
   else if (
@@ -31,7 +31,7 @@ for (const file of files.sort()) {
     file === 'packages/nurture-db/tests/t014-host-runtime-joint.integration.test.ts'
   ) routes.x5Joint.push(file);
   else if (file.startsWith('packages/nurture-db/')) routes.productionDb.push(file);
-  else if (file.startsWith('apps/backend/') && file.endsWith('.e2e.test.ts')) routes.legacyHost.push(file);
+  else if (file.startsWith('apps/backend/')) throw new Error(`legacy host is deleted; no tests may live under apps/backend: ${file}`);
   else if (file.startsWith('apps/scenario-service/')) routes.scenarioService.push(file);
   else routes.unclassified.push(file);
 }
@@ -44,5 +44,5 @@ if (mismatches.length > 0) {
   throw new Error(`Test file census changed: ${mismatches.join(' ')}`);
 }
 process.stdout.write(
-  `[ok] test routing files=${files.length} unit=${routes.unit.length} production-db=${routes.productionDb.length} legacy-host=${routes.legacyHost.length} scenario-service=${routes.scenarioService.length} x5-joint=${routes.x5Joint.length}\n`,
+  `[ok] test routing files=${files.length} unit=${routes.unit.length} production-db=${routes.productionDb.length} scenario-service=${routes.scenarioService.length} x5-joint=${routes.x5Joint.length}\n`,
 );

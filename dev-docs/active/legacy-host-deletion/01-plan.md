@@ -151,6 +151,34 @@ x5 lane 全绿 6 文件 / 40 用例；census x5Joint 5→6（files 213）。
 验收：删除后全量 gate 绿；T-012 删除闸三条件全部满足并记录于
 `04-verification.md`。
 
+### Wave 4 结果（2026-08-17，完成）
+
+- 用户拍板取「今天就删」解释：产物腿的等价 = 缺口 joint 钉住 + 业务语义
+  unit/db 覆盖 + 审批/路由面等价。
+- 删除：`apps/backend`（含私有 prisma 与 9 个 e2e）、
+  `vitest.legacy-host.config.ts`、`assert-legacy-host-db-boundary.mjs`。
+- package.json：`dev:legacy-host`、`test:legacy-host*`、`legacy-host:db:*`、
+  `verify:legacy-host-population` 移除；`db:generate:all`/`db:migrate:all`
+  收敛为生产 schema 别名；`test:all` 去掉 legacy 段。
+- CI：`legacy-host-db` job、`legacy-host:db:validate` 步骤、三处
+  `DEV_HOST_DATABASE_URL` env 移除。
+- 守卫反转：persistence-boundaries 断言 `apps/backend` 不得回归；
+  port-topology 断言三个退休 env 变量不得回归；test-routing 删除
+  legacyHost 通道并对 apps/backend 下的测试直接报错。
+- env 契约：`DEV_HOST_PORT`、`DEV_HOST_DATABASE_URL`、`NURTURE_BACKEND_URL`
+  从 contract/values/secrets 移除，`env_contractctl generate` 重生成
+  `.env.example`/`docs/env.md`/`docs/context/env/contract.json`，
+  `ctl-context touch` 更新校验和；dev.yaml.template 去掉 baseUrl。
+- joint 修补：新共享 fixture `host-validation-snapshot.ts` 取代被删的
+  `devHostSnapshot`（t007-e8 改指向）。
+- 补登记（Wave 2 漏项）：`assert-formal-ingress-contract` 的两份
+  scenario-service 普查加入两个新 controller / 三条新路由。
+- 跨仓 pin：`my-chat-workflow-contract.json` 的 nurtureScenario
+  contractPaths 去掉三条 apps/backend 条目（验证器必需清单本就不含），
+  self contractSha256 按提交树重算。
+- 并行协调：与 forgery 清理会话（第三会话）交叉确认文件所有权，其
+  handlers 清理与 joint 钉翻转在本批推送后按 pathspec 提交。
+
 ## 风险
 
 - Wave 3 是工期主体（3–5 天），joint 组合真 runtime 的搭建成本最高。

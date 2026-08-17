@@ -28,7 +28,7 @@ The Nurture is a My-Chat scenario module for pregnancy, motherhood, childcare, f
 - P0 workflows: pregnancy stage management, family strategy, short-term care planning, activity comparison, execution review.
 - Root Prisma assets are Nurture production-only; they never create My-Chat workflow runtime tables.
 - Workflow run/step IDs in Nurture rows are opaque external references.
-- The legacy workflow test host uses `apps/backend/prisma`, a generated private client, and the separate `nurture_dev_host` database. It is not the normal Nurture backend.
+- The legacy workflow test host was deleted (T-014) after its journeys gained owner-boundary equivalents; host runtime ownership lives in My-Chat, exercised locally through the x5 joint lane.
 - The Next.js workbench is a scenario development console; it does not own account/auth or shared My-Chat surfaces.
 
 ## Local setup
@@ -71,13 +71,10 @@ Repository commands load configuration in this order: the existing process envir
 `db:generate:all` is a full-repository verification helper; normal scenario
 service development needs only `db:generate`.
 
-The Fastify harness is retained only for focused legacy workflow-runtime
-evidence. It is never required to start the normal scenario service. Run its
-isolated lane explicitly when changing that boundary:
+Host workflow-runtime evidence runs in the x5 joint lane against real
+My-Chat source on two disposable databases (`X5_NURTURE_DATABASE_URL`,
+`X5_MY_CHAT_DATABASE_URL`):
 
 ```bash
-pnpm legacy-host:db:validate
-pnpm legacy-host:db:deploy
-pnpm test:legacy-host
-pnpm legacy-host:db:assert-boundary
+pnpm test:x5
 ```

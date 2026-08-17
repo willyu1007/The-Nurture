@@ -139,6 +139,10 @@ const expectedControllerRoutes = [
   'apps/scenario-service/src/family-growth-rendition.controller.ts:GET:`${FAMILY_GROWTH_RENDITION_MEDIA_PATH}/:lease`',
   `apps/scenario-service/src/family-growth-rendition.controller.ts:POST:FAMILY_GROWTH_RENDITION_RESOLVE_PATH`,
   `apps/scenario-service/src/family-sharing-private.controller.ts:POST:NURTURE_FAMILY_SHARING_PRIVATE_PATH`,
+  // T-014 Wave 2: owner routes migrated from the deleted legacy host.
+  `apps/scenario-service/src/growth-record-contribution.controller.ts:POST:GROWTH_RECORD_CONTRIBUTION_PATH`,
+  `apps/scenario-service/src/user-attention-owner.controller.ts:POST:USER_ATTENTION_ACKNOWLEDGE_PATH`,
+  `apps/scenario-service/src/user-attention-owner.controller.ts:POST:USER_ATTENTION_RESOLVE_PATH`,
   `apps/scenario-service/src/harness.controller.ts:POST:HARNESS_EXECUTE_PATH`,
   `apps/scenario-service/src/harness.controller.ts:POST:HARNESS_PREPARE_PATH`,
   `apps/scenario-service/src/harness.controller.ts:POST:HARNESS_QUERY_PATH`,
@@ -204,6 +208,9 @@ const expectedRegisteredControllers = [
   "apps/scenario-service/src/teacher-assistant-query-owner.controller.ts#TeacherAssistantQueryOwnerController",
   "apps/scenario-service/src/parent-communication-extension.controller.ts#ParentCommunicationExtensionController",
   "apps/scenario-service/src/family-sharing-private.controller.ts#FamilySharingPrivateController",
+  // T-014 Wave 2: owner routes migrated from the deleted legacy host.
+  "apps/scenario-service/src/user-attention-owner.controller.ts#UserAttentionOwnerController",
+  "apps/scenario-service/src/growth-record-contribution.controller.ts#GrowthRecordContributionController",
 ];
 const expectedPrivateResponseControllers = [
   "apps/scenario-service/src/teacher-release-owner.controller.ts#TeacherReleaseOwnerController",

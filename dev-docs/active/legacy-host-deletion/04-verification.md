@@ -44,8 +44,28 @@
 - 注：四条旅程的产物腿被真 kernel 的物化缺口挡住，等价目标据实改为
   「缺口显式钉住」，见 01-plan Wave 3 结果。
 
-## Wave 4（删除闸销项）
+## Wave 4（删除闸销项，2026-08-17）
 
-- [ ] 条件 1：02-architecture 审计表每行的处置落地（等价覆盖 / 搬迁 / 陪葬）
-- [ ] 条件 2：CI/bootstrap 无 legacy 依赖（typecheck / db:generate:all / CI job）
-- [ ] 条件 3：README Verify 全清单在删除后通过
+- [x] 条件 1：02-architecture 审计表每行处置落地——陪葬 2 文件；Wave 1
+  下沉 4 项；Wave 2 搬迁 2 路由面（x5 打真 ingress）；Wave 3 joint 钉住
+  审批暂停等价 + 两个宿主缺口（物化 / 标准事件伪造）；产物腿按用户拍板
+  取「缺口钉住 + 业务语义覆盖」解释。
+- [x] 条件 2：CI/bootstrap 零 legacy 依赖——job、步骤、env、脚本、lockfile
+  （workspace 包移除后 `pnpm install` 重锁）全部清理。
+- [x] 条件 3：删除后 gate 全绿——`verify:test-routing`（files=204
+  unit=105 production-db=61 scenario-service=32 x5-joint=6）、
+  `verify:persistence-boundaries`、`verify:port-topology`、
+  `verify:n1-schema-contract`、`verify:c30-i3-default-off`、
+  `verify:g2-exit-contract`、`verify:formal-ingress-contract`（普查补
+  登记后）、`verify:surface-conformance`、`verify:surface-contract`、
+  `verify:family-sharing-invariants`、`verify:family-growth-outbox-invariants`、
+  `verify:x4-handoff-replay-contract`、env `validate` PASS、
+  `ctl-context verify --strict`、`lint-skills --strict`、根 `typecheck`、
+  smoke `[ok]`；测试 lane：unit 105/1146、production-db 61/510、
+  scenario-service 213 + db 73、x5 6/40。
+- 环境性/设计性红（非本批）：`verify:workflow-contract-pin`（sibling 漂移，
+  CI 钉住检出不受影响）、`verify:g2-exit-db-census`（fresh-DB 普查）、
+  `verify:owner-integration`（T-007 真 owner 资格认证前设计性 NO-GO，
+  不在 CI）。
+- 首跑期间的 unit/db 单点红均甄别为并行会话 WIP/构建竞争，复跑全绿
+  （见 05-pitfalls 模式）。

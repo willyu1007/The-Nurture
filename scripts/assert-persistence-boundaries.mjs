@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,35 +29,10 @@ reject('production migration', productionMigration, /(?:CREATE TABLE|ALTER TABLE
 reject('production migration', productionMigration, /CREATE TYPE "Workflow/);
 reject('Nurture DB exports', nurtureDbExports, /Workflow(?:Run|Step|Artifact|Approval|ContextBinding|OutboxEvent|StepResultStatus|ApprovalStatus)/);
 
-const legacyHostSchema = await read('apps/backend/prisma/schema.prisma');
-const legacyHostMigration = await readMigrationStream('apps/backend/prisma/migrations');
-reject('legacy-host schema', legacyHostSchema, /^(?:model|enum) Nurture/m);
-reject('legacy-host schema', legacyHostSchema, /@@map\("nurture_/);
-reject('legacy-host migration', legacyHostMigration, /(?:CREATE TABLE|ALTER TABLE|REFERENCES) "nurture_/);
-reject('legacy-host migration', legacyHostMigration, /CREATE TYPE "Nurture/);
-
-for (const relativePath of [
-  'apps/backend/src/actions/action-service.ts',
-  'apps/backend/src/deps/mock-deps.ts',
-  'apps/backend/src/dispatcher.ts',
-  'apps/backend/src/ledger/pg-workflow-ledger.repository.ts',
-  'apps/backend/src/runtime/pg-workflow-runtime.port.ts',
-]) {
-  reject(relativePath, await read(relativePath), /from "@the-nurture\/db"/);
-}
-
-for (const relativePath of [
-  'apps/backend/src/app.ts',
-  'apps/backend/src/server.ts',
-  'apps/backend/tests/approval-pause-resume.e2e.test.ts',
-  'apps/backend/tests/nurture-family-rule-trial-first-slice.e2e.test.ts',
-  'apps/backend/tests/p3-audit-fixes.e2e.test.ts',
-  'apps/backend/tests/p4-audit-fixes.e2e.test.ts',
-  'apps/backend/tests/safety-escalation.e2e.test.ts',
-  'apps/backend/tests/thin-vertical.e2e.test.ts',
-  'apps/backend/tests/two-issue-types.e2e.test.ts',
-]) {
-  reject(relativePath, await read(relativePath), /app\.prisma\b/);
+// T-014: the legacy workflow test host is deleted; its private schema and
+// runtime must never come back.
+if (existsSync(path.join(repoRoot, 'apps/backend'))) {
+  failures.push('apps/backend exists: the deleted legacy host must not return');
 }
 
 if (failures.length > 0) throw new Error(`Persistence boundary violations:\n- ${failures.join('\n- ')}`);

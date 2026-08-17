@@ -15,37 +15,26 @@ const readYaml = (relativePath) => parseYaml(read(relativePath));
 
 const contract = readYaml("env/contract.yaml");
 assertEqual(contract.variables?.PORT?.default, 8000, "PORT default");
+// T-014: the legacy host is deleted; its port vocabulary must not return.
+assertEqual(contract.variables?.DEV_HOST_PORT, undefined, "DEV_HOST_PORT retired");
 assertEqual(
-  contract.variables?.DEV_HOST_PORT?.default,
-  3001,
-  "DEV_HOST_PORT default",
+  contract.variables?.NURTURE_BACKEND_URL,
+  undefined,
+  "NURTURE_BACKEND_URL retired",
 );
 assertEqual(
-  contract.variables?.NURTURE_BACKEND_URL?.default,
-  "http://localhost:3200",
-  "NURTURE_BACKEND_URL default",
+  contract.variables?.DEV_HOST_DATABASE_URL,
+  undefined,
+  "DEV_HOST_DATABASE_URL retired",
 );
 
 const devValues = readYaml("env/values/dev.yaml");
 assertEqual(devValues.PORT, 8000, "dev PORT");
-assertEqual(devValues.DEV_HOST_PORT, 3001, "dev DEV_HOST_PORT");
-assertEqual(
-  devValues.NURTURE_BACKEND_URL,
-  "http://localhost:3200",
-  "dev NURTURE_BACKEND_URL",
-);
+assertEqual(devValues.DEV_HOST_PORT, undefined, "dev DEV_HOST_PORT retired");
 
 const scenarioConfig = read("apps/scenario-service/src/config.ts");
 assertIncludes(scenarioConfig, "const DEFAULT_PORT = 8000;", "scenario port");
 assertIncludes(scenarioConfig, "parsePort(env.PORT)", "scenario PORT input");
-
-const legacyHostMain = read("apps/backend/src/main.ts");
-assertIncludes(
-  legacyHostMain,
-  "process.env.DEV_HOST_PORT",
-  "legacy-host dedicated port input",
-);
-assertExcludes(legacyHostMain, "process.env.PORT", "legacy-host shared PORT input");
 
 const frontendPackage = readJson("apps/frontend/package.json");
 assertEqual(frontendPackage.scripts?.dev, "next dev -p 3201", "frontend dev");
@@ -65,10 +54,10 @@ assertExcludes(
 );
 
 const devTemplate = read("config/environments/dev.yaml.template");
-assertIncludes(
+assertExcludes(
   devTemplate,
-  "${NURTURE_BACKEND_URL:-http://localhost:3200}",
-  "development template backend environment key",
+  "NURTURE_BACKEND_URL",
+  "development template retired backend environment key",
 );
 assertExcludes(
   devTemplate,
@@ -77,7 +66,7 @@ assertExcludes(
 );
 
 process.stdout.write(
-  "[ok] port topology scenario=8000 legacy-host=3001 backend=3200 frontend=3201\n",
+  "[ok] port topology scenario=8000 frontend=3201 legacy-host=absent\n",
 );
 
 function assertEqual(actual, expected, label) {

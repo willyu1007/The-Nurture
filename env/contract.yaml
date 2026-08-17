@@ -16,31 +16,12 @@ variables:
     required: true
     default: 8000
     description: Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately.
-  DEV_HOST_PORT:
-    type: int
-    required: false
-    default: 3001
-    scopes: [dev]
-    description: Loopback-only Fastify workflow dev-host listen port; never used by the formal scenario service.
-  NURTURE_BACKEND_URL:
-    type: url
-    required: false
-    default: http://localhost:3200
-    scopes: [dev]
-    description: Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field.
   DATABASE_URL:
     type: url
     required: true
     secret: true
     secret_ref: database_url
     description: PostgreSQL connection URL for Nurture-owned production schema and migrations.
-  DEV_HOST_DATABASE_URL:
-    type: url
-    required: true
-    scopes: [dev]
-    secret: true
-    secret_ref: dev_host_database_url
-    description: PostgreSQL connection URL for backend-private workflow dev-host schema and migrations.
   NURTURE_BINDING_EVIDENCE_KEY:
     type: string
     required: false

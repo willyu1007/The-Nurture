@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-15T11:54:59Z",
+  "generated_at_utc": "2026-08-17T00:26:08Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -40,44 +40,6 @@
       "secret_ref": "database_url",
       "state": "active",
       "type": "url"
-    },
-    "DEV_HOST_DATABASE_URL": {
-      "default": null,
-      "deprecate_after": null,
-      "description": "PostgreSQL connection URL for backend-private workflow dev-host schema and migrations.",
-      "legacy": {
-        "deprecated": false,
-        "replaced_by": null
-      },
-      "migration": null,
-      "replacement": null,
-      "required": true,
-      "scopes": [
-        "dev"
-      ],
-      "secret": true,
-      "secret_ref": "dev_host_database_url",
-      "state": "active",
-      "type": "url"
-    },
-    "DEV_HOST_PORT": {
-      "default": 3001,
-      "deprecate_after": null,
-      "description": "Loopback-only Fastify workflow dev-host listen port; never used by the formal scenario service.",
-      "legacy": {
-        "deprecated": false,
-        "replaced_by": null
-      },
-      "migration": null,
-      "replacement": null,
-      "required": false,
-      "scopes": [
-        "dev"
-      ],
-      "secret": false,
-      "secret_ref": null,
-      "state": "active",
-      "type": "int"
     },
     "FAMILY_GROWTH_EVENTS_SERVICE_TOKEN": {
       "default": null,
@@ -142,25 +104,6 @@
       "replacement": null,
       "required": false,
       "scopes": null,
-      "secret": false,
-      "secret_ref": null,
-      "state": "active",
-      "type": "url"
-    },
-    "NURTURE_BACKEND_URL": {
-      "default": "http://localhost:3200",
-      "deprecate_after": null,
-      "description": "Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field.",
-      "legacy": {
-        "deprecated": false,
-        "replaced_by": null
-      },
-      "migration": null,
-      "replacement": null,
-      "required": false,
-      "scopes": [
-        "dev"
-      ],
       "secret": false,
       "secret_ref": null,
       "state": "active",

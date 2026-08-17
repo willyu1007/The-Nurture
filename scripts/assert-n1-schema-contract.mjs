@@ -61,11 +61,10 @@ const expectedChecks = [
   'ck_nurture_command_execution_n1',
 ];
 
-const [schema, migration, contextText, devHostSchema] = await Promise.all([
+const [schema, migration, contextText] = await Promise.all([
   read('prisma/schema.prisma'),
   read(migrationPath),
   read('docs/context/db/schema.json'),
-  read('apps/backend/prisma/schema.prisma'),
 ]);
 const context = JSON.parse(contextText);
 const contextTables = new Set(context.tables.map((table) => table.dbName));
@@ -88,9 +87,6 @@ for (const constraint of expectedChecks) {
 if (/\b(?:DROP|TRUNCATE)\b/i.test(migration)) failures.push('N1 migration is not additive');
 if (/"workflow_/i.test(migration) || /^(?:model|enum) Workflow/m.test(schema)) {
   failures.push('production persistence contains My-Chat Workflow runtime state');
-}
-if (/^(?:model|enum) Nurture/m.test(devHostSchema) || /@@map\("nurture_/m.test(devHostSchema)) {
-  failures.push('dev-host persistence contains Nurture business state');
 }
 if (!/handoffRequestSnapshotsPayload\s+Json/.test(schema)) {
   failures.push('Execution snapshot payload is not required JSON in Prisma');

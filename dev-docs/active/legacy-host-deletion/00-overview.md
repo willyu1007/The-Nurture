@@ -6,10 +6,9 @@
 - Task: T-014
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-17
-- Next step: Wave 4 — 拆除。开工前需拍板一个解释问题：条件一对产物腿的
-  「等价覆盖」取「缺口已 joint 钉住 + 业务语义 unit/db 已覆盖」（今天可
-  删）还是「等 My-Chat future kernel」（外部依赖化），见
-  03-implementation-notes Wave 3 段（Wave 1–3 已于 2026-08-17 完成）。
+- Next step: 收尾——等 forgery 清理会话（P0 handlers 标准事件剥离）落地
+  后归档本任务。四波全部完成；`apps/backend` 已于 2026-08-17 删除，
+  T-012 删除闸三条件销项记录在 `04-verification.md`。
 
 ## Goal
 
