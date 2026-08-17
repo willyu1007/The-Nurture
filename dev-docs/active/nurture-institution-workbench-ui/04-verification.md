@@ -183,6 +183,49 @@ node .ai/scripts/ctl-project-governance.mjs lint --check --project main
 工具注意：在同一次 `javascript_exec` 里点击 tab 并立刻读 DOM 会读到旧内容，
 React 尚未重渲染。点击与断言必须分两次调用。
 
-## P7
+## P7 — 强确认组件（2026-08-17）
 
-（待填）
+| 命令 | 结果 |
+| --- | --- |
+| `pnpm --filter @the-nurture/frontend typecheck` | 通过 |
+| `pnpm --filter @the-nurture/frontend lint` | 通过 |
+
+浏览器验证（全新 tab，零控制台错误）。以 `trial_review` 阶段的三个动作为样本：
+
+- Record 动作行渲染「延长试入园（primary）/ 提出正式入园（ghost）/
+  结束试入园并释放名额（ghost）」——**不可逆动作没有占用 navy pill**。
+- **抽屉形态**（`extend_trial`，可逆）：含会立即发生、不会发生、影响范围、
+  版本条「重校验于 2026-08-17 01:00 · 期望版本 v7」、可逆性「可再次调整」；
+  确认按钮初始 `mt-btn--primary mt-btn--disabled` 且 `disabled === true`。
+- **勾选门控**：勾选后按钮变为 `mt-btn mt-btn--primary`，`disabled === false`。
+- **全屏形态**（`end_trial`，不可逆）：eyebrow 为「强确认 · end_trial · 不可逆」，
+  确认按钮为 `mt-btn--danger`，「不会发生」4 条齐全。
+- **提交**：确认后覆盖层关闭并弹出 toast
+  「命令通道尚未接入 / …但 end_trial 的执行入口属于后端任务。」
+
+发现并修复的缺陷：
+
+- **全屏层没有全屏**。`position: fixed; inset: 0` 被 kit 的
+  `.wb-scene.wb-reveal` 的恒等 `transform` 困住（该属性为 fixed 定位创建
+  containing block），面板实测位于 left 308 / top 232 而非 0/0，
+  侧栏与顶栏仍可见可点——号称 modal 的确认框并不 modal。
+  改用 `createPortal` 到 `document.body`，截图复验覆盖正确。
+  **typecheck 与 lint 均不会报此类缺陷。**
+- **`ActionButton` 无 danger 变体**，由 typecheck 抓到。确认按钮改用 kit 的
+  `.mt-btn--danger` 类构建。
+
+排除的假阳性：
+
+- tab-8 控制台报 `useToast must be used within ToastProvider`。全新 tab 复跑完整
+  流程后无此错误，判定为加入 `ToastProvider` 之前 HMR 过渡态的残留。
+- 首次读取 toast 为空。两次 `javascript_exec` 之间有秒级往返，toast 已自动消失；
+  改为单次 async 调用内 `await` 后读取即可见。
+
+## 工具经验
+
+- Browser pane 会间歇进入 viewport 0x0 状态：`read_page` / `computer` 不可用，
+  `get_page_text` 与 `javascript_tool` 仍可用。此时任何依赖 `innerWidth` 的
+  断言都会变成假阳性（0 === 0），需改用截图判定。
+- 点击与断言必须分开：同一次 `javascript_exec` 内点击后立即读 DOM 会读到旧内容。
+  需要连续操作时用单次 async 调用并在其中 `await`。
+- 控制台跨导航累积且不清空，判定「零错误」必须开新 tab。

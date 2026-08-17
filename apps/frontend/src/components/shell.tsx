@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { AppShell, type ShellNav } from "@willyu1007/web-workbench";
+import { AppShell, ToastProvider, type ShellNav } from "@willyu1007/web-workbench";
 
 // The institution_workbench modules, in the surface registry's
 // orderedContentKinds order. `soon` marks the ones with no capability contract
@@ -88,10 +88,14 @@ function RoleBar() {
 }
 
 export function Shell({ children }: { children: ReactNode }) {
+  // The kit leaves toast to the host: AppShell does not wrap it, so the
+  // provider belongs here, outside the shell.
   return (
-    <AppShell nav={nav} accountName="dev">
-      <RoleBar />
-      {children}
-    </AppShell>
+    <ToastProvider>
+      <AppShell nav={nav} accountName="dev">
+        <RoleBar />
+        {children}
+      </AppShell>
+    </ToastProvider>
   );
 }

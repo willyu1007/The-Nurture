@@ -5,9 +5,12 @@ import type { TabItem } from "@willyu1007/web-workbench";
 import { notFound } from "next/navigation";
 import {
   now,
+  openWorkbench,
   queryEnrollmentJourney,
   waitlistPlacementOf,
 } from "@/lib/queries/enrollment-journey";
+import { actionsForStage } from "@/lib/view/consequences";
+import { JourneyActions } from "./journey-actions.client";
 import { dueLabel } from "@/lib/view/due";
 import {
   LIFECYCLE_LABEL,
@@ -40,6 +43,7 @@ export default async function JourneyRecordPage({
   const clock = now();
   const placement = await waitlistPlacementOf(targetOptionRef);
   const milestones = orderedMilestones(journey);
+  const envelope = await openWorkbench();
 
   const overview = (
     <>
@@ -170,7 +174,19 @@ export default async function JourneyRecordPage({
         <Stat label="到期" value={dueLabel(journey.dueAt, clock)} />
         <Stat label="已完成里程碑" value={milestones.length} />
       </StatStrip>
-      <RecordView tabs={tabs} />
+      <RecordView
+        tabs={tabs}
+        actions={
+          <JourneyActions
+            actionKeys={actionsForStage(journey.currentStage)}
+            target={{
+              summary: journey.safeSummary,
+              expectedVersion: journey.workflowHead,
+              revalidatedAt: envelope.generatedAt,
+            }}
+          />
+        }
+      />
     </>
   );
 }

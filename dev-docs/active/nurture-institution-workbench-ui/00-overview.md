@@ -6,7 +6,9 @@
 - **Updated:** 2026-08-17
 - **Feature:** F-003（六表面 store-beta readiness）
 - **Owner:** willyu1007
-- Next step: 按 `01-plan.md` 的 P1 改造 `apps/frontend` shell 与路由。
+- P1–P7 全部完成，垂直切片可运行（fixtures 驱动）。
+- Next step: 后端 ingress 是独立任务；接入后把 `lib/queries` 的实现换掉，
+  并按 `03-implementation-notes.md` 的 P3 记录处理三个契约缺口。
 
 ## Goal
 
@@ -63,12 +65,24 @@ kit 六范式里从未用过的 Hub 与 Queue，以及 8 个 `strong_confirmatio
 
 ## Acceptance criteria
 
-- [ ] `apps/frontend` 不再引用 legacy host；`lib/api.ts` / `lib/adapters.ts` 已移除或替换。
-- [ ] Shell 呈现 8 模块导航与 active role 芯片，切换行为符合决策 3。
-- [ ] Hub / Queue / Record 三个路由可访问，数据来自 fixtures。
-- [ ] 强确认组件两形态共用一套 props 契约，三个不可逆动作走全屏。
-- [ ] 时限语义色映射只有一个来源。
-- [ ] `pnpm --filter @the-nurture/frontend lint` 与 `typecheck` 通过。
+- [x] `apps/frontend` 不再引用 legacy host；`lib/api.ts` / `lib/adapters.ts` 已移除或替换。
+- [x] Shell 呈现 8 模块导航与 active role 芯片，切换行为符合决策 3。
+- [x] Hub / Queue / Record 三个路由可访问，数据来自 fixtures。
+- [x] 强确认组件两形态共用一套 props 契约。三个不可逆动作中只有 `end_trial`
+      有能力契约，另两个已在 `FULLSCREEN_ACTIONS` 中声明待用。
+- [x] 时限语义色映射只有一个来源（`lib/view/due.ts`）。
+- [x] `pnpm --filter @the-nurture/frontend lint` 与 `typecheck` 通过。
+
+## 交付后仍未闭合的契约缺口
+
+这些不是实现遗漏，是契约当前不提供，记录在此供后端任务取用：
+
+1. **没有列表能力**——队列靠逐条解析 `itemRefs`，扇出集中在 `listQueueRows()`。
+2. **没有意向详情能力**——孩子称呼、出生月份、目标班型、照护需求、来源渠道、
+   联系方式均无能力返回，Record 因此没有意向 facet。
+3. **没有授权/照护记录能力**——同上，两个 facet 一并去掉。
+4. **候补无名次字段**——名次由 `orderedEntries` 索引推导。
+5. **后果文案无能力返回**——属 UX 责任，文案在 `lib/view/consequences.ts`。
 
 ## Key links
 

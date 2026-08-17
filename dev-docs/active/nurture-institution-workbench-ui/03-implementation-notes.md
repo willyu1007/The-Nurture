@@ -286,4 +286,51 @@ crumb 文案是 `safeSummary` 的**截断**，不是从中解析出来的片段�
 
 ## P7 — 强确认组件
 
-（待填）
+`components/consequence-confirm.tsx`（两种形态共用一套披露渲染）、
+`lib/view/consequences.ts`（文案与形态映射）、
+`app/nurture/queue/[ref]/journey-actions.client.tsx`（Record 的动作行）。
+
+### 后果文案是前端责任
+
+能力契约给 `confirmationPolicy` 与 `concurrencyPolicy`，**不给任何句子**。
+「会发生什么 / 不会发生什么」没有能力返回，只能由前端按已锁定语义撰写。
+这与「意向信息」的缺口不同：那是数据缺失，这是 UX 责任——后端即便接入也未必该返回这些文案。
+文案来源标注在 `consequences.ts` 的头注释（B3-1c 与 D-07C/D/E）。
+
+`willNotHappen` 与 `willHappen` 同等重要。不可逆动作最危险的误读通常是
+「系统接下来会自动做什么」——结束试入园**不会**自动联系候补下一位，也**不代表**家庭主动退园。
+
+### 形态由动作键查表，不由组件猜
+
+`FULLSCREEN_ACTIONS` 是唯一的映射来源。组件自己判断会把策略散落到各处。
+集合里声明了三个键，但当前只有 `end_trial` 有能力契约；
+`close_enrollment` 与 `revoke_child_link_grant` 先占位，能力出现时无需改组件。
+
+### 确认按钮绕开了 ActionButton
+
+`ActionButton` 只暴露 `primary | ghost`，因为场景工具栏只允许一个 navy pill。
+但确认框的 footer 不是工具栏，而 kit 自带 `.mt-btn--danger`。
+所以销毁性提交按钮直接用 kit 的类构建，而不是给 ActionButton 塞一个它不提供的颜色。
+
+Record 的动作行里，**不可逆动作永远不占 primary pill**——`journey-actions.client.tsx`
+里第一个动作才是 primary，且要求它不在 `FULLSCREEN_ACTIONS` 中。
+
+### 执行通道诚实缺席
+
+没有 controller 服务这个表面，能力也是 default-off。确认走完后弹 toast 说明
+「命令通道尚未接入」，而不是静默无事——一个什么都不做的按钮会被读成成功。
+
+`ToastProvider` 加在 `shell.tsx` 里包住 `AppShell`：kit 明确把 toast 留给宿主，
+`AppShell` 自己不包。
+
+### 验证抓到的缺陷：全屏层根本没全屏
+
+`position: fixed; inset: 0` 没有覆盖侧栏与顶栏。原因是 kit 的
+`.wb-scene.wb-reveal` 带一个恒等 `transform: matrix(1,0,0,1,0,0)`（reveal 动画留下的），
+它为 `position: fixed` 创建了 containing block，面板因此被限制在场景盒内
+（实测 rect 为 left 308 / top 232，而非 0/0）。
+
+后果不只是难看：导航仍然可见可点，一个号称 modal 的确认框实际并不 modal。
+改为 `createPortal` 到 `document.body` escape 掉那个祖先。截图复验后侧栏与顶栏均被覆盖。
+
+**这个缺陷截图能看出来，但 typecheck 和 lint 都不会报。**
