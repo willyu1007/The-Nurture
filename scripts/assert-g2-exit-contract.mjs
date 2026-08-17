@@ -155,9 +155,12 @@ assertEqual(
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // 2026-08-16 reseal: Wave 3 batch: command-settlement observability event +
-  // response-validator core extraction
-  "8cbdc30f371b35b252f71375b700e672ee1ff2ea",
+  // 2026-08-17 reseal: adopt My-Chat bb545671; pinned-scope changes are inert
+  // (forwarding wrapper, conditional type resolving to the same type, three
+  // symbols exported). Also reseals the Nurture contract hash for the
+  // committed Wave 4 / T-014 packages changes, whose sessions archived without
+  // resealing.
+  "bb545671df7eed54abf02675a5b0629f6f97a37c",
   "My-Chat revision",
 );
 assertEqual(

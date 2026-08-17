@@ -182,9 +182,12 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-16 reseal: Wave 3 batch: command-settlement observability event +
-      // response-validator core extraction
-      head_revision: "8cbdc30f371b35b252f71375b700e672ee1ff2ea",
+      // 2026-08-17 reseal: adopt My-Chat bb545671; pinned-scope changes are inert
+      // (forwarding wrapper, conditional type resolving to the same type, three
+      // symbols exported). Also reseals the Nurture contract hash for the
+      // committed Wave 4 / T-014 packages changes, whose sessions archived without
+      // resealing.
+      head_revision: "bb545671df7eed54abf02675a5b0629f6f97a37c",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "352358fa16e32f7a10a5e261dd369bdc09a18713ea28b269c966c2cf93ae5c3c",
     },
