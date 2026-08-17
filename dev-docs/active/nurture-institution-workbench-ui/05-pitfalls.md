@@ -16,8 +16,13 @@
 并把 `legacy-host-retirement` 从 active 移到 archive）。规矩：
 
 - 提交前先 `git fetch` 并确认工作区完整性。
-- `git add` 一律路径限定，不要 `-A`。
+- **路径限定的 `git add` 不够**。`git commit` 提交的是整个索引，别的会话已暂存的
+  改动会一起进来。本任务踩过：只 `git add apps/frontend/src`，却把另一会话
+  暂存的 29 个 `apps/backend` 删除一并提交了。用 pathspec 形式
+  `git commit -F - -- <paths>`，它只提交指定路径且保留其余暂存状态。
 - 不要用 `git checkout -- <path>` 回滚测试性改动——会连未提交的正式修改一起冲掉（已踩过）。
+- 门禁报红先判定归属。`ctl-context verify --strict` 可能因别的会话未提交的
+  context 改动而红；**不要替他们 `ctl-context touch`**，那会把在途改动封在你名下。
 
 ## 提交门禁
 
