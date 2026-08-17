@@ -37,7 +37,12 @@
 
 ## Wave 3
 
-- [ ] `pnpm test:x5` 全绿（四条 joint 旅程）
+- [x] 2026-08-17 `pnpm test:x5` 全绿 → 6 files / 40 passed（新增
+  `t014-host-runtime-joint` 3 用例；双库配方见 03-implementation-notes）
+- [x] 2026-08-17 `pnpm verify:test-routing` → files=213 x5-joint=6
+- [x] 2026-08-17 根 `pnpm typecheck` 通过
+- 注：四条旅程的产物腿被真 kernel 的物化缺口挡住，等价目标据实改为
+  「缺口显式钉住」，见 01-plan Wave 3 结果。
 
 ## Wave 4（删除闸销项）
 

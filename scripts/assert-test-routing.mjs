@@ -19,7 +19,7 @@ async function collect(directory) {
 
 const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await collect(path.join(repoRoot, 'apps')))];
 const routes = { unit: [], productionDb: [], legacyHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
-const expectedCounts = { unit: 105, productionDb: 61, legacyHost: 9, scenarioService: 32, x5Joint: 5 };
+const expectedCounts = { unit: 105, productionDb: 61, legacyHost: 9, scenarioService: 32, x5Joint: 6 };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
   else if (
@@ -27,7 +27,8 @@ for (const file of files.sort()) {
     file === 'packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts' ||
     file === 'packages/nurture-db/tests/t007-institution-knowledge-e8-joint.integration.test.ts' ||
     file === 'packages/nurture-db/tests/t007-workflow-run-settlement-joint.integration.test.ts' ||
-    file === 'packages/nurture-db/tests/t010-family-sharing-joint.integration.test.ts'
+    file === 'packages/nurture-db/tests/t010-family-sharing-joint.integration.test.ts' ||
+    file === 'packages/nurture-db/tests/t014-host-runtime-joint.integration.test.ts'
   ) routes.x5Joint.push(file);
   else if (file.startsWith('packages/nurture-db/')) routes.productionDb.push(file);
   else if (file.startsWith('apps/backend/') && file.endsWith('.e2e.test.ts')) routes.legacyHost.push(file);

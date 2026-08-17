@@ -1,5 +1,23 @@
 # Implementation Notes
 
+## 2026-08-17 — Wave 3 完成（范围据实修订）
+
+- 新 joint 文件 `t014-host-runtime-joint.integration.test.ts` 用真
+  My-Chat kernel 钉了三件真相（明细见 `01-plan.md` Wave 3 结果）。两个
+  发现改变了 Wave 4 的判断基础：
+  1. **真 kernel 尚无步骤物化**（artifact_drafts / context_bindings →
+     `workflow_step_materialization_requires_future_kernel` fail-close）。
+     legacy 旅程的产物腿在任何真 owner 路径上都跑不起来——harness 在这些
+     腿上的「独家价值」是在模拟一个宿主还不存在的能力。
+  2. **P0 handlers 起草标准 workflow.\* 事件在真 kernel 是伪造**
+     （`workflow_handoff_standard_event_forgery`）。已开独立后续任务
+     （chip：Strip standard-event forgery from Nurture P0 handlers）。
+- Wave 4 的删除判断由此变为：条件一对产物腿的「等价覆盖」应解释为
+  「缺口已被 joint 测试显式钉住 + 业务语义已有 unit/db 覆盖」，还是
+  「等 My-Chat future kernel 落地后重建旅程」。前者今天即可删 harness，
+  后者退役时点外部依赖化。建议 Wave 4 开工前由任务负责人拍板。
+- 本波未动 package.json / c30 哈希输入，无需重封锁。
+
 ## 2026-08-17 — 任务建立
 
 - 完成 `apps/backend/tests` 11 文件 / 27 用例逐文件审计（见 `02-architecture.md`）。

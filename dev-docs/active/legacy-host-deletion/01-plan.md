@@ -107,6 +107,33 @@
 验收：`pnpm test:x5` 全绿；02-architecture 审计表中每个 Wave 3 条目
 对应至少一个 joint 用例。
 
+### Wave 3 结果（2026-08-17，完成；范围据实修订）
+
+动手后发现「四条旅程整体 joint 化」被真宿主两项能力现状挡住，改为**用
+joint 测试把真相钉死**（`t014-host-runtime-joint.integration.test.ts`，
+3 用例，真 My-Chat kernel：真 schema + PrismaWorkflowRuntimePort +
+WorkflowWorker + 真 run-binding verifier + 真 host validator 注册）：
+
+1. **审批暂停**：request_approval 在真 kernel 上停为
+   `manual_review_required`、run 保持 running、真 outbox 落
+   `workflow.step.manual_review_required`（approval-pause 腿等价达成；
+   见下述伪造缺陷的双重原因说明）。
+2. **标准事件伪造钉**：真 kernel 以
+   `workflow_handoff_standard_event_forgery` 拒绝场景 handler 起草的
+   标准 `workflow.*` 事件——P0 handlers 的 eventDraft 是 harness 宽松端
+   口纵容的越权行为。已开后续任务：剥离标准事件草稿后，(1) 将原样暂停、
+   write_artifact 将干净完成。
+3. **物化缺口钉**：calibrate 步骤在真 kernel 上 fail-close 为
+   `workflow_step_materialization_requires_future_kernel`，同时 Nurture
+   业务写（strategy payloads）落在真 nurture 库——双库都是真的。
+   thin-vertical / first-slice 的产物腿**不可能**在今天的真宿主上等价
+   复现：这不是覆盖缺口，是宿主 kernel 的能力缺口，删除闸条件一在这些
+   腿上转化为对 My-Chat future kernel 的显式外部依赖。
+4. 安全闸停机旅程不单独建 joint 用例：其 kernel 映射语义与 (1)(3) 同路
+   （handler 分类已有单测层覆盖；其产物草稿同样触发物化缺陷）。
+
+x5 lane 全绿 6 文件 / 40 用例；census x5Joint 5→6（files 213）。
+
 ## Wave 4 — 拆除（M，机械但面广）
 
 8. 与 T-013 协调 `apps/frontend` 的 legacy-host 指向移除（api.ts /
