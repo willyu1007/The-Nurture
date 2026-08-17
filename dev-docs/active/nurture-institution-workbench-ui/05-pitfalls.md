@@ -20,6 +20,12 @@
   改动会一起进来。本任务踩过：只 `git add apps/frontend/src`，却把另一会话
   暂存的 29 个 `apps/backend` 删除一并提交了。用 pathspec 形式
   `git commit -F - -- <paths>`，它只提交指定路径且保留其余暂存状态。
+- **但 pathspec 形式不含未跟踪文件**，它只作用于已跟踪路径。本任务紧接着又踩过：
+  新建 `artifacts/capability-proposal.md` 后直接 `git commit -- <dir>`，
+  结果只提交了同目录里已跟踪的 `00-overview.md`，新文件被静默漏掉。
+  两步都要：**新文件先 `git add`，再用 `git commit -- <paths>`**——
+  前者让文件进入索引，后者防止别人的暂存内容混进来。
+  提交后用 `git show --stat` 核一遍文件数，别只看命令成功。
 - 不要用 `git checkout -- <path>` 回滚测试性改动——会连未提交的正式修改一起冲掉（已踩过）。
 - 门禁报红先判定归属。`ctl-context verify --strict` 可能因别的会话未提交的
   context 改动而红；**不要替他们 `ctl-context touch`**，那会把在途改动封在你名下。
