@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   AppShell,
   ToastProvider,
@@ -55,57 +55,27 @@ const GROUPS: ShellNav["groups"] = [
   },
 ];
 
-// Placeholder until real authentication exists. `active` is the bound role for
-// this session; `others` are roles the account holds that this surface cannot
-// serve — B3-0 gives the caregiver no domain web workbench at all, so they are
-// listed with the reason instead of a switch that leads nowhere.
-const ROLES = {
-  active: { label: "园长 · 晨光园", surface: "机构 Web 操作台" },
-  others: [{ label: "本班老师 · 托小班", surface: "仅移动端班级工作台" }],
-};
-
-/**
- * Active-role binding. The workbench binds one explicit role per session; the
- * kit's AppShell has no topbar slot, so this renders as the first strip of the
- * content area instead. Switching is a plain navigation — the role grants
- * nothing on its own, so there is no confirmation step.
- */
-function RoleBar() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="nurture-rolebar">
-      <div className="nurture-rolebar__id">
-        <span className="mt-value-label">当前角色</span>
-        <span className="mt-chip">{ROLES.active.label}</span>
-      </div>
-      <button
-        type="button"
-        className="mt-btn mt-btn--ghost mt-btn--sm"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-      >
-        切换角色
-      </button>
-      {open ? (
-        <div className="nurture-rolebar__menu">
-          <p className="mt-value-label">当前</p>
-          <p className="mt-body">
-            {ROLES.active.label} — {ROLES.active.surface}
-          </p>
-          <p className="mt-value-label">该账号的其他角色</p>
-          {ROLES.others.map((r) => (
-            <p className="mt-body" key={r.label}>
-              {r.label} — {r.surface}
-            </p>
-          ))}
-          <p className="mt-value-label">
-            角色本身不授予权限；每次读取与动作仍会重新校验范围与授权。
-          </p>
-        </div>
-      ) : null}
-    </div>
-  );
-}
+// Placeholder until real authentication exists. The workbench binds one explicit
+// role per session, rendered as the kit's topbar identity chip (0.19.0).
+//
+// `onSwitch` is deliberately absent: B3-0 gives the caregiver no domain web
+// workbench at all, so no other role this account holds is reachable from here.
+// The kit then lists them with their surface instead of offering a switch that
+// leads nowhere. Wire `onSwitch` once a second role can actually be served.
+const IDENTITY = {
+  current: {
+    key: "institution_admin",
+    label: "园长 · 晨光园",
+    surface: "机构 Web 操作台",
+  },
+  others: [
+    {
+      key: "class_teacher",
+      label: "本班老师 · 托小班",
+      surface: "仅移动端班级工作台",
+    },
+  ],
+} as const;
 
 /**
  * Nav is built inside the provider because its callbacks need `useToast`. The
@@ -121,11 +91,15 @@ function ShellWithNav({
   const toast = useToast();
 
   const nav: ShellNav = {
+    // 托育 is the scenario's name wherever it is listed — the sibling education
+    // workbench registers this same key/name in its own switcher, so the two must
+    // agree or switching lands nowhere once it stops being a demo.
     scenario: {
       current: "nurture",
-      registered: [{ key: "nurture", name: "The Nurture", mark: "育" }],
+      registered: [{ key: "nurture", name: "托育", mark: "育" }],
       onSwitch: () => {},
     },
+    identity: IDENTITY,
     groups: GROUPS,
     // The hub is the home entry, so it has no group item to derive a crumb from.
     // `activeCrumb` only walks groups and sections, which is exactly what this
@@ -152,7 +126,6 @@ function ShellWithNav({
       // so leaving it unwired ships a button that does nothing.
       onSearch={() => toast.notify("info", "搜索尚未接入", "工作台的检索面还没有能力支撑。")}
     >
-      <RoleBar />
       {children}
     </AppShell>
   );

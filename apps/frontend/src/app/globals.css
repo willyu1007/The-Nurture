@@ -1,23 +1,6 @@
 /* Host-authored layout CSS (linted by the kit stylelint preset — typography is
  * owned by the kit's type scale, so no literal font-size/weight/family here). */
 
-/* Active-role strip. Sits at the top of the content area because the kit's
- * AppShell topbar takes no host slot; see 02-architecture.md. Colors and
- * typography come from kit classes/tokens — this file only positions things. */
-.nurture-rolebar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding-bottom: 1rem;
-}
-
-.nurture-rolebar__id {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 /* Consequence acknowledgement — a checkbox the reader must tick before an
  * irreversible action can commit. */
 .nurture-ack {
@@ -50,15 +33,3 @@
   margin-top: 2rem;
 }
 
-.nurture-rolebar__menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 20;
-  width: 20rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-1);
-  border-radius: 0.625rem;
-  background: var(--bg-surface);
-  box-shadow: 0 0.5rem 1.5rem var(--scrim);
-}

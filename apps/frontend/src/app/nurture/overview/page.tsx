@@ -1,4 +1,3 @@
-import { Scene } from "@willyu1007/web-workbench";
 import { Hub, type DashAttention, type DashStat, type WorkflowModule } from "@willyu1007/web-workbench/hub";
 import type { ResponsibleRole } from "@/lib/contracts/enrollment-journey";
 import { listQueueRows, now } from "@/lib/queries/enrollment-journey";
@@ -63,9 +62,7 @@ export default async function OverviewPage() {
     },
   ];
 
-  return (
-    <Scene intro={`共 ${rows.length} 条进行中的入园流程`}>
-      <Hub modules={modules} />
-    </Scene>
-  );
+  // The Hub is its own scene: no bar, no intro. A total restating the stat row
+  // (the five buckets already sum to it) is a second place to read one number.
+  return <Hub modules={modules} />;
 }
