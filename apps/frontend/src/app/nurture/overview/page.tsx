@@ -58,7 +58,6 @@ export default async function OverviewPage() {
       stats,
       attention,
       highlights: [],
-      quickActions: [],
     },
   ];
 
