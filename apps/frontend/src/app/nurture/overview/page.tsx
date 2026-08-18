@@ -24,6 +24,7 @@ export default async function OverviewPage() {
   const stats: DashStat[] = ROLE_GROUP_ORDER.map((role) => ({
     label: ROLE_GROUP_LABEL[role],
     value: counts.get(role) ?? 0,
+    unit: "条",
   }));
 
   // Two levels, per the support-signal rule: only a canonical overdue date or a
@@ -51,7 +52,9 @@ export default async function OverviewPage() {
   const modules: WorkflowModule[] = [
     {
       key: "enrollment_journey",
-      label: "入园流程",
+      // The kit's stat-row label column is 44px — sized for two-character
+      // category names (education uses 作业/学情). Four characters wrap.
+      label: "入园",
       accent: "accent",
       stats,
       attention,
