@@ -178,8 +178,8 @@
         "my-chat",
         "llm"
       ],
-      "checksumSha256": "2b1641ad8b1b011af766e43045c095ded1296651b19a0b429b03e678ee91459e",
-      "lastUpdated": "2026-07-30T08:02:37.170Z",
+      "checksumSha256": "fb1623eb0dbeaeccc74a809084c85f59e8d6e0b6e6b39e01560b8329598379c7",
+      "lastUpdated": "2026-08-19T00:00:00.000Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
