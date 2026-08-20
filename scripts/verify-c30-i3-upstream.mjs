@@ -15,13 +15,15 @@ const hostRoot = process.env.RESEAL_MY_CHAT_ROOT
 // owner, signed-route and execute-schema repairs are content-inert for the C30
 // Host source profiles, but the qualified repository head remains exact.
 const expected = {
-  baseHead: "536638a204865ebdc43bca70992388352789a36f",
-  // 2026-08-17 reseal: adopt My-Chat bb545671; pinned-scope changes are inert
-  // (forwarding wrapper, conditional type resolving to the same type, three
-  // symbols exported). Also reseals the Nurture contract hash for the
-  // committed Wave 4 / T-014 packages changes, whose sessions archived without
-  // resealing.
-  hostHead: "bb545671df7eed54abf02675a5b0629f6f97a37c",
+  // 2026-08-20 reseal: Base moves to 24fcfdcb — web-workbench 0.20.x only,
+  // already adopted by the frontend chore commits; contract source untouched
+  // and Base/My-Chat contract parity holds.
+  baseHead: "24fcfdcb5622f5ce2df89e8d38161895ff547055",
+  // 2026-08-20 reseal: adopt My-Chat 9bb88cae (mobile
+  // chat/drawer/dashboard-grammar UI + docs; one pinned-scope commit 463980a
+  // is inert cleanup) and Base 24fcfdcb (web-workbench 0.20.x already adopted
+  // by frontend chores; contract source untouched)
+  hostHead: "9bb88caea6c64e2ccaaa146cd48cb68f55811c42",
 };
 
 const run = (command, args, cwd) =>

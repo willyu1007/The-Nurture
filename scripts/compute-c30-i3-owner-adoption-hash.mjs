@@ -182,12 +182,11 @@ const computeLock = () => {
     algorithm: "sha256(path_nul_bytes_nul_sha256_lf)_v1",
     source_revision: sourceRevision,
     base: {
-      // 2026-08-17 reseal: adopt My-Chat bb545671; pinned-scope changes are inert
-      // (forwarding wrapper, conditional type resolving to the same type, three
-      // symbols exported). Also reseals the Nurture contract hash for the
-      // committed Wave 4 / T-014 packages changes, whose sessions archived without
-      // resealing.
-      head_revision: "bb545671df7eed54abf02675a5b0629f6f97a37c",
+      // 2026-08-20 reseal: adopt My-Chat 9bb88cae (mobile
+      // chat/drawer/dashboard-grammar UI + docs; one pinned-scope commit 463980a
+      // is inert cleanup) and Base 24fcfdcb (web-workbench 0.20.x already adopted
+      // by frontend chores; contract source untouched)
+      head_revision: "9bb88caea6c64e2ccaaa146cd48cb68f55811c42",
       source_revision: "6740871affd53a1200af8e19eaee67f4f0aff52d",
       aggregate_source_hash: "352358fa16e32f7a10a5e261dd369bdc09a18713ea28b269c966c2cf93ae5c3c",
     },
